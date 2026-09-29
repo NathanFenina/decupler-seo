@@ -15,8 +15,8 @@ reconnaissent, dans toutes ses langues.
     theme,valeur,motif
     creation-societe,3,cr[ée]+er? (une )?(soci[ée]t[ée]|entreprise)
     creation-societe,3,company (formation|setup)
-    creation-societe,3,تأسيس شركة
-    marque-saip,2,(d[ée]p[ôo]t|enregistr\\w*) (de )?marque
+    creation-societe,3,إنشاء شركة
+    depot-marque,2,(d[ée]p[ôo]t|enregistr\\w*) (de )?marque
 
 Score = clics mensuels gagnables × valeur du thème × facilité.
 - Clics gagnables : impressions × (CTR attendu à la position visée − CTR actuel).
@@ -98,7 +98,7 @@ def theme_de(requete: str, lexique: list) -> tuple[str, int]:
 def motifs_marque() -> list[re.Pattern]:
     termes = lire_liste("opportunites.marque")
     if not termes:
-        # Par défaut : le nom du projet et le nom du domaine (« tasispartners »).
+        # Par défaut : le nom du projet et le nom du domaine (« atlas-conseil » pour atlas-conseil.fr).
         hote = re.sub(r"^(https?://)?(www\.)?", "", lire_valeur("projet.domaine")).split("/")[0]
         termes = [lire_valeur("projet.nom"), hote.split(".")[0] if hote else ""]
     return [re.compile(re.escape(t.strip()), re.I) for t in termes if t and len(t.strip()) >= 3]

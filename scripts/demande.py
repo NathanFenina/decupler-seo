@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """La demande de recherche, par l'API DataForSEO — sans connecteur, donc aussi dans une routine.
 
-    python3 demande.py volumes --mots "créer société arabie saoudite, tva arabie saoudite" --langue fr
-    python3 demande.py idees --graines "créer société arabie saoudite" --langue fr --max 100
+    python3 demande.py volumes --mots "création entreprise, expert comptable lyon" --langue fr
+    python3 demande.py idees --graines "création entreprise" --langue fr --max 100
     python3 demande.py idees --lexique --langue ar            # graines = thèmes du lexique du projet
-    python3 demande.py serp --mot "saoudisation nitaqat" --langue fr
+    python3 demande.py serp --mot "expert comptable lyon" --langue fr
 
 - `volumes` : volume mensuel, CPC et concurrence de mots-clés donnés.
 - `idees`   : mots-clés liés à des graines, avec volume, difficulté et intention.

@@ -42,9 +42,9 @@ class TestCalculs(unittest.TestCase):
 
     def test_requetes_nouvelles_et_marque(self):
         avant = [l("requete", "tva", 1, 10)]
-        apres = [l("requete", "tva", 1, 10), l("requete", "nitaqat", 0, 40), l("requete", "tasis avis", 2, 5)]
-        self.assertEqual([x["requete"] for x in rapport.requetes_nouvelles(avant, apres)], ["nitaqat", "tasis avis"])
-        marque, autres = rapport.separer_marque(apres, [re.compile("tasis", re.I)])
+        apres = [l("requete", "tva", 1, 10), l("requete", "prime embauche", 0, 40), l("requete", "atlas avis", 2, 5)]
+        self.assertEqual([x["requete"] for x in rapport.requetes_nouvelles(avant, apres)], ["prime embauche", "atlas avis"])
+        marque, autres = rapport.separer_marque(apres, [re.compile("atlas", re.I)])
         self.assertEqual((marque["clics"], autres["impressions"]), (2, 50))
 
     def test_journal_du_mois(self):
@@ -71,8 +71,8 @@ class TestDemande(unittest.TestCase):
 
     def test_lieu_depuis_code_pays(self):
         class A:
-            pays, lieu, langue = "sa", None, "AR"
-        self.assertEqual(demande.lieu_et_langue(A()), ("Saudi Arabia", "ar"))
+            pays, lieu, langue = "be", None, "FR"
+        self.assertEqual(demande.lieu_et_langue(A()), ("Belgium", "fr"))
 
     def test_identifiants_absents(self):
         import os

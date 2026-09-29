@@ -13,13 +13,13 @@ import share_of_model  # noqa: E402
 
 EXPORT = [
     # requête, page, clics, impressions, position
-    ("creer societe arabie saoudite", "https://ex.com/creation", 30, 3000, 7.0),
-    ("company formation saudi arabia", "https://ex.com/en/formation", 5, 2000, 14.0),
-    ("vivre a riyad", "https://ex.com/riyad", 60, 3000, 7.0),
-    ("tva arabie saoudite", "https://ex.com/tva", 10, 1500, 2.0),
-    ("depot marque arabie", "https://ex.com/marque", 8, 800, 5.0),
-    ("depot marque arabie", "https://ex.com/marque-cout", 6, 700, 6.0),
-    ("tasis partners avis", "https://ex.com/", 50, 200, 1.0),
+    ("creer societe lyon", "https://ex.com/creation", 30, 3000, 7.0),
+    ("company formation lyon", "https://ex.com/en/formation", 5, 2000, 14.0),
+    ("vivre a lyon", "https://ex.com/lyon", 60, 3000, 7.0),
+    ("tva auto entrepreneur", "https://ex.com/tva", 10, 1500, 2.0),
+    ("depot marque inpi", "https://ex.com/marque", 8, 800, 5.0),
+    ("depot marque inpi", "https://ex.com/marque-cout", 6, 700, 6.0),
+    ("atlas conseil avis", "https://ex.com/", 50, 200, 1.0),
     ("requete rare", "https://ex.com/x", 0, 5, 30.0),
 ]
 
@@ -45,7 +45,7 @@ class TestOpportunites(DossierIsole):
             w.writerow(["Query", "Page", "Clicks", "Impressions", "Position"])
             w.writerows(EXPORT)
         (self.dossier / "decupler-seo.config.yml").write_text(
-            'mode: assisted\nprojet:\n  nom: "Tasis Partners"\n  domaine: "https://www.tasispartners.com"\n'
+            'mode: assisted\nprojet:\n  nom: "Atlas Conseil"\n  domaine: "https://www.atlas-conseil.example"\n'
             "mesure:\n  delai_jours: 28\n", encoding="utf-8")
         if journal:
             (self.dossier / "journal").mkdir()
@@ -64,20 +64,20 @@ class TestOpportunites(DossierIsole):
         res = self.classer()
         ordre = [o["requete"] for o in res["opportunites"]]
         # Même position et même volume : le thème qui se vend passe devant le thème d'information.
-        self.assertLess(ordre.index("creer societe arabie saoudite"), ordre.index("vivre a riyad"))
+        self.assertLess(ordre.index("creer societe lyon"), ordre.index("vivre a lyon"))
 
     def test_la_marque_est_hors_classement(self):
         self.preparer()
         res = self.classer()
-        self.assertNotIn("tasis partners avis", [o["requete"] for o in res["opportunites"]])
+        self.assertNotIn("atlas conseil avis", [o["requete"] for o in res["opportunites"]])
         self.assertEqual(res["marque"]["clics"], 50)
 
     def test_actions_selon_la_situation(self):
         self.preparer()
         actions = {o["requete"]: o["action"] for o in self.classer()["opportunites"]}
-        self.assertEqual(actions["tva arabie saoudite"], "ctr")          # top 3, CTR 0,7 %
-        self.assertEqual(actions["company formation saudi arabia"], "page-2")
-        self.assertEqual(actions["depot marque arabie"], "cannibalisation")
+        self.assertEqual(actions["tva auto entrepreneur"], "ctr")          # top 3, CTR 0,7 %
+        self.assertEqual(actions["company formation lyon"], "page-2")
+        self.assertEqual(actions["depot marque inpi"], "cannibalisation")
         self.assertNotIn("requete rare", actions)                         # sous le seuil d'impressions
 
     def test_page_en_cours_de_mesure_exclue(self):
@@ -92,13 +92,13 @@ class TestOpportunites(DossierIsole):
     def test_theme_non_couvert_et_demande(self):
         self.preparer()
         with open(self.dossier / "demande.csv", "w", newline="", encoding="utf-8") as f:
-            f.write("requete,volume,page\nvisa affaires arabie saoudite,900,\ntva arabie saoudite,500,\n"
-                    "marque arabie prix,300,https://ex.com/marque-cout\n")
+            f.write("requete,volume,page\nvisa affaires canada,900,\ntva auto entrepreneur,500,\n"
+                    "marque inpi prix,300,https://ex.com/marque-cout\n")
         res = self.classer("--demande", "demande.csv")
         a_creer = [o for o in res["opportunites"] if o["action"] == "a-creer"]
-        self.assertEqual([o["requete"] for o in a_creer], ["visa affaires arabie saoudite"])
+        self.assertEqual([o["requete"] for o in a_creer], ["visa affaires canada"])
         invisibles = [o["requete"] for o in res["opportunites"] if o["action"] == "invisible"]
-        self.assertEqual(invisibles, ["marque arabie prix"])
+        self.assertEqual(invisibles, ["marque inpi prix"])
         couverture = {c["theme"]: c for c in res["couverture"]}
         self.assertIsNone(couverture["visa"]["meilleure_position"])
 
@@ -106,12 +106,12 @@ class TestOpportunites(DossierIsole):
         # Site jeune ou accès pas encore donné : on classe, mais sans prétendre connaître les positions.
         self.preparer()
         with open(self.dossier / "demande.csv", "w", newline="", encoding="utf-8") as f:
-            f.write("requete,volume,page\ncreer societe riyad,400,https://ex.com/riyad\nvisa affaires,900,\n")
+            f.write("requete,volume,page\ncreer societe marseille,400,https://ex.com/marseille\nvisa affaires,900,\n")
         r = lancer("opportunites.py", "--demande", "demande.csv", "--json", cwd=self.dossier)
         self.assertEqual(r.returncode, 0, r.stderr)
         res = json.loads(r.stdout)
         actions = {o["requete"]: o["action"] for o in res["opportunites"]}
-        self.assertEqual(actions, {"creer societe riyad": "a-verifier", "visa affaires": "a-creer"})
+        self.assertEqual(actions, {"creer societe marseille": "a-verifier", "visa affaires": "a-creer"})
         self.assertFalse(res["gsc"])
 
     def test_sans_lexique_le_rapport_le_dit(self):
@@ -138,12 +138,48 @@ class TestOpportunites(DossierIsole):
 
 class TestShareOfModel(unittest.TestCase):
     def test_citation_rang_et_sous_domaine(self):
-        res = share_of_model.analyser({"texte": "Selon Tasis Partners, il faut…",
-                                       "sources": ["misa.gov.sa", "misa.gov.sa", "blog.tasispartners.com"]},
-                                      "Tasis Partners", "tasispartners.com")
+        res = share_of_model.analyser({"texte": "Selon Atlas Conseil, il faut…",
+                                       "sources": ["impots.gouv.fr", "impots.gouv.fr", "blog.atlas-conseil.example"]},
+                                      "Atlas Conseil", "atlas-conseil.example")
         self.assertTrue(res["cite"])
         self.assertEqual(res["rang"], 2)                     # doublons retirés avant de compter
         self.assertTrue(res["nomme"])
+
+    def test_garde_anti_homonyme(self):
+        alias = share_of_model.alias_marque("Atlas", "atlas.example")
+        self.assertFalse(share_of_model.mentionne("Le mot « atlas » est un terme de cartographie.", alias))
+        self.assertTrue(share_of_model.mentionne("Atlas accompagne les créateurs d'entreprise.", alias))
+
+    def test_verifier_la_liste(self):
+        lignes = [{"famille": "visibilite", "funnel": "BOFU", "prompt": "Quel est le meilleur cabinet, Atlas ou un autre ?"},
+                  {"famille": "visibilite", "funnel": "MOFU", "prompt": "Comment faire de la génération de leads ?"},
+                  {"famille": "marque", "funnel": "", "prompt": "Que vaut Atlas ?"}]
+        erreurs, _ = share_of_model.verifier(lignes, "Atlas", "atlas.example")
+        self.assertTrue(any("ligne 2" in e and "marque" in e for e in erreurs))
+        self.assertTrue(any("ligne 3" in e and "vendeur" in e for e in erreurs))
+        self.assertFalse(any("ligne 4" in e for e in erreurs))     # famille marque : le nom est attendu
+
+    def test_generation_2_3_3_et_verification(self):
+        lignes = share_of_model.generer("cabinet comptable", ["création d'entreprise"], "France", "fr", "Atlas")
+        funnels = [l["funnel"] for l in lignes if l["famille"] != "marque"]
+        self.assertEqual((funnels.count("TOFU"), funnels.count("MOFU"), funnels.count("BOFU")), (2, 3, 3))
+        erreurs, _ = share_of_model.verifier(lignes, "Atlas", "atlas.example")
+        self.assertEqual(erreurs, [])
+
+    def test_visibilite_ponderee_et_prompts_manquants(self):
+        releves = [
+            {"moteur": "openai", "famille": "visibilite", "poids": 3, "prompt": "b", "cite": False, "rang": 0,
+             "nomme": True, "sources": "a.com", "concurrents_nommes": "X"},
+            {"moteur": "openai", "famille": "visibilite", "poids": 1, "prompt": "t", "cite": False, "rang": 0,
+             "nomme": False, "sources": "a.com", "concurrents_nommes": "X, Y"},
+            {"moteur": "openai", "famille": "visibilite", "poids": 2, "prompt": "m", "cite": False, "rang": 0,
+             "nomme": False, "sources": "", "concurrents_nommes": ""},
+        ]
+        b = share_of_model.synthese(releves)["openai"]
+        self.assertEqual(b["taux_mention_pondere_pct"], 50.0)        # 3 sur 6
+        self.assertEqual(b["sov_pct"], 25.0)                         # 1 mention contre 3
+        self.assertEqual(b["visibilite"], 40.0)                      # 0,6 × 50 + 0,4 × 25
+        self.assertEqual(share_of_model.prompts_manquants(releves), ["m"])
 
     def test_la_famille_marque_ne_compte_pas_dans_la_visibilite(self):
         releves = [
