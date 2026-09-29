@@ -40,6 +40,24 @@ circule pas vers les pages qui vendent. Il faut des liens profonds.
 **Vitesse d'acquisition.** Une régularité vaut mieux qu'un pic. 30 liens en
 une semaine puis rien pendant six mois est un signal d'achat.
 
+## Le principe — un lien s'échange contre de la valeur
+
+Avant d'écrire le moindre email, répondez : **qu'est-ce qu'on donne ?** Si la
+réponse est « rien, on demande gentiment », la campagne n'obtiendra rien.
+
+| Contrepartie | Pour qui | Effort |
+|---|---|---|
+| Analyse offerte (visibilité IA, audit express) | annuaires, classements, pairs | ~1 h par cible |
+| Audit complet + feuille de route 90 jours | prescripteurs, dirigeants | ~2 h par cible |
+| **Étude ou donnée propriétaire** | **médias à forte autorité** | 2-3 semaines, une seule fois |
+| Prestation offerte (outil, page, site) | prescripteurs, communautés | coût de production |
+
+L'étude propriétaire coûte le plus cher et rapporte le plus : elle se propose
+à tous les médias à la fois, et continue d'attirer des liens après la
+campagne (voir `seo-digital-pr`). Le livrable n'est jamais une liste de
+domaines : c'est une **campagne prête à envoyer** — cibles qualifiées,
+contrepartie choisie, emails écrits, ordre d'envoi, fichier de suivi.
+
 ## Étape 2 — Prospecter
 
 Cinq sources, par ordre de rendement :

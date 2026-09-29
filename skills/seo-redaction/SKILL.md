@@ -29,6 +29,35 @@ Avant la première phrase :
 Si la donnée manque : soit on la trouve, soit on écrit la phrase sans elle.
 « Selon une étude récente » sans référence est un aveu.
 
+## Règle un — vérifier qu'il faut écrire (anti-cannibalisation)
+
+Avant la première ligne, cherchez ce que le site dit déjà sur ce territoire :
+pages existantes, articles du blog, titres Hn publiés, requêtes Search Console
+qui y mènent déjà. Deux contenus sur la même intention se concurrencent et
+**aucun des deux ne se positionne** — c'est l'incident le plus fréquent d'un
+site qui publie beaucoup.
+
+Puis tranchez, explicitement :
+
+- **Intention différente** → écrivez, et posez un lien croisé entre les deux.
+- **Même intention** → **n'écrivez pas un second contenu.** Recommandez
+  d'enrichir l'existant pour couvrir aussi la nouvelle requête. C'est presque
+  toujours la bonne réponse, même quand le calendrier prévoit un contenu neuf.
+- **Intention voisine** (pilier et satellite) → écrivez le satellite avec un
+  angle propre, un titre qui ne vise pas la requête du pilier, et un lien
+  montant vers lui dès l'introduction.
+
+Consignez l'arbitrage en tête du fichier produit : la prochaine session doit
+comprendre pourquoi ce contenu existe à côté de l'autre.
+
+## Règle deux — une thèse avant un plan
+
+Un plan sans thèse produit un contenu « bateau » : exhaustif, exact, et
+interchangeable avec les dix premiers résultats. Avant le plan, écrivez en
+une phrase **ce que ce contenu soutient** et que les concurrents ne disent
+pas — une position, une donnée, une méthode, un contre-pied argumenté.
+Si vous ne trouvez pas de thèse, vous n'avez pas encore assez cherché.
+
 ## La structure qui fonctionne
 
 ### L'ouverture — les 100 premiers mots
@@ -54,6 +83,31 @@ sujet à la première phrase.
 ### La conclusion
 Pas de résumé. Une conclusion utile donne la prochaine action concrète et
 un lien interne vers l'étape suivante.
+
+## Le test anti-remplissage — sur chaque paragraphe
+
+> « Est-ce qu'un lecteur qui pratique le sujet apprend quelque chose ici, ou
+> est-ce qu'il lit ce qu'il sait déjà ? »
+
+Si c'est la seconde réponse : supprimez ou creusez. Un paragraphe qui
+pourrait figurer tel quel sur le site d'un concurrent ne défend pas la
+marque, il la banalise.
+
+Obligatoires : une position assumée par section ; le *comment*, pas seulement
+le *quoi* ; la contrepartie de chaque recommandation (ce qu'elle coûte, quand
+elle ne s'applique pas) ; et au moins une chose que le lecteur **ne fera plus**
+après avoir lu. Le marqueur le plus fiable d'un bon contenu : il dit aussi
+**quand s'abstenir**.
+
+## Deux pages d'un même gabarit ne se lisent jamais pareil
+
+Un gabarit partagé est un acquis (une correction se fait une fois). Mais si
+chaque page remplit les mêmes emplacements dans le même ordre, avec les mêmes
+trois chiffres, le lecteur qui en ouvre deux voit un formulaire rempli deux
+fois — et Google aussi. Chaque page porte au moins **un bloc qui n'existe que
+chez elle**, d'un type que ses voisines n'emploient pas : grille de
+diagnostic, tableau de livrables, aide à la décision, référentiel de formats,
+routeur « votre situation → par où commencer ».
 
 ## Le style — ne pas écrire comme une IA
 

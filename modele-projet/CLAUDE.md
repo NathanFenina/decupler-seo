@@ -8,7 +8,7 @@ court : le détail vit dans `memoire/`.
 
 - **Site** : {{DOMAINE}}
 - **Marché** : {{PAYS}} · langues : {{LANGUES}}
-- **CMS** : {{CMS}}
+- **CMS** : {{CMS}} · publication : **{{PUBLICATION}}** (`cms` = par l'API du CMS, `depot` = fusionner c'est publier)
 - **Activité** : {{ACTIVITE}}
 - **Ce qui doit rapporter** : les pages listées dans `decupler-seo.config.yml` → `projet.pages_prioritaires`
 
@@ -27,6 +27,18 @@ court : le détail vit dans `memoire/`.
    `python3 .claude/decupler-seo/scripts/guard.py --action <action> --cible <url>`
 5. **Ne jamais inventer un chiffre.** Donnée absente = « nécessite tel outil ».
 
+## Règles d'or
+
+Chacune vient d'un incident réel sur ce projet. Quand un problème survient,
+on ajoute la règle qui l'aurait évité — avec la date et ce qui s'est passé.
+
+1. **Aucun chiffre hors de `memoire/faits.md`.** Aucune preuve inventée : ni
+   témoignage, ni compteur de clients, ni logo, ni certification supposée.
+2. **Avant d'écrire, vérifier que le site ne couvre pas déjà l'intention**
+   (passe anti-cannibalisation de `seo-redaction`).
+3. **Rien ne part sans contrôle** : `controle_contenu.py`, puis les commandes
+   de `controle.commandes` dans la config.
+
 ## Niveaux d'autonomie
 
 | Niveau | Quoi | Règle |
@@ -40,15 +52,18 @@ Plafond : **{{PAGES_MAX}} pages neuves par semaine**, qualité avant volume.
 ## Où sont les choses
 
 - `memoire/marque.md` — voix, lexique, chiffres officiels, interdits
+- `memoire/faits.md` — **la seule source des chiffres du site**, sourcés et datés
 - `memoire/decisions.md` — décisions humaines, datées. **À lire avant de
   proposer une action** : ne pas reproposer ce qui a été refusé.
 - `memoire/apprentissages.md` — ce qui a marché et échoué sur ce site,
   alimenté par la mesure à J+28
 - `journal/modifications.csv` — chaque modification et son effet mesuré
 - `donnees/` — instantanés Search Console hebdomadaires
+- `recherche/benchmarks/` — le benchmark « faire mieux » de chaque page
 - `rapports/` — rapports mensuels, `a-valider.md`, et `runs/` (journal de
   chaque exécution de routine)
 
 @memoire/marque.md
+@memoire/faits.md
 @memoire/decisions.md
 @memoire/apprentissages.md

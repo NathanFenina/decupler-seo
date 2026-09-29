@@ -75,3 +75,47 @@ def resoudre(chemin: str) -> Path:
     """Résout un chemin de la config (ex. un fichier de clé) depuis le projet."""
     p = Path(chemin).expanduser()
     return p if p.is_absolute() else racine_projet() / p
+
+
+def _lignes_config() -> list[str]:
+    config = fichier_config()
+    return config.read_text(encoding="utf-8").splitlines() if config else []
+
+
+def lire_valeur(cle: str, defaut: str = "") -> str:
+    """Première valeur scalaire trouvée pour `cle`, quel que soit son niveau.
+
+    Lecture volontairement minimale, sans PyYAML : les scripts de garde-fou
+    doivent tourner partout, y compris dans une routine sans dépendances.
+    """
+    for ligne in _lignes_config():
+        nue = ligne.split("#", 1)[0].rstrip()
+        if nue.strip().startswith(f"{cle}:"):
+            valeur = nue.split(":", 1)[1].strip().strip("\"'")
+            if valeur:
+                return valeur
+    return defaut
+
+
+def lire_liste(cle: str) -> list[str]:
+    """Liste YAML sous `cle`, en blocs (« - valeur ») ou en ligne (« [a, b] »)."""
+    lignes = _lignes_config()
+    for i, ligne in enumerate(lignes):
+        nue = ligne.split("#", 1)[0].rstrip()
+        if not nue.strip().startswith(f"{cle}:"):
+            continue
+        en_ligne = nue.split(":", 1)[1].strip()
+        if en_ligne.startswith("["):
+            return [v.strip().strip("\"'") for v in en_ligne.strip("[]").split(",") if v.strip()]
+        retrait = len(ligne) - len(ligne.lstrip())
+        valeurs = []
+        for suite in lignes[i + 1:]:
+            if not suite.strip() or suite.strip().startswith("#"):
+                continue
+            if len(suite) - len(suite.lstrip()) <= retrait:
+                break
+            item = suite.strip()
+            if item.startswith("- "):
+                valeurs.append(item[2:].split(" #", 1)[0].strip().strip("\"'"))
+        return valeurs
+    return []

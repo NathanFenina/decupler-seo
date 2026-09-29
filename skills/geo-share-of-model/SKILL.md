@@ -29,6 +29,18 @@ Quatre familles, à équilibrer :
 | **Problème** (25 %) | « Comment résoudre [problème que vous adressez] ? » | Êtes-vous cité comme solution |
 | **Marque** (20 %) | « Que vaut [votre marque] ? » | Que disent les modèles de vous |
 
+**Ne mélangez pas les deux mesures.** Les prompts qui ne citent pas la
+marque (découverte, comparaison, problème) mesurent la **visibilité** : le
+modèle vous cite-t-il sans qu'on le lui demande ? C'est le share of model.
+Les prompts qui nomment la marque mesurent la **réputation** : ce que le
+modèle en dit, et si c'est exact. Deux indicateurs, deux lignes dans le
+rapport — un score qui additionne les deux est flatteur et trompeur.
+
+Pour générer la batterie : 5 à 8 sujets tirés de l'offre réelle, et pour
+chacun **trois prompts** — un informationnel, un comparatif, un de décision
+ou de confiance. Rédigés comme on parle à un assistant, dans la langue du
+marché, jamais en mots-clés.
+
 Les prompts de marque sont les plus révélateurs : ils montrent ce que les
 modèles ont retenu de vous, y compris les erreurs. Il arrive qu'un modèle
 attribue à une entreprise des services qu'elle ne rend pas.
@@ -62,6 +74,7 @@ Par prompt et par moteur :
 | Rang de la mention | 1re source, 2e, 3e… |
 | Type de mention | citation avec lien / mention sans lien / recommandation explicite |
 | Formulation | le passage exact vous concernant |
+| Tonalité | positive, neutre ou négative |
 | Autres sources citées | les domaines, dans l'ordre |
 | Exactitude | ce qui est dit de vous est-il juste ? |
 

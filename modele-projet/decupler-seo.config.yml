@@ -21,6 +21,9 @@ projet:
 
 # Règles propres à ce client. Elles priment sur les valeurs par défaut.
 regles:
+  # Expressions interdites propres à ce client (expressions régulières),
+  # vérifiées par controle_contenu.py en plus de celles de la méthode.
+  interdits: []
   # Laissez vide pour un placement naturel. Mettez 20 si c'est la règle
   # validée avec ce client (cas Apogea et Reux).
   mot_cle_occurrences_min:
@@ -59,7 +62,19 @@ seuils:
   crawl_delai_ms: 1000
 
 publication:
+  # cms   : publication par l'API du CMS, pages neuves en brouillon
+  # depot : site en code — branche, contrôles, pull request ; fusionner = publier
+  mode: {{PUBLICATION}}
   statut_par_defaut: draft
+
+# Commandes lancées avant toute publication, toutes bloquantes.
+# Site en code : typiquement le build et le contrôle de contenu du site.
+controle:
+  commandes: []
+
+# Boucle de fraîcheur : pages revérifiées chaque semaine, en plus des neuves.
+fraicheur:
+  pages_par_semaine: 1
 
 sorties:
   dossier: ./contenus

@@ -55,9 +55,46 @@ dernier instantané) :
   au premier passage)
 - sitemap accessible
 
+Puis le contrôle complet de production, qui fait tout cela sur **chaque URL
+du sitemap** (200 sans redirection, https, pas de noindex, canonical
+auto-référente, robots.txt sain) :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/seo_live.py" --json
+```
+
+Il retente deux fois avant de déclarer une page injoignable : une alerte
+fausse coûte plus cher qu'elle n'en a l'air, parce qu'elle apprend à ignorer
+les vraies.
+
 Anomalie → une entrée dans `rapports/a-valider.md` répondant à quatre
 questions : **quoi, depuis quand, combien ça coûte, quoi faire**. Pas
 d'anomalie → aucune entrée. Le silence est le bon comportement.
+
+## Publier : deux mécaniques selon le site
+
+`decupler-seo.config.yml` → `publication.mode` :
+
+**`cms`** — WordPress, Webflow, Contentful… Publication par l'API, via
+`seo-publication-cms` : sauvegarde, écriture, vérification. Les pages neuves
+partent en brouillon.
+
+**`depot`** — site en code (Next.js, Astro, générateur statique) : le
+contenu vit dans le dépôt, et **publier, c'est fusionner**.
+1. Travailler sur une branche `claude/<mode>-AAAA-MM-JJ` partie de la
+   branche principale à jour.
+2. Contrôles, tous bloquants :
+   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/controle_contenu.py" <fichiers modifiés>`,
+   puis chaque commande de `controle.commandes` (typiquement le build, le
+   typage, le contrôle de contenu du site).
+3. Ouvrir une pull request qui liste les pages, les requêtes visées, le
+   résumé du benchmark et tout chiffre « à confirmer ».
+4. **Fusionner seulement si** tous les contrôles sont verts, qu'aucun chiffre
+   n'est resté douteux, et que le mode est `autonomous`. Sinon, laisser la
+   PR ouverte et écrire dans sa description ce qui bloque. Le déploiement
+   suit la fusion : sur ce type de site, une fusion est une mise en ligne.
+5. Après déploiement : `seo_live.py --ping` (IndexNow si `INDEXNOW_KEY`
+   est défini).
 
 ## Mode optimisation — hebdomadaire
 
@@ -94,10 +131,28 @@ d'anomalie → aucune entrée. Le silence est le bon comportement.
 2. Au plus `cycle.pages_neuves_par_semaine_max` pages. **Jamais au-delà**,
    même si la file est longue : la mise à jour spam d'août 2026 a frappé des
    sites qui publiaient en masse, pas des sites qui publiaient lentement.
-3. Pour chacune : `seo-brief` → `seo-redaction` (+ `projet-marque`) →
-   `seo-optimisation-onpage` jusqu'à 85/100 minimum → brouillon CMS.
-4. Chaque page : une entrée dans `rapports/a-valider.md`. Une fois publiée
-   par un humain, elle sera journalisée comme `page-neuve`.
+3. Pour chacune — en parallèle, un agent par page quand elles sont
+   indépendantes : `seo-benchmark` (au moins 5 axes gagnés, sinon la page
+   n'est pas prête) → `seo-brief` → `seo-redaction` (+ `projet-marque`, et la
+   passe anti-cannibalisation) → `seo-optimisation-onpage` jusqu'à 85/100 →
+   `controle_contenu.py`, bloquant.
+4. **Chaque chiffre** est vérifié à sa source officielle et reporté dans
+   `memoire/faits.md`, qui est la seule source des chiffres du site : un même
+   fait ne doit jamais avoir deux valeurs sur deux pages.
+5. Publication selon `publication.mode` (voir plus haut) : brouillon CMS et
+   entrée dans `rapports/a-valider.md`, ou pull request.
+
+### La boucle de fraîcheur — une page par semaine
+
+En plus des pages neuves, reprendre **la page publiée revérifiée depuis le
+plus longtemps** (date de dernière vérification, ou à défaut de dernière
+modification ; pages légales exclues). Revérifier chacun de ses chiffres à
+la source, corriger ce qui a changé — en le signalant dans la page si une
+règle a bougé — puis mettre à jour sa date de vérification.
+
+**Ne jamais changer une date de mise à jour sans avoir réellement
+revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
+évaluateurs de Google et les moteurs IA apprennent à repérer.
 
 ## Mode rapport — mensuel
 

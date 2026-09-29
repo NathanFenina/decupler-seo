@@ -247,6 +247,7 @@ def initialiser(args) -> int:
         "VOUVOIEMENT": "true" if args.vouvoiement else "false",
         "PAGES_MAX": str(args.pages_max),
         "MODE": args.mode,
+        "PUBLICATION": args.publication,
         "DATE": dt.date.today().isoformat(),
         "PAR": args.par,
     }
@@ -340,6 +341,8 @@ def main() -> int:
     i.add_argument("--pays", default="FR")
     i.add_argument("--langues", default="fr", help="ex. fr ou ar,en")
     i.add_argument("--cms", default="wordpress")
+    i.add_argument("--publication", default="cms", choices=["cms", "depot"],
+                   help="depot pour un site en code : publier = fusionner une PR")
     i.add_argument("--activite", default="")
     i.add_argument("--proposition", default="")
     i.add_argument("--ton", default="expert, direct, sans jargon inutile")
