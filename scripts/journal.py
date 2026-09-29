@@ -9,6 +9,10 @@
     python3 journal.py a-annuler
     python3 journal.py bilan
 
+Avec --auto, les chiffres viennent directement de Search Console (gsc.py) :
+    python3 journal.py ajouter --url … --type title --avant … --apres … --auto
+    python3 journal.py mesurer-tout --auto      # toutes les échéances, témoin compris
+
 Toute modification publiée par le dispositif passe par ici AVANT d'être
 considérée comme faite. Sans situation de départ enregistrée, on ne saura
 jamais si elle a aidé ou nui — et une publication automatique qu'on ne peut
@@ -30,7 +34,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _projet import fichier_config, racine_projet  # noqa: E402
+from _projet import charger_env, fichier_config, racine_projet  # noqa: E402
 
 COLONNES = [
     "id", "date", "url", "requete", "type", "niveau", "avant", "apres",
@@ -46,6 +50,10 @@ NIVEAUX = {"title": "automatique", "meta": "automatique", "faq": "automatique",
 # En dessous de ce volume de clics, une variation en pourcentage ne veut rien
 # dire (passer de 2 à 4 clics fait +100 %) : on juge alors sur la position.
 CLICS_MIN_POUR_JUGER_EN_CLICS = 20
+
+# En dessous, la variation du groupe témoin est trop bruitée pour corriger
+# quoi que ce soit (constaté sur un site réel : 20 → 50 clics, soit +150 %).
+TEMOIN_CLICS_MIN = 200
 
 
 def reglages() -> dict:
@@ -133,6 +141,13 @@ def cmd_ajouter(a) -> int:
     r = reglages()
     prochain = max((int(l["id"]) for l in lignes if l["id"].isdigit()), default=0) + 1
     aujourd_hui = dt.date.today()
+    if a.auto:
+        m = releve(a.url)
+        if m is None:
+            return 2
+        a.clics, a.impressions, a.position, a.ctr = m["clics"], m["impressions"], m["position"], m["ctr"]
+        print(f"  Search Console {m['debut']} → {m['fin']} : {m['clics']} clics, "
+              f"{m['impressions']} impressions, position {m['position']}")
     ligne = {
         "id": str(prochain), "date": aujourd_hui.isoformat(), "url": a.url,
         "requete": a.requete or "", "type": a.type, "niveau": NIVEAUX.get(a.type, ""),
@@ -174,11 +189,90 @@ def cmd_echeances(a) -> int:
     return 0
 
 
+def releve(url: str, fin: dt.date | None = None) -> dict | None:
+    """Chiffres Search Console d'une URL sur 28 jours, ou None avec un message clair."""
+    import gsc
+    try:
+        return gsc.mesures_page(url, fin)
+    except gsc.ErreurGSC as exc:
+        print(f"  ✗ Search Console : {exc}")
+        return None
+
+
+def temoin_pour(ligne: dict, lignes: list[dict]) -> float | None:
+    """Variation des pages non modifiées entre la fenêtre de départ et aujourd'hui.
+
+    On exclut toute URL modifiée depuis le début de la fenêtre de départ :
+    une page elle-même en cours de modification ne peut pas servir de référence.
+    """
+    import gsc
+    debut_modif = dt.date.fromisoformat(ligne["date"])
+    avant_fin = debut_modif - dt.timedelta(days=gsc.LATENCE_JOURS)
+    borne = avant_fin - dt.timedelta(days=28)
+    exclure = {l["url"] for l in lignes if l["date"] and dt.date.fromisoformat(l["date"]) >= borne}
+    try:
+        t = gsc.variation_temoin(avant_fin, dt.date.today(), exclure)
+    except gsc.ErreurGSC as exc:
+        print(f"  ! Témoin indisponible ({exc}) — mesure sans correction de saisonnalité.")
+        return None
+    # Sur un petit site, les pages non modifiées peuvent ne peser que quelques
+    # dizaines de clics : passer de 20 à 50 donne +150 %, ce qui ferait passer
+    # toute modification pour une perte. Un témoin aussi mince est du bruit.
+    if t["clics_avant"] < TEMOIN_CLICS_MIN:
+        print(f"  ! Témoin écarté : {t['clics_avant']} clics sur les pages non modifiées, sous le "
+              f"seuil de {TEMOIN_CLICS_MIN}. Mesure sans correction de saisonnalité.")
+        return None
+    return t["variation_pct"]
+
+
+def cmd_mesurer_tout(a) -> int:
+    """Mesure toutes les échéances d'un coup. C'est ce qu'appelle la routine mensuelle."""
+    lignes = lire()
+    aujourd_hui = dt.date.today().isoformat()
+    dues = [l for l in lignes if not l["verdict"] and l["date_mesure"] and l["date_mesure"] <= aujourd_hui]
+    if not dues:
+        print("  Aucune modification à mesurer aujourd'hui.")
+        return 0
+    if not a.auto:
+        print(f"  {len(dues)} échéance(s). Sans --auto, mesurez-les une à une avec `mesurer`.")
+        return 1
+    # Un seul calcul de témoin par date de modification : c'est la requête la plus lourde.
+    temoins: dict[str, float | None] = {}
+    for l in dues:
+        m = releve(l["url"])
+        if m is None:
+            return 2
+        if l["date"] not in temoins:
+            temoins[l["date"]] = temoin_pour(l, lignes)
+        l.update({"clics_apres": m["clics"], "impressions_apres": m["impressions"],
+                  "position_apres": m["position"] if m["position"] is not None else "",
+                  "ctr_apres": m["ctr"],
+                  "variation_temoin_pct": temoins[l["date"]] if temoins[l["date"]] is not None else ""})
+        verdict, detail = juger(l, reglages())
+        l["verdict"] = verdict
+        l["note"] = (l.get("note", "") + f" | mesuré le {dt.date.today()} : {detail}").strip(" |")
+        icone = {"gain": "🟢", "neutre": "⚪", "perte": "🔴", "insuffisant": "·"}[verdict]
+        print(f"  {icone} #{l['id']} {l['type']:<18} {verdict:<11} {detail}")
+    ecrire(lignes)
+    print(f"\n  {len(dues)} mesure(s) enregistrée(s) dans {chemin_journal()}")
+    return 0
+
+
 def cmd_mesurer(a) -> int:
     lignes = lire()
     cible = next((l for l in lignes if l["id"] == str(a.id)), None)
     if not cible:
         print(f"  ✗ Modification #{a.id} introuvable.")
+        return 1
+    if a.auto:
+        m = releve(cible["url"])
+        if m is None:
+            return 2
+        a.clics, a.impressions, a.position, a.ctr = m["clics"], m["impressions"], m["position"], m["ctr"]
+        if a.temoin is None:
+            a.temoin = temoin_pour(cible, lignes)
+    elif a.clics is None or a.impressions is None:
+        print("  ✗ Donnez --clics et --impressions, ou --auto pour les relever dans Search Console.")
         return 1
     cible.update({
         "clics_apres": a.clics, "impressions_apres": a.impressions,
@@ -266,24 +360,31 @@ def main() -> int:
     aj.add_argument("--position", type=float)
     aj.add_argument("--ctr", type=float)
     aj.add_argument("--note")
+    aj.add_argument("--auto", action="store_true", help="relever la situation de départ dans Search Console")
 
     e = sp.add_parser("echeances")
     e.add_argument("--json", action="store_true")
 
     m = sp.add_parser("mesurer")
     m.add_argument("--id", required=True, type=int)
-    m.add_argument("--clics", required=True, type=float)
-    m.add_argument("--impressions", required=True, type=float)
+    m.add_argument("--clics", type=float)
+    m.add_argument("--impressions", type=float)
     m.add_argument("--position", type=float)
     m.add_argument("--ctr", type=float)
     m.add_argument("--temoin", type=float, help="variation des clics des pages non modifiées, en %%")
+    m.add_argument("--auto", action="store_true", help="relever les chiffres et le témoin dans Search Console")
+
+    mt = sp.add_parser("mesurer-tout")
+    mt.add_argument("--auto", action="store_true")
 
     sp.add_parser("a-annuler")
     b = sp.add_parser("bilan")
     b.add_argument("--json", action="store_true")
 
+    charger_env()
     a = p.parse_args()
     return {"ajouter": cmd_ajouter, "echeances": cmd_echeances, "mesurer": cmd_mesurer,
+            "mesurer-tout": cmd_mesurer_tout,
             "a-annuler": cmd_a_annuler, "bilan": cmd_bilan}[a.commande](a)
 
 

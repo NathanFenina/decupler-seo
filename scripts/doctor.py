@@ -23,7 +23,7 @@ from _projet import charger_env, config_est_le_modele, fichier_config, racine_pr
 
 # (identifiant, nom, variables requises, niveau, ce que ça débloque, où l'obtenir, coût)
 OUTILS = [
-    ("search-console", "Google Search Console", ["GSC_SITE_URL", "GSC_CREDENTIALS_JSON"], 1,
+    ("search-console", "Google Search Console", ["GSC_SITE_URL", "GSC_SA_JSON|GSC_CREDENTIALS_JSON"], 1,
      "Quick wins, rapports, diagnostic de chute de trafic, priorisation réelle",
      "Google Cloud → Search Console API → compte de service", "gratuit"),
     ("google-analytics", "Google Analytics 4", ["GA4_PROPERTY_ID", "GA4_CREDENTIALS_JSON"], 1,
@@ -79,6 +79,12 @@ def _verifier(outil) -> dict:
     ident, nom, variables, niveau, debloque, obtenir, cout = outil
     manquantes = []
     for var in variables:
+        if "|" in var:
+            # Plusieurs variables possibles : une seule suffit.
+            options = var.split("|")
+            if not any(os.environ.get(o, "").strip() for o in options):
+                manquantes.append(" ou ".join(options))
+            continue
         valeur = os.environ.get(var, "").strip()
         if not valeur:
             manquantes.append(var)

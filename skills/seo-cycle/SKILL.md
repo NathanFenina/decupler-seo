@@ -34,8 +34,9 @@ découlent, avant tout le reste :
    `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/guard.py" --statut`
    Si le mode est `safe`, vous ne publiez rien : vous produisez les fichiers
    et les propositions, point.
-3. Identifier la source Search Console disponible, dans cet ordre : outils
-   du MCP `search-console`, connecteur (Windsor.ai ou autre) exposant Search
+3. Identifier la source Search Console disponible, dans cet ordre :
+   `gsc.py` (identifiants `GSC_SA_JSON` dans l'environnement), outils du MCP
+   `search-console`, connecteur (Windsor.ai ou autre) exposant Search
    Console, export CSV déposé dans `donnees/`. **Si aucune n'est disponible,
    le dire dans le journal de run et s'arrêter** — on ne pilote pas à
    l'aveugle.
@@ -60,8 +61,8 @@ d'anomalie → aucune entrée. Le silence est le bon comportement.
 
 ## Mode optimisation — hebdomadaire
 
-1. **Instantané.** Search Console, 28 derniers jours, dimensions page +
-   requête. Enregistrer dans `donnees/AAAA-SWW.json`.
+1. **Instantané.** `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gsc.py" instantane` — page ×
+   requête, 28 derniers jours, écrit dans `donnees/AAAA-SWW.json`.
 2. **Mesures dues d'abord.** `seo-journal-mesure`, étape « mesurer » : on
    évalue ce qui a été fait avant d'en faire davantage.
 3. **Candidats** : pages en position 4-20, au moins 100 impressions, non
@@ -100,7 +101,8 @@ d'anomalie → aucune entrée. Le silence est le bon comportement.
 
 ## Mode rapport — mensuel
 
-1. `seo-journal-mesure` : mesurer tout ce qui est échu, puis `bilan`.
+1. `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" mesurer-tout --auto`, puis `bilan`
+   (voir `seo-journal-mesure`).
 2. Reporter dans `memoire/apprentissages.md` uniquement ce que `bilan`
    signale (au moins 3 mesures du même type). Pas d'intuition.
 3. Lister dans `rapports/a-valider.md` les retours arrière proposés

@@ -18,6 +18,24 @@ qu'un pari répété chaque semaine.
 Le script : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py"`, lancé
 depuis la racine du projet (il écrit dans `journal/modifications.csv`).
 
+## Le mode automatique — à utiliser dès que Search Console est branché
+
+```bash
+# au moment de publier : la situation de départ est relevée toute seule
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" ajouter --url <url> --type <type> \
+  --avant "<ancienne valeur>" --apres "<nouvelle valeur>" --auto
+
+# chaque mois : toutes les échéances, témoin compris
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" mesurer-tout --auto
+```
+
+Les chiffres viennent de `gsc.py` (compte de service `GSC_SA_JSON` ou
+`GSC_CREDENTIALS_JSON`, propriété `GSC_SITE_URL`). Le témoin est calculé en
+excluant toutes les pages modifiées dans la période, et il est **écarté** s'il
+repose sur moins de 200 clics : sur un petit site, 20 → 50 clics fait +150 %,
+ce qui fausserait tous les verdicts. Le mode manuel ci-dessous reste la
+référence quand Search Console n'est pas accessible.
+
 ## 1. Journaliser — au moment de publier
 
 **Avant** de publier, relevez dans Search Console les 28 derniers jours de
