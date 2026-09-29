@@ -25,7 +25,7 @@ regles:
   # vérifiées par controle_contenu.py en plus de celles de la méthode.
   interdits: []
   # Laissez vide pour un placement naturel. Mettez 20 si c'est la règle
-  # validée avec ce client (cas Apogea et Reux).
+  # validée avec ce client.
   mot_cle_occurrences_min:
   densite_max_pct: 3
 

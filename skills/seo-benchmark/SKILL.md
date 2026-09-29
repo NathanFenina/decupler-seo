@@ -51,9 +51,9 @@ page**, juste avant de l'écrire.
 | Langue native dans chaque marché (pas de traduction brute) | | |
 | Données structurées et citabilité IA (réponse directe, FAQ, schema) | | |
 
-4. **Consigner** dans `recherche/benchmarks/<page>.md` : date, URL
-   analysées, grille remplie, et les axes où l'on ne gagne pas — avec la
-   raison. C'est ce fichier que la routine de fraîcheur relira dans six mois.
+4. **Consigner** dans `recherche/benchmarks/<page>.md` (ou le dossier que
+   désigne `memoire/decisions.md`) : date, URL analysées, grille remplie, et
+   les axes où l'on ne gagne pas — avec la raison. C'est ce fichier que la routine de fraîcheur relira dans six mois.
 
 Moins de 5 axes gagnés → la page n'est pas prête. Dites-le, et dites ce
 qui manque, plutôt que de publier une page « correcte ».

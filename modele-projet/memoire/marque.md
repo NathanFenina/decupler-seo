@@ -17,7 +17,7 @@
 ## Voix
 
 - Registre : {{TON}}
-- Vouvoiement : {{VOUVOIEMENT}}
+- Vouvoiement : {{VOUVOIEMENT_TEXTE}}
 - Langue(s) de rédaction : {{LANGUES}}
 
 ## Lexique

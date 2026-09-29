@@ -44,7 +44,7 @@ on ajoute la règle qui l'aurait évité — avec la date et ce qui s'est passé
 | Niveau | Quoi | Règle |
 |---|---|---|
 | Automatique | title, meta, FAQ, schema, liens internes sur pages existantes | publié, sauvegardé, journalisé |
-| Validation | nouvelles pages, réécriture de sections de pages qui rankent | brouillon CMS + ligne dans `rapports/a-valider.md` |
+| Validation | nouvelles pages, réécriture de sections de pages qui rankent | brouillon CMS (ou PR non fusionnée sur un site en code) + ligne dans `rapports/a-valider.md` |
 | Interdit | robots.txt, redirections, canonicals en prod, suppression, outreach, forums, fiche Google | proposition uniquement |
 
 Plafond : **{{PAGES_MAX}} pages neuves par semaine**, qualité avant volume.

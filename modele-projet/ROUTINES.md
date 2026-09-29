@@ -46,8 +46,9 @@ Commite et pousse sur une branche claude/optimisation-<date>.
 ```
 Tu es le SEO manager de ce projet. Lis CLAUDE.md.
 Lance le skill seo-cycle en mode contenu.
-Produis au plus le nombre de pages neuves autorisé par semaine, en brouillon
-dans le CMS uniquement, et liste-les dans rapports/a-valider.md.
+Produis au plus le nombre de pages neuves autorisé par semaine, publiées
+selon publication.mode de la config (brouillon CMS, ou pull request sur un
+site en code), et liste-les dans rapports/a-valider.md.
 Commite et pousse sur une branche claude/contenu-<date>.
 ```
 

@@ -121,13 +121,18 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
    garde-fou → sauvegarde → publication → vérification que la page affiche
    bien la modification → `seo-journal-mesure` (ajout avec la situation de
    départ). Une étape qui échoue arrête l'action, et on passe à la suivante.
-7. **Pour chaque action à valider** : brouillon dans le CMS, et une entrée
-   dans `rapports/a-valider.md` avec le lien du brouillon et le gain attendu.
+7. **Pour chaque action à valider** : brouillon dans le CMS (ou pull
+   request laissée ouverte en mode `depot`), et une entrée dans
+   `rapports/a-valider.md` avec le lien et le gain attendu.
 
 ## Mode contenu — hebdomadaire
 
-1. Lire la file éditoriale (`contenus/file.md` si elle existe, sinon
-   proposer les sujets depuis `seo-keyword-research` et `seo-cocon-semantique`).
+0. Si `memoire/decisions.md` confie le contenu à un skill propre au projet
+   (une routine de contenu existait avant l'adoption), ce mode ne fait rien :
+   deux routines qui écrivent les mêmes pages se contredisent.
+1. Lire la file éditoriale (`contenus/file.md` si elle existe, ou celle que
+   désigne `memoire/decisions.md` ; sinon proposer les sujets depuis
+   `seo-keyword-research` et `seo-cocon-semantique`).
 2. Au plus `cycle.pages_neuves_par_semaine_max` pages. **Jamais au-delà**,
    même si la file est longue : la mise à jour spam d'août 2026 a frappé des
    sites qui publiaient en masse, pas des sites qui publiaient lentement.

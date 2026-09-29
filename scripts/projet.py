@@ -265,7 +265,8 @@ def valeurs_gabarit(args) -> dict[str, str]:
         "PAYS": args.pays, "LANGUES": ", ".join(langues), "LANGUES_YAML": ", ".join(langues),
         "LANGUE_PRINCIPALE": langues[0] if langues else "fr", "CMS": args.cms,
         "ACTIVITE": args.activite, "PROPOSITION_VALEUR": args.proposition, "TON": args.ton,
-        "VOUVOIEMENT": "true" if args.vouvoiement else "false", "PAGES_MAX": str(args.pages_max),
+        "VOUVOIEMENT": "true" if args.vouvoiement else "false",
+        "VOUVOIEMENT_TEXTE": "oui" if args.vouvoiement else "non (tutoiement)", "PAGES_MAX": str(args.pages_max),
         "MODE": args.mode, "PUBLICATION": args.publication,
         "DATE": dt.date.today().isoformat(), "PAR": args.par,
     }
