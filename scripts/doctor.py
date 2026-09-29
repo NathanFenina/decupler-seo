@@ -35,7 +35,7 @@ OUTILS = [
     ("firecrawl", "Firecrawl", ["FIRECRAWL_API_KEY"], 2,
      "Lecture propre des concurrents, extraction de plans Hn, veille",
      "https://firecrawl.dev", "offre gratuite généreuse"),
-    ("dataforseo", "DataForSEO", ["DATAFORSEO_USERNAME", "DATAFORSEO_PASSWORD"], 2,
+    ("dataforseo", "DataForSEO", ["DATAFORSEO_LOGIN|DATAFORSEO_USERNAME", "DATAFORSEO_PASSWORD"], 2,
      "Volumes de recherche, difficulté, SERP live, positions concurrents",
      "https://app.dataforseo.com/api-access", "à la requête, ~0,05 $ / appel"),
     ("ubersuggest", "Ubersuggest", ["UBERSUGGEST_API_KEY"], 2,
