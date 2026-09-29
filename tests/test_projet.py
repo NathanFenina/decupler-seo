@@ -1,9 +1,11 @@
 """Création de projet et synchronisation : c'est ce qui empêche les copies de diverger."""
 
 import json
+import subprocess
+import sys
 import unittest
 
-from _outils import DossierIsole, lancer
+from _outils import DossierIsole, environnement_propre, lancer
 
 
 class TestProjet(DossierIsole):
@@ -95,6 +97,17 @@ class TestProjet(DossierIsole):
         self.assertTrue((existant / "CLAUDE.decupler-seo.md").exists())
         self.assertNotEqual((existant / ".claude/skills/seo-redaction/SKILL.md").read_text(encoding="utf-8"),
                             "ancienne copie")
+
+    def test_statut_depuis_la_copie_embarquee(self):
+        # Lancé depuis .claude/decupler-seo, le script ne doit pas prendre le
+        # dépôt du projet pour une source de la méthode.
+        p = self.creer()
+        subprocess.run(["git", "init", "-q"], cwd=p, check=True)
+        r = subprocess.run([sys.executable, ".claude/decupler-seo/scripts/projet.py", "statut", "."], cwd=p,
+                           env=environnement_propre(), capture_output=True, text=True, timeout=60)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertNotIn("inconnue", r.stdout)
+        self.assertNotIn("disponible ici", r.stdout)
 
 
 if __name__ == "__main__":

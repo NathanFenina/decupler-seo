@@ -16,6 +16,13 @@ https://claude.ai/code/routines → **New routine** → **Cloud**.
     et la liste par défaut cochée. Sans ça, toute lecture du site échoue en 403.
   - **Clés** : en *API credentials* sur Pro/Max, en variables d'environnement
     sur Team. Jamais dans le dépôt.
+  - **Search Console** (mesure automatique, sans connecteur) : variables
+    `GSC_SA_JSON` (contenu de la clé du compte de service, JSON brut ou
+    base64 — compte en lecture seule sur la propriété) et `GSC_SITE_URL`
+    (`sc-domain:exemple.com` ou `https://www.exemple.com/`, exactement comme
+    dans Search Console). Autorisez aussi `oauth2.googleapis.com` et
+    `www.googleapis.com` dans le réseau. Test :
+    `python3 .claude/decupler-seo/scripts/gsc.py sites`.
 - **Heure** : quelques minutes après l'heure pile (7 h 07 et non 7 h 00),
   sinon le départ peut glisser de plusieurs minutes.
 

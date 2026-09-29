@@ -417,11 +417,32 @@ def statut(args) -> int:
     if manquants:
         print(f"  ! {len(manquants)} fichier(s) de méthode supprimé(s) localement")
 
-    source_version = version_de(RACINE_METHODE)
-    if source_version != manifeste["version"]:
-        print(f"  → Une autre version est disponible ici : {source_version}")
+    if (RACINE_METHODE / ".claude-plugin" / "plugin.json").is_file():
+        source_version = version_de(RACINE_METHODE)
+        if source_version != manifeste["version"]:
+            print(f"  → Une autre version est disponible ici : {source_version}")
+    else:
+        # Lancé depuis la copie embarquée : on compare à la dernière version
+        # publiée, sans rien télécharger.
+        publiee = derniere_publiee()
+        embarquee = manifeste["version"].rpartition("+")[2]
+        if not publiee:
+            print("  Dernière version publiée : impossible à lire (réseau ?)")
+        elif embarquee and publiee.startswith(embarquee):
+            print("  ✓ À jour avec la dernière version publiée")
+        else:
+            print(f"  → Mise à jour disponible ({publiee[:7]}) : python3 {DOSSIER_EMBARQUE}/scripts/projet.py sync .")
     print()
     return 0
+
+
+def derniere_publiee() -> str:
+    try:
+        sortie = subprocess.run(["git", "ls-remote", DEPOT_DEFAUT, "HEAD"], capture_output=True,
+                                text=True, timeout=20).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return sortie.split()[0] if sortie.split() else ""
 
 
 def main() -> int:
