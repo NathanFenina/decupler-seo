@@ -352,7 +352,7 @@ FUNNEL_REQUETE = [("BOFU", r"\b(prix|tarifs?|co[uû]t|acheter|devis|souscrire|pr
                   ("TOFU", r"\b(comment|pourquoi|qu'est-ce|definition|d[ée]finition|guide|how|what|why)\b"
                            r"|كيف|ما هو|ما هي|لماذا|شرح|دليل|طريقة")]
 FORMAT_SPECIAL = re.compile(r"\b(checklist|check-list|mod[eè]le|template|exemple|calcul(ateur|er)?|simulat(eur|ion)"
-                            r"|gratuit|pdf|glossaire|calculator|example|free)\b|حاسبة|نموذج|قالب|مجان", re.I)
+                            r"|gratuit|pdf|glossaire|calculator|example|free)\b|حاسبة|^حساب\s|نموذج|قالب|مجان", re.I)
 SCHEMA_INTENTION = {"transactional": "Service ou Product (prix visible) + FAQPage",
                     "commercial": "ItemList + FAQPage", "informational": "Article + FAQPage (HowTo si pas-à-pas)",
                     "navigational": "WebPage + BreadcrumbList"}

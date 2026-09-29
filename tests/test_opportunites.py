@@ -158,6 +158,11 @@ class TestFunnelEtCalendrier(unittest.TestCase):
         self.assertEqual(o.funnel_de("", "prix expert comptable"), "BOFU")
         self.assertEqual(o.funnel_de("", "tva auto entrepreneur"), "TOFU")
 
+    def test_format_special_en_arabe(self):
+        import opportunites
+        self.assertTrue(opportunites.FORMAT_SPECIAL.search("حساب ضريبة القيمة المضافة"))   # « calculer la TVA »
+        self.assertFalse(opportunites.FORMAT_SPECIAL.search("فتح حساب بنكي"))              # « ouvrir un compte »
+
     def test_format_special_et_calendrier(self):
         import datetime as dt
         import opportunites as o
