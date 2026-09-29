@@ -324,6 +324,28 @@ def completer(p: dict, lexique: list, demande: dict, langue_defaut: str = "fr", 
     return p
 
 
+def completer_saisies(lignes: list[dict], lexique: list, demande: dict, langue_defaut: str = "fr",
+                      categorie: str = "") -> int:
+    """Mot-clé principal saisi à la main (ou importé d'un plan) sans prompt : proposer le reste.
+
+    Seules les cellules vides sont remplies ; le prompt proposé est marqué à valider."""
+    n = 0
+    for l in lignes:
+        if not l.get("mot_cle_principal") or l.get("prompt_principal"):
+            continue
+        p = completer({"url": l.get("url", ""), "mot_cle_principal": l["mot_cle_principal"],
+                       "funnel": l.get("funnel", "")}, lexique, demande, langue_defaut, categorie)
+        for cle, val in p.items():
+            if cle in ("a_valider", "url", "mot_cle_principal") or val in ("", None) or l.get(cle):
+                continue
+            l[cle] = str(val)
+        drapeaux_ligne = [d for d in (l.get("a_valider") or "").split(";") if d]
+        if "prompt_principal" not in drapeaux_ligne:
+            l["a_valider"] = ";".join(drapeaux_ligne + ["prompt_principal"])
+        n += 1
+    return n
+
+
 def fusionner(existantes: list[dict], propositions: list[dict], date: str,
               publiees: dict[str, str] | None = None) -> dict:
     """Complète le tableau sans jamais écraser une cellule remplie.
@@ -468,6 +490,7 @@ def cmd_initialiser(a) -> int:
     for p in propositions:
         completer(p, lexique, demande, langue_projet(), a.categorie)
     stats = fusionner(lignes_carto, propositions, dt.date.today().isoformat(), opportunites.pages_ciblees())
+    stats["completees"] += completer_saisies(lignes_carto, lexique, demande, langue_projet(), a.categorie)
 
     print(f"\n  {source} · {stats['ajoutees']} ligne(s) ajoutée(s), {stats['completees']} complétée(s), "
           f"{stats['publiees']} page(s) prévue(s) désormais publiée(s)")

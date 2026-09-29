@@ -128,6 +128,19 @@ class TestCalculsPurs(unittest.TestCase):
         self.assertNotIn("_source", existantes[2])
         self.assertEqual(stats, {"ajoutees": 1, "completees": 1, "publiees": 1})
 
+    def test_mot_cle_saisi_a_la_main_recoit_un_prompt(self):
+        # Site jeune : mot-clé repris du plan éditorial, Search Console n'en donne pas encore.
+        lignes = [{**{c: "" for c in carto.COLONNES}, "url": "https://a.example/en/company-formation",
+                   "statut": "existante", "mot_cle_principal": "company formation", "priorite": "P1"},
+                  {**{c: "" for c in carto.COLONNES}, "url": "https://a.example/x", "mot_cle_principal": "sci",
+                   "prompt_principal": "Mon prompt ?"}]
+        self.assertEqual(carto.completer_saisies(lignes, [], {}, "fr"), 1)
+        self.assertTrue(lignes[0]["prompt_principal"].endswith("?"))
+        self.assertEqual(lignes[0]["langue"], "en")
+        self.assertEqual(lignes[0]["priorite"], "P1")                # jamais écrasé
+        self.assertIn("prompt_principal", lignes[0]["a_valider"])
+        self.assertEqual(lignes[1]["prompt_principal"], "Mon prompt ?")
+
     def test_page_prevue_publiee_d_apres_le_journal(self):
         lignes = [{**{c: "" for c in carto.COLONNES}, "statut": "a-creer", "mot_cle_principal": "Holding"}]
         carto.fusionner(lignes, [], "2026-09-29", {"holding": "https://a.example/holding"})
