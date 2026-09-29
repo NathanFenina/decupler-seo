@@ -37,8 +37,9 @@
 | Symptôme | Cause | Correctif |
 |----------|-------|-----------|
 | 401 | Mot de passe de compte au lieu du mot de passe d'application | En générer un dans Utilisateurs → Profil |
-| 403 | L'API REST est bloquée | Plugin de sécurité ou règle serveur : autoriser `/wp-json/` |
-| Le contenu passe, pas les balises SEO | Champs meta non exposés dans l'API | Dépend du plugin — voir la doc de Yoast / Rank Math / SEOPress |
+| 401 avec le bon mot de passe | L'hébergeur retire l'en-tête `Authorization` | `.htaccess` : `SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1` |
+| 403 | L'API REST est bloquée, ou rôle trop faible | Plugin de sécurité ou règle serveur : autoriser `/wp-json/` ; rôle Éditeur |
+| Le contenu passe, pas les balises SEO | Champs meta non exposés dans l'API | `wp.py verifier`, puis le mu-plugin de `skills/seo-publication-cms/references/wordpress.md` |
 | Le HTML est modifié à la publication | Filtres WordPress (`wpautop`) | Vérifier le rendu, ajuster le balisage |
 
 ## Webflow

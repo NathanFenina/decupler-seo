@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-46 skills · 15 agents · 22 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 117 tests
+49 skills · 15 agents · 29 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 291 tests
 
 ---
 
@@ -114,8 +114,9 @@ Votre temps : **30 minutes le lundi**, à lire `rapports/a-valider.md`.
 |---|---|---|
 | Idées | `demande.py idees --lexique` (DataForSEO, sans connecteur) | la demande réelle : volume, difficulté, intention, tendance |
 | Priorités | `opportunites.py --calendrier` | actions classées par valeur pour **ce** client, funnel, calendrier éditorial |
-| Brief | `demande.py serp` + `seo-benchmark` + `seo-brief` | brief en 14 sections : SERP, failles des concurrents, plan, H1 et intro rédigés |
-| Rédaction | `seo-redaction` + `controle_contenu.py` | texte relu, contrôlé, bloqué s'il contient une promesse ou un chiffre non sourcé |
+| Brief | `serp_concurrents.py` + `seo-benchmark` + `seo-brief` | top 5 lu et mesuré (longueur cible, sujets récurrents, questions non traitées, AI Overview), puis brief en 14 sections : failles des concurrents, plan, H1 et intro rédigés |
+| Rédaction | `style_maison.py` + `seo-redaction` + `controle_contenu.py` | texte écrit dans le style mesuré du client, relu, contrôlé, bloqué s'il contient une promesse ou un chiffre non sourcé |
+| Publication | `wp.py` (WordPress) | brouillon par défaut, révision à valider pour une page en ligne, meta relue puis journalisée, carte de contenu et maillage |
 | Mesure | `journal.py` | chaque modification jugée à J+28 contre un témoin |
 | Rapport | `rapport.py` | les chiffres du mois calculés par script ; l'agent rédige seulement les causes |
 | Visibilité IA | `share_of_model.py` | part de voix dans ChatGPT et Gemini, prompts où vous manquez |
@@ -196,15 +197,15 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>46 skills</b>, en 8 familles</summary>
+<summary><b>49 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
 | **Diagnostic et technique** | `seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` · `seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` · `seo-migration` · `seo-veille` |
 | **Données Search Console** | `seo-gsc-analyses` — 21 analyses : content decay, gagnants et perdants, requêtes émergentes, saisonnalité, cannibalisation, pages à créer… |
-| **Recherche et stratégie** | `seo-opportunites` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
+| **Recherche et stratégie** | `seo-opportunites` · `seo-cartographie` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
 | **Contenu** | `seo-brief` · `seo-redaction` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` |
-| **Structure et échelle** | `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-hreflang-i18n` · `seo-images` |
+| **Structure et échelle** | `seo-design-pages` · `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-entites-triplets` · `seo-hreflang-i18n` · `seo-images` |
 | **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |
 | **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |
 | **Pilotage** | `seo-nouveau-projet` · `seo-cycle` · `seo-journal-mesure` · `seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` · `seo-dashboard` · `seo-ecommerce` |

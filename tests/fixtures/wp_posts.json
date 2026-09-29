@@ -1,0 +1,24 @@
+[
+  {
+    "id": 31,
+    "link": "https://www.atlas-conseil.example/blog/avis-clients-google/",
+    "slug": "avis-clients-google",
+    "type": "post",
+    "status": "publish",
+    "modified": "2026-06-01T09:30:00",
+    "title": {"rendered": "Avis clients Google&#8239;: comment en obtenir plus"},
+    "content": {"rendered": "<p>Les avis clients Google comptent pour le référencement local. Pensez aussi à la fiche d’établissement.</p><h2>Demander un avis</h2><p>Envoyez un lien court après chaque mission.</p>"},
+    "meta": {}
+  },
+  {
+    "id": 32,
+    "link": "https://www.atlas-conseil.example/blog/recette-crepes/",
+    "slug": "recette-crepes",
+    "type": "post",
+    "status": "publish",
+    "modified": "2026-05-01T09:30:00",
+    "title": {"rendered": "Notre recette de crêpes du vendredi"},
+    "content": {"rendered": "<p>Farine, œufs, lait : la tradition de l’équipe.</p>"},
+    "meta": {}
+  }
+]

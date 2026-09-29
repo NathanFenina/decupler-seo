@@ -1,5 +1,55 @@
 # Journal des versions
 
+## 3.4.0
+
+### Ajouté
+
+- **La SERP lue page par page** : `scripts/serp_concurrents.py`. Une SERP
+  DataForSEO (PAA dépliées, AI Overview et ses sources, features), puis le
+  top 5 lu sans dépendance : plan H1-H3, listes, tableaux, mots, FAQ,
+  schémas, dates, ton. En sortie, la fourchette de longueur mesurée
+  (médiane → 3e quartile), les sujets de H2 récurrents, les questions
+  qu'aucun titre du top ne traite, le champ sémantique commun et, avec
+  `--url`, ce qui manque à la page du client. Repli payant optionnel par
+  DataForSEO pour les pages bloquées.
+- **Le style du client, mesuré** : `scripts/style_maison.py` écrit
+  `memoire/style.md` (adresse, personne, rythme des phrases et des
+  paragraphes, lisibilité, listes, ouvertures, expressions et vocabulaire
+  récurrents) ; la section « Lecture », remplie à la main, est conservée
+  d'une mesure à l'autre.
+- `seo-brief` construit le plan à partir des sujets récurrents et des
+  gaps mesurés ; `seo-redaction` écrit dans le style mesuré et le vérifie ;
+  `seo-images` couvre l'illustration d'un contenu neuf.
+- **Design des pages** : skill `seo-design-pages` (gabarit par type de
+  page — service, article, page locale, landing, comparatif, outil, aimant à
+  leads —, placement des CTA, bannières, plan d'images, tokens, pièges
+  WordPress, checklist avant publication) et 11 nouveaux composants HTML
+  (hero, CTA, témoignages, aimant à leads, sommaire, chiffres clés,
+  comparatif, auteur, en bref, encadrés, figure légendée).
+- **Images** : `scripts/images_generer.py` (Gemini, OpenAI en repli, prompt
+  tiré du style du site, jamais de texte ni de logo, alt proposé) ;
+  `audit_images.py` sans dépendance (alt, dimensions, image principale en
+  lazy, poids, formats, doublons).
+- **Publication WordPress** : `scripts/wp.py` (vérifier, publier en
+  brouillon, média, title et meta journalisés, carte des contenus,
+  maillage appliqué en révision, remplacement en masse), gardé par
+  `guard.py`, sauvegarde avant chaque écriture.
+- **Cartographie par site** : `scripts/cartographie.py` et le skill
+  `seo-cartographie`. Une ligne par page avec son mot-clé principal et son
+  prompt principal ; chaque mois, la position de la page sur son mot-clé et
+  la citation du prompt par ChatGPT, Gemini et Claude ; historique, section
+  du rapport mensuel, export Notion.
+- **Triplets et entités** : `scripts/triplets.py` et le skill
+  `seo-entites-triplets`. Les faits d'une page en triplets sujet —
+  prédicat — objet, vérifiés contre le registre du projet
+  (`memoire/triplets.csv`, `memoire/entites.csv`), contradictions entre
+  pages, fragment JSON-LD `about`/`mentions` et recherche d'identifiant
+  Wikidata.
+- Le mode contenu de `seo-cycle` enchaîne SERP lue, brief avec triplets,
+  rédaction dans le style mesuré, design, et cinq contrôles bloquants ;
+  chaque page publiée entre au journal avec les requêtes qu'elle vise.
+
+
 ## 3.3.0
 
 ### Ajouté

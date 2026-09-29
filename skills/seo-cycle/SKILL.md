@@ -149,17 +149,30 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
    même si la file est longue : la mise à jour spam d'août 2026 a frappé des
    sites qui publiaient en masse, pas des sites qui publiaient lentement.
 3. Pour chacune — en parallèle, un agent par page quand elles sont
-   indépendantes : `demande.py serp --mot "<requête>"` (top 10, questions
-   « Autres questions posées », AI Overview) → `seo-benchmark` (au moins 5
-   axes gagnés, sinon la page n'est pas prête) → `seo-brief` (14 sections,
-   écrit dans `recherche/briefs/`) → `seo-redaction` (+ `projet-marque`, et la
-   passe anti-cannibalisation) → `seo-optimisation-onpage` jusqu'à 85/100 →
-   `controle_contenu.py`, bloquant.
+   indépendantes :
+   - `serp_concurrents.py --mot "<requête>"` : top 5 lu page par page
+     (plan Hn, longueur, FAQ, schémas), questions « Autres questions
+     posées », AI Overview et ses sources, termes du top absents chez nous ;
+   - `seo-benchmark` (au moins 5 axes gagnés, sinon la page n'est pas prête) ;
+   - `seo-brief` (14 sections + triplets à affirmer, écrit dans
+     `recherche/briefs/`), dans le style mesuré de `memoire/style.md` ;
+   - `seo-redaction` (+ `projet-marque`, et la passe anti-cannibalisation) ;
+   - `seo-design-pages` : gabarit du type de page, CTA, bannières, plan
+     d'images (`images_generer.py` si aucune photo réelle ne convient) ;
+   - contrôles bloquants : `seo-optimisation-onpage` jusqu'à 85/100,
+     `controle_contenu.py`, `triplets.py verifier --strict`,
+     `audit_images.py --strict`, `schema_validate.py --strict`.
 4. **Chaque chiffre** est vérifié à sa source officielle et reporté dans
-   `memoire/faits.md`, qui est la seule source des chiffres du site : un même
-   fait ne doit jamais avoir deux valeurs sur deux pages.
-5. Publication selon `publication.mode` (voir plus haut) : brouillon CMS et
-   entrée dans `rapports/a-valider.md`, ou pull request.
+   `memoire/faits.md` et `memoire/triplets.csv`, la seule source des chiffres
+   du site : un même fait ne doit jamais avoir deux valeurs sur deux pages.
+   Une fois par semaine : `triplets.py coherence contenus/ --triplets
+   memoire/triplets.csv` (ou le dossier des contenus du site).
+5. Publication selon `publication.mode` (voir plus haut) : brouillon CMS
+   (`wp.py publier` sur WordPress) et entrée dans `rapports/a-valider.md`, ou
+   pull request. Chaque page publiée entre au journal avec les requêtes
+   qu'elle vise : `journal.py ajouter --auto --type page-neuve --url <url>
+   --requete "<requête 1> | <requête 2>"`, et sa ligne de
+   `memoire/cartographie.csv` passe en « publiee ».
 
 ### La boucle de fraîcheur — une page par semaine
 
@@ -181,10 +194,29 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
    signale (au moins 3 mesures du même type). Pas d'intuition.
 3. Lister dans `rapports/a-valider.md` les retours arrière proposés
    (`journal.py a-annuler`).
-4. **Les chiffres par script** : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rapport.py"`
+4. **Visibilité IA**, même liste chaque mois : `share_of_model.py --prompts
+   recherche/prompts-ia.csv --concurrents "<concurrents de la config>"
+   --exporter donnees/ia-<AAAA-MM>.csv` (le mois du rapport), puis
+   une fois par trimestre `--sans-web --exporter donnees/ia-<AAAA-MM>-sans-web.csv`
+   (notoriété). Dans le rapport : la
+   visibilité par moteur, son évolution, et les prompts MOFU/BOFU où la
+   marque manque partout — ce sont les briefs du mois suivant (`seo-redaction`,
+   « Article GEO : gagner un prompt IA »).
+5. **La cartographie, avant le rapport** (si `memoire/cartographie.csv`
+   existe, skill `seo-cartographie`) :
+   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/cartographie.py" mensuel --mois <AAAA-MM>`.
+   Elle écrit `rapports/cartographie-AAAA-MM.md` et une ligne par page dans
+   `donnees/cartographie-historique.csv` : la position de chaque page sur son
+   mot-clé principal et la citation de son prompt principal par ChatGPT,
+   Gemini et Claude, reprise des relevés de l'étape 4. Pas d'option payante
+   (`--volumes`, `--prompts`) en routine sans accord écrit dans
+   `memoire/decisions.md`. Une cannibalisation signalée va dans
+   `rapports/a-valider.md`.
+6. **Les chiffres par script** : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rapport.py"`
    écrit la partie factuelle de `rapports/AAAA-MM.md` et `rapports/AAAA-MM.json`
    (mois, mois précédent, an passé ; marque et hors marque ; pages et requêtes
-   en hausse et en baisse ; requêtes nouvelles ; verdicts ; routines). Vous
+   en hausse et en baisse ; requêtes nouvelles ; verdicts ; routines ; la
+   synthèse de la cartographie quand elle existe). Vous
    rédigez seulement la section « Lecture et décisions » selon `seo-reporting` :
    les causes, pas les courbes. Ne recalculez jamais un chiffre à la main.
    Le JSON garde ces clés, toujours les mêmes, pour que les rapports de tous
@@ -195,16 +227,12 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
     "modifications": 0, "gains": 0, "neutres": 0, "pertes": 0,
     "a_valider": 0, "runs_attendus": 0, "runs_trouves": 0}
    ```
-5. **Opportunités** : `opportunites.py --ecrire`, et dans le rapport les
+   Une clé `cartographie` s'y ajoute (null sans cartographie) : pages suivies,
+   hausses et baisses sur les mots-clés principaux, prompts gagnés et perdus.
+7. **Opportunités** : `opportunites.py --ecrire`, et dans le rapport les
    cinq premières actions, les thèmes de valeur 3 non couverts, et ce qui a
    changé depuis le classement du mois précédent.
-6. **Visibilité IA**, même liste chaque mois : `share_of_model.py --prompts
-   recherche/prompts-ia.csv --concurrents "<concurrents de la config>"`, puis
-   une fois par trimestre `--sans-web` (notoriété). Dans le rapport : la
-   visibilité par moteur, son évolution, et les prompts MOFU/BOFU où la
-   marque manque partout — ce sont les briefs du mois suivant (`seo-redaction`,
-   « Article GEO : gagner un prompt IA »).
-7. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
+8. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
    mois. Environ 30 veilles, 4 optimisations, 4 contenus attendus. Toute
    absence est signalée en tête du rapport.
 

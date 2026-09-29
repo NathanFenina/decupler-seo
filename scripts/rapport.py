@@ -118,6 +118,47 @@ def bilan_runs(noms: list[str], mois: str) -> dict:
     return {"trouves": dict(compte), "veille_attendues": jours, "veille_trouvees": compte.get("veille", 0)}
 
 
+def cartographie(racine: Path, mois: str) -> dict | None:
+    """Synthèse de la cartographie du mois (cartographie.py mensuel), None s'il n'y en a pas."""
+    try:
+        import cartographie as carto
+        return carto.resume_pour_rapport(racine, mois)
+    except Exception as exc:  # un historique abîmé ne doit pas empêcher le rapport
+        print(f"  ! cartographie illisible : {exc}", file=sys.stderr)
+        return None
+
+
+def decimale(v: float | None, signe: bool = False) -> str:
+    return "n.d." if v is None else (f"{v:+.1f}" if signe else f"{v:.1f}").replace(".", ",")
+
+
+def section_cartographie(c: dict | None) -> list[str]:
+    """Résumé Markdown : gains et pertes sur les mots-clés principaux, prompts gagnés et perdus."""
+    if not c:
+        return []
+    l = ["## Cartographie : mots-clés et prompts principaux", ""]
+    if c.get("pages") is None:
+        return l + [f"Tableau du mois : `{c['fichier']}` (historique absent : relancer `cartographie.py mensuel`).", ""]
+    l += [f"{c['pages']} page(s) suivie(s), {c['a_creer']} à créer. Sur leur mot-clé principal : "
+          f"{c['en_hausse']} en hausse, {c['en_baisse']} en baisse, {c['top_10']} en page 1. "
+          f"Prompts principaux : site présent sur {c['prompts_presents']} des {c['prompts_mesures']} mesuré(s), "
+          f"{len(c['prompts_gagnes'])} gagné(s) et {len(c['prompts_perdus'])} perdu(s) ce mois-ci"
+          + (f" (relevé IA {c['mesure_ia']})" if c.get("mesure_ia") else "") + "."
+          + (f" Détail : `{c['fichier']}`." if c.get("fichier") else ""), ""]
+    lignes = [("hausse", x) for x in c["hausses"]] + [("baisse", x) for x in c["baisses"]]
+    if lignes:
+        l += ["| | Page | Mot-clé principal | Position | Δ places |", "|---|---|---|---|---|"]
+        for sens, x in lignes:
+            l.append(f"| {sens} | {x['url'].split('://', 1)[-1]} | {x['mot_cle_principal']} | "
+                     f"{decimale(x['position_mc_prec'])} → {decimale(x['position_mc'])} "
+                     f"| {decimale(x['delta_position_mc'], signe=True)} |")
+        l.append("")
+    for titre, cle in (("Prompts gagnés", "prompts_gagnes"), ("Prompts perdus", "prompts_perdus")):
+        if c.get(cle):
+            l += [f"{titre} : " + " ; ".join(f"« {x['prompt_principal']} »" for x in c[cle]) + ".", ""]
+    return l
+
+
 def a_valider(texte: str) -> int:
     """Entrées ouvertes de rapports/a-valider.md : les lignes de liste non cochées."""
     return len(re.findall(r"^\s*[-*] (?!\[x\])", texte, re.M))
@@ -172,7 +213,8 @@ def collecter(mois: str, site: str | None) -> dict:
             "requetes_nouvelles": requetes_nouvelles(req_prec, req),
             "journal": bilan_journal(journal, mois),
             "runs": bilan_runs(noms, mois),
-            "a_valider": a_valider(fichier_av.read_text(encoding="utf-8")) if fichier_av.is_file() else 0}
+            "a_valider": a_valider(fichier_av.read_text(encoding="utf-8")) if fichier_av.is_file() else 0,
+            "cartographie": cartographie(racine, mois)}
 
 
 # ─── Sorties ──────────────────────────────────────────────────────
@@ -185,6 +227,8 @@ def json_standard(r: dict) -> dict:
             "clics_variation_pct": t["clics_variation_pct"], "modifications": j["modifications"],
             "gains": j["gains"], "neutres": j["neutres"], "pertes": j["pertes"], "a_valider": r["a_valider"],
             "runs_attendus": r["runs"]["veille_attendues"], "runs_trouves": r["runs"]["veille_trouvees"],
+            # Ajoutée après coup : None quand le projet n'a pas de cartographie. Les clés ci-dessus ne bougent pas.
+            "cartographie": r.get("cartographie"),
             "detail": r}
 
 
@@ -229,6 +273,7 @@ def markdown(r: dict) -> str:
         l += ["## Requêtes apparues ce mois-ci", "", "| Requête | Impressions | Position |", "|---|---|---|"]
         l += [f"| {x['requete']} | {round(x['impressions'])} | {round(x['position'], 1)} |" for x in r["requetes_nouvelles"]]
         l.append("")
+    l += section_cartographie(r.get("cartographie"))
     j = r["journal"]
     l += ["## Modifications et mesures", "",
           f"{j['modifications']} modification(s) publiée(s) ce mois-ci"

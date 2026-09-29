@@ -35,6 +35,23 @@ indépendante de la qualité rédactionnelle.
 - **Claude** — sources fiables, données vérifiables
 - **Gemini** — cohérence de l'entité dans l'écosystème Google
 
+## Faits extractibles et entités reliées
+
+Un moteur retient des triplets : sujet — prédicat — objet. Vérifiez que les
+faits clés de la page sont écrits ainsi, une idée par phrase, sujet nommé
+(jamais « il » ou « cette offre » en tête de section), dans les 200 premiers
+mots ; que chaque entité principale est reliée à son QID Wikidata dans le
+JSON-LD ; et qu'aucune autre page du site ne donne une autre valeur au même
+fait. Méthode : skill `seo-entites-triplets`.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" extraire <page|url>        # ce que la page affirme
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" coherence contenus/ --triplets memoire/triplets.csv
+```
+
+Une contradiction entre deux pages coûte plus qu'une page absente : le
+moteur cite l'une, l'autre ou aucune.
+
 ## Livrable principal
 
 Le **paragraphe de réponse directe réécrit** : 40-60 mots, répond dès la

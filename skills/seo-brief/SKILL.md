@@ -3,8 +3,9 @@ name: seo-brief
 description: >
   Produit un brief SEO consolidé en 14 sections, en deux variantes :
   CRÉATION d'une page neuve ou OPTIMISATION d'un contenu existant (verdict,
-  décisions structurelles section par section). Données d'abord (SERP live,
-  PAA, AI Overview, Search Console, cannibalisation), puis intention, X-Ray
+  décisions structurelles section par section). Données d'abord (SERP live et
+  top 5 lu et mesuré, PAA, AI Overview, Search Console, cannibalisation,
+  style mesuré du client), puis intention, X-Ray
   du top 5, information gain, mix de mots-clés, noyau sémantique, H1 et
   intro rédigés, plan Hn détaillé, prompts GEO, maillage et priorités
   chiffrées. Déclencher sur "brief", "brief SEO", "brief rédactionnel",
@@ -37,19 +38,36 @@ il exécute.
 **Ne rédigez jamais un brief sans avoir regardé la SERP.** C'est la
 différence entre un brief et une supposition.
 
-1. **SERP live**, dans chaque langue du projet :
+1. **SERP live et top 5 lu**, dans chaque langue du projet :
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" serp --mot "<mot-clé>" --langue fr
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/serp_concurrents.py" --mot "<mot-clé>" --langue fr
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/serp_concurrents.py" --mot "<mot-clé>" --url <URL existante>   # OPTIMISATION
    ```
-   Top 10 organique, questions « Autres questions posées », présence d'un AI
-   Overview, recherches associées (~0,002 $ l'appel). Fonctionne sans
-   connecteur, donc aussi dans une routine.
+   Une SERP DataForSEO (top 10, PAA dépliées, AI Overview et ses sources,
+   recherches associées, features ; 0,002 à 0,004 $), puis les 5 premières
+   pages concurrentes lues une à une. Sans connecteur, donc aussi dans une
+   routine. Deux fichiers dans `recherche/` :
+   - `serp-<slug>-<date>.md` — les mesures : longueur (médiane et 3e
+     quartile), plans Hn, sujets de H2 récurrents, questions marquées
+     « traitée par le top : oui / non », extrait et sources de l'AI
+     Overview, champ sémantique commun, ton du top ; avec `--url`, ce qui
+     manque à la page du client (sujets, questions, termes, longueur) ;
+   - `serp-<slug>-<date>-contenus.md` — le contenu de chaque concurrent,
+     titres et listes conservés. **Lisez-le** : angles, preuves et failles
+     ne se mesurent pas, ils se lisent.
+
+   Une page illisible (403, rendu JavaScript) est signalée, pas inventée :
+   `--repli-dataforseo` la relit par DataForSEO (payant, coût affiché), ou
+   lisez-la avec Firecrawl.
 2. **Secondaires et longue traîne**, avec volume, KD, intention et tendance :
    ```bash
    python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" idees --graines "<mot-clé>, <variante>" --langue fr
    ```
-3. **Top 5 réellement lu** (Firecrawl) : plans Hn, angles, preuves, longueur.
-   Pas résumé de mémoire.
+3. **Style de la maison** : `memoire/style.md`. S'il manque, mesurez-le sur
+   5 à 10 pages écrites par le client (articles, pages de service) :
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/style_maison.py" <url1> <url2> …
+   ```
 4. **Existant** (variante OPTIMISATION) : contenu actuel de l'URL et ses
    requêtes Search Console sur 90 jours :
    ```bash
@@ -101,8 +119,8 @@ renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 13).
 | Mot-clé secondaire | + volume, KD |
 | URL cible | existante, ou proposée : courte, descriptive, avec le mot-clé |
 | Objectif | trafic, lead, vente, citation IA |
-| Nombre de mots cible | fourchette tirée du top 5, jamais un objectif de remplissage |
-| Tonalité / style | repris de `projet.ton` |
+| Nombre de mots cible | fourchette **mesurée** : médiane → 3e quartile du top (rapport SERP), jamais un objectif de remplissage |
+| Tonalité / style | `memoire/style.md` (mesuré), à défaut `projet.ton` |
 | Langue | une ligne par langue si le projet est multilingue |
 | Gabarit CMS | type de page et ses blocs fixes |
 
@@ -134,14 +152,21 @@ renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 13).
 | Source | Angle | Structure Hn | Point fort | Faille à exploiter |
 |---|---|---|---|---|
 
-Sous le tableau : **AI Overview présent ?** oui/non, et quelles sources il
-cite. Type de pages qui rankent, features occupées (PAA, vidéo, pack local),
-fourchette de longueur.
+Structure, longueur, formats et date viennent du rapport SERP ; angle,
+point fort et faille, de la lecture de `-contenus.md`. Sous le tableau :
+**AI Overview présent ?** oui/non, quelles sources il cite, et ce que dit
+son extrait — c'est la réponse que l'IA retient déjà : la page la couvre
+**et** va plus loin. Type de pages qui rankent, features occupées (PAA,
+vidéo, pack local), fourchette de longueur.
 
 ### 4. Différenciation (information gain)
 
 - **L'angle unique en une phrase** : ce que cette page apporte que le top 10
   n'apporte pas. Si vous ne savez pas l'écrire, ne produisez pas la page.
+- **Où le chercher dans le rapport SERP** : les questions « traitée par le
+  top : **non** », les sujets qu'une seule page traite, ce que l'extrait de
+  l'AI Overview ne dit pas. Ce que tout le top fait (sujets récurrents) est
+  le ticket d'entrée, pas la différence.
 - **3 à 5 axes de valeur** : donnée propre, cas vécu, outil, grille de
   décision, cas particuliers. Ils alimentent la grille de `seo-benchmark`
   (au moins 5 axes gagnés avant publication).
@@ -157,7 +182,8 @@ fourchette de longueur.
 | COMPLÉMENTAIRE | | |
 
 Règle : **chaque terme HAUTE comble une lacune relevée en section 2** (en
-CRÉATION : une faille de la section 3). Un terme HAUTE sans lacune
+CRÉATION : une faille de la section 3). En OPTIMISATION, les « termes du
+top absents de la page » du rapport `--url` sont les premiers candidats. Un terme HAUTE sans lacune
 correspondante descend en MOYENNE.
 
 ### 6. Noyau sémantique — 15 à 20 termes
@@ -170,10 +196,25 @@ Trois grappes, une par moment de la recherche :
 - **Do** — agir : verbe + mot-clé, étapes, coûts, délais, termes
   techniques, choix d'un prestataire.
 
+Point de départ : le **champ sémantique commun** du rapport SERP (termes
+présents sur au moins la moitié du top) et ses questions. Triez, ne
+recopiez pas : un terme de navigation ou une marque concurrente n'a rien à
+faire dans le noyau.
+
 Plus : **entités nommées obligatoires** (organismes, normes, lois, outils,
 lieux — ce que le Knowledge Graph relie au sujet) et **glossaire métier**
 (le terme juste et son usage). Pas pour les caser : pour vérifier qu'aucun
 sous-sujet n'est oublié. Export : `champ-semantique.csv`.
+
+### Triplets et entités
+
+Le brief liste les **triplets à affirmer** : 3 à 8 faits sous la forme
+sujet — prédicat — objet, avec leur source et leur emplacement (réponse
+directe, H2, FAQ), tirés de `memoire/triplets.csv` pour cette page ; un
+fait absent du registre n'entre qu'avec une source nommée. Il liste aussi
+les entités principales avec leur QID (`memoire/entites.csv`) et celle qui
+va en `about`. Méthode, gabarit de la section et contrôle :
+`seo-entites-triplets` (`scripts/triplets.py verifier`).
 
 ### 7. H1 & introduction
 
@@ -193,6 +234,19 @@ sous-sujet n'est oublié. Export : `champ-semantique.csv`.
   pas.
 
 ### 8. Plan Hn détaillé
+
+**Construire le plan à partir du rapport SERP, dans cet ordre :**
+
+1. **Le socle** : les sujets récurrents (traités par au moins 2 pages du
+   top). Google les attend. Un sujet récurrent écarté l'est par écrit, avec
+   sa raison (hors intention, hors gabarit).
+2. **Les gaps** : les questions PAA qu'aucun titre du top ne traite, un
+   sujet isolé qui sert l'intention, et le H2 d'information gain
+   (section 4).
+3. **L'ordre** : celui du lecteur (comprendre → se reconnaître → agir),
+   jamais celui d'un concurrent.
+4. **Le volume** : le nombre de H2 suit la médiane du top, entre 5 et 8 ;
+   les mots par section se répartissent dans la fourchette de la section 0.
 
 5 à 8 H2, 2 à 3 H3 au plus par H2. Pour chaque H2 :
 
@@ -240,7 +294,11 @@ Chaque section existante a sa ligne. Aucune n'est laissée sans décision.
 
 ### 10. Style & formatage
 
-Ton et registre (`projet.ton`), vouvoiement ou tutoiement, paragraphes de 3
+Les **règles déduites** de `memoire/style.md` (adresse au lecteur,
+personne, longueur des phrases et des paragraphes, questions, listes) et sa
+section « Lecture » ; à défaut `projet.ton`. Le ton du top, dans le rapport
+SERP, dit le registre que la SERP récompense ; il ne remplace jamais la voix
+du client. Puis : paragraphes de 3
 à 4 lignes, listes de 6 puces au plus, une idée neuve par paragraphe,
 tableau obligatoire dès que l'information est comparative ou chiffrée.
 Formules interdites propres au projet : `regles.interdits`.
@@ -295,7 +353,8 @@ s'écrit pas — ni dans le brief, ni dans la page.
 
 ## Livrables
 
-- `recherche/briefs/<slug>.md` — le brief complet
+- `recherche/briefs/<slug>.md` — le brief complet, qui cite en tête le
+  rapport SERP dont il part (`recherche/serp-<slug>-<date>.md`)
 - `champ-semantique.csv` — noyau sémantique et entités
 - Le H1, l'introduction et la FAQ **déjà rédigés** — pas à faire par le
   rédacteur

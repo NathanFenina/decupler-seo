@@ -1,0 +1,56 @@
+<!--
+  Tableau comparatif — options, offres ou solutions côte à côte.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-comparatif.
+  - Conteneur défilant : le tableau garde sa largeur minimale et défile en
+    mobile au lieu de casser la page. tabindex="0" + aria-label le rendent
+    défilable au clavier ; la première colonne reste visible (sticky).
+  - <caption> dit ce qu'on compare ; <th scope="col"> et <th scope="row">
+    relient chaque cellule à ses en-têtes pour les lecteurs d'écran.
+  - Option recommandée : un libellé écrit ET une bordure — jamais la couleur
+    seule. Oui / non : un signe ET le mot (masqué visuellement).
+  - Honnêteté : dites où l'autre option est meilleure. Un tableau à charge ne
+    convainc pas celui qui a déjà lu la page concurrente (voir seo-comparatifs).
+  - Sous le tableau : la date de vérification et ce qui fait varier les valeurs.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-comparatif">
+<style>
+.dcp-comparatif{--co-primaire:var(--dcp-primaire,#1F4E79);--co-encre:var(--dcp-encre,#1B1F24);--co-texte-2:var(--dcp-texte-2,#4B5563);
+  --co-fond:var(--dcp-fond-doux,#F3F5F8);--co-bord:var(--dcp-bord,#D9DEE5);--co-rayon:var(--dcp-rayon,12px);margin:2rem 0;
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.5;color:var(--co-encre)}
+.dcp-comparatif *{box-sizing:border-box}
+.dcp-comparatif .dcp-comparatif-scroll{position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--co-bord);border-radius:var(--co-rayon)}
+.dcp-comparatif .dcp-comparatif-scroll:focus-visible{outline:2px solid var(--co-primaire);outline-offset:2px}
+.dcp-comparatif table{width:100%;min-width:560px;border-collapse:separate;border-spacing:0;font-size:.95rem;background:#fff}
+.dcp-comparatif caption{caption-side:top;text-align:left;padding:1rem 1rem .75rem;font-weight:700;font-size:1.02rem}
+.dcp-comparatif th,.dcp-comparatif td{padding:.8rem 1rem;text-align:left;vertical-align:top;border-top:1px solid var(--co-bord)}
+.dcp-comparatif thead th{background:var(--co-primaire);color:#fff;font-weight:600;border-top:0}
+.dcp-comparatif tbody th{font-weight:600;background:var(--co-fond)}
+.dcp-comparatif th:first-child{position:sticky;left:0;z-index:1}
+.dcp-comparatif thead th:first-child{background:var(--co-primaire)}
+.dcp-comparatif .dcp-comparatif-reco{box-shadow:inset 3px 0 0 var(--co-primaire),inset -3px 0 0 var(--co-primaire)}
+.dcp-comparatif thead .dcp-comparatif-reco{box-shadow:none}
+.dcp-comparatif .dcp-comparatif-badge{display:inline-block;margin-left:.4rem;padding:.1rem .5rem;border-radius:999px;background:#fff;
+  color:var(--co-primaire);font-size:.75rem;font-weight:700;vertical-align:middle}
+.dcp-comparatif .dcp-oui::before{content:"\2713\00A0";font-weight:700;color:var(--co-primaire)}
+.dcp-comparatif .dcp-non::before{content:"\2014\00A0";color:var(--co-texte-2)}
+.dcp-comparatif .dcp-invisible{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.dcp-comparatif .dcp-comparatif-note{margin:.75rem 0 0;font-size:.85rem;color:var(--co-texte-2)}
+</style>
+  <div class="dcp-comparatif-scroll" tabindex="0" role="region" aria-label="[Tableau : comparaison des options]">
+    <table>
+      <caption>[Ce que compare le tableau, et pour quel besoin]</caption>
+      <thead>
+        <tr><th scope="col">Critère</th><th scope="col" class="dcp-comparatif-reco">[Option A]<span class="dcp-comparatif-badge">Recommandé</span></th><th scope="col">[Option B]</th><th scope="col">[Option C]</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">[Critère décisif n° 1]</th><td class="dcp-comparatif-reco">[valeur]</td><td>[valeur]</td><td>[valeur]</td></tr>
+        <tr><th scope="row">[Critère n° 2]</th><td class="dcp-comparatif-reco"><span class="dcp-oui"><span class="dcp-invisible">Oui</span></span>[précision]</td><td><span class="dcp-non"><span class="dcp-invisible">Non</span></span>[précision]</td><td><span class="dcp-oui"><span class="dcp-invisible">Oui</span></span>[précision]</td></tr>
+        <tr><th scope="row">[Prix ou fourchette]</th><td class="dcp-comparatif-reco">[valeur]</td><td>[valeur]</td><td>[valeur]</td></tr>
+        <tr><th scope="row">Idéal pour</th><td class="dcp-comparatif-reco">[profil]</td><td>[profil — dites où cette option est meilleure]</td><td>[profil]</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="dcp-comparatif-note">[Valeurs vérifiées le date, sur les sites des éditeurs. Ce qui les fait varier.]</p>
+</div>

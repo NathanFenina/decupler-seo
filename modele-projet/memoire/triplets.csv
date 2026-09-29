@@ -1,0 +1,2 @@
+sujet,predicat,objet,source,date_verif,pages
+# Exemple (ligne commentée, ignorée par triplets.py) : Le bilan annuel,coûte,1 200 € HT,grille tarifaire 2026,2026-09-01,/offres/bilan-annuel/ | /tarifs/

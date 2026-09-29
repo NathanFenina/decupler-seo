@@ -94,7 +94,7 @@ Dans `decupler-seo.config.yml`, `publication.mode` :
 
 | Mode | Pour | Ce que fait le cycle |
 |---|---|---|
-| `cms` | WordPress, Webflow | publie par l'API, en brouillon ou en ligne selon `publication.statut_par_defaut`, après sauvegarde |
+| `cms` | WordPress, Webflow | publie par l'API (`scripts/wp.py` pour WordPress), en brouillon ou en ligne selon `publication.statut_par_defaut`, après sauvegarde ; une page déjà en ligne reçoit une révision à valider |
 | `depot` | site en code | crée une branche, modifie les fichiers de contenu, lance `controle.commandes` (contrôle des contenus, typage, build), ouvre une pull request. La fusion déclenche le déploiement : elle n'est faite seule qu'en mode `autonomous`, si tous les contrôles sont verts et qu'aucun chiffre n'est douteux ; sinon la PR reste ouverte avec ce qui bloque |
 
 Dans les deux cas, `scripts/controle_contenu.py` passe avant toute

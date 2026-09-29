@@ -1,0 +1,72 @@
+<!--
+  Bannière témoignages — faire parler les clients.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-temoignages.
+  Règles, sans exception :
+  - Uniquement des avis RÉELS, repris mot pour mot (coupes signalées par […]).
+    Un faux témoignage est une pratique commerciale trompeuse (Code de la
+    consommation, art. L121-2 et suivants), et il se repère.
+  - Chaque avis est attribué : prénom + initiale au minimum, fonction ou ville,
+    date, source (« Avis Google », « Entretien client ») avec lien quand l'avis
+    est public. Pas de photo de banque d'images : initiales, ou photo réelle
+    avec accord écrit.
+  - Note moyenne : seulement avec le nombre d'avis, la source et la date du
+    relevé. Dites si les avis sont triés ou non (art. L111-7-2).
+  - Ne balisez pas ces avis en Review/AggregateRating sur votre propre
+    Organization ou LocalBusiness : Google n'affiche pas d'étoiles pour des
+    avis publiés par l'entreprise sur elle-même.
+  - Trois avis : ils couvrent chacun une objection différente (prix, délai,
+    qualité), pas trois fois « très satisfait ».
+  - Sans avis réels, supprimez la bannière : ne la remplissez pas.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-temoignages">
+<style>
+.dcp-temoignages{--t-primaire:var(--dcp-primaire,#1F4E79);--t-encre:var(--dcp-encre,#1B1F24);--t-texte-2:var(--dcp-texte-2,#4B5563);
+  --t-fond:var(--dcp-fond-doux,#F3F5F8);--t-bord:var(--dcp-bord,#D9DEE5);--t-rayon:var(--dcp-rayon,12px);overflow-x:hidden}
+.dcp-temoignages *{box-sizing:border-box}
+.dcp-temoignages .dcp-temoignages-bande{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;
+  background:var(--t-fond);color:var(--t-encre);padding:clamp(2.5rem,6vw,4.5rem) clamp(1rem,4vw,3rem);
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);line-height:1.65}
+.dcp-temoignages .dcp-temoignages-in{max-width:1140px;margin:0 auto}
+.dcp-temoignages h2{font-family:var(--dcp-police-titres,inherit);font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.25;margin:0 0 .5rem;color:var(--t-encre)}
+.dcp-temoignages .dcp-temoignages-note{margin:0 0 1.75rem;color:var(--t-texte-2);font-size:.95rem}
+.dcp-temoignages .dcp-temoignages-note strong{color:var(--t-encre);font-variant-numeric:tabular-nums}
+.dcp-temoignages .dcp-temoignages-grille{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:0;padding:0;list-style:none}
+.dcp-temoignages .dcp-temoignages-grille>li{margin:0}
+.dcp-temoignages figure{margin:0;height:100%;display:flex;flex-direction:column;background:#fff;border:1px solid var(--t-bord);
+  border-radius:var(--t-rayon);padding:1.5rem}
+.dcp-temoignages blockquote{margin:0 0 1.25rem;flex:1;font-size:1rem;color:var(--t-encre)}
+.dcp-temoignages blockquote p{margin:0}
+.dcp-temoignages blockquote p::before{content:"\201C\00A0"}
+.dcp-temoignages blockquote p::after{content:"\00A0\201D"}
+.dcp-temoignages figcaption{display:flex;gap:.8rem;align-items:center;border-top:1px solid var(--t-bord);padding-top:1rem;font-size:.9rem;color:var(--t-texte-2)}
+.dcp-temoignages .dcp-temoignages-initiales{flex:0 0 auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:var(--t-primaire);color:#fff;font-weight:700;font-size:.95rem}
+.dcp-temoignages .dcp-temoignages-qui{display:block;font-weight:700;color:var(--t-encre)}
+.dcp-temoignages a{color:var(--t-primaire);text-underline-offset:3px}
+.dcp-temoignages a:focus-visible{outline:2px solid var(--t-primaire);outline-offset:2px}
+.dcp-temoignages .dcp-temoignages-pied{margin:1.25rem 0 0;font-size:.82rem;color:var(--t-texte-2)}
+</style>
+  <section class="dcp-temoignages-bande" aria-label="Avis de clients">
+    <div class="dcp-temoignages-in">
+      <h2>[Ce qu'en disent nos clients — ou une phrase qui reprend le bénéfice]</h2>
+      <p class="dcp-temoignages-note"><strong>[4,8/5]</strong> sur <strong>[N]</strong> avis [Google], relevés le [date] — <a href="[URL publique de la fiche d'avis]">voir tous les avis</a></p>
+      <ul class="dcp-temoignages-grille">
+        <li><figure>
+          <blockquote><p>[Avis réel, mot pour mot. Il répond à une objection : le prix.]</p></blockquote>
+          <figcaption><span class="dcp-temoignages-initiales" aria-hidden="true">[AB]</span><span><span class="dcp-temoignages-qui">[Prénom I.]</span>[Fonction ou ville] · [mois année] · <a href="[URL de l'avis]">[Source]</a></span></figcaption>
+        </figure></li>
+        <li><figure>
+          <blockquote><p>[Avis réel. Il répond à une autre objection : le délai.]</p></blockquote>
+          <figcaption><span class="dcp-temoignages-initiales" aria-hidden="true">[CD]</span><span><span class="dcp-temoignages-qui">[Prénom I.]</span>[Fonction ou ville] · [mois année] · <a href="[URL de l'avis]">[Source]</a></span></figcaption>
+        </figure></li>
+        <li><figure>
+          <blockquote><p>[Avis réel. Troisième objection : la qualité, le suivi.]</p></blockquote>
+          <figcaption><span class="dcp-temoignages-initiales" aria-hidden="true">[EF]</span><span><span class="dcp-temoignages-qui">[Prénom I.]</span>[Fonction ou ville] · [mois année] · <a href="[URL de l'avis]">[Source]</a></span></figcaption>
+        </figure></li>
+      </ul>
+      <p class="dcp-temoignages-pied">[Avis publiés sans tri, avec l'accord de leurs auteurs.]</p>
+    </div>
+  </section>
+</div>

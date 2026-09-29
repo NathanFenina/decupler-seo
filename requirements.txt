@@ -5,10 +5,11 @@
 # Aucune dépendance pour le cœur du dispositif : guard.py, doctor.py,
 # projet.py, journal.py, gsc.py (signature de la clé Google en Python pur),
 # controle_contenu.py, seo_live.py, internal_pagerank.py, gsc_analyse.py,
-# cms_restore.py --lister. C'est ce qui tourne dans les routines cloud.
+# cms_restore.py --lister, audit_images.py, images_generer.py. C'est ce qui
+# tourne dans les routines cloud.
 #
 # Les dépendances ci-dessous ne servent qu'aux scripts qui analysent des pages
-# web (crawl_site.py, onpage_score.py, audit_images.py, fetch_page.py…).
+# web (crawl_site.py, onpage_score.py, fetch_page.py…).
 #
 # Installation :  pip install -r requirements.txt
 
@@ -20,4 +21,4 @@ urllib3>=2.6.3,<3.0.0             # correctifs de sécurité
 # Optionnel — captures d'écran et analyse visuelle.
 # Le MCP Chrome DevTools couvre les mêmes besoins sans cette dépendance.
 playwright>=1.56.0,<2.0.0
-Pillow>=12.1.0,<13.0.0
+Pillow>=12.1.0,<13.0.0            # images_generer.py : conversion WebP et recadrage

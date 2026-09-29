@@ -1,0 +1,70 @@
+<!--
+  Hero — haut de page : H1, réponse directe, action principale, visuel LCP.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-hero.
+  - Le H1 porte le mot-clé. Si le thème affiche déjà le titre de la page,
+    masquez-le, ou transformez ce H1 en <p class="dcp-hero-titre"> : un seul H1.
+  - La réponse directe (40 à 60 mots) répond seule : c'est elle qu'extraient
+    Google et les moteurs IA. Un chiffre précis dedans.
+  - Une action principale (la même partout dans la page), une secondaire au plus.
+  - L'image est l'élément LCP : jamais loading="lazy", fetchpriority="high",
+    width et height réels, moins de 200 Ko. Photo réelle ou visuel qui montre
+    la prestation ; sans visuel utile, supprimez le bloc .dcp-hero-visuel.
+  - Les preuves : uniquement des chiffres vrais, sourcés dans la page.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Couleurs : variables --dcp-* du site, valeurs neutres par défaut.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-hero">
+<style>
+.dcp-hero{--h-primaire:var(--dcp-primaire,#1F4E79);--h-accent:var(--dcp-accent,#B4531A);--h-sur-accent:var(--dcp-sur-accent,#FFFFFF);
+  --h-encre:var(--dcp-encre,#1B1F24);--h-texte-2:var(--dcp-texte-2,#4B5563);--h-fond:var(--dcp-fond-doux,#F3F5F8);
+  --h-bord:var(--dcp-bord,#D9DEE5);--h-rayon:var(--dcp-rayon,12px);overflow-x:hidden}
+.dcp-hero *{box-sizing:border-box}
+.dcp-hero .dcp-hero-bande{background:var(--h-fond);color:var(--h-encre);padding:clamp(2.5rem,6vw,5rem) clamp(1rem,4vw,3rem);
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);line-height:1.65}
+.dcp-hero .dcp-hero-grille{max-width:1180px;margin:0 auto;display:grid;gap:clamp(1.5rem,5vw,3.5rem);align-items:center;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.dcp-hero .dcp-hero-surtitre{margin:0 0 .75rem;font-size:.9rem;font-weight:600;color:var(--h-primaire)}
+.dcp-hero h1,.dcp-hero .dcp-hero-titre{font-family:var(--dcp-police-titres,inherit);font-size:clamp(1.9rem,4.5vw,2.8rem);
+  line-height:1.12;margin:0 0 1rem;max-width:20ch;text-wrap:balance;color:var(--h-encre);font-weight:700}
+.dcp-hero .dcp-hero-reponse{font-size:clamp(1.05rem,1.6vw,1.18rem);margin:0 0 1.5rem;max-width:58ch;color:var(--h-encre)}
+.dcp-hero .dcp-hero-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin:0 0 .75rem}
+.dcp-hero .dcp-hero-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.85rem 1.6rem;
+  border-radius:var(--h-rayon);font-weight:700;text-decoration:none;transition:background-color .2s,border-color .2s}
+.dcp-hero .dcp-hero-principal{background:var(--h-accent);color:var(--h-sur-accent)}
+.dcp-hero .dcp-hero-principal:hover{filter:brightness(.92)}
+.dcp-hero .dcp-hero-secondaire{border:2px solid var(--h-primaire);color:var(--h-primaire);background:transparent}
+.dcp-hero .dcp-hero-secondaire:hover{background:#fff}
+.dcp-hero a:focus-visible{outline:2px solid var(--h-primaire);outline-offset:3px}
+.dcp-hero .dcp-hero-reassurance{margin:0 0 1.5rem;font-size:.88rem;color:var(--h-texte-2)}
+.dcp-hero .dcp-hero-preuves{list-style:none;margin:0;padding:1rem 0 0;border-top:1px solid var(--h-bord);display:flex;flex-wrap:wrap;gap:.5rem 1.75rem}
+.dcp-hero .dcp-hero-preuves li{margin:0;font-size:.92rem;color:var(--h-texte-2)}
+.dcp-hero .dcp-hero-preuves strong{display:block;font-size:1.35rem;line-height:1.2;color:var(--h-encre);font-variant-numeric:tabular-nums}
+.dcp-hero .dcp-hero-visuel img{display:block;width:100%;height:auto;border-radius:var(--h-rayon)}
+@media (max-width:640px){.dcp-hero .dcp-hero-actions a{width:100%}}
+@media (prefers-reduced-motion:reduce){.dcp-hero *{transition:none!important}}
+</style>
+  <section class="dcp-hero-bande" aria-labelledby="dcp-hero-h1">
+    <div class="dcp-hero-grille">
+      <div>
+        <p class="dcp-hero-surtitre">[Rubrique ou zone d'intervention — facultatif]</p>
+        <h1 id="dcp-hero-h1">[Service] à [ville] : [promesse concrète]</h1>
+        <p class="dcp-hero-reponse">[Réponse directe de 40 à 60 mots : qui, quoi, en combien de temps, à quel prix ou avec quelle garantie vérifiable. Elle se comprend hors contexte.]</p>
+        <div class="dcp-hero-actions"><a class="dcp-hero-principal" href="[URL réelle de l'action principale]">[Verbe + objet : Recevoir mon devis]</a><a class="dcp-hero-secondaire" href="tel:[+33XXXXXXXXX]">[Action secondaire : Appeler le 01 23 45 67 89]</a></div>
+        <p class="dcp-hero-reassurance">[Ce qui se passe après le clic · ce que ça n'engage pas]</p>
+        <ul class="dcp-hero-preuves">
+          <li><strong>[chiffre]</strong>[ce qu'il mesure]</li>
+          <li><strong>[chiffre]</strong>[ce qu'il mesure]</li>
+          <li><strong>[note/5]</strong>[sur N avis, source]</li>
+        </ul>
+      </div>
+      <div class="dcp-hero-visuel">
+        <picture>
+          <source type="image/avif" srcset="[slug]-hero-800.avif 800w, [slug]-hero-1200.avif 1200w" sizes="(max-width:700px) 100vw, 560px">
+          <source type="image/webp" srcset="[slug]-hero-800.webp 800w, [slug]-hero-1200.webp 1200w" sizes="(max-width:700px) 100vw, 560px">
+          <img src="[slug]-hero-1200.jpg" alt="[Ce que montre la photo, et pourquoi elle compte ici]" width="1200" height="900" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
+    </div>
+  </section>
+</div>

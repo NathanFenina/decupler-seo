@@ -126,10 +126,28 @@ QID de l'élément chimique, c'est dire aux machines une chose fausse avec
 aplomb. Méfiez-vous des homonymes.
 
 **Aucun QID de mémoire.** Chaque entité passe par le registre du projet
-(`memoire/entites.json`) : recherche Wikidata → lecture de la description →
+(`memoire/entites.csv`) : recherche Wikidata → lecture de la description →
 inscription. Une entité non vérifiée part **sans `sameAs`** plutôt qu'avec
 un faux. Re-vérification trimestrielle. Processus et format :
 `references/entites-wikidata.md`.
+
+**Générer et contrôler depuis le registre.** Le skill `seo-entites-triplets`
+tient le registre (`memoire/entites.csv`, `memoire/triplets.csv`) et fait
+dire au texte et au balisage les mêmes faits. Son script produit le
+fragment `about`/`mentions` d'une page, avec les `sameAs` Wikidata, à
+fusionner dans le nœud `WebPage` ; et il signale les entités nommées dans le
+texte mais absentes du JSON-LD, sans `sameAs`, ou reliées à un autre QID
+que celui du registre :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" jsonld --about "…" --depuis page.html --url <canonical>
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" verifier page.html --page <slug> --strict
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" wikidata "<libellé>" [--site <domaine>]
+```
+
+`DefinedTerm` pour le jargon, `knowsAbout` de l'`Organization`, `provider`
+du `Service`, `author` → `Person` : graphe complet dans
+`seo-entites-triplets/references/jsonld-entites.md`.
 
 ## Les pièges — ceux qui coûtent une erreur en Search Console
 
@@ -189,7 +207,9 @@ exactement ce que voient les robots qui ne rendent pas le JavaScript.
 
 Vérifiez toujours la **cohérence avec le contenu visible**. Un prix, une
 note ou un avis balisé qui n'apparaît pas sur la page est un motif d'action
-manuelle — la première cause de pénalité liée aux données structurées.
+manuelle — la première cause de pénalité liée aux données structurées. Un
+prix balisé égale la valeur du registre (`memoire/triplets.csv`) ;
+`triplets.py coherence` trouve les pages où le texte dit autre chose.
 
 ## L'état des types en 2026
 
@@ -234,6 +254,6 @@ rich result associé.
 
 - `schema/socle-source.json` → `schema/socle-global.json` — le socle, régénéré, jamais édité
 - `schema/<slug>.json` — les nœuds de chaque page
-- `memoire/entites.json` — le registre des entités vérifiées
+- `memoire/entites.csv` — le registre des entités vérifiées (voir `seo-entites-triplets`)
 - `SCHEMA-RAPPORT.md` — existant, erreurs, opportunités, résultat du contrôle
 - `INSTRUCTIONS-POSE.md` — où et comment injecter selon le CMS

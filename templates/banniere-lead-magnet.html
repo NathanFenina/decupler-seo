@@ -1,0 +1,73 @@
+<!--
+  Bannière lead magnet — une ressource contre un email.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-lead-magnet.
+  - Montrez la ressource (couverture, aperçu d'une page), pas une icône.
+  - Trois points concrets de ce qu'elle contient, avec un chiffre si possible.
+  - Email seul : chaque champ en plus coûte des inscriptions. Le label est
+    visible (un placeholder n'est pas un label).
+  - Sous le bouton : ce qui sera envoyé, la fréquence, la désinscription en un
+    clic, le lien vers la politique de confidentialité.
+  - Aucun JavaScript : le formulaire poste vers l'outil d'emailing (action).
+    Vérifiez qu'une inscription de test arrive réellement dans la liste, et que
+    la page de confirmation livre la ressource immédiatement.
+  - Pas de fenêtre bloquante : ce bloc s'insère dans la page. Si une fenêtre
+    est imposée : fermable, jamais à l'arrivée sur mobile (voir le skill
+    seo-design-pages, cta-et-bannieres.md).
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-lead-magnet">
+<style>
+.dcp-lead-magnet{--lm-primaire:var(--dcp-primaire,#1F4E79);--lm-accent:var(--dcp-accent,#B4531A);--lm-sur-accent:var(--dcp-sur-accent,#FFFFFF);
+  --lm-encre:var(--dcp-encre,#1B1F24);--lm-texte-2:var(--dcp-texte-2,#4B5563);--lm-fond:var(--dcp-fond-doux,#F3F5F8);
+  --lm-bord:var(--dcp-bord,#D9DEE5);--lm-rayon:var(--dcp-rayon,12px);overflow-x:hidden}
+.dcp-lead-magnet *{box-sizing:border-box}
+.dcp-lead-magnet .dcp-lm-bande{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;background:var(--lm-fond);
+  color:var(--lm-encre);padding:clamp(2.5rem,6vw,4.5rem) clamp(1rem,4vw,3rem);
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);line-height:1.6}
+.dcp-lead-magnet .dcp-lm-grille{max-width:1080px;margin:0 auto;display:grid;gap:clamp(1.5rem,5vw,3rem);align-items:center;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.dcp-lead-magnet .dcp-lm-visuel img{display:block;width:100%;max-width:420px;height:auto;margin:0 auto;border-radius:6px;
+  box-shadow:0 12px 32px rgba(20,33,46,.18)}
+.dcp-lead-magnet .dcp-lm-format{margin:0 0 .5rem;font-size:.9rem;font-weight:600;color:var(--lm-primaire)}
+.dcp-lead-magnet h2{font-family:var(--dcp-police-titres,inherit);font-size:clamp(1.45rem,3vw,2rem);line-height:1.2;margin:0 0 1rem;color:var(--lm-encre)}
+.dcp-lead-magnet .dcp-lm-points{margin:0 0 1.5rem;padding:0;list-style:none}
+.dcp-lead-magnet .dcp-lm-points li{position:relative;margin:0 0 .6rem;padding-left:1.6rem;color:var(--lm-encre)}
+.dcp-lead-magnet .dcp-lm-points li::before{content:"";position:absolute;left:0;top:.45em;width:.8rem;height:.45rem;
+  border-left:2px solid var(--lm-primaire);border-bottom:2px solid var(--lm-primaire);transform:rotate(-45deg)}
+.dcp-lead-magnet form{display:flex;flex-wrap:wrap;gap:.6rem;align-items:flex-end;margin:0}
+.dcp-lead-magnet .dcp-lm-champ{flex:1 1 240px;display:flex;flex-direction:column;gap:.3rem}
+.dcp-lead-magnet label{font-size:.9rem;font-weight:600;color:var(--lm-encre)}
+.dcp-lead-magnet input[type=email]{width:100%;min-height:48px;padding:.7rem .9rem;font-size:16px;border:1px solid var(--lm-texte-2);
+  border-radius:var(--lm-rayon);background:#fff;color:var(--lm-encre)}
+.dcp-lead-magnet input[type=email]:focus-visible{outline:2px solid var(--lm-primaire);outline-offset:2px}
+.dcp-lead-magnet button{min-height:48px;padding:.8rem 1.5rem;border:0;border-radius:var(--lm-rayon);background:var(--lm-accent);
+  color:var(--lm-sur-accent);font-weight:700;font-size:1rem;cursor:pointer}
+.dcp-lead-magnet button:hover{filter:brightness(.92)}
+.dcp-lead-magnet button:focus-visible{outline:2px solid var(--lm-primaire);outline-offset:3px}
+.dcp-lead-magnet .dcp-lm-mention{margin:.75rem 0 0;font-size:.82rem;color:var(--lm-texte-2)}
+.dcp-lead-magnet .dcp-lm-mention a{color:var(--lm-primaire)}
+@media (max-width:640px){.dcp-lead-magnet button{width:100%}}
+</style>
+  <section class="dcp-lm-bande" aria-label="[Recevoir le guide : titre de la ressource]">
+    <div class="dcp-lm-grille">
+      <div class="dcp-lm-visuel">
+        <img src="[slug]-couverture-guide.webp" alt="Couverture du guide « [titre de la ressource] »" width="840" height="1090" loading="lazy" decoding="async">
+      </div>
+      <div>
+        <p class="dcp-lm-format">[Guide PDF · 24 pages · mis à jour en mois année]</p>
+        <h2>[Ce que le lecteur saura faire après l'avoir lu]</h2>
+        <ul class="dcp-lm-points">
+          <li>[Contenu concret n° 1, avec un chiffre si possible]</li>
+          <li>[Contenu concret n° 2]</li>
+          <li>[Contenu concret n° 3 : un modèle, une grille, une checklist]</li>
+        </ul>
+        <form action="[URL d'inscription de l'outil d'emailing]" method="post">
+          <div class="dcp-lm-champ"><label for="dcp-lm-email">Votre adresse email</label><input id="dcp-lm-email" type="email" name="email" autocomplete="email" required></div>
+          <button type="submit">[Recevoir le guide]</button>
+        </form>
+        <p class="dcp-lm-mention">[Le guide, puis une lettre par mois au plus.] Désinscription en un clic. <a href="[URL de la politique de confidentialité]">Données personnelles</a></p>
+      </div>
+    </div>
+  </section>
+</div>

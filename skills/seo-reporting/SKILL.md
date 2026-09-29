@@ -18,7 +18,12 @@ livrable, c'est : **ce qui a bougé, pourquoi, et ce qu'on fait maintenant.**
 
 ## Étape 1 — Les chiffres : un script, pas l'agent
 
+Si le projet a une cartographie (`memoire/cartographie.csv`, skill
+`seo-cartographie`), son relevé d'abord, pour que le rapport en reprenne la
+synthèse :
+
 ```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/cartographie.py" mensuel --mois AAAA-MM
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rapport.py" [--mois AAAA-MM] [--site sc-domain:exemple.com] [--json]
 ```
 
@@ -29,11 +34,15 @@ Sans `--mois`, le mois précédent complet. Le script écrit :
   requêtes anonymisées par Google ; pages et requêtes en hausse et en
   baisse ; requêtes apparues ; modifications du mois et verdicts des mesures
   arrivées à échéance (journal) ; routines exécutées trouvées dans
-  `rapports/runs/` ; points en attente dans `rapports/a-valider.md`
+  `rapports/runs/` ; points en attente dans `rapports/a-valider.md` ; et,
+  quand la cartographie existe, sa synthèse : pages en hausse et en baisse
+  sur leur mot-clé principal, prompts principaux gagnés et perdus dans les
+  IA (le détail page par page est dans `rapports/cartographie-AAAA-MM.md`)
 - `rapports/AAAA-MM.json` — clés fixes (`clics`, `impressions`,
   `position_moyenne`, `clics_variation_pct`, `modifications`, `gains`,
   `neutres`, `pertes`, `a_valider`, `runs_attendus`, `runs_trouves`),
-  additionnables d'un projet à l'autre
+  additionnables d'un projet à l'autre, plus `cartographie` (null sans
+  cartographie)
 
 **L'agent n'écrit aucun chiffre de trafic.** Il rédige uniquement la section
 `## Lecture et décisions`, à la fin du fichier. Relancer `rapport.py`

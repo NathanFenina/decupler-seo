@@ -1,0 +1,26 @@
+[
+  {
+    "id": 12,
+    "link": "https://www.atlas-conseil.example/audit-seo-local/",
+    "slug": "audit-seo-local",
+    "type": "page",
+    "status": "publish",
+    "modified": "2026-08-02T10:14:00",
+    "title": {"rendered": "Audit SEO local&nbsp;: la méthode en 7 étapes"},
+    "content": {"rendered": "<p>Un <strong>audit SEO local</strong> commence par la fiche d&rsquo;établissement.</p>\n<h2>Pourquoi un audit local</h2>\n<p>Voir aussi <a href=\"/referencement-local/\">le référencement local</a> et <a href=\"https://www.atlas-conseil.example/audit-seo-local/#etapes\">les étapes</a>.</p>\n<h2>Les 7 étapes</h2>\n<ol><li>Fiche</li><li>Avis</li></ol>\n<img src=\"https://www.atlas-conseil.example/wp-content/uploads/2026/08/carte.webp\" alt=\"carte\">\n<a href=\"https://www.atlas-conseil.example/wp-content/uploads/guide.pdf\">PDF</a>\n<a href=\"https://www.autre-site.example/etude\">une étude</a>\n<script>var x = 1;</script>"},
+    "yoast_head_json": {"title": "Audit SEO local : méthode en 7 étapes | Atlas Conseil", "description": "Ancienne description de la page d&#039;audit local."},
+    "meta": {"_yoast_wpseo_title": "", "_yoast_wpseo_metadesc": ""}
+  },
+  {
+    "id": 14,
+    "link": "https://www.atlas-conseil.example/referencement-local/",
+    "slug": "referencement-local",
+    "type": "page",
+    "status": "publish",
+    "modified": "2026-07-15T08:00:00",
+    "title": {"rendered": "Référencement local pour les PME"},
+    "content": {"rendered": "<p>Le référencement local aide les PME à apparaître sur Google Maps.</p><h2>Fiche d’établissement et avis</h2><p>La fiche et les avis clients pèsent lourd. Un audit SEO local complet permet de prioriser.</p>"},
+    "yoast_head_json": {"title": "Référencement local pour PME | Atlas Conseil", "description": "Le référencement local pour les PME : fiche d’établissement, avis, pages locales."},
+    "meta": {}
+  }
+]

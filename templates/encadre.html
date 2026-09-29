@@ -1,0 +1,43 @@
+<!--
+  Encadré — trois variantes : conseil, attention, limites.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-encadre.
+  - Conseil (.dcp-encadre-conseil) : une astuce actionnable, tout de suite.
+  - Attention (.dcp-encadre-attention) : un piège, un signal d'alarme.
+  - Limites (.dcp-encadre-limites) : ce que vous ne promettez pas. Obligatoire
+    dès que la page parle d'un résultat, d'un délai ou d'un budget : il borne
+    la promesse, rassure, et les moteurs IA reprennent volontiers les pages qui
+    ne promettent pas trop.
+  - La variante se lit par un libellé écrit (« Conseil », « Attention »),
+    pas seulement par la couleur.
+  - Un encadré par section au plus : trois d'affilée ne se lisent plus.
+  - Gardez un seul bloc <style> par page si vous collez plusieurs encadrés.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets] et gardez la variante utile.
+-->
+<div class="dcp-encadre">
+<style>
+.dcp-encadre{--en-primaire:var(--dcp-primaire,#1F4E79);--en-encre:var(--dcp-encre,#1B1F24);--en-texte-2:var(--dcp-texte-2,#4B5563);
+  --en-fond:var(--dcp-fond-doux,#F3F5F8);--en-bord:var(--dcp-bord,#D9DEE5);--en-rayon:var(--dcp-rayon,12px);
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.6}
+.dcp-encadre *{box-sizing:border-box}
+.dcp-encadre aside{margin:1.75rem 0;padding:1.1rem 1.3rem;border-radius:var(--en-rayon);border-left:4px solid;color:var(--en-encre)}
+.dcp-encadre aside p{margin:0}
+.dcp-encadre aside p+p{margin-top:.5rem}
+.dcp-encadre .dcp-encadre-libelle{display:block;margin-bottom:.25rem;font-weight:700}
+.dcp-encadre .dcp-encadre-conseil{background:var(--en-fond);border-color:var(--en-primaire)}
+.dcp-encadre .dcp-encadre-conseil .dcp-encadre-libelle{color:var(--en-primaire)}
+.dcp-encadre .dcp-encadre-attention{background:#FFF6E8;border-color:#9A5B00}
+.dcp-encadre .dcp-encadre-attention .dcp-encadre-libelle{color:#7A4700}
+.dcp-encadre .dcp-encadre-limites{background:#fff;border:1px solid var(--en-bord);border-left:4px solid var(--en-texte-2)}
+.dcp-encadre .dcp-encadre-limites .dcp-encadre-libelle{color:var(--en-encre)}
+</style>
+  <aside class="dcp-encadre-conseil" aria-label="Conseil">
+    <p><strong class="dcp-encadre-libelle">Conseil</strong>[Une astuce actionnable, en une ou deux phrases.]</p>
+  </aside>
+  <aside class="dcp-encadre-attention" aria-label="Attention">
+    <p><strong class="dcp-encadre-libelle">Attention</strong>[Le piège, et comment le repérer.]</p>
+  </aside>
+  <aside class="dcp-encadre-limites" aria-label="Ce que nous ne promettons pas">
+    <p><strong class="dcp-encadre-libelle">Ce que nous ne promettons pas</strong>[Ce qui ne peut pas être garanti, et pourquoi. Ce qui, en revanche, s'engage : un délai, une méthode, un livrable.]</p>
+  </aside>
+</div>

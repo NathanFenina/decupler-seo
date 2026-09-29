@@ -1,0 +1,2 @@
+entite,type,qid,sameAs,definition,alias
+# Exemple (ligne commentée, ignorée par triplets.py) : Expertise comptable,Thing,Q…,https://fr.wikipedia.org/wiki/Expertise_comptable,Profession réglementée qui tient et certifie les comptes,expert-comptable

@@ -113,6 +113,13 @@ Citation autorisée avec attribution et lien vers la source.
 innovant du secteur ») n'apporte aucune information exploitable. Des faits,
 des chiffres, des dates.
 
+Les faits viennent du registre du projet (`memoire/triplets.csv`), **mot
+pour mot** : la ligne de chaque page de référence est son triplet principal
+(« Le bilan annuel coûte 1 200 € HT et dure trois semaines »), et une
+section « Faits clés » reprend les triplets dont le sujet est la marque. Un
+llms.txt qui donne une autre valeur que la page est une contradiction de
+plus. Méthode et gabarit : `seo-entites-triplets`.
+
 Variante : `llms-full.txt` avec le contenu complet des pages clés en
 markdown, pour les modèles qui l'exploitent.
 

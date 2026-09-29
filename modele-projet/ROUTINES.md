@@ -65,8 +65,9 @@ Commite et pousse sur une branche claude/contenu-<date>.
 Tu es le SEO manager de ce projet. Lis CLAUDE.md.
 Lance le skill seo-cycle en mode rapport : mesure toutes les modifications
 arrivées à échéance (seo-journal-mesure), mets à jour
-memoire/apprentissages.md, écris rapports/<AAAA-MM>.md et
-rapports/<AAAA-MM>.json. Vérifie aussi rapports/runs/ : signale toute
+memoire/apprentissages.md, relève la cartographie du mois
+(cartographie.py mensuel → rapports/cartographie-<AAAA-MM>.md), puis écris
+rapports/<AAAA-MM>.md et rapports/<AAAA-MM>.json. Vérifie aussi rapports/runs/ : signale toute
 routine qui n'a pas produit son journal de run ce mois-ci.
 Commite et pousse sur une branche claude/rapport-<date>.
 ```

@@ -1,0 +1,35 @@
+<!--
+  En bref — 3 à 5 points à retenir.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-en-bref.
+  - Deux usages : « En bref » après le chapô (le lecteur pressé a tout en
+    15 secondes), « Ce qu'il faut retenir » en fin d'article. Changez le titre.
+  - Chaque point est une phrase complète et autonome, avec un chiffre ou un
+    fait : c'est le bloc que citent les moteurs IA. Pas de puce de trois mots.
+  - Le mot-clé principal apparaît dans le premier point, naturellement.
+  - Pas de nouveauté ici : l'encadré résume, il n'ajoute pas.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-en-bref">
+<style>
+.dcp-en-bref{--eb-primaire:var(--dcp-primaire,#1F4E79);--eb-encre:var(--dcp-encre,#1B1F24);--eb-fond:var(--dcp-fond-doux,#F3F5F8);
+  --eb-rayon:var(--dcp-rayon,12px);margin:1.75rem 0;font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.6}
+.dcp-en-bref *{box-sizing:border-box}
+.dcp-en-bref .dcp-en-bref-boite{background:var(--eb-fond);border-top:3px solid var(--eb-primaire);border-radius:0 0 var(--eb-rayon) var(--eb-rayon);
+  padding:clamp(1.1rem,3vw,1.6rem) clamp(1.1rem,3vw,1.75rem)}
+.dcp-en-bref .dcp-en-bref-titre{margin:0 0 .75rem;font-size:1.15rem;font-weight:700;color:var(--eb-primaire)}
+.dcp-en-bref ul{margin:0;padding:0;list-style:none}
+.dcp-en-bref li{position:relative;margin:0 0 .6rem;padding-left:1.3rem;color:var(--eb-encre)}
+.dcp-en-bref li:last-child{margin-bottom:0}
+.dcp-en-bref li::before{content:"";position:absolute;left:0;top:.8em;width:.65rem;height:2px;background:var(--eb-primaire)}
+</style>
+  <section class="dcp-en-bref-boite" aria-label="En bref">
+    <p class="dcp-en-bref-titre">[En bref — ou : Ce qu'il faut retenir]</p>
+    <ul>
+      <li>[Point n° 1 : la réponse à la question du titre, avec le mot-clé et un chiffre.]</li>
+      <li>[Point n° 2 : une condition, une exception ou un délai.]</li>
+      <li>[Point n° 3 : ce que ça coûte ou ce que ça change.]</li>
+      <li>[Point n° 4 : l'erreur à éviter.]</li>
+    </ul>
+  </section>
+</div>

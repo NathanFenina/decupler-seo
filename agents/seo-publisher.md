@@ -15,6 +15,11 @@ publique et parfois irréversible.
 
 ## WordPress
 
+Tout passe par `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/wp.py"` (`verifier`,
+`publier`, `media`, `meta`, `carte`, `maillage`, `remplacer`) : garde-fou,
+sauvegarde, brouillon par défaut, révision pour une page en ligne, journal.
+`--simuler` d'abord. Le détail est dans le skill `seo-publication-cms`.
+
 Authentification par **mot de passe d'application**, jamais le mot de passe
 de connexion.
 
@@ -41,6 +46,12 @@ Une réponse 200 de l'API ne prouve rien. Vérifiez : l'URL répond, le contenu
 s'affiche entièrement (comparez le nombre de mots), les balises sont bien
 celles envoyées, le schema est présent et unique, les images s'affichent, le
 rendu mobile tient.
+
+Avant l'envoi, `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" <fichier> --strict`
+(aucun marqueur `__IMG_…__` oublié, image LCP sans `lazy`, dimensions
+présentes) ; après, la checklist de `seo-design-pages` sur la page en ligne :
+H1 unique (le thème n'en ajoute pas un second), CTA qui répondent en 200,
+aucune ligne vide transformée en `<p>` parasite.
 
 Sur une mise à jour de page positionnée : le contenu d'origine n'a pas été
 perdu, l'URL n'a pas changé, la canonical est intacte.

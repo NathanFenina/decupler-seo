@@ -1,0 +1,48 @@
+<!--
+  Sommaire — ancres vers les H2 d'un article long (dès 5 H2 ou 1 500 mots).
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-sommaire.
+  - <details open> : déplié par défaut, repliable d'un geste en mobile, sans
+    JavaScript. Les liens restent dans le HTML : Google peut en tirer des
+    liens d'ancre dans le résultat.
+  - Chaque lien pointe vers l'id d'un H2 existant (<h2 id="combien-ca-coute">).
+    Ids en minuscules, sans accents, stables : on les partage.
+  - Les intitulés reprennent les H2, raccourcis si besoin, jamais inventés.
+  - Placez-le après le chapô et l'encadré « En bref », avant la première section.
+  - Si l'en-tête du site est collant, ajoutez au thème :
+    h2[id]{scroll-margin-top:96px} (hauteur de l'en-tête + marge).
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-sommaire">
+<style>
+.dcp-sommaire{--so-primaire:var(--dcp-primaire,#1F4E79);--so-encre:var(--dcp-encre,#1B1F24);--so-texte-2:var(--dcp-texte-2,#4B5563);
+  --so-bord:var(--dcp-bord,#D9DEE5);--so-rayon:var(--dcp-rayon,12px);margin:1.75rem 0;
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.5}
+.dcp-sommaire *{box-sizing:border-box}
+.dcp-sommaire details{border:1px solid var(--so-bord);border-radius:var(--so-rayon);background:#fff}
+.dcp-sommaire summary{cursor:pointer;list-style:none;padding:.9rem 3rem .9rem 1.2rem;font-weight:700;color:var(--so-encre);position:relative}
+.dcp-sommaire summary::-webkit-details-marker{display:none}
+.dcp-sommaire summary::after{content:"+";position:absolute;right:1.2rem;top:.7rem;font-size:1.4rem;line-height:1;color:var(--so-primaire)}
+.dcp-sommaire details[open] summary::after{content:"\2212"}
+.dcp-sommaire summary:focus-visible{outline:2px solid var(--so-primaire);outline-offset:2px}
+.dcp-sommaire nav{padding:0 1.2rem 1rem}
+.dcp-sommaire ol{margin:0;padding:0 0 0 1.4rem}
+.dcp-sommaire li{margin:.35rem 0;padding-left:.2rem;color:var(--so-texte-2);font-variant-numeric:tabular-nums}
+.dcp-sommaire a{color:var(--so-primaire);text-decoration:none;border-bottom:1px solid transparent}
+.dcp-sommaire a:hover{border-bottom-color:currentColor}
+.dcp-sommaire a:focus-visible{outline:2px solid var(--so-primaire);outline-offset:2px}
+</style>
+  <details open>
+    <summary>Sommaire</summary>
+    <nav aria-label="Sommaire de l'article">
+      <ol>
+        <li><a href="#[id-du-h2-1]">[Intitulé du H2 n° 1]</a></li>
+        <li><a href="#[id-du-h2-2]">[Intitulé du H2 n° 2]</a></li>
+        <li><a href="#[id-du-h2-3]">[Intitulé du H2 n° 3]</a></li>
+        <li><a href="#[id-du-h2-4]">[Intitulé du H2 n° 4]</a></li>
+        <li><a href="#[id-du-h2-5]">[Intitulé du H2 n° 5]</a></li>
+        <li><a href="#faq">Questions fréquentes</a></li>
+      </ol>
+    </nav>
+  </details>
+</div>

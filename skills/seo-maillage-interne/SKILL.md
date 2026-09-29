@@ -23,7 +23,14 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/internal_pagerank.py" crawl.csv
 ```
 
 Vous obtenez par page : liens entrants internes, liens sortants, profondeur,
-score d'autorité interne. Croisez avec GSC (impressions, position) et GA4
+score d'autorité interne. Sur WordPress, ajoutez la carte du maillage
+**contextuel** — les liens du corps, sans menu ni pied de page :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/wp.py" carte       # → donnees/carte-contenu.csv
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/wp.py" maillage    # qui devrait lier les pages peu liées
+```
+ Croisez avec GSC (impressions, position) et GA4
 (conversions) — sans ces deux dimensions, vous optimisez à l'aveugle.
 
 ## Étape 2 — Les 5 diagnostics
@@ -93,7 +100,10 @@ l'exécutant doit choisir où mettre le lien, le plan est incomplet.
 ## Étape 5 — Appliquer
 
 **Mode autonomous + CMS branché** → application directe. Sauvegarde de
-l'état d'origine avant chaque modification.
+l'état d'origine avant chaque modification. Sur WordPress,
+`wp.py maillage --cible <url> --appliquer` pose le lien sur une ancre déjà
+présente dans le texte, en révision à valider pour une page en ligne ;
+sans ancre, le lien est listé à placer à la main.
 
 **Sinon** → le CSV, ligne par ligne. Comptez 2-3 minutes par lien à la main.
 

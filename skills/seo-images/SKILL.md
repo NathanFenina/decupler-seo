@@ -3,9 +3,11 @@ name: seo-images
 description: >
   Audite et optimise les images : poids, formats modernes, dimensions, alt,
   lazy loading, nommage, impact sur le LCP et le CLS, sitemap images, schema
-  ImageObject. Déclencher sur "images", "optimiser mes images", "alt", "poids
-  des images", "WebP", "AVIF", "SEO images", "Google Images", "mes images sont
-  trop lourdes", "lazy loading".
+  ImageObject ; et prévoit l'illustration d'un contenu neuf (combien, où,
+  brief de chaque image, légende). Déclencher sur "images", "optimiser mes
+  images", "alt", "poids des images", "WebP", "AVIF", "SEO images", "Google
+  Images", "mes images sont trop lourdes", "lazy loading", "illustrer
+  l'article", "brief image".
 ---
 
 # Images — le poids mort le plus facile à corriger
@@ -97,6 +99,36 @@ tirets, descriptif. Signal faible mais gratuit, et utile dans Google Images.
 Google comprend une image par ce qui l'entoure : la légende, le paragraphe
 qui la précède, le titre de la section. Une image placée dans un contexte
 cohérent est mieux indexée qu'une image isolée.
+
+## Illustrer un contenu neuf
+
+Plan d'images par type de page, règles de génération et prompts :
+`seo-design-pages` (`references/images.md`). Génération :
+`scripts/images_generer.py` (Gemini, OpenAI en repli ; `--dry-run` pour
+voir le prompt sans payer). Contrôle avant publication :
+`scripts/audit_images.py --strict`.
+
+- **Combien, où** : une image de couverture juste sous le H1, puis des
+  images de section réparties régulièrement sur les H2 — pour 2 images sur
+  6 sections, la 1re et la 4e ; pour 3, la 1re, la 3e et la 5e — placées
+  juste après le titre de leur section. Pas une image par H2 par principe.
+- **Informer avant de décorer** : schéma, tableau, capture, photo de
+  terrain. L'image dit quelque chose que le texte ne dit pas mieux ; si
+  elle répète un paragraphe, elle n'a pas lieu d'être.
+- **Le brief de chaque image** (génération ou graphiste) : le sujet est le
+  titre de la section et sa première phrase ; format paysage 16:9, un
+  sujet net, de l'espace autour ; **aucun texte incrusté, logo, filigrane
+  ni élément d'interface** ; un seul style sur tout l'article (photo
+  réaliste ou illustration, pas les deux).
+- **Sans génération disponible** : un emplacement et son brief plutôt
+  qu'une photo de banque générique —
+  `<!-- IMG 2 : schéma des trois étapes, du diagnostic à la réception -->`
+  puis `<img src="__IMG_2__" alt="…">` — et la liste des briefs en fin de
+  livrable, pour le client ou le graphiste.
+- **La légende** dit ce que l'image démontre (« ignorer une seule de ces
+  étapes suffit à bloquer la réception »), l'`alt` décrit ce qu'elle
+  montre (point 6). Les deux ne se recopient pas.
+- La couverture est souvent l'élément LCP : section suivante.
 
 ## Le hero — traitement particulier
 

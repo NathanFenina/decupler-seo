@@ -78,6 +78,14 @@ python3 scripts/cms_restore.py --lister
 python3 scripts/cms_restore.py .seo-decupler/backups/<fichier>.json
 ```
 
+### Une page en ligne ne change pas sans feu vert
+Sur WordPress, `scripts/wp.py` crée les contenus neufs en brouillon et
+envoie toute modification d'une page déjà publiée en **révision**
+(autosave) : la page publique ne bouge pas tant que personne ne l'a validée
+dans l'éditeur. La mise en ligne directe exige une demande explicite et le
+verdict `AUTORISE` du garde-fou ; chaque modification mise en ligne est
+journalisée avec sa valeur d'avant.
+
 ### Diff obligatoire sur les fichiers critiques
 robots.txt, redirections, canonicals : le diff est toujours présenté avant
 application, même en mode autonomous. Une règle `Disallow: /` posée par

@@ -15,7 +15,7 @@ de quarante minutes à six.
 | `seo-schema` | JSON-LD, validation, dépréciations, chaîne d'entité |
 | `seo-geo` | Citabilité par les moteurs IA, extractibilité, réponse directe |
 | `seo-netlinking` | Profil de liens, prospection, qualification, outreach |
-| `seo-frontend` | HTML autonome, CSS scopé, accessibilité, correctifs de performance |
+| `seo-frontend` | Design des pages (gabarit, CTA, bannières, images), HTML autonome, CSS scopé, accessibilité, correctifs de performance |
 | `seo-crawler` | Crawl, architecture, orphelines, profondeur, PageRank interne |
 | `seo-strategiste` | Priorisation, séquencement, arbitrages, roadmap |
 | `seo-publisher` | Publication CMS, sauvegarde, vérification post-mise en ligne |

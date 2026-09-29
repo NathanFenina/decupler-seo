@@ -1,0 +1,50 @@
+<!--
+  Bloc auteur — qui a écrit, pourquoi il est légitime, quand c'est à jour.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-auteur.
+  - Deux usages : version complète en fin d'article (photo, bio, liens) ;
+    version courte sous le H1 (nom, date de mise à jour) — supprimez alors la
+    photo et la bio.
+  - Bio factuelle : métier, années de pratique, ce qu'il a fait de vérifiable
+    (certification avec numéro, publications, missions). Pas de « passionné ».
+  - Photo réelle, jamais générée. Lien vers la page auteur du site (qui porte
+    le nœud Person du JSON-LD, voir seo-schema-jsonld) et vers un profil
+    public qui confirme l'identité.
+  - « Relu par » seulement si un second expert a réellement relu.
+  - Dates en <time datetime> : « mis à jour » change à chaque révision réelle
+    du fond, pas à chaque correction de virgule.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-auteur">
+<style>
+.dcp-auteur{--au-primaire:var(--dcp-primaire,#1F4E79);--au-encre:var(--dcp-encre,#1B1F24);--au-texte-2:var(--dcp-texte-2,#4B5563);
+  --au-fond:var(--dcp-fond-doux,#F3F5F8);--au-rayon:var(--dcp-rayon,12px);margin:2.5rem 0;
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.6}
+.dcp-auteur *{box-sizing:border-box}
+.dcp-auteur .dcp-auteur-carte{display:flex;flex-wrap:wrap;gap:1.25rem;align-items:flex-start;background:var(--au-fond);
+  border-radius:var(--au-rayon);padding:clamp(1.1rem,3vw,1.6rem)}
+.dcp-auteur img{flex:0 0 auto;width:96px;height:96px;border-radius:50%;object-fit:cover;display:block}
+.dcp-auteur .dcp-auteur-corps{flex:1 1 260px;min-width:0}
+.dcp-auteur .dcp-auteur-role{margin:0;font-size:.85rem;color:var(--au-texte-2)}
+.dcp-auteur .dcp-auteur-nom{margin:.1rem 0 .5rem;font-size:1.15rem;font-weight:700;color:var(--au-encre)}
+.dcp-auteur .dcp-auteur-nom a{color:inherit;text-decoration:none;border-bottom:1px solid var(--au-primaire)}
+.dcp-auteur p{margin:0 0 .6rem;color:var(--au-encre);font-size:.95rem}
+.dcp-auteur .dcp-auteur-meta{font-size:.85rem;color:var(--au-texte-2);margin:0}
+.dcp-auteur .dcp-auteur-liens{margin:.6rem 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.9rem}
+.dcp-auteur .dcp-auteur-liens a{color:var(--au-primaire);font-weight:600}
+.dcp-auteur a:focus-visible{outline:2px solid var(--au-primaire);outline-offset:2px}
+</style>
+  <aside class="dcp-auteur-carte" aria-label="À propos de l'auteur">
+    <img src="[prenom-nom]-portrait.webp" alt="[Prénom Nom], [fonction]" width="192" height="192" loading="lazy" decoding="async">
+    <div class="dcp-auteur-corps">
+      <p class="dcp-auteur-role">Écrit par</p>
+      <p class="dcp-auteur-nom"><a href="[URL de la page auteur sur le site]">[Prénom Nom]</a>, [fonction]</p>
+      <p>[Deux phrases factuelles : métier, années de pratique, preuve vérifiable (certification n°…, missions, publications).]</p>
+      <p class="dcp-auteur-meta">Publié le <time datetime="[AAAA-MM-JJ]">[jour mois année]</time> · mis à jour le <time datetime="[AAAA-MM-JJ]">[jour mois année]</time> · relu par [Prénom Nom, fonction — si relu réellement]</p>
+      <ul class="dcp-auteur-liens">
+        <li><a href="[URL du profil professionnel public]">[Profil professionnel]</a></li>
+        <li><a href="[URL de la page auteur]">Tous ses articles</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>

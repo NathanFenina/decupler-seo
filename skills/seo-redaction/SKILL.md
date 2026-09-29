@@ -24,11 +24,14 @@ Interdiction d'écrire depuis les seules connaissances du modèle.
 
 Avant la première phrase :
 1. Lire le brief, ou le produire (`/seo brief`)
-2. Lire réellement le top 3 (Firecrawl) — pas le résumer de mémoire
+2. Lire réellement le top 3 : `recherche/serp-<slug>-<date>-contenus.md`
+   (produit par `serp_concurrents.py` avec le brief), sinon Firecrawl — pas
+   le résumer de mémoire
 3. Vérifier chaque chiffre à sa source, et le consigner dans
    `memoire/faits.md`
 4. Récupérer le vocabulaire de l'audience (Reddit, avis, forums)
-5. Lire `memoire/marque.md` : voix, vocabulaire validé, formules proscrites
+5. Lire `memoire/marque.md` (voix, vocabulaire validé, formules proscrites)
+   et `memoire/style.md` (le style mesuré — voir « Écrire comme la maison »)
 
 **Aucun chiffre inventé. Jamais.** Un chiffre sans source ne s'écrit pas.
 Si la donnée manque : soit on la trouve, soit on écrit la phrase sans elle.
@@ -37,8 +40,11 @@ Si la donnée manque : soit on la trouve, soit on écrit la phrase sans elle.
 **Ordre de priorité en cas de conflit :**
 - Une donnée de recherche récente et sourcée **remplace** un fait périmé du
   brief. Signalez la correction en tête du fichier.
-- La voix de marque (`memoire/marque.md`) **prime sur le brief** : un brief
-  ne change pas la manière dont la marque parle.
+- La voix de marque (`memoire/marque.md`, puis `memoire/style.md`) **prime
+  sur le brief** : un brief ne change pas la manière dont la marque parle.
+  Si les deux fichiers se contredisent (la config dit vouvoiement, les pages
+  tutoient), `marque.md` l'emporte — c'est lui que le client a validé — et
+  l'écart se signale.
 
 ## Règle un — vérifier qu'il faut écrire (anti-cannibalisation)
 
@@ -83,6 +89,9 @@ Si vous ne trouvez pas de thèse, vous n'avez pas encore assez cherché.
 - Paragraphes de **3 à 4 lignes au plus**.
 - Encadrés « Conseil » et « Attention » pour ce que le lecteur ne doit pas
   manquer.
+- Une puce qui définit ou compare commence par son terme en gras :
+  « - **Délai :** trois semaines en moyenne, car… ». Le gras sert aux
+  idées-clés, jamais à des phrases entières ni à faire office de titre.
 
 ### L'ouverture — les 100 premiers mots
 1. **Une situation concrète** du lecteur, avec le mot-clé dans la première
@@ -157,6 +166,45 @@ fois — et Google aussi. Chaque page porte au moins **un bloc qui n'existe que
 chez elle**, d'un type que ses voisines n'emploient pas : grille de
 diagnostic, tableau de livrables, aide à la décision, référentiel de formats,
 routeur « votre situation → par où commencer ».
+
+## Écrire comme la maison
+
+Un texte juste mais qui ne sonne pas comme le reste du site se repère :
+par le lecteur qui passe d'une page à l'autre, et par le client qui relit.
+Le style se **mesure** sur les pages que le client a écrites lui-même, pas
+se devine :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/style_maison.py" <url1> <url2> …   # 5 à 10 pages
+```
+
+`memoire/style.md` contient alors des **règles déduites** chiffrées
+(vouvoiement ou tutoiement, « nous » ou impersonnel, longueur moyenne des
+phrases, part de phrases courtes et longues, taille des paragraphes,
+fréquence des questions et des listes, façon d'ouvrir et de conclure), les
+**expressions** et le **vocabulaire** qui reviennent, et une section
+**Lecture** : registre, traits de voix, à faire, à éviter. Cette section-là
+se remplit en lisant les pages — le script ne la devine pas — et reste en
+place quand on relance la mesure.
+
+En rédigeant :
+- **Le rythme** : la phrase moyenne du texte tombe à ±3 mots de celle de la
+  maison ; les règles anti-détection ci-dessous jouent *autour* de ce
+  rythme, pas contre lui.
+- **L'adresse et la personne** : celles de la maison, sans exception dans
+  un même texte.
+- **Les expressions** : reprenez celles qui portent la marque ; évitez
+  celles qui sont des tics.
+- **Vérifier** le brouillon avec le même instrument, avant la relecture :
+  ```bash
+  python3 "${CLAUDE_PLUGIN_ROOT}/scripts/style_maison.py" contenus/<slug>.md --json
+  ```
+  Phrase moyenne, adresse et personne comparées à `memoire/style.md` ; un
+  écart se corrige, il ne se justifie pas.
+
+Sans `memoire/style.md` (site neuf, pas de page écrite par le client) :
+`projet.ton` et `memoire/marque.md`, et le ton du top relevé dans le rapport
+SERP comme repère de registre — jamais comme voix.
 
 ## Le style — ne pas écrire comme une IA
 
@@ -249,6 +297,14 @@ Un LLM cite ce qu'il peut extraire proprement :
 - **Réponse directe** en haut, autonome hors contexte
 - **Définitions explicites** : « Le X est un Y qui permet de Z. » Une
   phrase, complète, sans référence au paragraphe précédent
+- **Les faits en triplets** : chaque triplet du brief devient une phrase
+  dont le sujet est nommé (jamais « il » ou « cette offre » en tête de
+  section), une idée par phrase, la valeur recopiée de
+  `memoire/triplets.csv` sans la reformuler. Les 2 ou 3 triplets principaux
+  tiennent dans les 200 premiers mots ; chaque H2 s'ouvre par le sien ;
+  chaque réponse de FAQ commence par le sien. Avant remise :
+  `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" verifier <page> --strict`
+  (voir `seo-entites-triplets`).
 - **Données chiffrées sourcées** : les LLM privilégient le vérifiable
 - **Structure lisible par machine** : titres explicites, listes, tableaux
 - **FAQ en fin d'article** avec des réponses de 40-60 mots
@@ -293,7 +349,10 @@ Mesure : relancer le relevé du prompt à J+28 et journaliser l'écart.
 ## Longueur
 
 **Le nombre de mots n'est pas un facteur de classement.** Écrivez ce que le
-sujet exige ; le top 3 donne un ordre de grandeur, pas un objectif. Un
+sujet exige ; le top donne un ordre de grandeur, pas un objectif. Cet ordre
+de grandeur est **mesuré** : la fourchette du brief (médiane → 3e quartile du
+top, `serp_concurrents.py`). La dépasser demande un angle qui le justifie ;
+rester nettement en dessous, une page qui répond plus vite. Un
 article de 900 mots qui répond complètement bat un article de 2 500 mots
 dont 1 600 sont du remplissage.
 
@@ -308,6 +367,8 @@ dont 1 600 sont du remplissage.
 ## Relecture avant remise
 
 - [ ] Chaque chiffre a sa source, reliée dans `memoire/faits.md`
+- [ ] `triplets.py verifier --strict` passe : triplets du brief affirmés,
+      sujets nommés, aucune valeur contredite
 - [ ] Aucune réalisation sur-attribuée : ce qui a été fait par d'autres, ou
       en partie, est dit comme tel
 - [ ] Le vocabulaire est celui validé par le client (`memoire/marque.md`)
@@ -319,6 +380,10 @@ dont 1 600 sont du remplissage.
 - [ ] Aucune formule des interdits, `controle_contenu.py` passe
 - [ ] Densité du mot-clé dans la cible, sous le plafond
 - [ ] Les liens internes du brief sont posés
+- [ ] Rythme, adresse et personne conformes à `memoire/style.md`
+      (`style_maison.py … --json`)
+- [ ] Le fichier commence par le H1 : aucun préambule (« Voici
+      l'article… »), aucun bloc de code autour du texte
 - [ ] Un lecteur du métier apprendrait quelque chose
 - [ ] Vous seriez à l'aise de le signer de votre nom
 
@@ -331,6 +396,8 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/controle_contenu.py" contenus/<slug>.md
 - `article-<slug>.md` — le texte
 - `article-<slug>.html` — si destiné à un CMS (`/seo page`)
 - `sources.md` — chaque affirmation chiffrée et son lien
+- Les emplacements d'images et leur brief (`seo-images`, « Illustrer un
+  contenu neuf »)
 - Le schema JSON-LD correspondant (`/seo schema`)
 
 Enchaînez : `/seo publish` pour la mise en ligne en brouillon.

@@ -61,6 +61,13 @@ chiffres officiels **avec leur source**, interdits, preuves. C'est le
 fichier qui fait la différence entre un contenu du client et un contenu
 générique — il mérite dix minutes.
 
+Si le site a déjà des pages écrites par le client, mesurer son style dans
+la foulée (5 à 10 pages), puis remplir la section « Lecture » :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/style_maison.py" <url1> <url2> …
+```
+
 ## 3. Le dépôt privé
 
 ```bash

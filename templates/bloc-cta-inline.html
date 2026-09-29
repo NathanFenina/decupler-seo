@@ -1,0 +1,40 @@
+<!--
+  CTA dans le texte — l'appel contextuel au milieu d'un article.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-cta-inline.
+  - Placez-le juste APRÈS la section où le besoin apparaît, jamais avant que
+    la question du titre ait reçu sa réponse.
+  - Le titre reprend le problème que la section vient de décrire ; la phrase
+    dit ce que vous faites pour le lecteur ; le bouton est l'action principale
+    de la page, avec le même libellé qu'ailleurs.
+  - Un par article, deux au plus (milieu et fin). Ce n'est pas une bannière :
+    il reste dans la colonne de lecture.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-cta-inline">
+<style>
+.dcp-cta-inline{--ci-primaire:var(--dcp-primaire,#1F4E79);--ci-accent:var(--dcp-accent,#B4531A);--ci-sur-accent:var(--dcp-sur-accent,#FFFFFF);
+  --ci-encre:var(--dcp-encre,#1B1F24);--ci-texte-2:var(--dcp-texte-2,#4B5563);--ci-fond:var(--dcp-fond-doux,#F3F5F8);
+  --ci-rayon:var(--dcp-rayon,12px);margin:2rem 0}
+.dcp-cta-inline *{box-sizing:border-box}
+.dcp-cta-inline .dcp-cta-inline-carte{background:var(--ci-fond);border-left:4px solid var(--ci-primaire);border-radius:var(--ci-rayon);
+  padding:clamp(1.1rem,3vw,1.6rem) clamp(1.1rem,3vw,1.75rem);display:grid;gap:1rem;align-items:center;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.6}
+.dcp-cta-inline .dcp-cta-inline-titre{margin:0 0 .35rem;font-size:1.12rem;font-weight:700;color:var(--ci-encre)}
+.dcp-cta-inline p{margin:0;color:var(--ci-texte-2);font-size:.97rem}
+.dcp-cta-inline .dcp-cta-inline-action{text-align:right}
+.dcp-cta-inline .dcp-cta-inline-action a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.8rem 1.5rem;
+  border-radius:var(--ci-rayon);background:var(--ci-accent);color:var(--ci-sur-accent);font-weight:700;text-decoration:none}
+.dcp-cta-inline .dcp-cta-inline-action a:hover{filter:brightness(.92)}
+.dcp-cta-inline .dcp-cta-inline-action a:focus-visible{outline:2px solid var(--ci-primaire);outline-offset:3px}
+.dcp-cta-inline .dcp-cta-inline-action small{display:block;margin-top:.4rem;font-size:.8rem;color:var(--ci-texte-2)}
+@media (max-width:640px){.dcp-cta-inline .dcp-cta-inline-action{text-align:left}.dcp-cta-inline .dcp-cta-inline-action a{width:100%}}
+</style>
+  <aside class="dcp-cta-inline-carte" aria-label="[Proposition : Faire réaliser votre audit]">
+    <div>
+      <p class="dcp-cta-inline-titre">[Le problème décrit dans la section, en une question]</p>
+      <p>[Ce que vous faites pour le lecteur, avec un délai ou un livrable concret.]</p>
+    </div>
+    <div class="dcp-cta-inline-action"><a href="[URL réelle de l'action principale]">[Même libellé que les autres CTA]</a><small>[Réponse sous 24 h ouvrées · Sans engagement]</small></div>
+  </aside>
+</div>

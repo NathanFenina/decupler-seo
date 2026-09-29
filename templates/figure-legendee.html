@@ -1,0 +1,36 @@
+<!--
+  Figure légendée — une image de corps qui prouve, explique ou montre.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-figure.
+  - Placez-la dans la section qu'elle illustre, pas en tête d'article par défaut.
+  - <picture> : AVIF, puis WebP, puis JPEG. width et height réels (sinon la
+    page saute au chargement). loading="lazy" : c'est une image de corps.
+    Si c'est l'image du premier écran, retirez loading="lazy" et ajoutez
+    fetchpriority="high".
+  - sizes décrit la largeur AFFICHÉE : ici la colonne de lecture (760 px au plus).
+  - alt : ce que montre l'image, pour qui ne la voit pas (125 caractères au
+    plus). La légende, elle, INTERPRÈTE : ce qu'il faut en retenir.
+  - Crédit obligatoire pour une photo tierce ; image générée : jamais comme
+    preuve (équipe, client, chantier, résultat).
+  - Nom de fichier : [slug-de-la-page]-[role].webp, minuscules, tirets.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-figure">
+<style>
+.dcp-figure{--fi-texte-2:var(--dcp-texte-2,#4B5563);--fi-primaire:var(--dcp-primaire,#1F4E79);--fi-rayon:var(--dcp-rayon,12px);
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif)}
+.dcp-figure figure{margin:2rem 0}
+.dcp-figure img{display:block;width:100%;height:auto;border-radius:var(--fi-rayon)}
+.dcp-figure figcaption{margin-top:.6rem;font-size:.88rem;line-height:1.5;color:var(--fi-texte-2);display:flex;flex-wrap:wrap;justify-content:space-between;gap:.25rem 1rem}
+.dcp-figure .dcp-figure-credit{font-size:.8rem}
+.dcp-figure a{color:var(--fi-primaire)}
+</style>
+  <figure>
+    <picture>
+      <source type="image/avif" srcset="[slug]-[role]-800.avif 800w, [slug]-[role]-1600.avif 1600w" sizes="(max-width:800px) 100vw, 760px">
+      <source type="image/webp" srcset="[slug]-[role]-800.webp 800w, [slug]-[role]-1600.webp 1600w" sizes="(max-width:800px) 100vw, 760px">
+      <img src="[slug]-[role]-1600.jpg" alt="[Ce que montre l'image]" width="1600" height="1067" loading="lazy" decoding="async">
+    </picture>
+    <figcaption><span>[Une phrase qui interprète l'image : ce qu'il faut en retenir.]</span><span class="dcp-figure-credit">Photo : [auteur] / <a href="[URL de la source ou de la licence]">[source]</a></span></figcaption>
+  </figure>
+</div>

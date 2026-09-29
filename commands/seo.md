@@ -1,6 +1,6 @@
 ---
 description: Routeur principal Claude Code SEO Décupler — dirige vers le bon skill selon ce que vous demandez
-argument-hint: "[audit|opportunites|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
+argument-hint: "[audit|opportunites|cartographie|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
 ---
 
 # /seo — routeur
@@ -19,6 +19,7 @@ laissez jamais l'utilisateur devant un menu.
 |--------------------|-------|
 | `audit`, une URL de domaine seule | `seo-audit-360` |
 | `opportunites`, `priorités`, `par où commencer` | `seo-opportunites` |
+| `cartographie`, `mot-clé principal`, `prompt principal` | `seo-cartographie` |
 | `quickwins`, `gains rapides` | `seo-quick-wins` |
 | `technique`, `fix`, `corrige` | `seo-technique-autofix` |
 | `crawl`, `architecture` | `seo-crawl-architecture` |
@@ -37,6 +38,7 @@ laissez jamais l'utilisateur devant un menu.
 | `faq` | `seo-faq-paa` |
 | `eeat` | `seo-eeat` |
 | `page`, `html` | `seo-page-builder-html` |
+| `design`, `maquette`, `gabarit`, `cta`, `bannière` | `seo-design-pages` |
 | `programmatique` | `seo-programmatique` |
 | `maillage`, `liens internes` | `seo-maillage-interne` |
 | `schema`, `jsonld` | `seo-schema-jsonld` |
@@ -45,6 +47,7 @@ laissez jamais l'utilisateur devant un menu.
 | `geo`, `ia`, `chatgpt` | `geo-visibilite-ia` |
 | `citation` | `geo-citation-tracker` |
 | `llmstxt`, `entité` | `geo-llms-txt` |
+| `triplets`, `entités`, `knowledge graph`, `cohérence des faits` | `seo-entites-triplets` |
 | `share-of-model`, `part de voix` | `geo-share-of-model` |
 | `backlink`, `netlinking` | `seo-netlinking` |
 | `reddit`, `communautés` | `seo-reddit-communautes` |

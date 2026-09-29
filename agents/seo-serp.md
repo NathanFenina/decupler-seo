@@ -34,8 +34,11 @@ vécue ; un contenu de marque générique ne passera pas.
 
 ## Disséquer le top 3
 
-Type de domaine, autorité, **backlinks vers cette page précise**, longueur,
-plan Hn, fraîcheur, éléments distinctifs, signaux E-E-A-T, façon d'ouvrir.
+`serp_concurrents.py --mot "<requête>"` mesure longueur, plan Hn, formats,
+FAQ, schémas, fraîcheur, façon d'ouvrir et ton de chaque page, et en tire
+la fourchette de longueur, les sujets récurrents et les questions que le top
+ne traite pas. À vous : type de domaine, autorité, **backlinks vers cette
+page précise**, éléments distinctifs, signaux E-E-A-T.
 
 ## Difficulté réelle
 

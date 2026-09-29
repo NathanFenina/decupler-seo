@@ -1,4 +1,4 @@
-# Les 46 skills
+# Les 49 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -23,6 +23,7 @@ aussi l'appeler par son nom.
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
 | `seo-opportunites` | Classe toutes les opportunités du client : clics gagnables × valeur du thème (lexique du métier) × facilité, et les thèmes non couverts | « opportunités », « par où commencer », « priorités » |
+| `seo-cartographie` | Une ligne par page : mot-clé principal, prompt principal, et chaque mois la position sur ce mot-clé et la citation du prompt par ChatGPT, Gemini et Claude ; export Notion | « cartographie », « mot-clé principal », « prompt principal » |
 | `seo-quick-wins` | Les pages en position 4-20 à rattraper, chiffrées, avec les corrections écrites | « quick wins », « gains rapides », « j'ai peu de temps » |
 | `seo-keyword-research` | Volumes, intention, risque zero-click IA, arbitrage | « mots-clés », « sur quoi me positionner » |
 | `seo-competitor-gap` | 4 types de gaps, benchmark GEO, plan 90 jours | « concurrents », « pourquoi ils rankent mieux » |
@@ -48,10 +49,12 @@ aussi l'appeler par son nom.
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
-| `seo-page-builder-html` | Pages HTML autonomes, prêtes à coller | « page HTML », « Elementor », « landing page » |
+| `seo-design-pages` | Design d'une page qui convertit : gabarit par type de page, placement des CTA, bannières, plan d'images et génération, tokens, checklist avant publication | « design de la page », « où mettre les CTA », « bannière », « plan d'images » |
+| `seo-page-builder-html` | Pages HTML autonomes, prêtes à coller, avec 15 composants (hero, sommaire, chiffres clés, tableau, témoignages, lead magnet, auteur…) | « page HTML », « Elementor », « landing page » |
 | `seo-programmatique` | Pages à l'échelle, garde-fous anti-contenu mince | « pages à l'échelle », « pages ville », « pSEO » |
 | `seo-maillage-interne` | Orphelines, flux d'autorité, plan de liens exécutable | « maillage », « liens internes » |
 | `seo-schema-jsonld` | Détection, validation, génération, dépréciations | « schema », « JSON-LD », « rich results » |
+| `seo-entites-triplets` | Faits en triplets sujet — prédicat — objet, entités reliées à Wikidata, JSON-LD `about`/`mentions`, cohérence des valeurs sur tout le site | « triplets », « entités », « knowledge graph », « cohérence des faits » |
 | `seo-hreflang-i18n` | Validation et génération hreflang, architecture i18n | « hreflang », « multilingue », « international » |
 | `seo-images` | Poids, formats, alt, lazy loading, impact LCP et CLS | « images », « WebP », « alt » |
 

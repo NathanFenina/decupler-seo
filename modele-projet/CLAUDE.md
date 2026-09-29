@@ -15,7 +15,8 @@ court : le détail vit dans `memoire/`.
 ## Comment travailler sur ce projet
 
 1. **Toujours lire d'abord** : `decupler-seo.config.yml` (règles et seuils),
-   puis `memoire/marque.md` (voix et interdits).
+   puis `memoire/marque.md` (voix et interdits) ; avant d'écrire,
+   `memoire/style.md` (le style mesuré sur les pages du client).
 2. **Méthode** : les skills de `.claude/skills/` (synchronisés depuis
    decupler-seo — ne pas les modifier ici, ils seraient écrasés à la
    prochaine synchronisation). Ce qui est propre à ce projet vit dans
@@ -52,13 +53,22 @@ Plafond : **{{PAGES_MAX}} pages neuves par semaine**, qualité avant volume.
 ## Où sont les choses
 
 - `memoire/marque.md` — voix, lexique, chiffres officiels, interdits
+- `memoire/style.md` — le style mesuré sur les pages du client (`style_maison.py`) :
+  adresse, rythme, expressions ; sa section « Lecture » se remplit à la main
 - `memoire/faits.md` — **la seule source des chiffres du site**, sourcés et datés
 - `memoire/decisions.md` — décisions humaines, datées. **À lire avant de
   proposer une action** : ne pas reproposer ce qui a été refusé.
+- `memoire/cartographie.csv` — chaque page, son mot-clé principal et son
+  prompt principal, validés avec le client (`seo-cartographie`). Un mot-clé
+  principal n'appartient qu'à une page.
+- `memoire/entites.csv` et `memoire/triplets.csv` — les entités du site (QID
+  Wikidata, sameAs) et les faits en triplets sujet — prédicat — objet, une
+  seule valeur par fait sur tout le site (`seo-entites-triplets`)
 - `memoire/apprentissages.md` — ce qui a marché et échoué sur ce site,
   alimenté par la mesure à J+28
 - `journal/modifications.csv` — chaque modification et son effet mesuré
 - `donnees/` — instantanés Search Console hebdomadaires
+- `recherche/serp-*.md` — la SERP mesurée et le contenu du top, source de chaque brief
 - `recherche/benchmarks/` — le benchmark « faire mieux » de chaque page
 - `rapports/` — rapports mensuels, `a-valider.md`, et `runs/` (journal de
   chaque exécution de routine)

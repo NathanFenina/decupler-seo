@@ -5,29 +5,34 @@
   rien, et le lecteur doit voir la preuve avant la demande.
   Une action principale, la même que le CTA de la page ; le téléphone en second.
   Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-contact.
+  Couleurs : variables --dcp-* du site (voir seo-design-pages), valeurs
+  neutres par défaut. Les deux liens restent sur la même ligne : un retour
+  à la ligne entre eux devient un <br> sous WordPress.
   Remplacez tous les [crochets].
 -->
 <div class="dcp-contact">
 <style>
-.dcp-contact{overflow-x:hidden}
+.dcp-contact{--c-primaire:var(--dcp-primaire,#1F4E79);--c-accent:var(--dcp-accent,#B4531A);--c-sur-accent:var(--dcp-sur-accent,#FFFFFF);
+  --c-rayon:var(--dcp-rayon,12px);overflow-x:hidden}
 .dcp-contact *{box-sizing:border-box}
 .dcp-contact .dcp-contact-bande{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
-  width:100vw;background:#0B7285;color:#fff;text-align:center;
+  width:100vw;background:var(--c-primaire);color:#fff;text-align:center;
   padding:clamp(2rem,5vw,3rem) clamp(1rem,4vw,3rem);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);line-height:1.6}
 .dcp-contact h2{font-size:clamp(1.4rem,3vw,2rem);margin:0 0 .5rem;color:#fff}
-.dcp-contact p{margin:0 auto 1.4rem;max-width:56ch;color:#E3F4F7}
+.dcp-contact p{margin:0 auto 1.4rem;max-width:56ch;color:#E6EDF4}
+.dcp-contact .dcp-contact-reassurance{margin:1rem auto 0;font-size:.85rem}
 .dcp-contact .dcp-contact-actions{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center}
-.dcp-contact a{display:inline-block;padding:.9rem 1.8rem;border-radius:12px;font-weight:700;text-decoration:none}
-.dcp-contact .dcp-contact-principal{background:#fff;color:#0B7285}
+.dcp-contact a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.9rem 1.8rem;border-radius:var(--c-rayon);font-weight:700;text-decoration:none}
+.dcp-contact a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.dcp-contact .dcp-contact-principal{background:#fff;color:var(--c-primaire)}
 .dcp-contact .dcp-contact-secondaire{border:2px solid #fff;color:#fff}
+@media (max-width:640px){.dcp-contact a{width:100%}}
 </style>
   <section class="dcp-contact-bande">
     <h2>[Promesse concrète : devis sous 48 h, intervention sous 2 h…]</h2>
     <p>[Une phrase : ce qui se passe après la demande, et en combien de temps.]</p>
-    <div class="dcp-contact-actions">
-      <a class="dcp-contact-principal" href="[URL réelle de la page devis]">[Demander un devis]</a>
-      <a class="dcp-contact-secondaire" href="tel:[+33XXXXXXXXX]">[Numéro affiché]</a>
-    </div>
+    <div class="dcp-contact-actions"><a class="dcp-contact-principal" href="[URL réelle de la page devis]">[Demander un devis]</a><a class="dcp-contact-secondaire" href="tel:[+33XXXXXXXXX]">[Numéro affiché]</a></div>
+    <p class="dcp-contact-reassurance">[Réponse sous 24 h ouvrées · Sans engagement — uniquement des engagements tenus]</p>
   </section>
 </div>

@@ -50,6 +50,25 @@ Ne promettez jamais des étoiles là où Google n'en affiche plus.
 La chaîne Article → Person → Organization → sameAs est ce qui permet
 l'attribution par les LLM. C'est ce qui manque à la plupart des sites.
 
+## Entités et registre
+
+Chaque entité principale de la page — sujet en `about` (3 au plus), entités
+citées en `mentions` (12 au plus, visibles dans le texte) — est reliée à son
+QID Wikidata par `sameAs`, **depuis le registre du projet**
+(`memoire/entites.csv`), jamais de mémoire. Le jargon défini dans le texte
+devient un `DefinedTerm` ; les domaines d'expertise, le `knowsAbout` de
+l'`Organization`. Méthode : skill `seo-entites-triplets`.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" jsonld --about "…" --depuis page.html --url <canonical>
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" verifier page.html --page <slug> --strict
+```
+
+Le premier produit le fragment à fusionner dans le `WebPage` ; le second
+bloque une page dont une entité pointe vers un autre QID que le registre,
+ou dont le texte contredit un fait du registre. Un prix balisé égale la
+valeur de `memoire/triplets.csv`.
+
 ## Règles
 
 Un seul bloc par page, avec `@graph` si plusieurs entités. `@id` pour lier

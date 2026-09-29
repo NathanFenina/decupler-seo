@@ -67,7 +67,7 @@ def restaurer(chemin: Path) -> int:
 
     if cms == "wordpress":
         site = os.environ.get("WP_SITE_URL", "").rstrip("/")
-        utilisateur = os.environ.get("WP_USERNAME", "")
+        utilisateur = os.environ.get("WP_USER") or os.environ.get("WP_USERNAME", "")
         motdepasse = os.environ.get("WP_APP_PASSWORD", "")
         if not all([site, utilisateur, motdepasse]):
             print("  ✗ Identifiants WordPress absents dans .env\n")
@@ -75,8 +75,10 @@ def restaurer(chemin: Path) -> int:
 
         type_contenu = donnees.get("type", "posts")
         identifiant = donnees.get("id")
+        # `meta` : les champs SEO bruts sauvegardés par wp.py (vide = modèle de l'extension).
         charge = {c: donnees[c] for c in
-                  ("title", "content", "excerpt", "status", "slug", "categories", "tags")
+                  ("title", "content", "excerpt", "status", "slug", "categories", "tags",
+                   "featured_media", "meta")
                   if c in donnees}
 
         rep = requests.post(f"{site}/wp-json/wp/v2/{type_contenu}/{identifiant}",

@@ -108,6 +108,13 @@ longueur, meta actuelle, meta proposée, longueur, justification.
 Si WordPress ou Webflow est branché et le mode autonomous actif,
 l'application peut être directe — les titles et metas sont réversibles sans
 risque, contrairement au contenu. Sauvegardez quand même l'état d'origine.
+Sur WordPress, `wp.py meta` fait les trois d'un coup — sauvegarde, écriture
+relue, ligne de journal avec la valeur d'avant :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/wp.py" meta --url <url> --titre-seo "…" \
+  --description "…" --requete "<requête>" --auto
+```
 
 ## Mesurer
 

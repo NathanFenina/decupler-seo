@@ -1,0 +1,45 @@
+<!--
+  Chiffres clés — 3 ou 4 chiffres, chacun sourcé et daté.
+  Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-chiffres.
+  - Liste de définitions : le chiffre et ce qu'il mesure restent liés pour les
+    lecteurs d'écran et pour les moteurs qui extraient la page.
+  - Chaque chiffre renvoie à sa source : note numérotée en bas de l'encadré,
+    ou lien direct. Un chiffre sans source retire de la confiance.
+  - Chiffres de l'entreprise (années, interventions, délai moyen) : tirés de
+    données vérifiables (mentions légales, CRM). Chiffres de marché : source
+    officielle ou étude nommée, avec l'année.
+  - Chiffres en tabular-nums : ils s'alignent et se comparent.
+  - Pas de compteur animé : le chiffre est lisible sans JavaScript.
+  - Deux encadrés dans la même page : renumérotez les id (dcp-source-4…),
+    sinon les renvois pointent tous vers le premier.
+  - Aucune ligne vide : le fragment résiste au filtre wpautop de WordPress.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-chiffres">
+<style>
+.dcp-chiffres{--ch-primaire:var(--dcp-primaire,#1F4E79);--ch-encre:var(--dcp-encre,#1B1F24);--ch-texte-2:var(--dcp-texte-2,#4B5563);
+  --ch-bord:var(--dcp-bord,#D9DEE5);margin:2rem 0;font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif);line-height:1.5}
+.dcp-chiffres *{box-sizing:border-box}
+.dcp-chiffres .dcp-chiffres-titre{margin:0 0 1rem;font-size:1.05rem;font-weight:700;color:var(--ch-encre)}
+.dcp-chiffres dl{margin:0;display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));border-top:2px solid var(--ch-primaire)}
+.dcp-chiffres dl>div{padding:1rem 1rem 1rem 0;border-bottom:1px solid var(--ch-bord)}
+.dcp-chiffres dt{font-size:.9rem;color:var(--ch-texte-2);margin:0}
+.dcp-chiffres dd{margin:.25rem 0 0;font-size:clamp(1.6rem,3.5vw,2.1rem);font-weight:700;line-height:1.1;color:var(--ch-encre);font-variant-numeric:tabular-nums}
+.dcp-chiffres dd sup{font-size:.45em;font-weight:600;margin-left:.15em}
+.dcp-chiffres dd sup a{color:var(--ch-primaire);text-decoration:none}
+.dcp-chiffres dd sup a:focus-visible{outline:2px solid var(--ch-primaire);outline-offset:2px}
+.dcp-chiffres ol{margin:.9rem 0 0;padding-left:1.2rem;font-size:.8rem;color:var(--ch-texte-2)}
+.dcp-chiffres ol a{color:inherit}
+</style>
+  <p class="dcp-chiffres-titre">[En chiffres — ou une phrase qui dit ce que prouvent ces chiffres]</p>
+  <dl>
+    <div><dt>[Ce que mesure le chiffre n° 1]</dt><dd>[chiffre]<sup><a href="#dcp-source-1" aria-label="Source 1">1</a></sup></dd></div>
+    <div><dt>[Ce que mesure le chiffre n° 2]</dt><dd>[chiffre]<sup><a href="#dcp-source-2" aria-label="Source 2">2</a></sup></dd></div>
+    <div><dt>[Ce que mesure le chiffre n° 3]</dt><dd>[chiffre]<sup><a href="#dcp-source-3" aria-label="Source 3">3</a></sup></dd></div>
+  </dl>
+  <ol>
+    <li id="dcp-source-1"><a href="[URL de la source 1]">[Source 1, année]</a></li>
+    <li id="dcp-source-2">[Source 2 : donnée interne, périmètre, date du relevé]</li>
+    <li id="dcp-source-3"><a href="[URL de la source 3]">[Source 3, année]</a></li>
+  </ol>
+</div>

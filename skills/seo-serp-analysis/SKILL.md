@@ -16,13 +16,22 @@ résultat pour cette requête ». Elle est publique, gratuite et sans
 ambiguïté. La lire évite d'écrire pendant six heures un guide de 3 000 mots
 sur une requête où Google ne montre que des fiches produit.
 
-## Étape 1 — Récupérer la SERP
+## Étape 1 — Récupérer la SERP et lire le top
 
-Via DataForSEO (SERP live, pays et langue de la config), ou à défaut une
-recherche en navigation privée sur le bon domaine Google.
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/serp_concurrents.py" --mot "<requête>" --langue fr [--top 8] [--url <page du client>]
+```
 
-Relevez le top 10 organique **et toutes les features** — pas seulement les
-liens bleus.
+Une SERP DataForSEO (pays de la config) : top 10, **toutes les features**
+(`item_types`), PAA dépliées d'un niveau, AI Overview chargé même quand
+Google l'affiche en différé (extrait et sources citées), extrait optimisé,
+recherches associées. Puis chaque page du top est lue : title, meta, plan
+H1-H3, listes, tableaux, mots, FAQ, schémas, images, liens, dates, ton.
+Coût : 0,002 à 0,004 $ ; la lecture des pages est gratuite (le repli
+`--repli-dataforseo` pour les pages bloquées est facturé).
+
+À défaut d'identifiants : une recherche en navigation privée sur le bon
+domaine Google, et les pages lues avec Firecrawl.
 
 ## Étape 2 — L'intention dominante
 
@@ -63,15 +72,25 @@ générique n'y a aucune chance.
 
 ## Étape 4 — Disséquer le top 3
 
-Pour chacun (via Firecrawl) :
+Le rapport mesure déjà, pour chaque page : **longueur, plan Hn complet,
+listes et tableaux, FAQ, schémas, date de mise à jour, façon d'ouvrir,
+adresse au lecteur et longueur des phrases**. Et pour l'ensemble : la
+fourchette de longueur (médiane → 3e quartile), les **sujets de H2
+récurrents** (ce que Google attend), les sujets qu'une seule page traite,
+les questions que **aucun titre du top** ne traite, et le champ sémantique
+commun.
+
+Restent à établir, par la lecture et les outils de liens :
 
 - Type de domaine : marque, média, annuaire, forum, concurrent direct
 - Autorité du domaine et **backlinks vers cette page précise**
-- Longueur, plan Hn complet, format
-- Fraîcheur affichée
-- Éléments distinctifs : tableau, calculateur, vidéo, données propriétaires
+- Éléments distinctifs : calculateur, vidéo, données propriétaires
 - Signaux E-E-A-T : auteur identifié, credentials, expérience de terrain
-- Comment ouvrent-ils ? (répondent-ils immédiatement ?)
+- Répondent-ils dès la première phrase ? (`-contenus.md`)
+
+Une mesure ne vaut que si la page a été lue : une page à 150 mots sur un
+site éditorial est une page bloquée ou rendue en JavaScript, signalée comme
+telle et exclue des statistiques — pas un concurrent faible.
 
 Puis la synthèse en une phrase : *« Pour ranker ici, il faut un comparatif
 d'au moins 8 solutions, avec un tableau, un auteur identifié et environ
@@ -103,6 +122,7 @@ Concluez par une recommandation nette :
 
 ## Livrables
 
-- `SERP-<requête>.md` — analyse complète
-- `serp-top10.csv` — les données brutes
+- `recherche/serp-<slug>-<date>.md` — les mesures (produit par le script)
+- `recherche/serp-<slug>-<date>-contenus.md` — le contenu structuré du top
+- La décision de l'étape 6, en tête du rapport ou dans le brief
 - Les questions PAA, exploitables directement en FAQ ou en plan Hn

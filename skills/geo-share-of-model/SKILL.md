@@ -48,6 +48,11 @@ attribue à une entreprise des services qu'elle ne rend pas.
 Figez la liste. **Elle ne doit pas changer** d'un mois à l'autre, sinon la
 comparaison n'a aucun sens. Ajoutez des prompts sans jamais en retirer.
 
+Si le projet a une cartographie (`seo-cartographie`), chaque page y a son
+**prompt principal**, validé avec le client : ajoutez-les à la batterie.
+`cartographie.py mensuel` relit ensuite ces relevés et dit, page par page,
+quel moteur cite le site sur la question que la page doit gagner.
+
 ## 2. Interroger les moteurs
 
 Automatique, recherche web activée sur chaque moteur, sources relevées :

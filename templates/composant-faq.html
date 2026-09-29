@@ -2,7 +2,6 @@
   Composant FAQ autonome — Claude Code SEO Décupler
   Un fichier à part, collé dans son propre widget HTML (Elementor, Gutenberg,
   embed Webflow). Fragment : pas de DOCTYPE, html, head ni body.
-
   - Classes préfixées dcp-faq : aucune règle ne touche le thème hôte.
   - <details> natif : aucun JavaScript, réponses présentes dans le HTML
     initial, donc lisibles par Google et par les moteurs IA.
@@ -10,13 +9,16 @@
   - Le JSON-LD reprend MOT POUR MOT les questions et réponses visibles.
     Sur un site qui a déjà un @graph (plugin SEO), ne collez pas ce script :
     ajoutez le nœud FAQPage au graphe (voir le skill seo-schema-jsonld).
+  Couleurs : variables --dcp-* du site (voir seo-design-pages), valeurs
+  neutres par défaut.
   Remplacez tous les [crochets].
 -->
 <div class="dcp-faq">
 <style>
-.dcp-faq{--dcp-faq-primaire:#0B7285;--dcp-faq-bord:#DCE7EB;--dcp-faq-rayon:14px;
+.dcp-faq{--dcp-faq-primaire:var(--dcp-primaire,#1F4E79);--dcp-faq-bord:var(--dcp-bord,#D9DEE5);--dcp-faq-rayon:var(--dcp-rayon,12px);
+  color:var(--dcp-encre,#1B1F24);
   max-width:860px;margin:0 auto;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,2rem);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.65}
+  font-family:var(--dcp-police-texte,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);line-height:1.65}
 .dcp-faq *{box-sizing:border-box}
 .dcp-faq .dcp-faq-titre{font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.25;margin:0 0 1.25rem;
   color:var(--dcp-faq-primaire)}
@@ -31,24 +33,19 @@
 .dcp-faq .dcp-faq-reponse{padding:0 1.25rem 1.15rem}
 .dcp-faq .dcp-faq-reponse p{margin:0}
 </style>
-
   <h2 class="dcp-faq-titre">Questions fréquentes sur [sujet]</h2>
-
   <details>
     <summary>[Question 1, formulée comme le lecteur la tape ?]</summary>
     <div class="dcp-faq-reponse"><p>[Réponse directe en une phrase. Une précision chiffrée. Une limite ou une condition.]</p></div>
   </details>
-
   <details>
     <summary>[Question 2 ?]</summary>
     <div class="dcp-faq-reponse"><p>[Réponse, 3 phrases maximum.]</p></div>
   </details>
-
   <details>
     <summary>[Question 3 ?]</summary>
     <div class="dcp-faq-reponse"><p>[Réponse, 3 phrases maximum.]</p></div>
   </details>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
