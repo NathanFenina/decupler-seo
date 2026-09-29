@@ -254,13 +254,15 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
 
     connues = set(par_requete)
     for requete, (volume, page) in (demande or {}).items():
-        if requete in connues or any(m.search(requete) for m in marque) or volume <= 0:
+        if any(m.search(requete) for m in marque):
             continue
         theme, valeur = theme_de(requete, lexique)
+        if page:
+            themes[theme]["pages"].add(page)        # la couverture compte la page, même sans volume
+        if requete in connues or volume <= 0:
+            continue
         gain = volume * ctr_attendu(8)
         action = ("invisible" if gsc else "a-verifier") if page else "a-creer"
-        if page:
-            themes[theme]["pages"].add(page)
         libelle, facilite, type_journal = ACTIONS[action]
         bloque = en_mesure.get(normaliser(page)) if page else ""
         opportunites.append({
