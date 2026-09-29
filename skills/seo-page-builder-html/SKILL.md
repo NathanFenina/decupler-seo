@@ -29,6 +29,34 @@ immédiatement. Pas un squelette à styliser.
    hiérarchie Hn respectée, `alt` sur chaque image, ordre de tabulation
    logique.
 5. **Un seul H1 par page**, et il correspond au title.
+6. **Le contenu réel du site.** Images et URL reprises de la page en ligne
+   (ou fournies par le client), jamais inventées ni pointées vers une banque
+   d'images : un lien vers `/devis` qui n'existe pas est une 404 livrée.
+7. **Les retours visuels validés se propagent.** Une correction acceptée sur
+   la première page (couleur, espacement, ton du CTA) s'applique d'office aux
+   pages suivantes. Le client ne doit jamais la redemander.
+
+## Fragment pour Elementor ou un CMS
+
+Le livrable est un **fragment**, pas un document :
+
+- **Pas de `<!DOCTYPE>`, `<html>`, `<head>` ni `<body>`** — collés dans un
+  widget, ils cassent la page hôte ou sont supprimés par l'éditeur
+- **Tout le CSS scopé sous une classe racine** (`.dcp-page …`), dans le bloc
+- **Bandes pleine largeur** quand la colonne du thème est plus étroite :
+
+```css
+.dcp-page{overflow-x:hidden}
+.dcp-page .dcp-bande{position:relative;left:50%;right:50%;
+  margin-left:-50vw;margin-right:-50vw;width:100vw}
+```
+
+  `overflow-x:hidden` sur le conteneur évite la barre de défilement
+  horizontale que crée `100vw` avec une barre verticale. **Testez dans
+  l'aperçu de l'éditeur** : certains thèmes posent un `overflow:hidden` sur
+  la colonne qui coupe la bande.
+- **Bandes alternées** : jamais deux fonds identiques d'affilée, sinon deux
+  sections se lisent comme une seule
 
 ## La structure type d'une page de service
 
@@ -108,25 +136,59 @@ domaine externe : elle disparaîtra.
 **Le CTA.** Un seul par écran, et la même action tout au long de la page.
 Trois CTA différents dans une page divisent la conversion.
 
+## Les composants autonomes
+
+Chaque composant est un **fichier à part**, collé dans son propre widget :
+il se réutilise d'une page à l'autre sans toucher au reste.
+
+| Composant | Modèle | Rôle |
+|-----------|--------|------|
+| FAQ | `${CLAUDE_PLUGIN_ROOT}/templates/composant-faq.html` | Répondre aux questions, alimenter le JSON-LD `FAQPage` |
+| Bannière E-E-A-T | `${CLAUDE_PLUGIN_ROOT}/templates/banniere-eeat.html` | **Prouver** qui parle |
+| Bannière contact / devis | `${CLAUDE_PLUGIN_ROOT}/templates/banniere-contact.html` | **Déclencher** l'action |
+
+**FAQ.** Classes préfixées (`dcp-faq-…`). `<details>` sans JavaScript de
+préférence. Si un accordéon JS est imposé, il se scope avec
+`bouton.closest('.dcp-faq')`, **jamais par `id`** : deux FAQ sur la même
+page (ou un widget dupliqué) partagent les mêmes `id` et le second
+accordéon pilote le premier. Réponses de **3 phrases maximum**, la première
+répond seule. Le JSON-LD `FAQPage` est inclus et reprend le texte visible
+mot pour mot — sur un site qui a déjà un `@graph`, le nœud va dans ce graphe
+(voir `seo-schema-jsonld`).
+
+**Bannière E-E-A-T** — pleine largeur : photo réelle, sceau, titre
+« [métier] depuis [année] », badges de preuve, CTA téléphone. **Uniquement
+des preuves réelles et vérifiables** (certification avec numéro, année
+tirée des mentions légales, avis avec leur source) : un badge invérifiable
+retire de la confiance. Voir `seo-eeat`.
+
+**Bannière contact / devis** — distincte de la précédente : l'une prouve,
+l'autre demande. Fusionnées, elles font les deux à moitié, et le lecteur
+voit la demande avant la preuve.
+
 ## Le schema
 
-Générez le JSON-LD correspondant au type de page et intégrez-le dans un
-`<script type="application/ld+json">` en fin de bloc. Sur WordPress avec un
-plugin SEO, prévenez du risque de doublon : deux schemas `Article` sur la
-même page créent une ambiguïté.
+Générez le JSON-LD correspondant au type de page selon `seo-schema-jsonld`.
+Sur un site statique, il va dans un seul `<script type="application/ld+json">`
+en fin de bloc. **Sur un CMS avec un plugin SEO, il ne va pas dans le
+fragment** : le plugin pose déjà un graphe, et un second script crée deux
+`Organization` que Google ignore toutes les deux. Livrez les nœuds à part,
+pour injection dans le graphe du plugin côté serveur. Contrôle :
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" page-<slug>.html --strict`.
 
 ## Contraintes par plateforme
 
 | Plateforme | À savoir |
 |------------|----------|
-| **Elementor** | Widget « HTML personnalisé ». Le CSS doit être dans le bloc. Un H1 existe souvent déjà dans le template — ne le doublez pas. |
+| **Elementor** | Widget « HTML personnalisé », fragment sans `<html>`/`<body>`. Le CSS doit être dans le bloc. Section Elementor en pleine largeur, ou bandes en `100vw`. Un H1 existe souvent déjà dans le template — ne le doublez pas. |
 | **WordPress (Gutenberg)** | Bloc « HTML personnalisé ». Attention aux filtres de contenu qui suppriment certaines balises. |
 | **Webflow** | Embed HTML limité à 50 000 caractères. Découpez si nécessaire. |
 | **Site statique** | Aucune contrainte. Vous pouvez sortir le CSS dans une feuille séparée. |
 
 ## Livrables
 
-- `page-<slug>.html` — la page complète, autonome
+- `page-<slug>.html` — la page complète, autonome (fragment)
+- `faq-<slug>.html`, `banniere-eeat.html`, `banniere-contact.html` — les composants, un fichier chacun
 - `page-<slug>.jsonld` — le schema, si séparé
 - `INSTRUCTIONS.md` — où coller, quoi vérifier après collage
 

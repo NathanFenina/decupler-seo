@@ -182,7 +182,7 @@ sous-sujet n'est oublié. Export : `champ-semantique.csv`.
 - ❌ H1 actuel : « … »
 - ✅ H1 proposé : 50-60 caractères, mot-clé en tête, année si le sujet
   vieillit. Proche du title, pas identique.
-- **Title** 50-60 caractères, **meta** 150-160 caractères (promesse +
+- **Title** 50-60 caractères, **meta** 120-156 caractères (promesse +
   différenciation), ou renvoi à `seo-meta-serp`.
 - **Introduction RÉDIGÉE**, 80-100 mots, selon une méthode nommée dans le
   brief — **PAS** (problème, agitation, solution), **AIDA**, ou

@@ -16,7 +16,7 @@ Accès aux données : voir « Récupérer les données » dans `../SKILL.md`.
 
 1. Reprendre les pages identifiées en déficit de CTR.
 2. Réécrire en intégrant **la formulation exacte** de la requête la plus porteuse de la page.
-3. Respecter les limites d'affichage (environ 60 caractères pour le title, 155 pour la meta).
+3. Respecter les limites d'affichage (environ 60 caractères pour le title, 120 à 156 pour la meta).
 4. Proposer deux variantes par page pour permettre un test.
 5. Estimer le gain de clics si le CTR rejoint la médiane de sa position.
 
@@ -38,7 +38,7 @@ en clics à position égale.
 3. Réécris en intégrant la FORMULATION EXACTE de cette requête, pas une
    variante élégante. Google met en gras ce qui correspond.
 4. Respecte les limites d'affichage : environ 60 caractères pour le
-   title, 155 pour la meta. Compte-les et affiche le compte.
+   title, 120 à 156 pour la meta. Compte-les et affiche le compte.
 5. Produis DEUX variantes par page, avec des angles différents — une
    factuelle, une orientée bénéfice — pour permettre un test.
 6. Estime le gain si le CTR rejoint la médiane de sa position.

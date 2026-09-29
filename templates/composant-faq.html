@@ -1,0 +1,68 @@
+<!--
+  Composant FAQ autonome — Claude Code SEO Décupler
+  Un fichier à part, collé dans son propre widget HTML (Elementor, Gutenberg,
+  embed Webflow). Fragment : pas de DOCTYPE, html, head ni body.
+
+  - Classes préfixées dcp-faq : aucune règle ne touche le thème hôte.
+  - <details> natif : aucun JavaScript, réponses présentes dans le HTML
+    initial, donc lisibles par Google et par les moteurs IA.
+  - Réponses de 3 phrases maximum : la première répond, seule.
+  - Le JSON-LD reprend MOT POUR MOT les questions et réponses visibles.
+    Sur un site qui a déjà un @graph (plugin SEO), ne collez pas ce script :
+    ajoutez le nœud FAQPage au graphe (voir le skill seo-schema-jsonld).
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-faq">
+<style>
+.dcp-faq{--dcp-faq-primaire:#0B7285;--dcp-faq-bord:#DCE7EB;--dcp-faq-rayon:14px;
+  max-width:860px;margin:0 auto;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,2rem);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.65}
+.dcp-faq *{box-sizing:border-box}
+.dcp-faq .dcp-faq-titre{font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.25;margin:0 0 1.25rem;
+  color:var(--dcp-faq-primaire)}
+.dcp-faq details{border:1px solid var(--dcp-faq-bord);border-radius:var(--dcp-faq-rayon);
+  margin-bottom:.75rem;background:#fff}
+.dcp-faq summary{padding:1.05rem 3rem 1.05rem 1.25rem;cursor:pointer;font-weight:600;
+  list-style:none;position:relative}
+.dcp-faq summary::-webkit-details-marker{display:none}
+.dcp-faq summary::after{content:"+";position:absolute;right:1.25rem;top:.85rem;font-size:1.4rem;line-height:1}
+.dcp-faq details[open] summary::after{content:"\2212"}
+.dcp-faq summary:focus-visible{outline:2px solid var(--dcp-faq-primaire);outline-offset:2px}
+.dcp-faq .dcp-faq-reponse{padding:0 1.25rem 1.15rem}
+.dcp-faq .dcp-faq-reponse p{margin:0}
+</style>
+
+  <h2 class="dcp-faq-titre">Questions fréquentes sur [sujet]</h2>
+
+  <details>
+    <summary>[Question 1, formulée comme le lecteur la tape ?]</summary>
+    <div class="dcp-faq-reponse"><p>[Réponse directe en une phrase. Une précision chiffrée. Une limite ou une condition.]</p></div>
+  </details>
+
+  <details>
+    <summary>[Question 2 ?]</summary>
+    <div class="dcp-faq-reponse"><p>[Réponse, 3 phrases maximum.]</p></div>
+  </details>
+
+  <details>
+    <summary>[Question 3 ?]</summary>
+    <div class="dcp-faq-reponse"><p>[Réponse, 3 phrases maximum.]</p></div>
+  </details>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "[URL canonique]#faq",
+  "isPartOf": { "@id": "[URL canonique]#webpage" },
+  "mainEntity": [
+    { "@type": "Question", "name": "[Question 1 ?]",
+      "acceptedAnswer": { "@type": "Answer", "text": "[Réponse 1, identique au texte visible.]" } },
+    { "@type": "Question", "name": "[Question 2 ?]",
+      "acceptedAnswer": { "@type": "Answer", "text": "[Réponse 2.]" } },
+    { "@type": "Question", "name": "[Question 3 ?]",
+      "acceptedAnswer": { "@type": "Answer", "text": "[Réponse 3.]" } }
+  ]
+}
+</script>
+</div>

@@ -1,0 +1,59 @@
+<!--
+  Bannière E-E-A-T pleine largeur — Claude Code SEO Décupler
+  Elle PROUVE qui parle : photo réelle, sceau, « [métier] depuis [année] »,
+  badges de preuve. Distincte de la bannière contact/devis (banniere-contact.html),
+  qui, elle, déclenche l'action.
+
+  Règles :
+  - Uniquement des preuves réelles et vérifiables : certification avec son
+    numéro, année de création tirée des mentions légales, avis avec leur
+    source. Une preuve invérifiable retire de la confiance au lieu d'en ajouter.
+  - Photo réelle de l'équipe ou du dirigeant, jamais une banque d'images.
+  - Un seul CTA : le téléphone, cliquable.
+  - Fragment : pas de DOCTYPE, html, head ni body. CSS sous .dcp-eeat.
+  Remplacez tous les [crochets].
+-->
+<div class="dcp-eeat">
+<style>
+.dcp-eeat{overflow-x:hidden}
+.dcp-eeat *{box-sizing:border-box}
+.dcp-eeat .dcp-eeat-bande{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
+  width:100vw;background:#0F2F3A;color:#fff;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,3rem);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+.dcp-eeat .dcp-eeat-grille{max-width:1140px;margin:0 auto;display:grid;gap:clamp(1.25rem,4vw,2.5rem);
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:center}
+.dcp-eeat .dcp-eeat-photo{position:relative;max-width:360px}
+.dcp-eeat .dcp-eeat-photo img{width:100%;height:auto;border-radius:16px;display:block}
+.dcp-eeat .dcp-eeat-sceau{position:absolute;right:-12px;bottom:-12px;width:96px;height:96px;border-radius:50%;
+  background:#fff;color:#0F2F3A;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;font-size:.8rem;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.dcp-eeat .dcp-eeat-sceau strong{font-size:1.5rem;line-height:1}
+.dcp-eeat .dcp-eeat-titre{font-size:clamp(1.5rem,3.4vw,2.2rem);line-height:1.2;margin:0 0 .75rem;color:#fff}
+.dcp-eeat p{margin:0 0 1.1rem;max-width:60ch;color:#DCEBF0}
+.dcp-eeat .dcp-eeat-badges{display:flex;flex-wrap:wrap;gap:.6rem;margin:0 0 1.5rem;padding:0;list-style:none}
+.dcp-eeat .dcp-eeat-badges li{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:.4rem .9rem;
+  font-size:.9rem}
+.dcp-eeat .dcp-eeat-cta{display:inline-block;background:#fff;color:#0F2F3A;padding:.9rem 1.8rem;
+  border-radius:12px;font-weight:700;text-decoration:none}
+.dcp-eeat .dcp-eeat-cta:hover{background:#DCEBF0}
+</style>
+  <section class="dcp-eeat-bande">
+    <div class="dcp-eeat-grille">
+      <div class="dcp-eeat-photo">
+        <img src="[URL de la photo réelle, reprise de la page en ligne]" alt="[Prénom] [Nom], [métier], sur un chantier à [ville]"
+             width="720" height="540" loading="lazy">
+        <div class="dcp-eeat-sceau"><strong>[année]</strong>depuis</div>
+      </div>
+      <div>
+        <h2 class="dcp-eeat-titre">[Métier] depuis [année] à [ville]</h2>
+        <p>[Deux phrases factuelles : qui intervient, sur quel périmètre, avec quelle preuve vérifiable.]</p>
+        <ul class="dcp-eeat-badges">
+          <li>[Certification + numéro]</li>
+          <li>[Assurance décennale : assureur]</li>
+          <li>[Note moyenne + source des avis]</li>
+        </ul>
+        <a class="dcp-eeat-cta" href="tel:[+33XXXXXXXXX]">Appeler le [numéro affiché]</a>
+      </div>
+    </div>
+  </section>
+</div>

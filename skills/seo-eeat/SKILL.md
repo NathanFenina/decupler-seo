@@ -135,8 +135,25 @@ Toujours dire **où** et **quoi écrire**, jamais « améliorez votre E-E-A-T »
 Ce socle profite à toutes les pages du site. Faites-le avant d'optimiser
 page par page.
 
+## La bannière E-E-A-T — les preuves, visibles sur chaque page
+
+Les signaux du socle vivent souvent sur des pages que personne ne lit (« À
+propos », mentions légales). La bannière les ramène là où se prend la
+décision : une bande pleine largeur avec photo réelle, sceau, titre
+« [métier] depuis [année] », badges de preuve et CTA téléphone.
+
+- **Uniquement des preuves réelles et vérifiables** : certification avec son
+  numéro, année de création conforme aux mentions légales, assurance nommée,
+  note avec la source des avis. Un badge qu'on ne peut pas vérifier coûte
+  plus de confiance qu'il n'en rapporte.
+- **Distincte de la bannière contact/devis** : l'une prouve, l'autre
+  demande. Le lecteur doit voir la preuve avant la demande.
+- Modèle : `${CLAUDE_PLUGIN_ROOT}/templates/banniere-eeat.html` ; mise en
+  page et intégration : `seo-page-builder-html`.
+
 ## Livrables
 
 - `EEAT-<slug>.md` — scorecard, verdict, top 3 faiblesses
 - `CORRECTIFS-EEAT.md` — les textes à ajouter, prêts à coller
-- `person.jsonld` / `organization.jsonld` — les schemas d'entité
+- `person.jsonld` / `organization.jsonld` — les schemas d'entité (voir `seo-schema-jsonld`)
+- `banniere-eeat.html` — la bannière de preuves, si la page en manque

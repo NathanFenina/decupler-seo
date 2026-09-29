@@ -1,5 +1,34 @@
 # Journal des versions
 
+## 3.3.0
+
+### Ajouté
+
+- **Idées de contenu chiffrées** : `scripts/demande.py` (volumes, idées à
+  partir de graines ou du lexique du projet, SERP d'un mot-clé avec PAA,
+  AI Overview et recherches associées). DataForSEO en direct, coût affiché
+  à chaque appel.
+- **Calendrier éditorial** : `opportunites.py --calendrier` répartit les
+  sujets par semaine (80 % création, 20 % optimisation, mix
+  TOFU/MOFU/BOFU réglable par projet, une seule optimisation par page),
+  avec funnel, formats spéciaux et schéma conseillé par ligne.
+- **Rapport mensuel par script** : `scripts/rapport.py` (clics,
+  impressions, marque et hors marque, requêtes nouvelles, bilan du journal
+  de mesure, décisions à valider) en Markdown et en JSON stable. La section
+  « Lecture et décisions » est conservée d'un passage à l'autre.
+- **Données structurées** : `schema_validate.py --socle --strict`, fiches
+  entités Wikidata et déploiement dans `seo-schema-jsonld`.
+- **Score on-page en 6 catégories** avec malus, mots-clés secondaires et
+  mode URL ; composants HTML FAQ, bannière E-E-A-T et bannière contact.
+- Brief en 14 sections (création ou optimisation), règles de rédaction
+  anti-IA, politique d'occurrences du mot-clé réglable par client.
+
+### Modifié
+
+- Meta description : zone verte 120-156 caractères partout.
+- `share_of_model.py` : gabarits de prompts par langue, analyse des
+  homonymes et du côté vendeur, mode `--sans-web` pour la notoriété seule.
+
 ## 3.2.0
 
 ### Ajouté

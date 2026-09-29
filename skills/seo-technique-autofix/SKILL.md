@@ -68,7 +68,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/check_redirects.py" <url> --suivre-chaine
 | Problème | Règle appliquée |
 |----------|-----------------|
 | Title absent, dupliqué, > 60 car. | Réécrire, mot-clé dans les 3 premiers mots |
-| Meta description absente ou > 160 car. | Réécrire, 150-160 car., promesse + différenciation |
+| Meta description absente ou > 156 car. | Réécrire, 120-156 car., promesse + différenciation |
 | H1 absent ou multiple | Un seul H1, alignés sur l'intention |
 | Hiérarchie Hn cassée (H2 → H4) | Rétablir la séquence |
 
