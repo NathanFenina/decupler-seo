@@ -1,0 +1,179 @@
+<!--
+  Modèle de page de service — Claude Code SEO Décupler
+  Autonome : aucune dépendance externe, tout le CSS est dans le bloc.
+  Collez tel quel dans Elementor (widget HTML), Gutenberg (bloc HTML
+  personnalisé), un embed Webflow, ou une page statique.
+
+  Adaptez la palette dans :root. Remplacez tous les [crochets].
+  Si le template de votre site pose déjà un H1, transformez le H1
+  ci-dessous en H2 pour ne pas en avoir deux.
+-->
+<div class="dcp-page">
+<style>
+.dcp-page{
+  --dcp-primaire:#0B7285; --dcp-accent:#15AABF; --dcp-encre:#1A1A2E;
+  --dcp-doux:#F1F6F8; --dcp-bord:#DCE7EB; --dcp-rayon:14px;
+  --dcp-ombre:0 2px 16px rgba(11,114,133,.08);
+  color:var(--dcp-encre); line-height:1.7;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.dcp-page *{box-sizing:border-box}
+.dcp-page section{padding:clamp(2rem,5vw,4rem) clamp(1rem,4vw,3rem)}
+.dcp-page section:nth-of-type(even){background:var(--dcp-doux)}
+.dcp-page h1{font-size:clamp(1.9rem,4.5vw,2.8rem);line-height:1.15;margin:0 0 1rem}
+.dcp-page h2{font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.25;
+  margin:0 0 1rem;color:var(--dcp-primaire)}
+.dcp-page h3{font-size:clamp(1.1rem,2.2vw,1.35rem);margin:1.6rem 0 .5rem}
+.dcp-page p{margin:0 0 1rem;max-width:70ch}
+.dcp-reponse{font-size:1.12rem;border-left:4px solid var(--dcp-accent);
+  padding-left:1.1rem;margin:1.5rem 0}
+.dcp-grille{display:grid;gap:1.25rem;
+  grid-template-columns:repeat(auto-fit,minmax(255px,1fr))}
+.dcp-carte{background:#fff;border:1px solid var(--dcp-bord);
+  border-radius:var(--dcp-rayon);padding:1.5rem;box-shadow:var(--dcp-ombre)}
+.dcp-carte h3{margin-top:0}
+.dcp-chiffre{font-size:2.2rem;font-weight:700;color:var(--dcp-primaire);
+  display:block;line-height:1.1}
+.dcp-chiffre + span{font-size:.92rem;opacity:.75}
+.dcp-cta{display:inline-block;background:var(--dcp-primaire);color:#fff;
+  padding:.9rem 1.9rem;border-radius:var(--dcp-rayon);text-decoration:none;
+  font-weight:600;margin-top:.5rem}
+.dcp-cta:hover,.dcp-cta:focus{background:var(--dcp-accent);color:#fff}
+.dcp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dcp-tableau{width:100%;border-collapse:collapse;font-size:.95rem;min-width:520px}
+.dcp-tableau th{background:var(--dcp-primaire);color:#fff;padding:.85rem;text-align:left}
+.dcp-tableau td{padding:.85rem;border-bottom:1px solid var(--dcp-bord)}
+.dcp-tableau tr:nth-child(even) td{background:var(--dcp-doux)}
+.dcp-etapes{counter-reset:etape;list-style:none;padding:0;margin:0}
+.dcp-etapes li{counter-increment:etape;position:relative;
+  padding:0 0 1.5rem 3.2rem;margin:0}
+.dcp-etapes li::before{content:counter(etape);position:absolute;left:0;top:0;
+  width:2.2rem;height:2.2rem;background:var(--dcp-primaire);color:#fff;
+  border-radius:50%;display:grid;place-items:center;font-weight:700}
+.dcp-faq details{border:1px solid var(--dcp-bord);border-radius:var(--dcp-rayon);
+  margin-bottom:.75rem;background:#fff}
+.dcp-faq summary{padding:1.05rem 1.25rem;cursor:pointer;font-weight:600;list-style:none}
+.dcp-faq summary::-webkit-details-marker{display:none}
+.dcp-faq summary::after{content:"+";float:right;font-size:1.4rem;line-height:1}
+.dcp-faq details[open] summary::after{content:"\2212"}
+.dcp-faq details > div{padding:0 1.25rem 1.15rem}
+.dcp-final{background:var(--dcp-primaire);color:#fff;text-align:center}
+.dcp-final h2{color:#fff}
+.dcp-final .dcp-cta{background:#fff;color:var(--dcp-primaire)}
+.dcp-page img{max-width:100%;height:auto}
+</style>
+
+<!-- 1 · Hero — H1, réponse directe extractible, CTA -->
+<section>
+  <h1>[Service] à [Ville] : [promesse chiffrée]</h1>
+  <p class="dcp-reponse">
+    [Réponse directe de 40 à 60 mots. Elle doit répondre complètement dès la
+    première phrase et fonctionner hors contexte : c'est ce qu'extrairont un
+    featured snippet et un modèle de langage. Placez-y un chiffre précis.]
+  </p>
+  <a class="dcp-cta" href="#devis">[Action principale]</a>
+</section>
+
+<!-- 2 · Preuves chiffrées -->
+<section>
+  <div class="dcp-grille">
+    <div class="dcp-carte"><span class="dcp-chiffre">[X]</span><span>[ce que ça mesure]</span></div>
+    <div class="dcp-carte"><span class="dcp-chiffre">[X]</span><span>[ce que ça mesure]</span></div>
+    <div class="dcp-carte"><span class="dcp-chiffre">[X]</span><span>[ce que ça mesure]</span></div>
+  </div>
+</section>
+
+<!-- 3 · Le problème, dans les mots du lecteur -->
+<section>
+  <h2>[La question que se pose vraiment le lecteur]</h2>
+  <p>[Décrivez sa situation avec ses mots à lui, pas avec votre vocabulaire
+  métier. Une idée par paragraphe, avec une donnée ou un exemple.]</p>
+</section>
+
+<!-- 4 · La solution -->
+<section>
+  <h2>[Ce que vous faites]</h2>
+  <div class="dcp-grille">
+    <div class="dcp-carte"><h3>[Prestation 1]</h3><p>[Ce que ça règle, concrètement.]</p></div>
+    <div class="dcp-carte"><h3>[Prestation 2]</h3><p>[Idem.]</p></div>
+    <div class="dcp-carte"><h3>[Prestation 3]</h3><p>[Idem.]</p></div>
+  </div>
+</section>
+
+<!-- 5 · Le déroulé -->
+<section>
+  <h2>Comment ça se passe</h2>
+  <ol class="dcp-etapes">
+    <li><h3>[Étape]</h3><p>[Ce qui se passe, et en combien de temps.]</p></li>
+    <li><h3>[Étape]</h3><p>[Idem.]</p></li>
+    <li><h3>[Étape]</h3><p>[Idem.]</p></li>
+  </ol>
+</section>
+
+<!-- 6 · Tableau — toujours dans .dcp-scroll, sinon il casse en mobile -->
+<section>
+  <h2>[Tarifs / comparaison / caractéristiques]</h2>
+  <div class="dcp-scroll">
+    <table class="dcp-tableau">
+      <thead><tr><th>[Colonne]</th><th>[Colonne]</th><th>[Colonne]</th></tr></thead>
+      <tbody>
+        <tr><td>[valeur]</td><td>[valeur]</td><td>[valeur]</td></tr>
+        <tr><td>[valeur]</td><td>[valeur]</td><td>[valeur]</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><small>Tarifs vérifiés le [date]. [Ce qui fait varier le prix.]</small></p>
+</section>
+
+<!-- 7 · FAQ — <details> natif : pas de JS, contenu lisible par les crawlers -->
+<section class="dcp-faq">
+  <h2>Questions fréquentes</h2>
+  <details>
+    <summary>[Question reprise d'un People Also Ask]</summary>
+    <div><p>[La première phrase répond complètement. Puis 2-3 phrases de
+    contexte. 40 à 120 mots au total.]</p></div>
+  </details>
+  <details>
+    <summary>[Question]</summary>
+    <div><p>[Réponse.]</p></div>
+  </details>
+  <details>
+    <summary>[Question]</summary>
+    <div><p>[Réponse.]</p></div>
+  </details>
+</section>
+
+<!-- 8 · CTA final — une seule action, la même que le hero -->
+<section class="dcp-final" id="devis">
+  <h2>[Bénéfice, reformulé]</h2>
+  <p>[Ce qui se passe après le clic, et ce que ça n'engage pas.]</p>
+  <a class="dcp-cta" href="[url]">[Action principale]</a>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "name": "[Service] à [Ville]",
+      "description": "[La réponse directe, reprise telle quelle]",
+      "provider": { "@type": "LocalBusiness", "name": "[Entreprise]",
+        "address": { "@type": "PostalAddress", "streetAddress": "[rue]",
+          "addressLocality": "[ville]", "postalCode": "[cp]", "addressCountry": "FR" },
+        "telephone": "[téléphone]" },
+      "areaServed": { "@type": "City", "name": "[Ville]" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "[Question 1]",
+          "acceptedAnswer": { "@type": "Answer", "text": "[Réponse 1, texte identique à celui affiché]" } },
+        { "@type": "Question", "name": "[Question 2]",
+          "acceptedAnswer": { "@type": "Answer", "text": "[Réponse 2]" } }
+      ]
+    }
+  ]
+}
+</script>
+</div>

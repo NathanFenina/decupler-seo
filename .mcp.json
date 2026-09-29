@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json.schemastore.org/mcp.json",
+  "_commentaire": "13 MCP préconfigurés pour Claude Code SEO Décupler. Aucun ne démarre sans sa variable d'environnement : copiez config/.env.example vers .env et remplissez uniquement ce dont vous avez besoin. Lancez `/seo doctor` pour savoir lesquels répondent.",
+  "mcpServers": {
+    "dataforseo": {
+      "_role": "Volumes de recherche, difficulté, SERP live, positions, backlinks. Le socle chiffré de tout le pipeline.",
+      "_obtenir": "https://app.dataforseo.com/api-access",
+      "command": "npx",
+      "args": ["-y", "dataforseo-mcp-server"],
+      "env": {
+        "DATAFORSEO_USERNAME": "${DATAFORSEO_USERNAME}",
+        "DATAFORSEO_PASSWORD": "${DATAFORSEO_PASSWORD}"
+      }
+    },
+    "ahrefs": {
+      "_role": "Backlinks, domaines référents, Domain Rating, anchor texts, contenus les plus liés.",
+      "_obtenir": "https://ahrefs.com/api — nécessite un plan API Ahrefs",
+      "command": "npx",
+      "args": ["-y", "@ahrefs/mcp"],
+      "env": {
+        "AHREFS_API_KEY": "${AHREFS_API_KEY}"
+      }
+    },
+    "semrush": {
+      "_role": "Mots-clés organiques et payants, concurrents, gaps de mots-clés, Position Tracking.",
+      "_obtenir": "https://www.semrush.com/api-analytics/",
+      "command": "npx",
+      "args": ["-y", "semrush-mcp"],
+      "env": {
+        "SEMRUSH_API_KEY": "${SEMRUSH_API_KEY}"
+      }
+    },
+    "ubersuggest": {
+      "_role": "Expansion de mots-clés, suggestions Google, idées de contenu, audit de site. Disponible aussi en connecteur claude.ai (un clic, sans clé).",
+      "_obtenir": "Connecteur claude.ai → Réglages → Connecteurs → Ubersuggest",
+      "command": "npx",
+      "args": ["-y", "ubersuggest-mcp"],
+      "env": {
+        "UBERSUGGEST_API_KEY": "${UBERSUGGEST_API_KEY}"
+      }
+    },
+    "search-console": {
+      "_role": "LA source de vérité : impressions, clics, CTR, positions moyennes réelles, couverture d'index. 16 mois d'historique max (limite API Google).",
+      "_obtenir": "Google Cloud → activer Search Console API → compte de service → JSON dans ./secrets/",
+      "command": "npx",
+      "args": ["-y", "mcp-server-gsc"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GSC_CREDENTIALS_JSON}",
+        "GSC_SITE_URL": "${GSC_SITE_URL}"
+      }
+    },
+    "google-analytics": {
+      "_role": "Sessions, conversions, canaux, pages d'entrée. Sert à relier le SEO au chiffre d'affaires.",
+      "_obtenir": "Google Cloud → activer Analytics Data API → compte de service → lecteur sur la propriété GA4",
+      "command": "npx",
+      "args": ["-y", "mcp-server-google-analytics"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GA4_CREDENTIALS_JSON}",
+        "GA4_PROPERTY_ID": "${GA4_PROPERTY_ID}"
+      }
+    },
+    "firecrawl": {
+      "_role": "Scrape une page en markdown propre, rendu JavaScript inclus. Sert à lire les concurrents sans se battre avec le HTML.",
+      "_obtenir": "https://firecrawl.dev — offre gratuite disponible",
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      }
+    },
+    "chrome-devtools": {
+      "_role": "Navigateur réel : rendu final, screenshots, Core Web Vitals mesurés, trace performance. Aucune clé API, tourne en local.",
+      "_obtenir": "Rien à faire — nécessite juste Node et Chrome installés",
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest", "--isolated"]
+    },
+    "wordpress": {
+      "_role": "Lecture et écriture d'articles/pages via l'API REST WordPress. Publication en brouillon par défaut.",
+      "_obtenir": "WordPress → Utilisateurs → Profil → Mots de passe d'application",
+      "command": "npx",
+      "args": ["-y", "server-wp-mcp"],
+      "env": {
+        "WP_SITE_URL": "${WP_SITE_URL}",
+        "WP_USERNAME": "${WP_USERNAME}",
+        "WP_APP_PASSWORD": "${WP_APP_PASSWORD}"
+      }
+    },
+    "webflow": {
+      "_role": "CMS Collections Webflow : création et mise à jour d'items, publication.",
+      "_obtenir": "Webflow → Site settings → Apps & integrations → API access → Generate token",
+      "command": "npx",
+      "args": ["-y", "webflow-mcp-server"],
+      "env": {
+        "WEBFLOW_TOKEN": "${WEBFLOW_TOKEN}",
+        "WEBFLOW_SITE_ID": "${WEBFLOW_SITE_ID}"
+      }
+    },
+    "notion": {
+      "_role": "Le cerveau du dispositif : leads, objectifs, roadmap, briefs, backlinks. Disponible en connecteur natif claude.ai (recommandé).",
+      "_obtenir": "Connecteur claude.ai → Notion. Ou https://www.notion.so/my-integrations pour une clé",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "${NOTION_TOKEN}"
+      }
+    },
+    "perplexity": {
+      "_role": "Mesure de la visibilité IA : quelles sources sont citées sur vos requêtes cibles, dans quel ordre.",
+      "_obtenir": "https://docs.perplexity.ai — clé API Sonar",
+      "command": "npx",
+      "args": ["-y", "@perplexity-ai/mcp-server"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      }
+    },
+    "reddit": {
+      "_role": "Questions réelles de l'audience, vocabulaire, threads fortement cités par les LLM.",
+      "_obtenir": "https://www.reddit.com/prefs/apps → create app (type: script)",
+      "command": "npx",
+      "args": ["-y", "reddit-mcp-server"],
+      "env": {
+        "REDDIT_CLIENT_ID": "${REDDIT_CLIENT_ID}",
+        "REDDIT_CLIENT_SECRET": "${REDDIT_CLIENT_SECRET}"
+      }
+    }
+  }
+}

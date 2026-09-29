@@ -1,0 +1,9 @@
+Indicateur,Catégorie,Valeur de départ,Valeur actuelle,Objectif,Échéance,Fréquence de relevé,Dernier relevé
+Clics organiques mensuels,Trafic,0,0,5000,,Mensuel,
+Impressions mensuelles,Trafic,0,0,150000,,Mensuel,
+Position moyenne top 20,Positions,0,0,8,,Mensuel,
+Pages indexées,Technique,0,0,0,,Mensuel,
+Domaines référents,Autorité,0,0,100,,Mensuel,
+Share of model (%),GEO,0,0,35,,Mensuel,
+Conversions organiques,Conversions,0,0,50,,Mensuel,
+Core Web Vitals au vert (%),Technique,0,0,100,,Mensuel,

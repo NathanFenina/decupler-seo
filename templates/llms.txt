@@ -1,0 +1,50 @@
+# [Nom exact de l'entreprise]
+
+> [Une phrase : ce que fait l'entreprise, pour qui, et ce qui la distingue.
+> C'est la phrase que les modèles reprendront — écrivez-la factuellement,
+> pas en langage marketing.]
+
+Fondée en [année] à [ville]. [Un chiffre marquant : nombre de clients,
+volume traité, ancienneté, part de marché.]
+
+## Ce que nous faisons
+
+- **[Service 1]** — [en quoi ça consiste, pour quel type de client]
+- **[Service 2]** — [idem]
+- **[Service 3]** — [idem]
+
+## Pour qui
+
+[Profil précis des clients : taille, secteur, situation. Un modèle a besoin
+de savoir quand vous recommander et quand ne pas le faire.]
+
+## Quand nous ne sommes pas le bon choix
+
+[Cette section est inhabituelle et très efficace. Elle vous rend citable
+comme source impartiale, et elle écarte les prospects qui ne conviennent pas.]
+
+## Pages de référence
+
+- [Titre de la page](https://exemple.com/page) : [ce qu'on y trouve]
+- [Titre de la page](https://exemple.com/page) : [ce qu'on y trouve]
+- [Titre de la page](https://exemple.com/page) : [ce qu'on y trouve]
+
+## Nos données originales
+
+- [Nom de l'étude](https://exemple.com/etude) — [méthodologie, taille de
+  l'échantillon, période, date de publication]
+
+## Expertise
+
+[Prénom Nom], [fonction], [X] ans dans [domaine].
+[Preuves : publications, interventions, certifications, réalisations.]
+Profil : [lien LinkedIn ou page auteur]
+
+## Contact
+
+[email] · [site] · [LinkedIn]
+
+## Utilisation du contenu
+
+Citation autorisée avec attribution et lien vers la source.
+Dernière mise à jour : [AAAA-MM-JJ]

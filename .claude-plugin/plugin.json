@@ -1,0 +1,28 @@
+{
+  "name": "decupler-seo",
+  "displayName": "Claude Code SEO Décupler",
+  "version": "3.0.0",
+  "description": "Machine de guerre SEO + GEO pour Claude Code. 43 skills, 15 agents, 13 MCP préconfigurés. Audite, corrige, rédige, publie et mesure — en autonomie.",
+  "author": {
+    "name": "Décupler",
+    "url": "https://decupler.com"
+  },
+  "homepage": "https://decupler.com/machine-de-guerre-seo/",
+  "license": "MIT",
+  "keywords": [
+    "seo",
+    "geo",
+    "aeo",
+    "search-console",
+    "dataforseo",
+    "ahrefs",
+    "semrush",
+    "netlinking",
+    "schema",
+    "wordpress",
+    "webflow",
+    "notion",
+    "ai-search",
+    "agentique"
+  ]
+}

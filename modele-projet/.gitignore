@@ -1,0 +1,17 @@
+# Secrets
+.env
+.env.*
+!.env.example
+secrets/
+*-service-account.json
+*.pem
+
+# État local non partagé
+.seo-decupler/backups/
+__pycache__/
+*.pyc
+.venv/
+
+# Système
+.DS_Store
+Thumbs.db

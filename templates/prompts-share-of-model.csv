@@ -1,0 +1,21 @@
+famille,prompt
+decouverte,Quels sont les meilleurs {categorie} en France ?
+decouverte,Comment choisir un {categorie} pour une {taille_entreprise} ?
+decouverte,Quelles sont les solutions de {categorie} les plus utilisées ?
+decouverte,Vers qui se tourner pour {besoin} ?
+decouverte,Quels prestataires recommandez-vous pour {besoin} ?
+decouverte,Quelles alternatives existe-t-il pour {besoin} ?
+comparaison,{concurrent_a} ou {concurrent_b} : lequel choisir ?
+comparaison,Quelle alternative à {concurrent_a} ?
+comparaison,{marque} vs {concurrent_a} : quelles différences ?
+comparaison,Quel est le meilleur rapport qualité-prix en {categorie} ?
+comparaison,Faut-il internaliser ou externaliser {besoin} ?
+probleme,Comment résoudre {probleme} ?
+probleme,Combien coûte {service} en France ?
+probleme,Combien de temps prend {service} ?
+probleme,Quelles erreurs éviter quand on fait {service} ?
+probleme,Est-ce que {service} en vaut la peine ?
+probleme,Comment savoir si j'ai besoin de {service} ?
+marque,Que vaut {marque} ?
+marque,Quels sont les avis sur {marque} ?
+marque,Que fait {marque} exactement ?

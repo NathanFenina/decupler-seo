@@ -1,0 +1,122 @@
+# ══════════════════════════════════════════════════════════════════
+# Claude Code SEO Décupler — configuration
+# ══════════════════════════════════════════════════════════════════
+# Tous les skills lisent ce fichier avant d'agir.
+# Modifiez-le librement : il est fait pour ça.
+# ══════════════════════════════════════════════════════════════════
+
+# ─── MODE D'AUTONOMIE ─────────────────────────────────────────────
+# safe        → aucune écriture externe. Tout sort en fichier local
+#               que vous copiez-collez vous-même. Zéro risque.
+# assisted    → écriture externe autorisée mais chaque action est
+#               annoncée et attend un "oui" avant de partir.
+# autonomous  → écriture externe directe, sans demander. Les garde-fous
+#               durs (plus bas) s'appliquent toujours.
+mode: autonomous
+
+# ─── KILL-SWITCH ──────────────────────────────────────────────────
+# Trois façons de tout arrêter, par ordre de priorité :
+#   1. la variable d'environnement SEO_SAFE_MODE=1   ← gagne toujours
+#   2. le flag --safe sur n'importe quelle commande  ← gagne sur ce fichier
+#   3. mode: safe ci-dessus
+#
+# Dites simplement « passe en safe mode » à Claude et il bascule.
+
+# ─── GARDE-FOUS DURS ──────────────────────────────────────────────
+# Non désactivables, même en mode autonomous. Ils existent parce que
+# chacun correspond à une façon connue de se faire mal.
+garde_fous:
+  # Ne jamais supprimer de contenu publié. Dépublier ou mettre en
+  # brouillon, oui. Supprimer, jamais.
+  jamais_supprimer_contenu: true
+
+  # Ne jamais écraser une page existante sans en sauvegarder l'état
+  # d'origine dans .seo-decupler/backups/.
+  toujours_sauvegarder_avant_ecriture: true
+
+  # Ne jamais publier sur un domaine hors de la liste autorisée
+  # (SEO_ALLOWED_DOMAINS, ou le domaine de GSC_SITE_URL par défaut).
+  domaines_autorises_uniquement: true
+
+  # Ne jamais poster sur un forum ou un réseau social sans validation
+  # humaine explicite. Un post automatisé = bannissement du compte,
+  # et le compte est à vous, pas à Claude.
+  jamais_poster_communaute_sans_validation: true
+
+  # Ne jamais envoyer d'email d'outreach sans validation humaine.
+  jamais_envoyer_email_sans_validation: true
+
+  # Ne jamais modifier robots.txt, les redirections ou les canonicals
+  # d'un site en production sans diff présenté au préalable.
+  diff_obligatoire_sur_fichiers_critiques: true
+
+  # Ne jamais inventer un chiffre. Si la donnée n'est pas disponible,
+  # écrire « donnée indisponible » et dire quel outil la fournirait.
+  jamais_inventer_de_donnee: true
+
+# ─── SEUILS ───────────────────────────────────────────────────────
+seuils:
+  # Génération programmatique de pages
+  pages_programmatiques_alerte: 100      # avertissement
+  pages_programmatiques_blocage: 500     # arrêt dur sans audit qualité
+
+  # Pages locales (risque de doorway pages)
+  pages_locales_alerte: 30
+  pages_locales_blocage: 50
+
+  # Crawl
+  crawl_max_pages: 500
+  crawl_delai_ms: 1000
+  crawl_concurrence: 5
+  crawl_respecter_robots: true
+
+  # Contenu
+  contenu_mince_mots: 300               # sous ce seuil = contenu mince
+  duplication_max_pct: 20               # au-delà = cannibalisation
+
+  # Core Web Vitals (seuils Google en vigueur)
+  lcp_bon_ms: 2500
+  inp_bon_ms: 200
+  cls_bon: 0.1
+
+  # Netlinking — au-delà, le profil devient suspect
+  ancres_exactes_max_pct: 15
+  nouveaux_liens_par_mois_max: 30
+
+# ─── SORTIES ──────────────────────────────────────────────────────
+sorties:
+  dossier: ./seo-output
+  format_rapport: markdown          # markdown | html | both
+  langue: fr
+  horodater: true                   # préfixe AAAA-MM-JJ sur les fichiers
+
+# ─── PUBLICATION ──────────────────────────────────────────────────
+publication:
+  cms: wordpress                    # wordpress | webflow | aucun
+  statut_par_defaut: draft          # draft | pending | publish
+  # Même en mode autonomous, `draft` reste le défaut recommandé :
+  # Claude écrit tout seul, vous gardez le dernier clic.
+  categorie_par_defaut: ""
+  auteur_par_defaut: ""
+
+# ─── PROJET ───────────────────────────────────────────────────────
+# Renseignez ces champs une fois : tous les skills s'en servent pour
+# arrêter de vous poser les mêmes questions à chaque session.
+projet:
+  nom: ""
+  domaine: ""
+  langue_cible: fr
+  pays_cible: FR
+  secteur: ""
+  # Ce que vous vendez, en une phrase. Sert au ciblage sémantique.
+  proposition_valeur: ""
+  # Vos 3 concurrents SEO principaux (pas vos concurrents business).
+  concurrents:
+    - ""
+    - ""
+    - ""
+  # Les URL qui doivent recevoir le jus de liens en priorité.
+  pages_prioritaires: []
+  # Ton et registre pour la rédaction.
+  ton: "expert, direct, sans jargon inutile"
+  vouvoiement: true

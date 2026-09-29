@@ -1,0 +1,65 @@
+# Secrets — ne jamais commiter
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*-service-account.json
+
+# Sorties générées
+seo-output/
+.seo-decupler/
+*.csv
+!config/*.csv
+!templates/*.csv
+!modele-projet/**/*.csv
+crawl.csv
+quick-wins.csv
+releves-*.csv
+historique-*.csv
+dashboard-*.html
+prompts.csv
+
+# Rapports générés
+*-AUDIT-*.md
+*-RAPPORT.md
+PLAN-ACTION.md
+/rapports/
+/veille/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+
+# Captures et médias générés
+screenshots/
+captures/
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Éditeurs
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.bak
+*.tmp
+
+# Archives
+*.zip
+*.tar.gz
+
+# Logs
+*.log

@@ -1,0 +1,6 @@
+Action,Type,Impact,Effort,Statut,URL concernée,Gain estimé,Date de réalisation,Date de mesure,Résultat mesuré,Skill utilisé
+Réécrire les titles des 12 pages en position 5-10,Contenu,🟠 Fort,S,À faire,,+180 clics/mois,,,,seo-meta-serp
+Corriger les pages orphelines détectées au crawl,Technique,🟠 Fort,S,À faire,,+2900 impressions/mois,,,,seo-maillage-interne
+Retirer le noindex sur /services/,Technique,🔴 Critique,XS,À faire,/services/,+3400 impressions/mois,,,,seo-technique-autofix
+Publier le pilier du silo principal,Contenu,🟡 Moyen,L,À faire,,,,,,seo-redaction
+Poser le schema Organization avec sameAs,GEO,🟠 Fort,XS,À faire,/,,,,,geo-llms-txt

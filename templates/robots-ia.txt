@@ -1,0 +1,54 @@
+# ─────────────────────────────────────────────────────────────────
+#  Crawlers IA — bloc à intégrer dans votre robots.txt
+#
+#  Configuration recommandée pour la plupart des sites : rester
+#  visible dans les moteurs IA.
+#
+#  Distinction importante : l'entraînement et la recherche sont deux
+#  choses différentes. Vous pouvez refuser d'alimenter l'entraînement
+#  tout en restant citable dans les réponses.
+# ─────────────────────────────────────────────────────────────────
+
+# Recherche ChatGPT — bloquer revient à disparaître des réponses
+User-agent: OAI-SearchBot
+Allow: /
+
+# Navigation à la demande d'un utilisateur — il a explicitement
+# demandé votre page ; la bloquer n'a aucun sens
+User-agent: ChatGPT-User
+Allow: /
+
+# Perplexity — le moteur IA qui cite le plus systématiquement
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+# Gemini et AI Overviews.
+# Bloquer Google-Extended n'affecte PAS votre ranking Google classique.
+User-agent: Google-Extended
+Allow: /
+
+
+# ─── Si vous voulez refuser l'entraînement des modèles ───────────
+# Décommentez ce bloc. Vous resterez citable dans les réponses de
+# recherche (grâce aux règles ci-dessus) sans alimenter l'entraînement.
+#
+# User-agent: GPTBot
+# Disallow: /
+#
+# User-agent: CCBot
+# Disallow: /
+
+
+# ─── Crawlers réputés agressifs ──────────────────────────────────
+User-agent: Bytespider
+Disallow: /
+
+
+Sitemap: https://exemple.com/sitemap.xml

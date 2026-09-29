@@ -1,0 +1,66 @@
+# ══════════════════════════════════════════════════════════════════
+# {{NOM}} — configuration du projet
+# ══════════════════════════════════════════════════════════════════
+# Lue par tous les skills et scripts. Elle appartient à CE projet :
+# modifiez-la librement, la synchronisation de la méthode n'y touche pas.
+
+mode: {{MODE}}                       # safe | assisted | autonomous
+
+projet:
+  nom: "{{NOM}}"
+  domaine: "{{DOMAINE}}"
+  pays_cible: {{PAYS}}
+  langues: [{{LANGUES_YAML}}]
+  cms: {{CMS}}                       # wordpress | webflow | contentful | shopify | statique | aucun
+  secteur: "{{ACTIVITE}}"
+  proposition_valeur: "{{PROPOSITION_VALEUR}}"
+  concurrents: []
+  pages_prioritaires: []
+  ton: "{{TON}}"
+  vouvoiement: {{VOUVOIEMENT}}
+
+# Règles propres à ce client. Elles priment sur les valeurs par défaut.
+regles:
+  # Laissez vide pour un placement naturel. Mettez 20 si c'est la règle
+  # validée avec ce client (cas Apogea et Reux).
+  mot_cle_occurrences_min:
+  densite_max_pct: 3
+
+# Le cycle autonome : ce que les routines ont le droit de faire seules.
+cycle:
+  pages_neuves_par_semaine_max: {{PAGES_MAX}}
+  pages_optimisees_par_semaine_max: 10
+  automatique: [title, meta, faq, schema, maillage]
+  validation: [page-neuve, reecriture-section]
+  interdit: [robots, redirection, canonical, suppression, outreach, communaute, fiche-google]
+
+# La boucle de mesure.
+mesure:
+  delai_jours: 28
+  impressions_min_pour_juger: 100    # en dessous : « donnée insuffisante »
+  seuil_gain_pct: 10
+  seuil_perte_pct: -15
+
+garde_fous:
+  jamais_supprimer_contenu: true
+  toujours_sauvegarder_avant_ecriture: true
+  domaines_autorises_uniquement: true
+  jamais_poster_communaute_sans_validation: true
+  jamais_envoyer_email_sans_validation: true
+  diff_obligatoire_sur_fichiers_critiques: true
+  jamais_inventer_de_donnee: true
+
+seuils:
+  pages_programmatiques_alerte: 100
+  pages_programmatiques_blocage: 500
+  pages_locales_alerte: 30
+  pages_locales_blocage: 50
+  crawl_max_pages: 500
+  crawl_delai_ms: 1000
+
+publication:
+  statut_par_defaut: draft
+
+sorties:
+  dossier: ./contenus
+  langue: {{LANGUE_PRINCIPALE}}
