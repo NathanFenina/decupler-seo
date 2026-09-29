@@ -50,13 +50,23 @@ comparaison n'a aucun sens. Ajoutez des prompts sans jamais en retirer.
 
 ## 2. Interroger les moteurs
 
-| Moteur | Méthode |
-|--------|---------|
-| Perplexity | MCP ou API Sonar — automatisable |
-| ChatGPT | API avec recherche activée, ou manuellement |
-| Google AI Overviews | Recherche manuelle, ou DataForSEO (feature AIO) |
-| Claude | Avec recherche web |
-| Gemini | Manuellement |
+Automatique, recherche web activée sur chaque moteur, sources relevées :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/share_of_model.py" --prompts recherche/prompts-ia.csv \
+  --exporter donnees/ia-AAAA-MM.csv
+```
+
+| Moteur | Clé | Méthode |
+|--------|-----|---------|
+| ChatGPT | `OPENAI_API_KEY` | API Responses + recherche web — automatique |
+| Gemini | `GEMINI_API_KEY` | API + Google Search — automatique, le plus proche des AI Overviews |
+| Claude | `ANTHROPIC_API_KEY` | API + recherche web — automatique |
+| Perplexity | `PERPLEXITY_API_KEY` | API Sonar — automatique, facultatif |
+| Google AI Overviews | — | DataForSEO (feature AIO) ou relevé manuel |
+
+Deux clés suffisent (OpenAI et Gemini) : elles couvrent les deux moteurs
+qui pèsent le plus. Un moteur sans clé est ignoré, sans erreur.
 
 Conditions à respecter pour que la mesure soit comparable :
 - **Session neuve**, sans historique ni personnalisation

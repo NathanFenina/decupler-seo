@@ -1,4 +1,4 @@
-# Les 45 skills
+# Les 46 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -22,6 +22,7 @@ aussi l'appeler par son nom.
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
+| `seo-opportunites` | Classe toutes les opportunités du client : clics gagnables × valeur du thème (lexique du métier) × facilité, et les thèmes non couverts | « opportunités », « par où commencer », « priorités » |
 | `seo-quick-wins` | Les pages en position 4-20 à rattraper, chiffrées, avec les corrections écrites | « quick wins », « gains rapides », « j'ai peu de temps » |
 | `seo-keyword-research` | Volumes, intention, risque zero-click IA, arbitrage | « mots-clés », « sur quoi me positionner » |
 | `seo-competitor-gap` | 4 types de gaps, benchmark GEO, plan 90 jours | « concurrents », « pourquoi ils rankent mieux » |

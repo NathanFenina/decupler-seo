@@ -89,8 +89,8 @@ plusieurs skills sans que vous ayez à orchestrer quoi que ce soit.
 
 **La chaîne**
 1. Vérification du robots.txt : les crawlers IA sont-ils autorisés ?
-2. 20 questions d'acheteur posées aux moteurs (Perplexity automatisé, les
-   autres à la main ou par API)
+2. 20 questions d'acheteur posées aux moteurs (ChatGPT et Gemini par API,
+   Claude et Perplexity si leur clé existe, AI Overviews à la main)
 3. Relevé : qui est cité, dans quel ordre, avec quelle formulation
 4. Calcul de la part de voix, pondérée par le rang
 5. Comparaison aux positions Google sur les mêmes sujets

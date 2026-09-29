@@ -88,8 +88,9 @@ Ne devinez pas. Testez.
 
 1. Établissez **20 questions d'acheteur** — celles que quelqu'un pose avant
    d'acheter ce que vous vendez. Pas vos mots-clés : des questions.
-2. Posez-les aux 5 moteurs (Perplexity via son MCP, les autres à la main ou
-   via API).
+2. Posez-les aux moteurs : `scripts/share_of_model.py` interroge ChatGPT,
+   Gemini, Claude et Perplexity selon les clés présentes ; AI Overviews à
+   la main ou via DataForSEO.
 3. Pour chaque réponse, relevez : les domaines cités, leur ordre, la
    formulation de la mention, et si vous y êtes.
 4. Calculez votre **part de voix** : nombre de réponses où vous êtes cité,

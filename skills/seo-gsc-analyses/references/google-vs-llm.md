@@ -33,8 +33,9 @@ dans les moteurs génératifs.
 
 1. Prends mes requêtes cibles où je suis déjà bien placé sur Google
    (position 1 à 10 selon Search Console).
-2. Pose ces mêmes questions à Perplexity, en langage naturel — pas en
-   mots-clés. Un utilisateur d'IA écrit des phrases.
+2. Pose ces mêmes questions aux moteurs génératifs
+   (`scripts/share_of_model.py` : ChatGPT, Gemini, et Claude ou Perplexity
+   si leur clé existe), en langage naturel — pas en mots-clés. Un utilisateur d'IA écrit des phrases.
 3. Pour chaque réponse, relève : mon domaine est-il cité ? à quel rang
    parmi les sources ? et QUI est cité à ma place ?
 4. Mets les deux colonnes face à face : position Google contre présence
@@ -45,7 +46,7 @@ dans les moteurs génératifs.
    se faire mentionner.
 6. Journalise le relevé avec sa date pour comparer d'un mois sur l'autre.
 
-Rends le tableau requête | position Google | cité par Perplexity |
+Rends le tableau requête | position Google | cité par les moteurs IA |
 rang de citation | sources citées à ma place. Puis les 5 requêtes au
 plus gros écart, avec pour chacune l'action concrète pour y entrer.
 

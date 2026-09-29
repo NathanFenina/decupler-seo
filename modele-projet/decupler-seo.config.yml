@@ -9,6 +9,10 @@ mode: {{MODE}}                       # safe | assisted | autonomous
 projet:
   nom: "{{NOM}}"
   domaine: "{{DOMAINE}}"
+  # Propriété Search Console, exactement comme dans Search Console :
+  # "sc-domain:exemple.com" (propriété domaine) ou "https://www.exemple.com/".
+  # Vide = le domaine ci-dessus, avec une barre finale.
+  propriete_gsc: ""
   pays_cible: {{PAYS}}
   langues: [{{LANGUES_YAML}}]
   cms: {{CMS}}                       # wordpress | webflow | contentful | shopify | statique | aucun
@@ -75,6 +79,11 @@ controle:
 # Boucle de fraîcheur : pages revérifiées chaque semaine, en plus des neuves.
 fraicheur:
   pages_par_semaine: 1
+
+# Classement des opportunités (scripts/opportunites.py, skill seo-opportunites).
+# Le lexique du métier — thèmes, valeur 1 à 3, motifs — est dans memoire/lexique.csv.
+opportunites:
+  marque: []                 # termes de marque, exclus du classement (défaut : nom et domaine)
 
 sorties:
   dossier: ./contenus

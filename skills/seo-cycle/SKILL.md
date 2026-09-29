@@ -102,10 +102,13 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
    requête, 28 derniers jours, écrit dans `donnees/AAAA-SWW.json`.
 2. **Mesures dues d'abord.** `seo-journal-mesure`, étape « mesurer » : on
    évalue ce qui a été fait avant d'en faire davantage.
-3. **Candidats** : pages en position 4-20, au moins 100 impressions, non
-   modifiées depuis 28 jours (vérifier dans `journal/modifications.csv` :
-   modifier une page en cours de mesure fausse sa mesure).
-4. **Diagnostic** selon `seo-quick-wins` : snippet, contenu, cannibalisation.
+3. **Candidats, dans l'ordre** : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --ecrire`
+   (skill `seo-opportunites`). Le classement pondère par la valeur des
+   thèmes du client (`memoire/lexique.csv`) et exclut déjà les pages en
+   cours de mesure : modifier une page en cours de mesure fausse sa mesure.
+   On prend les actions de haut en bas.
+4. **Diagnostic** de chaque candidat selon `seo-quick-wins` : snippet,
+   contenu, cannibalisation.
 5. **Agir, dans le plafond** `cycle.pages_optimisees_par_semaine_max` :
 
 | Diagnostic | Action | Niveau |
@@ -176,7 +179,10 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
     "modifications": 0, "gains": 0, "neutres": 0, "pertes": 0,
     "a_valider": 0, "runs_attendus": 0, "runs_trouves": 0}
    ```
-5. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
+5. **Opportunités** : `opportunites.py --ecrire`, et dans le rapport les
+   cinq premières actions, les thèmes de valeur 3 non couverts, et ce qui a
+   changé depuis le classement du mois précédent.
+6. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
    mois. Environ 30 veilles, 4 optimisations, 4 contenus attendus. Toute
    absence est signalée en tête du rapport.
 

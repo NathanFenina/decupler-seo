@@ -242,6 +242,11 @@ def appel(url: str, corps: dict | None = None, methode: str | None = None, ecrit
 def site_par_defaut() -> str:
     if _env("GSC_SITE_URL"):
         return _env("GSC_SITE_URL")
+    # Réglage du projet : indispensable quand un même environnement cloud
+    # sert plusieurs clients (une seule variable GSC_SITE_URL pour tous).
+    propriete = lire_valeur("projet.propriete_gsc")
+    if propriete:
+        return propriete
     domaine = lire_valeur("projet.domaine")
     if domaine:
         return domaine.rstrip("/") + "/"

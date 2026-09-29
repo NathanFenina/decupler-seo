@@ -23,7 +23,7 @@ from _projet import charger_env, config_est_le_modele, fichier_config, racine_pr
 
 # (identifiant, nom, variables requises, niveau, ce que ça débloque, où l'obtenir, coût)
 OUTILS = [
-    ("search-console", "Google Search Console", ["GSC_SITE_URL", "GSC_SA_JSON|GSC_CREDENTIALS_JSON"], 1,
+    ("search-console", "Google Search Console", ["GSC_SA_JSON|GSC_CREDENTIALS_JSON"], 1,
      "Quick wins, rapports, diagnostic de chute de trafic, priorisation réelle",
      "Google Cloud → Search Console API → compte de service", "gratuit"),
     ("google-analytics", "Google Analytics 4", ["GA4_PROPERTY_ID", "GA4_CREDENTIALS_JSON"], 1,
@@ -56,8 +56,14 @@ OUTILS = [
     ("notion", "Notion", ["NOTION_TOKEN"], 3,
      "Pilotage : leads, objectifs, roadmap, briefs, backlinks",
      "Connecteur claude.ai natif (recommandé) ou clé d'intégration", "gratuit"),
-    ("perplexity", "Perplexity", ["PERPLEXITY_API_KEY"], 4,
-     "Mesure de citation dans les moteurs IA, share of model",
+    ("openai", "OpenAI (ChatGPT)", ["OPENAI_API_KEY"], 4,
+     "Part de voix dans ChatGPT, sources citées (share_of_model.py)",
+     "https://platform.openai.com/api-keys", "quelques centimes par mesure"),
+    ("gemini", "Gemini", ["GEMINI_API_KEY"], 4,
+     "Part de voix dans Gemini avec Google Search, proche des AI Overviews",
+     "https://aistudio.google.com/apikey", "offre gratuite suffisante"),
+    ("perplexity", "Perplexity (facultatif)", ["PERPLEXITY_API_KEY"], 4,
+     "Part de voix dans Perplexity — utile seulement si votre audience l'utilise",
      "https://docs.perplexity.ai", "à l'usage, quelques euros / mois"),
     ("reddit", "Reddit", ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET"], 4,
      "Questions réelles de l'audience, threads fortement cités par les LLM",

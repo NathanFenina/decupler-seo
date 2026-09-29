@@ -89,7 +89,9 @@ Avant d'automatiser quoi que ce soit, établir le point de départ :
 2. Un premier instantané Search Console dans `donnees/`
 3. `seo-technique-autofix` en mode proposition : les blocages techniques
    d'abord, sinon tout le reste est inutile
-4. Consigner dans `memoire/decisions.md` ce qui est validé ou refusé
+4. Le lexique du métier dans `memoire/lexique.csv`, validé avec le client
+   (thèmes et valeur 1 à 3), puis le premier classement `seo-opportunites`
+5. Consigner dans `memoire/decisions.md` ce qui est validé ou refusé
 
 ## Projet dans un autre pays ou une autre langue
 

@@ -204,16 +204,23 @@ dispositif fonctionne sans, avec moins de données de marché.
 
 ## Niveau 4 — Visibilité IA
 
-### Perplexity
+### Moteurs IA : OpenAI, Gemini (Claude, Perplexity en option)
 
 **Ce que ça débloque** : la mesure automatisée de votre part de voix dans les
-moteurs IA (`/seo share-of-model`).
+moteurs IA (`/seo share-of-model`) : chaque moteur est interrogé avec sa
+recherche web activée, et le script relève les sources citées et leur rang.
 
-[docs.perplexity.ai](https://docs.perplexity.ai) → clé API Sonar →
-`PERPLEXITY_API_KEY`. Quelques euros par mois.
+| Moteur | Variable | Où |
+|---|---|---|
+| ChatGPT | `OPENAI_API_KEY` | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| Gemini | `GEMINI_API_KEY` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| Claude | `ANTHROPIC_API_KEY` | facultatif |
+| Perplexity | `PERPLEXITY_API_KEY` | facultatif — seulement si votre audience l'utilise |
 
-Sans la clé, le script prépare une grille de relevé manuel : la mesure reste
-possible, elle est juste plus lente.
+OpenAI et Gemini suffisent : ce sont les deux moteurs qui pèsent le plus, et
+Gemini avec Google Search est ce qui se rapproche le plus des AI Overviews.
+Une mesure de 30 prompts coûte quelques centimes. Sans aucune clé, le script
+prépare une grille de relevé manuel.
 
 ### Reddit
 

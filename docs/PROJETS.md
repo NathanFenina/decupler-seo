@@ -174,6 +174,15 @@ apprentissage dans `memoire/apprentissages.md` — et le cycle en tient compte :
 un type de modification qui nuit sur ce site cesse d'être appliqué
 automatiquement.
 
+## Les priorités de chaque client
+
+Le moteur de classement est le même pour tous ; ce qui change d'un client à
+l'autre, c'est son lexique, `memoire/lexique.csv` : les thèmes de son
+métier, la valeur de chacun pour son chiffre d'affaires (1 à 3) et les
+motifs qui les reconnaissent, dans toutes ses langues. Le cycle
+d'optimisation prend les actions dans l'ordre de `opportunites.py`, et le
+rapport mensuel montre les thèmes de valeur encore non couverts.
+
 ## Les niveaux d'autonomie
 
 | Niveau | Quoi |

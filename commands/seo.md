@@ -1,6 +1,6 @@
 ---
 description: Routeur principal Claude Code SEO Décupler — dirige vers le bon skill selon ce que vous demandez
-argument-hint: "[audit|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
+argument-hint: "[audit|opportunites|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
 ---
 
 # /seo — routeur
@@ -18,6 +18,7 @@ laissez jamais l'utilisateur devant un menu.
 | Ce qui est demandé | Skill |
 |--------------------|-------|
 | `audit`, une URL de domaine seule | `seo-audit-360` |
+| `opportunites`, `priorités`, `par où commencer` | `seo-opportunites` |
 | `quickwins`, `gains rapides` | `seo-quick-wins` |
 | `technique`, `fix`, `corrige` | `seo-technique-autofix` |
 | `crawl`, `architecture` | `seo-crawl-architecture` |

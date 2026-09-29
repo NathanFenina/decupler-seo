@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-45 skills · 15 agents · 18 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 56 tests
+46 skills · 15 agents · 19 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 67 tests
 
 ---
 
@@ -58,7 +58,7 @@ Ou les commandes :
 | `/seo fix <url>` | détecte **et corrige** la technique : robots, canonicals, redirections |
 | `/seo brief <mot-clé>` | brief adossé à la SERP réelle, réponse directe et FAQ déjà rédigées |
 | `/seo article` | rédaction : recherche obligatoire, thèse, zéro chiffre inventé |
-| `/seo geo <url>` | visibilité dans ChatGPT, Perplexity, AI Overviews, et comment y entrer |
+| `/seo geo <url>` | visibilité dans ChatGPT, Gemini, AI Overviews, et comment y entrer |
 | `/seo rapport` | le mois écoulé : ce qui a bougé, **pourquoi**, et quoi faire |
 
 ---
@@ -172,7 +172,7 @@ disent ce qui manque.
 | **Le socle** | Search Console · GA4 · Chrome DevTools | gratuit |
 | **La donnée marché** | Firecrawl · DataForSEO · Ubersuggest | gratuit à quelques € |
 | **La production** | WordPress · Webflow · Notion · Semrush · Ahrefs | variable |
-| **La visibilité IA** | Perplexity · Reddit | quelques € |
+| **La visibilité IA** | clés OpenAI et Gemini (Claude et Perplexity en option) · Reddit | quelques centimes par mesure |
 
 Search Console, GA4 et Chrome DevTools couvrent l'essentiel, et sont gratuits.
 Search Console se lit aussi en direct, sans intermédiaire, avec
@@ -184,13 +184,13 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>45 skills</b>, en 8 familles</summary>
+<summary><b>46 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
 | **Diagnostic et technique** | `seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` · `seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` · `seo-migration` · `seo-veille` |
 | **Données Search Console** | `seo-gsc-analyses` — 20 analyses : content decay, gagnants et perdants, requêtes émergentes, saisonnalité, cannibalisation, pages à créer… |
-| **Recherche et stratégie** | `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
+| **Recherche et stratégie** | `seo-opportunites` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
 | **Contenu** | `seo-brief` · `seo-redaction` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` |
 | **Structure et échelle** | `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-hreflang-i18n` · `seo-images` |
 | **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |

@@ -1,5 +1,24 @@
 # Journal des versions
 
+## 3.2.0
+
+### Ajouté
+
+- **Classement des opportunités par client** : `scripts/opportunites.py` et
+  le skill `seo-opportunites`. Score = clics mensuels gagnables × valeur du
+  thème pour le client × facilité ; une action par ligne (title, enrichir,
+  renforcer, consolider, créer) ; les pages en cours de mesure exclues ; la
+  couverture des thèmes du métier, pour voir ce qui manque au site. Le
+  lexique du métier vit dans chaque projet (`memoire/lexique.csv`).
+  Utilisé par le cycle d'optimisation et le rapport mensuel.
+- **Part de voix IA sur plusieurs moteurs** : `share_of_model.py` interroge
+  ChatGPT et Gemini (et Claude, Perplexity si leur clé existe), recherche web
+  activée, relève les sources citées et distingue visibilité et réputation.
+  Sans dépendance. Perplexity devient facultatif.
+- `projet.propriete_gsc` : la propriété Search Console se règle par projet,
+  pour qu'un même environnement cloud serve plusieurs clients.
+
+
 ## 3.1.0
 
 ### Ajouté
