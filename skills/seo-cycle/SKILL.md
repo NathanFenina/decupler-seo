@@ -133,15 +133,26 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
 0. Si `memoire/decisions.md` confie le contenu à un skill propre au projet
    (une routine de contenu existait avant l'adoption), ce mode ne fait rien :
    deux routines qui écrivent les mêmes pages se contredisent.
-1. Lire la file éditoriale (`contenus/file.md` si elle existe, ou celle que
-   désigne `memoire/decisions.md` ; sinon proposer les sujets depuis
-   `seo-keyword-research` et `seo-cocon-semantique`).
+1. **Les idées viennent de la demande, pas de l'intuition.** Une fois par
+   mois (première semaine), rafraîchir la demande puis le calendrier :
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" idees --lexique --langue <langue> --ecrire   # par langue du projet
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --demande donnees/demande-<langue>-<date>.csv \
+     --calendrier --semaines 4 --capacite <cycle.pages_neuves_par_semaine_max> --ecrire
+   ```
+   Le calendrier (`rapports/calendrier-*.md`) respecte le mix TOFU/MOFU/BOFU
+   de `opportunites.mix`, 80 % de créations et 20 % d'optimisations, et
+   propose un outil ou une ressource quand la requête en demande un. Chaque
+   semaine, prendre les lignes de la semaine ; à défaut, la file éditoriale
+   (`contenus/file.md` ou celle que désigne `memoire/decisions.md`).
 2. Au plus `cycle.pages_neuves_par_semaine_max` pages. **Jamais au-delà**,
    même si la file est longue : la mise à jour spam d'août 2026 a frappé des
    sites qui publiaient en masse, pas des sites qui publiaient lentement.
 3. Pour chacune — en parallèle, un agent par page quand elles sont
-   indépendantes : `seo-benchmark` (au moins 5 axes gagnés, sinon la page
-   n'est pas prête) → `seo-brief` → `seo-redaction` (+ `projet-marque`, et la
+   indépendantes : `demande.py serp --mot "<requête>"` (top 10, questions
+   « Autres questions posées », AI Overview) → `seo-benchmark` (au moins 5
+   axes gagnés, sinon la page n'est pas prête) → `seo-brief` (14 sections,
+   écrit dans `recherche/briefs/`) → `seo-redaction` (+ `projet-marque`, et la
    passe anti-cannibalisation) → `seo-optimisation-onpage` jusqu'à 85/100 →
    `controle_contenu.py`, bloquant.
 4. **Chaque chiffre** est vérifié à sa source officielle et reporté dans
@@ -170,9 +181,14 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
    signale (au moins 3 mesures du même type). Pas d'intuition.
 3. Lister dans `rapports/a-valider.md` les retours arrière proposés
    (`journal.py a-annuler`).
-4. Écrire `rapports/AAAA-MM.md` selon `seo-reporting`, et
-   `rapports/AAAA-MM.json` avec ces clés, toujours les mêmes, pour que les
-   rapports de tous les projets s'additionnent :
+4. **Les chiffres par script** : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rapport.py"`
+   écrit la partie factuelle de `rapports/AAAA-MM.md` et `rapports/AAAA-MM.json`
+   (mois, mois précédent, an passé ; marque et hors marque ; pages et requêtes
+   en hausse et en baisse ; requêtes nouvelles ; verdicts ; routines). Vous
+   rédigez seulement la section « Lecture et décisions » selon `seo-reporting` :
+   les causes, pas les courbes. Ne recalculez jamais un chiffre à la main.
+   Le JSON garde ces clés, toujours les mêmes, pour que les rapports de tous
+   les projets s'additionnent :
    ```json
    {"projet": "", "mois": "AAAA-MM", "clics": 0, "impressions": 0,
     "position_moyenne": 0, "clics_variation_pct": 0,
@@ -182,7 +198,13 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
 5. **Opportunités** : `opportunites.py --ecrire`, et dans le rapport les
    cinq premières actions, les thèmes de valeur 3 non couverts, et ce qui a
    changé depuis le classement du mois précédent.
-6. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
+6. **Visibilité IA**, même liste chaque mois : `share_of_model.py --prompts
+   recherche/prompts-ia.csv --concurrents "<concurrents de la config>"`, puis
+   une fois par trimestre `--sans-web` (notoriété). Dans le rapport : la
+   visibilité par moteur, son évolution, et les prompts MOFU/BOFU où la
+   marque manque partout — ce sont les briefs du mois suivant (`seo-redaction`,
+   « Article GEO : gagner un prompt IA »).
+7. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
    mois. Environ 30 veilles, 4 optimisations, 4 contenus attendus. Toute
    absence est signalée en tête du rapport.
 

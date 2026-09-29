@@ -58,6 +58,8 @@ ACTIONS = {
     "cannibalisation": ("Consolider : plusieurs pages se disputent la requête", 0.6, "contenu"),
     "loin": ("Créer une page dédiée ou refondre : le site n'est pas en position de gagner", 0.25, "page-neuve"),
     "a-creer": ("Créer une page : demande réelle, le site n'y apparaît pas", 0.25, "page-neuve"),
+    "format-special": ("Créer un outil ou une ressource (modèle, checklist, simulateur) : la requête le demande", 0.3,
+                       "page-neuve"),
     "invisible": ("Page publiée mais absente des résultats : revoir l'angle, le maillage, les liens", 0.35, "contenu"),
     "a-verifier": ("Page publiée, position inconnue sans Search Console : vérifier puis renforcer", 0.35, "contenu"),
 }
@@ -157,6 +159,18 @@ def lire_demande(chemin: Path) -> dict[str, tuple[float, str]]:
         c_page = next((cols[c] for c in ("page", "url") if c in cols), None)
         return {l[c_req].strip().lower(): (_nombre(l[c_vol]), (l.get(c_page) or "").strip() if c_page else "")
                 for l in lecteur if l.get(c_req)}
+
+
+def lire_intentions(chemin: Path) -> dict[str, str]:
+    """Colonne « intention » facultative de la demande (écrite par demande.py)."""
+    with chemin.open(encoding="utf-8-sig") as f:
+        lecteur = csv.DictReader(f)
+        cols = {c.lower().strip(): c for c in lecteur.fieldnames or []}
+        c_req = next((cols[c] for c in ("requete", "requête", "keyword", "query") if c in cols), None)
+        c_int = cols.get("intention") or cols.get("intent")
+        if not c_req or not c_int:
+            return {}
+        return {l[c_req].strip().lower(): (l.get(c_int) or "").strip().lower() for l in lecteur if l.get(c_req)}
 
 
 def pages_en_mesure(delai: int) -> dict[str, str]:
@@ -306,6 +320,117 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
             "en_mesure": sorted(set(o["page"] for o in opportunites if o["en_mesure_jusqu_au"]))}
 
 
+# ─── Funnel, formats et calendrier ────────────────────────────────
+# Heuristiques d'un outil éprouvé : l'URL d'abord (le site dit ce qu'est la page),
+# puis la requête, TOFU par défaut.
+
+FUNNEL_URL = [("BOFU", r"pricing|tarif|prix|demo|contact|temoignage|service|devis|essai|checkout|offre"),
+              ("MOFU", r"comparatif|\bvs\b|alternative|use-case|cas-client|tutoriel|avis|benchmark"),
+              ("TOFU", r"blog|guide|glossaire|faq|ressource|conseil|actualit")]
+# \b ne vaut pas pour l'arabe (lettres attachées aux préfixes) : les termes arabes sont cherchés tels quels.
+FUNNEL_REQUETE = [("BOFU", r"\b(prix|tarifs?|co[uû]t|acheter|devis|souscrire|price|cost|fees?|buy|quote)\b"
+                           r"|سعر|أسعار|اسعار|تكلفة|تكاليف|رسوم|شراء|عرض سعر"),
+                  ("MOFU", r"\b(comparatif|vs|versus|alternative|avis|diff[ée]rence|meilleur|best|review)\b"
+                           r"|أفضل|افضل|مقارنة|بديل|تقييم|الفرق بين"),
+                  ("TOFU", r"\b(comment|pourquoi|qu'est-ce|definition|d[ée]finition|guide|how|what|why)\b"
+                           r"|كيف|ما هو|ما هي|لماذا|شرح|دليل|طريقة")]
+FORMAT_SPECIAL = re.compile(r"\b(checklist|check-list|mod[eè]le|template|exemple|calcul(ateur|er)?|simulat(eur|ion)"
+                            r"|gratuit|pdf|glossaire|calculator|example|free)\b|حاسبة|نموذج|قالب|مجان", re.I)
+SCHEMA_INTENTION = {"transactional": "Service ou Product (prix visible) + FAQPage",
+                    "commercial": "ItemList + FAQPage", "informational": "Article + FAQPage (HowTo si pas-à-pas)",
+                    "navigational": "WebPage + BreadcrumbList"}
+
+
+def funnel_de(page: str, requete: str) -> str:
+    chemin = re.sub(r"^https?://[^/]+", "", page or "").lower()
+    for etape, motif in FUNNEL_URL:
+        if chemin and re.search(motif, chemin):
+            return etape
+    for etape, motif in FUNNEL_REQUETE:
+        if re.search(motif, requete, re.I):
+            return etape
+    return "TOFU"
+
+
+def lire_mix(texte: str | None) -> dict[str, float]:
+    """« 60/25/15 » → parts cibles TOFU/MOFU/BOFU. Défaut : site qui construit son autorité."""
+    try:
+        t, m, b = (float(x) for x in (texte or "60/25/15").split("/"))
+        s = t + m + b
+        return {"TOFU": t / s, "MOFU": m / s, "BOFU": b / s}
+    except ValueError:
+        raise SystemExit(f"✗ mix « {texte} » : attendu TOFU/MOFU/BOFU, ex. 60/25/15") from None
+
+
+def enrichir(res: dict, lignes: list[dict], intentions: dict[str, str] | None = None) -> dict:
+    """Ajoute funnel, format spécial et schéma conseillé ; mesure la répartition du site par funnel."""
+    intentions = intentions or {}
+    for o in res["opportunites"]:
+        o["funnel"] = funnel_de(o["page"], o["requete"])
+        intention = intentions.get(o["requete"].lower(), "")
+        o["intention"] = intention
+        o["schema"] = SCHEMA_INTENTION.get(intention, "")
+        if o["action"] in ("a-creer", "loin") and FORMAT_SPECIAL.search(o["requete"]):
+            libelle, facilite, type_journal = ACTIONS["format-special"]
+            ancienne = ACTIONS[o["action"]][1]
+            o.update(action="format-special", a_faire=libelle, type_journal=type_journal,
+                     score=round(o["score"] * facilite / ancienne, 1))
+    res["opportunites"].sort(key=lambda o: (-o["score"], -o["gain_clics_mois"]))
+    impressions: dict[str, float] = {"TOFU": 0.0, "MOFU": 0.0, "BOFU": 0.0}
+    for l in lignes:
+        impressions[funnel_de(l["page"], l["requete"])] += l["impressions"]
+    total = sum(impressions.values())
+    res["funnel_site_pct"] = {k: round(v / total * 100, 1) for k, v in impressions.items()} if total else {}
+    return res
+
+
+def calendrier(res: dict, semaines: int, capacite: int, mix: dict[str, float],
+               debut: dt.date | None = None) -> list[dict]:
+    """Planning éditorial : 80 % de créations, 20 % d'optimisations, créations réparties selon le mix."""
+    total = min(semaines * capacite, 24 * semaines)
+    a_creer = [o for o in res["opportunites"] if o["action"] in ("a-creer", "format-special", "loin") and o["score"] > 0]
+    a_optimiser = [o for o in res["opportunites"] if o["action"] not in ("a-creer", "format-special", "loin")
+                   and o["score"] > 0 and o["page"]]
+    nb_optim = min(len(a_optimiser), round(total * 0.2))
+    places = {k: round((total - nb_optim) * v) for k, v in mix.items()}
+    choisis, restes = [], []
+    for o in a_creer:
+        if places.get(o["funnel"], 0) > 0:
+            places[o["funnel"]] -= 1
+            choisis.append(o)
+        else:
+            restes.append(o)
+    # Si une étape du funnel manque d'idées, on complète avec les meilleures restantes.
+    choisis += restes[:max(0, total - nb_optim - len(choisis))]
+    vues_pages: set[str] = set()
+    optim = []
+    for o in a_optimiser:                      # une page n'est optimisée qu'une fois par calendrier
+        if o["page"] not in vues_pages and len(optim) < nb_optim:
+            vues_pages.add(o["page"])
+            optim.append(o)
+    entrees = sorted(choisis + optim, key=lambda o: -o["score"])[:total]
+    lundi = (debut or dt.date.today()) + dt.timedelta(days=(7 - (debut or dt.date.today()).weekday()) % 7 or 7)
+    plan = []
+    for i, o in enumerate(entrees):
+        plan.append({"semaine": (lundi + dt.timedelta(weeks=i // max(capacite, 1))).isoformat(),
+                     "type": "création" if o in choisis else "optimisation", "funnel": o["funnel"],
+                     "requete": o["requete"], "page": o["page"], "action": o["a_faire"],
+                     "schema": o.get("schema", ""), "statut": "à planifier"})
+    return plan
+
+
+def calendrier_markdown(plan: list[dict], mix: dict[str, float]) -> str:
+    l = ["# Calendrier éditorial", "",
+         f"Mix visé TOFU/MOFU/BOFU : {'/'.join(str(round(v * 100)) for v in mix.values())} · "
+         "80 % de créations, 20 % d'optimisations · statuts : à planifier → en cours → publié → indexé", "",
+         "| Semaine | Type | Funnel | Requête | Page | Action | Schéma | Statut |", "|---|---|---|---|---|---|---|---|"]
+    for e in plan:
+        page = e["page"].split("://", 1)[-1] if e["page"] else "à créer"
+        l.append(f"| {e['semaine']} | {e['type']} | {e['funnel']} | {e['requete']} | {page} | {e['action']} "
+                 f"| {e['schema'] or '—'} | {e['statut']} |")
+    return "\n".join(l) + "\n"
+
+
 # ─── Sortie ───────────────────────────────────────────────────────
 
 def rapport_markdown(res: dict, nom: str, jours: int, source: str, top: int, lexique_absent: bool) -> str:
@@ -338,6 +463,12 @@ def rapport_markdown(res: dict, nom: str, jours: int, source: str, top: int, lex
         else:
             pos = "invisible" if res["gsc"] else "?"
         l.append(f"| {c['theme']} | {c['pages']} | {c['requetes']} | {c['impressions']:.0f} | {c['clics']:.0f} | {pos} |")
+    if res.get("funnel_site_pct"):
+        f = res["funnel_site_pct"]
+        l += ["", "## Répartition du trafic par étape du funnel", "",
+              f"Impressions : TOFU {f.get('TOFU', 0)} % · MOFU {f.get('MOFU', 0)} % · BOFU {f.get('BOFU', 0)} % "
+              f"(cible {res.get('mix_cible', '60/25/15')}). Un BOFU très faible veut dire que le site attire des "
+              "curieux mais peu d'acheteurs."]
     l += ["", f"Marque : {res['marque']['clics']} clics et {res['marque']['impressions']} impressions par mois "
               "(hors classement)."]
     if res["en_mesure"]:
@@ -359,6 +490,10 @@ def main() -> int:
     ap.add_argument("--top", type=int, default=25)
     ap.add_argument("--ecrire", action="store_true", help="écrit rapports/opportunites-AAAA-MM-JJ.md")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--mix", help="parts cibles TOFU/MOFU/BOFU (défaut : opportunites.mix de la config, sinon 60/25/15)")
+    ap.add_argument("--calendrier", action="store_true", help="écrit aussi rapports/calendrier-AAAA-MM-JJ.md")
+    ap.add_argument("--semaines", type=int, default=8)
+    ap.add_argument("--capacite", type=int, default=3, help="contenus par semaine")
     a = ap.parse_args()
 
     racine = racine_projet()
@@ -382,6 +517,18 @@ def main() -> int:
     delai = int(lire_valeur("mesure.delai_jours", "28") or 28)
     res = classer(lignes, lexique, motifs_marque(), a.jours, demande, pages_en_mesure(delai), a.impressions_min,
                   gsc=bool(lignes) or bool(a.csv))
+    texte_mix = a.mix or lire_valeur("opportunites.mix") or "60/25/15"
+    mix = lire_mix(texte_mix)
+    res = enrichir(res, lignes, lire_intentions(Path(a.demande)) if a.demande else None)
+    res["mix_cible"] = texte_mix
+    if a.calendrier:
+        plan = calendrier(res, a.semaines, a.capacite, mix)
+        res["calendrier"] = plan
+        if not a.json:
+            cible_cal = racine / "rapports" / f"calendrier-{dt.date.today().isoformat()}.md"
+            cible_cal.parent.mkdir(parents=True, exist_ok=True)
+            cible_cal.write_text(calendrier_markdown(plan, mix), encoding="utf-8")
+            print(f"  ✓ {cible_cal.relative_to(racine)} · {len(plan)} contenus sur {a.semaines} semaines")
 
     if a.json:
         print(json.dumps({"source": source, "jours": a.jours, **res}, ensure_ascii=False, indent=1))

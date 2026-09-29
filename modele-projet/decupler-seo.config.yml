@@ -84,6 +84,9 @@ fraicheur:
 # Le lexique du métier — thèmes, valeur 1 à 3, motifs — est dans memoire/lexique.csv.
 opportunites:
   marque: []                 # termes de marque, exclus du classement (défaut : nom et domaine)
+  # Parts visées TOFU/MOFU/BOFU. 60/25/15 : site jeune qui construit son autorité ;
+  # 40/40/20 : site installé qui pousse la conversion.
+  mix: "60/25/15"
 
 sorties:
   dossier: ./contenus

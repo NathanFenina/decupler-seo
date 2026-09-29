@@ -136,6 +136,38 @@ class TestOpportunites(DossierIsole):
             os.environ.update({k: v for k, v in avant.items() if v})
 
 
+
+class TestFunnelEtCalendrier(unittest.TestCase):
+    def test_funnel_url_puis_requete(self):
+        import opportunites as o
+        self.assertEqual(o.funnel_de("https://ex.com/tarifs", "comment faire"), "BOFU")
+        self.assertEqual(o.funnel_de("https://ex.com/p", "comparatif logiciel paie"), "MOFU")
+        self.assertEqual(o.funnel_de("", "prix expert comptable"), "BOFU")
+        self.assertEqual(o.funnel_de("", "tva auto entrepreneur"), "TOFU")
+
+    def test_format_special_et_calendrier(self):
+        import datetime as dt
+        import opportunites as o
+        res = {"opportunites": [
+            {"requete": "modele facture gratuit", "page": "", "action": "a-creer", "a_faire": "", "type_journal": "",
+             "score": 10.0, "gain_clics_mois": 5},
+            {"requete": "prix expert comptable", "page": "", "action": "a-creer", "a_faire": "", "type_journal": "",
+             "score": 8.0, "gain_clics_mois": 4},
+            {"requete": "comment creer sa societe", "page": "", "action": "a-creer", "a_faire": "", "type_journal": "",
+             "score": 6.0, "gain_clics_mois": 3},
+            {"requete": "expert comptable lyon", "page": "https://ex.com/lyon", "action": "ctr", "a_faire": "",
+             "type_journal": "", "score": 9.0, "gain_clics_mois": 4}]}
+        res = o.enrichir(res, [])
+        actions = {x["requete"]: x["action"] for x in res["opportunites"]}
+        self.assertEqual(actions["modele facture gratuit"], "format-special")
+        plan = o.calendrier(res, semaines=2, capacite=2, mix=o.lire_mix("50/25/25"), debut=dt.date(2026, 9, 29))
+        self.assertEqual(len(plan), 4)
+        self.assertEqual(sum(1 for e in plan if e["type"] == "optimisation"), 1)       # 20 % de 4
+        self.assertEqual(plan[0]["semaine"], "2026-10-05")                              # lundi suivant
+        with self.assertRaises(SystemExit):
+            o.lire_mix("beaucoup")
+
+
 class TestShareOfModel(unittest.TestCase):
     def test_citation_rang_et_sous_domaine(self):
         res = share_of_model.analyser({"texte": "Selon Atlas Conseil, il faut…",
