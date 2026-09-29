@@ -330,7 +330,7 @@ def initialiser(args) -> int:
 # ─── Adoption d'un dépôt existant ─────────────────────────────────
 
 LIGNES_GITIGNORE = [".env", ".env.*", "!.env.example", "secrets/", "*-service-account.json",
-                    ".seo-decupler/backups/"]
+                    ".seo-decupler/backups/", "__pycache__/", "*.pyc"]
 
 
 def adopter(args) -> int:

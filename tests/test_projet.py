@@ -79,6 +79,7 @@ class TestProjet(DossierIsole):
         existant = self.dossier / "existant"
         (existant / ".claude/skills/seo-redaction").mkdir(parents=True)
         (existant / "CLAUDE.md").write_text("# Mémoire existante\n", encoding="utf-8")
+        (existant / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
         (existant / ".claude/skills/seo-redaction/SKILL.md").write_text("ancienne copie", encoding="utf-8")
         (existant / ".claude/skills/maison/SKILL.md").parent.mkdir(parents=True)
         (existant / ".claude/skills/maison/SKILL.md").write_text("skill maison", encoding="utf-8")
@@ -95,6 +96,10 @@ class TestProjet(DossierIsole):
         self.assertEqual((existant / ".claude/skills/maison/SKILL.md").read_text(encoding="utf-8"), "skill maison")
         self.assertTrue((existant / "memoire/faits.md").exists())
         self.assertTrue((existant / "CLAUDE.decupler-seo.md").exists())
+        # Lancer les scripts embarqués crée des .pyc : ils ne doivent jamais être commités.
+        ignore = (existant / ".gitignore").read_text(encoding="utf-8")
+        self.assertTrue(ignore.startswith("node_modules/\n"))       # complété, jamais remplacé
+        self.assertIn("__pycache__/", ignore)
         self.assertNotEqual((existant / ".claude/skills/seo-redaction/SKILL.md").read_text(encoding="utf-8"),
                             "ancienne copie")
 
