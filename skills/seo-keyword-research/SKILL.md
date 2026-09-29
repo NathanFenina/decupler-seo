@@ -2,11 +2,14 @@
 name: seo-keyword-research
 description: >
   Recherche de mots-clés complète : expansion sémantique, volumes, difficulté,
-  classification par intention, risque zero-click IA, opportunité GEO, et
-  arbitrage créer / optimiser / ignorer. Déclencher sur "mots-clés",
-  "keyword research", "recherche de mots-clés", "sur quoi me positionner",
-  "volume de recherche", "intention de recherche", "quels sujets traiter",
-  "champ sémantique", "requêtes", "je cherche des idées de contenu".
+  filtrage du bruit, choix du mot-clé pivot, classification par intention et
+  par étape du tunnel (TOFU / MOFU / BOFU), risque zero-click IA, opportunité
+  GEO, contrôle de cannibalisation par type de page, arbitrage créer /
+  optimiser / ignorer, et export pour import en masse. Déclencher sur
+  "mots-clés", "keyword research", "recherche de mots-clés", "sur quoi me
+  positionner", "volume de recherche", "intention de recherche", "quels
+  sujets traiter", "champ sémantique", "requêtes", "mot-clé pivot", "je
+  cherche des idées de contenu".
 ---
 
 # Recherche de mots-clés — arbitrer, pas collectionner
@@ -24,25 +27,78 @@ Trois sources, dans cet ordre de fiabilité :
    à impressions et sans clic sont les plus rentables.
 2. **Vos concurrents** — leurs mots-clés organiques (Semrush, Ahrefs). Ils
    ont déjà fait le travail de validation du marché.
-3. **L'expansion** — Ubersuggest, suggestions Google, DataForSEO,
-   People Also Ask, Reddit.
+3. **L'expansion** — `demande.py`, suggestions Google, People Also Ask,
+   Reddit.
+
+`demande.py` interroge DataForSEO sans connecteur MCP : il tourne donc aussi
+dans une routine cloud (identifiants `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD`).
+
+```bash
+# Longue traîne : volume, KD, intention, tendance sur un an
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" idees --graines "graine 1, graine 2" --langue fr --mode suggestions
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" idees --lexique --langue fr --ecrire   # graines = lexique du projet
+# Volumes de requêtes déjà connues
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" volumes --mots "requête a, requête b" --langue fr
+# SERP d'une requête candidate : top 10, PAA, AI Overview
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" serp --mot "requête" --langue fr
+```
+
+`--mode proches` élargit aux requêtes sémantiquement voisines ; `--ecrire`
+produit `donnees/demande-<langue>-<date>.csv`, que `seo-opportunites` lit
+directement. Une passe par langue du projet.
 
 Reddit mérite un mot : c'est la meilleure source de **vocabulaire réel**.
 Les gens y écrivent leurs problèmes avec leurs mots, pas avec les vôtres.
 Un mot-clé issu d'un thread Reddit convertit mieux qu'un mot-clé issu d'un
 outil.
 
-## Étape 2 — Enrichir
+## Étape 2 — Filtrer le bruit, AVANT tout test de volume
 
-Pour chaque requête, via DataForSEO / Semrush :
-volume mensuel, tendance 12 mois, difficulté, CPC (proxy de valeur
-commerciale), features SERP présentes, présence d'un AI Overview.
+Un volume mesuré sur une requête qui n'est pas pour vous est une donnée
+fausse qui a l'air juste. On écarte d'abord, on mesure ensuite :
+
+- **Hors zone** : une requête qui nomme une ville, une région ou un pays où
+  le site n'intervient pas est exclue, quel que soit son volume.
+- **Appartient à une autre page du site** : c'est de la cannibalisation.
+  On la laisse à la page qui la sert déjà (voir étape 8).
+- **Générique nationale à fort KD** : jamais le pivot d'un petit site. Elle
+  sert de champ sémantique, pas de cible.
+- **Bruit Search Console** : requêtes à 1 impression, fautes de frappe
+  isolées, requêtes tronquées ou sans sens — ignorées.
+
+Chaque exclusion se consigne avec sa raison : c'est ce qui évite de rouvrir
+le débat le mois suivant.
+
+## Étape 3 — Enrichir
+
+Pour chaque requête restante : volume mensuel, **tendance sur un an**
+(`tendance_an_pct` dans les sorties de `demande.py`), difficulté, CPC (proxy
+de valeur commerciale), features SERP présentes, présence d'un AI Overview.
 
 Le CPC est un signal sous-utilisé : un mot-clé à 12 € de CPC vaut de l'argent
 même à 90 recherches/mois. Un mot-clé à 0,10 € et 8 000 recherches/mois n'en
 vaut souvent aucun.
 
-## Étape 3 — Classer par intention
+La **saisonnalité** se lit dans `tendance_an_pct` : une forte variation
+annuelle signale une tendance de fond ou un pic saisonnier. Vérifiez le mois
+de pic avant de planifier : un contenu saisonnier se publie 6 à 8 semaines
+avant son pic, pas pendant.
+
+## Étape 4 — Choisir le mot-clé pivot
+
+Le pivot d'une page = **le meilleur compromis volume × KD bas × intention
+commerciale cohérente avec le vrai sujet de la page**. Pas le plus gros
+volume : celui qu'on peut réellement gagner et qui mène à ce qu'on vend.
+
+Présentez les candidats **triés par KD croissant**, avec volume, intention
+et tendance, puis le pivot retenu et, pour chaque candidat écarté, la raison
+en une ligne (« KD 62 à DR 15 », « intention informationnelle sur une page
+service », « appartient à une autre page »).
+
+Sur la difficulté : comparez au Domain Rating de votre site, pas dans
+l'absolu. Un KD 40 est infranchissable à DR 8 et facile à DR 65.
+
+## Étape 5 — Classer par intention et par étape du tunnel
 
 | Intention | Marqueurs | Ce qu'il faut produire |
 |-----------|-----------|------------------------|
@@ -51,27 +107,41 @@ vaut souvent aucun.
 | **Transactionnelle** | acheter, prix, tarif, devis, près de moi | Page produit, service, devis |
 | **Navigationnelle** | marque + terme | Page dédiée, ou rien |
 
-Et sur le parcours d'achat : Découverte → Considération → Décision.
+**Étiquetage du tunnel**, dans cet ordre : l'URL d'abord, la requête
+ensuite, TOFU par défaut.
 
-Erreur classique : produire uniquement de l'informationnel parce que c'est
-là qu'est le volume, puis s'étonner que le trafic ne convertisse pas.
-Visez un équilibre 40 / 40 / 20.
+| Étape | Motifs d'URL | Motifs de requête |
+|---|---|---|
+| **BOFU** | pricing, tarif, demo, contact, temoignages, services, devis, essai, checkout | prix, acheter, devis, souscrire |
+| **MOFU** | comparatif, vs, alternative, use-case, tutoriel, avis, benchmark | comparatif, vs, alternative, avis, différence |
+| **TOFU** | blog, guide, glossaire, faq, ressources, conseils, actualites | comment, pourquoi, qu'est-ce que, définition, guide |
 
-## Étape 4 — Le risque zero-click IA (nouveau, et déterminant)
+**Le mix TOFU / MOFU / BOFU est un paramètre du projet**, pas une règle
+universelle :
 
-En 2026, une part croissante des requêtes informationnelles reçoit une
-réponse directe dans l'AI Overview. Vous êtes cité, on ne clique pas.
+- **60 / 25 / 15** par défaut pour un **site jeune** qui construit son
+  autorité thématique : il faut d'abord exister sur le sujet.
+- **40 / 40 / 20** pour un **site établi** qui pousse la conversion.
+
+Il se règle dans `decupler-seo.config.yml` (clé `opportunites.mix`). Erreur
+classique dans les deux cas : ne produire que de l'informationnel parce que
+c'est là qu'est le volume, puis s'étonner que le trafic ne convertisse pas.
+
+## Étape 6 — Le risque zero-click IA
+
+Une part croissante des requêtes informationnelles reçoit une réponse
+directe dans l'AI Overview. Vous êtes cité, on ne clique pas.
 
 | Risque | Type de requête | Décision |
 |--------|-----------------|----------|
-| 🔴 Élevé | Fait simple : « qu'est-ce que le SEO », « capitale du Pérou », conversions, définitions | **Ne créez pas de page dédiée.** Traitez-le en section d'une page plus large |
+| 🔴 Élevé | Fait simple : « qu'est-ce que le SEO », conversions, définitions | **Ne créez pas de page dédiée.** Traitez-le en section d'une page plus large |
 | 🟡 Moyen | Procédural, multi-dimensionnel : « comment choisir un CRM » | Créez, mais avec de la profondeur que l'IA ne peut pas résumer |
 | 🟢 Faible | Local, temps réel, avis, données propriétaires, comparaison nuancée, transactionnel | **Créez en priorité.** Le clic reste |
 
-Ce filtre change radicalement une stratégie de contenu. Un plan éditorial de
-2023 rempli de « qu'est-ce que X » est aujourd'hui un plan à trafic nul.
+Un plan éditorial rempli de « qu'est-ce que X » est aujourd'hui un plan à
+trafic nul. `demande.py serp` dit si un AI Overview est présent.
 
-## Étape 5 — L'opportunité GEO
+## Étape 7 — L'opportunité GEO
 
 Un mot-clé peut avoir peu de clics et beaucoup de valeur, s'il vous fait
 citer par les moteurs IA auprès d'acheteurs. Notez chaque requête de 1 à 5 :
@@ -83,7 +153,24 @@ citer par les moteurs IA auprès d'acheteurs. Notez chaque requête de 1 à 5 :
 Un 5/5 en GEO avec 40 recherches/mois peut valoir plus qu'un 3 000/mois
 informationnel saturé.
 
-## Étape 6 — Décider
+## Étape 8 — Cannibalisation : à chaque type de page ses requêtes
+
+Avant d'attribuer une requête à une page, vérifiez qu'aucune autre ne la
+sert déjà (Search Console : quelle URL reçoit les impressions). Règles par
+type de page :
+
+- **Portfolio / réalisations ≠ pages secteur ou service** : une réalisation
+  illustre et renvoie vers la page service ; elle ne vise pas sa requête.
+- **Carrières / recrutement ≠ requêtes commerciales** : « métier + ville »
+  peut être une recherche d'emploi ou de prestataire. La SERP tranche, et la
+  page carrières ne prend que la première.
+- **Blog en soutien des piliers** : un article vise une question précise et
+  lie vers le pilier ; il ne cible jamais la requête du pilier.
+
+Les risques repérés vont dans une **note séparée**, pas dans la liste
+d'import.
+
+## Étape 9 — Décider
 
 Trois piles, et on assume la troisième :
 
@@ -98,23 +185,39 @@ originale, format différent, niche plus étroite.
 proposition de valeur, ou tellement zero-click qu'il n'y a rien à gagner.
 **Dites pourquoi.** C'est la partie la plus utile du livrable.
 
-Sur la difficulté : comparez au Domain Rating de votre site, pas dans
-l'absolu. Un KD 40 est infranchissable à DR 8 et facile à DR 65.
+**Écarts avec les concurrents (gap)** : ne retenez que les requêtes à
+**volume ≥ 30 et KD ≤ 80**. Une requête est **couverte** si son slug (en
+minuscules, sans accents, espaces en tirets) est égal à un segment d'URL du
+site ; sinon c'est un gap, à vérifier à la main avant de conclure à une page
+manquante — une page peut couvrir la requête sous un autre slug.
 
-## Étape 7 — Regrouper en clusters
+## Étape 10 — Regrouper en clusters
 
 Ne créez pas une page par mot-clé. Regroupez les requêtes qui partagent la
 même intention et la même SERP (si le top 10 est identique à 60 %, c'est la
 même page).
 
 Par cluster : la requête principale, les 5-15 secondaires, la page cible
-(existante ou à créer), le type de page, la priorité.
+(existante ou à créer), le type de page, l'étape du tunnel, la priorité.
+
+## Export pour import en masse
+
+Les outils tiers (suivi de positions, clustering, planification) importent
+des listes plates. Livrez :
+
+- **Liste plate** : un mot-clé par ligne, sans en-tête, sans colonne.
+- **Format silo** : une ligne par silo, `[Silo] / mot-clé 1 / mot-clé 2 / mot-clé 3`.
+- **Risques de cannibalisation** : dans une note à part, jamais mêlés à la
+  liste.
 
 ## Livrables
 
-- `MOTS-CLES.md` — les 3 piles, avec justification
-- `mots-cles.csv` — tableau complet : requête, volume, KD, CPC, intention,
-  parcours, zero-click, GEO, cluster, décision
+- `MOTS-CLES.md` — pivot par page, les 3 piles, les exclusions justifiées
+- `mots-cles.csv` — tableau complet : requête, volume, KD, CPC, tendance,
+  intention, tunnel, zero-click, GEO, cluster, décision
 - `CLUSTERS.md` — l'architecture éditoriale qui en découle
+- `import-mots-cles.txt` et `import-silos.txt` — pour les outils tiers
+- `cannibalisation.md` — les risques repérés
 
-Enchaînez : `/seo cocon` pour l'architecture, `/seo brief` pour produire.
+Enchaînez : `/seo cocon` pour l'architecture, `/seo brief` pour produire,
+`seo-opportunites` pour prioriser.

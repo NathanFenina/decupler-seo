@@ -1,16 +1,18 @@
 ---
 name: seo-gsc-analyses
 description: >
-  Bibliothèque de 20 analyses Google Search Console, chacune répondant à une
-  question précise : content decay, gagnants et perdants, requêtes émergentes
-  sans page, saisonnalité, cannibalisation, CTR anormal, pages à créer,
-  sections manquantes, FAQ et briefs tirés des vraies requêtes, consolidation,
-  panier de requêtes cibles, Google face aux IA. Déclencher sur une question
-  posée aux données Search Console : "qu'est-ce qui monte / qui baisse",
-  "pages qui déclinent", "content decay", "nouvelles requêtes", "c'est
-  saisonnier ?", "pages qui se cannibalisent", "quelle page créer", "quelles
-  questions on me pose", "fusionner des pages", "mes requêtes cibles", ou un
-  export Search Console à analyser.
+  Bibliothèque de 21 analyses Google Search Console, chacune répondant à une
+  question précise : content decay, gagnants et perdants, requêtes
+  émergentes sans page, saisonnalité, incident avant / après,
+  cannibalisation, CTR anormal, pages à créer, sections manquantes, FAQ et
+  briefs tirés des vraies requêtes, consolidation, panier de requêtes
+  cibles, Google face aux IA. Déclencher sur une question posée aux données
+  Search Console : "qu'est-ce qui monte / qui baisse", "pages qui
+  déclinent", "content decay", "nouvelles requêtes", "c'est saisonnier ?",
+  "pages qui se cannibalisent", "quelle page créer", "quelles questions on
+  me pose", "fusionner des pages", "mes requêtes cibles", "depuis le
+  piratage / la migration / la refonte", ou un export Search Console à
+  analyser.
 ---
 
 # Analyses Search Console
@@ -31,6 +33,7 @@ trouve **quoi** faire, le skill dit **comment** le faire.
 | Qu'est-ce qui monte et qu'est-ce qui tombe depuis le mois dernier ? | `gagnants-perdants.md` | |
 | Quelles pages déclinent lentement, avant qu'elles ne disparaissent ? | `content-decay.md` | `seo-optimisation-onpage` |
 | J'ai perdu du trafic : classement, CTR ou demande ? | `chute-trafic.md` | `seo-traffic-drop` |
+| Un incident (piratage, migration, refonte) : qu'a-t-il coûté, qu'est-ce qui est revenu ? | `incident-avant-apres.md` | `seo-migration`, `seo-local` |
 | Cette baisse est-elle un problème, ou mon creux annuel habituel ? | `saisonnalite.md` | |
 | Quelles pages sous-performent en clics pour leur position ? | `ctr-anormal.md` | `seo-meta-serp` |
 | Quelles pages sont juste sous le seuil, et rapportent le plus vite ? | `quick-wins.md` | `seo-quick-wins` |

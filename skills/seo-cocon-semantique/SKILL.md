@@ -67,6 +67,14 @@ Si le silo est commercial, le pilier est votre **page de service ou de
 catégorie**, pas un article de blog. C'est un choix structurant : c'est elle
 qui doit capter l'autorité, parce que c'est elle qui convertit.
 
+Le type d'activité décide de ce qui est pilier :
+
+| Activité | Piliers | Satellites |
+|---|---|---|
+| B2B / prestation de service | les pages service | questions métier, cas clients, coûts, étapes |
+| E-commerce | les pages catégorie | guides d'achat, comparatifs, usages, entretien |
+| SaaS / logiciel | les pages fonctionnalité | cas d'usage, comparaisons, alternatives, intégrations |
+
 ## Étape 3 — Les satellites
 
 Un satellite = une question précise, une intention unique, une réponse
@@ -81,6 +89,20 @@ lien remontant vers le pilier avec une ancre descriptive.
 
 **8 à 15 satellites par silo.** En dessous de 5, le silo n'existe pas aux
 yeux de Google.
+
+### Les formats spéciaux — chacun a sa raison
+
+| Format | Pourquoi l'ajouter au silo |
+|---|---|
+| Lead magnet (checklist, PDF, modèle) | capte un contact sur une intention informationnelle qui ne convertit pas autrement |
+| Simulateur / calculateur | répond à une requête que l'IA résume mal, attire des liens, garde le clic |
+| Comparatif | capte l'intention MOFU et prépare la décision vers le pilier |
+| Glossaire | couvre les définitions (zero-click élevé) en un seul lieu, sans une page par terme |
+| FAQ | regroupe les PAA du silo, extractible par les moteurs IA |
+| Étude de cas | preuve E-E-A-T, et satellite naturel de la page service |
+
+Un format spécial ne remplace pas un satellite : il s'ajoute quand la SERP
+ou le tunnel le justifient, pas pour « avoir un simulateur ».
 
 ## Étape 4 — Le plan de maillage
 

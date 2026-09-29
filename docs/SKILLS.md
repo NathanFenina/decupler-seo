@@ -29,7 +29,7 @@ aussi l'appeler par son nom.
 | `seo-cocon-semantique` | Silos, piliers, satellites, plan de maillage, calendrier | « cocon », « silo », « structurer mon contenu » |
 | `seo-serp-analysis` | Intention réelle, features, format attendu, difficulté vraie | « analyse la SERP », « qui ranke sur » |
 | `seo-traffic-drop` | Dater, isoler, expliquer, récupérer | « chute de trafic », « core update », « déclassé » |
-| `seo-gsc-analyses` | 20 analyses Search Console prêtes à lancer : cannibalisation, CTR anormal, content decay, requêtes neuves, page à créer, Google vs LLM… | « analyse la Search Console », « cannibalisation », « CTR », « pages qui déclinent » |
+| `seo-gsc-analyses` | 21 analyses Search Console prêtes à lancer : cannibalisation, CTR anormal, content decay, requêtes neuves, page à créer, Google vs LLM… | « analyse la Search Console », « cannibalisation », « CTR », « pages qui déclinent » |
 
 ## Contenu
 
