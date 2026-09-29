@@ -383,7 +383,10 @@ def adopter(args) -> int:
         print(f"\n  ✓ Gabarit : {len(ajoutes)} fichier(s) ajouté(s), rien d'existant écrasé")
         for nom in a_cote:
             print(f"  → {nom} : le gabarit de mémoire, écrit à côté de votre CLAUDE.md.")
-            print("    Reprenez-en ce qui vous sert (niveaux d'autonomie, imports @memoire/…), puis supprimez-le.")
+            print(f"    Importez-le depuis votre CLAUDE.md (ligne « @{nom} »), ou reprenez-en ce qui vous sert.")
+        if not (projet / ".mcp.json").exists():
+            print("  → .mcp.json non ajouté : un dépôt existant a déjà ses connecteurs, et une routine démarre")
+            print(f"    chaque serveur déclaré. Reprenez seulement ceux utiles depuis {DEPOT_DEFAUT}/blob/main/.mcp.json")
         code = synchroniser(projet, source, forcer=True)
     finally:
         if tempo:

@@ -79,9 +79,14 @@ python3 scripts/projet.py adopter ../mon-site \
 manquent, écrit ses consignes dans `CLAUDE.decupler-seo.md` si un
 `CLAUDE.md` existe déjà (à importer depuis celui-ci avec
 `@CLAUDE.decupler-seo.md`), complète le `.gitignore` au lieu de le
-remplacer, et refuse de s'installer si un fichier du dépôt porte le même
+remplacer, n'ajoute pas de `.mcp.json` (le dépôt a déjà ses connecteurs), et refuse de s'installer si un fichier du dépôt porte le même
 nom qu'un fichier de méthode avec un contenu différent — il les liste, vous
 décidez. Faites-le sur une branche.
+
+Ensuite, consignez dans `memoire/decisions.md` ce que le projet faisait déjà
+et qui prime sur la méthode : une routine de contenu en place (le mode
+contenu de `seo-cycle` s'efface alors), un dossier de benchmarks ou une
+table des faits existants. La méthode lit ce fichier avant d'agir.
 
 ## Deux modes de publication
 
