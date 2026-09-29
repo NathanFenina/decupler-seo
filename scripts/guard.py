@@ -22,7 +22,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _projet import charger_env, config_est_le_modele, fichier_config, racine_projet  # noqa: E402
+from _projet import charger_env, config_est_le_modele, fichier_config, lire_valeur, racine_projet  # noqa: E402
 
 # Le kill-switch doit voir SEO_SAFE_MODE même quand il n'est écrit que dans
 # le .env du projet — c'est là que la documentation dit de le mettre.
@@ -59,24 +59,29 @@ ACTIONS_INTERDITES = {
 }
 
 
-def _lire_config() -> dict:
-    """Lecture minimaliste du YAML — volontairement sans dépendance.
+# Chaque réglage du garde-fou, à son chemin exact dans la config. Un lecteur
+# qui aplatissait tout laissait `publication.mode: depot` écraser `mode`.
+CHEMINS = {
+    "mode": "mode",
+    "domaines_autorises_uniquement": "garde_fous.domaines_autorises_uniquement",
+    "domaine": "projet.domaine",
+    "cms": "projet.cms",
+    "statut_par_defaut": "publication.statut_par_defaut",
+    "pages_programmatiques_alerte": "seuils.pages_programmatiques_alerte",
+    "pages_programmatiques_blocage": "seuils.pages_programmatiques_blocage",
+    "pages_locales_alerte": "seuils.pages_locales_alerte",
+    "pages_locales_blocage": "seuils.pages_locales_blocage",
+}
 
-    On ne lit que les clés scalaires dont le garde-fou a besoin, ce qui
-    évite d'imposer PyYAML pour faire tourner le kill-switch.
-    """
-    valeurs: dict[str, str] = {}
+
+def _lire_config() -> dict:
+    """Les réglages utiles au garde-fou ; une clé absente est simplement omise."""
     if CONFIG is None:
-        return valeurs
-    for ligne in CONFIG.read_text(encoding="utf-8").splitlines():
-        nue = ligne.split("#", 1)[0].strip()
-        if not nue or ":" not in nue:
-            continue
-        cle, _, valeur = nue.partition(":")
-        valeur = valeur.strip().strip("\"'")
-        if valeur:
-            valeurs[cle.strip()] = valeur
-    return valeurs
+        return {}
+    valeurs = {nom: lire_valeur(chemin) for nom, chemin in CHEMINS.items()}
+    if not valeurs["cms"]:
+        valeurs["cms"] = lire_valeur("publication.cms")   # emplacement des anciennes configs
+    return {k: v for k, v in valeurs.items() if v}
 
 
 def mode_effectif() -> tuple[str, str]:

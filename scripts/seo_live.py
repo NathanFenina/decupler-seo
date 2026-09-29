@@ -35,7 +35,7 @@ from xml.etree import ElementTree
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _projet import charger_env, lire_valeur  # noqa: E402
 
-AGENT = "DecuplerSEO-LiveCheck/3.0 (+https://github.com/NathanFenina/decupler-seo)"
+AGENT = "DecuplerSEO-LiveCheck/3.1 (+https://github.com/NathanFenina/decupler-seo)"
 NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 
@@ -103,7 +103,7 @@ def urls_du_sitemap(url: str, maxi: int, vus: set[str] | None = None) -> list[st
 
 
 def site_par_defaut() -> str:
-    site = os.environ.get("SEO_SITE", "") or os.environ.get("GSC_SITE_URL", "") or lire_valeur("domaine")
+    site = os.environ.get("SEO_SITE", "") or os.environ.get("GSC_SITE_URL", "") or lire_valeur("projet.domaine")
     if not site or site.startswith("sc-domain:"):
         raise SystemExit("✗ Site inconnu : passez --site https://www.exemple.com")
     return site.rstrip("/")

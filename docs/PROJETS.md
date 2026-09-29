@@ -5,7 +5,7 @@ decupler-seo s'utilise de deux façons, qui se complètent.
 | | Plugin | Projet |
 |---|---|---|
 | **Pour** | travailler avec Claude, en direct | laisser tourner des routines, sans vous |
-| **Installation** | `/plugin install decupler-seo@decupler` | un dépôt privé par site, créé par `projet.py init` |
+| **Installation** | `/plugin install decupler-seo@decupler` | un dépôt privé par site, créé par `projet.py init` ou greffé par `projet.py adopter` |
 | **Où vit la méthode** | dans le plugin | copiée dans `.claude/` du dépôt projet |
 | **Mémoire** | aucune | `CLAUDE.md` + `memoire/` |
 | **Fonctionne dans une routine** | **non** | **oui** |
@@ -64,6 +64,41 @@ Ensuite :
 2. créer le dépôt **privé** sur GitHub et pousser
 3. créer les routines de `ROUTINES.md`
 
+## Greffer la méthode sur un dépôt existant
+
+Pour un site dont le code est déjà sur GitHub (Next.js, Astro, Hugo…),
+inutile de créer un second dépôt : le projet SEO vit dans celui du site.
+
+```bash
+python3 scripts/projet.py adopter ../mon-site \
+  --nom "Mon Site" --domaine https://www.exemple.com \
+  --pays FR --langues fr,en --cms nextjs --publication depot
+```
+
+`adopter` ne détruit rien. Il ajoute seulement les fichiers du gabarit qui
+manquent, écrit ses consignes dans `CLAUDE.decupler-seo.md` si un
+`CLAUDE.md` existe déjà (à importer depuis celui-ci avec
+`@CLAUDE.decupler-seo.md`), complète le `.gitignore` au lieu de le
+remplacer, et refuse de s'installer si un fichier du dépôt porte le même
+nom qu'un fichier de méthode avec un contenu différent — il les liste, vous
+décidez. Faites-le sur une branche.
+
+## Deux modes de publication
+
+Dans `decupler-seo.config.yml`, `publication.mode` :
+
+| Mode | Pour | Ce que fait le cycle |
+|---|---|---|
+| `cms` | WordPress, Webflow | publie par l'API, en brouillon ou en ligne selon `publication.statut_par_defaut`, après sauvegarde |
+| `depot` | site en code | crée une branche, modifie les fichiers de contenu, lance `controle.commandes` (contrôle des contenus, typage, build), ouvre une pull request. La fusion déclenche le déploiement : elle n'est faite seule qu'en mode `autonomous`, si tous les contrôles sont verts et qu'aucun chiffre n'est douteux ; sinon la PR reste ouverte avec ce qui bloque |
+
+Dans les deux cas, `scripts/controle_contenu.py` passe avant toute
+publication et la bloque sur une erreur : texte provisoire, promesse
+invérifiable, interdit du client (`regles.interdits`), title ou meta hors
+longueur, plusieurs H1. Après publication, `scripts/seo_live.py` vérifie le
+site en production : robots.txt, sitemap, chaque URL en 200 sans
+redirection, sans noindex, canonical sur elle-même.
+
 ## Mettre à jour la méthode dans un projet
 
 ```bash
@@ -113,6 +148,20 @@ avec ses chiffres Search Console des 28 jours précédents, puis remesurée à
 J+28 et comparée à un **groupe témoin** : les pages du site qui n'ont pas
 été modifiées. Si tout le site a pris +12 % sur la période, une page à
 +17 % n'a gagné que 5 points grâce à la modification.
+
+Tout est automatique quand Search Console est branchée par compte de
+service (`GSC_SA_JSON` dans l'environnement de la routine) :
+
+```bash
+python3 .claude/decupler-seo/scripts/journal.py ajouter --auto --url … --type title --avant … --apres …
+python3 .claude/decupler-seo/scripts/journal.py mesurer-tout --auto
+python3 .claude/decupler-seo/scripts/journal.py bilan
+```
+
+Le témoin exclut les pages modifiées depuis le début de la période de
+référence, et n'est utilisé que s'il pèse au moins 200 clics : sur un petit
+site, passer de 20 à 50 clics ferait +150 % et fausserait tout. En dessous
+de 20 clics sur la page, le jugement se fait sur la position.
 
 Verdicts : gain, neutre, perte, insuffisant. Les pertes sont proposées au
 retour arrière. Au bout de trois mesures du même type, le bilan en tire un

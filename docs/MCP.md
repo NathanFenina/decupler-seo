@@ -42,8 +42,18 @@ propriété Search Console. Pour qui ne veut pas voir un terminal.
    GSC_CREDENTIALS_JSON=./secrets/gsc-service-account.json
    ```
 
+   Dans une routine cloud, où aucun fichier n'est commité, mettez plutôt
+   le contenu de la clé (JSON brut ou encodé en base64) dans la variable
+   `GSC_SA_JSON` de l'environnement.
+8. Vérifiez : `python3 scripts/gsc.py sites` liste la propriété.
+
+`scripts/gsc.py` interroge l'API sans aucune dépendance (la signature de la
+clé est faite en Python pur) : `perf`, `page`, `instantane`, `temoin`,
+`sitemap`, `inspect`. C'est lui que la boucle de mesure utilise.
+
 > ⚠️ Ne donnez **jamais** le rôle propriétaire à un compte de service.
-> Lecture seule suffit pour tout ce que fait ce dispositif.
+> Lecture seule suffit pour tout, sauf `gsc.py sitemap --resoumettre` qui
+> demande l'autorisation « complète ».
 
 **Format de propriété** : si l'API renvoie 0 ligne, votre propriété est
 probablement de type domaine. Essayez `sc-domain:exemple.com` au lieu de

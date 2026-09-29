@@ -1,5 +1,54 @@
 # Journal des versions
 
+## 3.1.0
+
+### Ajouté
+
+- **Mesure branchée sur Search Console, sans dépendance** : `scripts/gsc.py`
+  (performances, page, instantané hebdomadaire, groupe témoin, sitemaps,
+  inspection d'URL). La clé de compte de service est signée en Python pur :
+  rien à installer, y compris dans une routine cloud. `journal.py ajouter
+  --auto` relève la situation de départ, `mesurer-tout --auto` juge toutes
+  les modifications arrivées à échéance.
+- **Skill `seo-gsc-analyses`** : 20 analyses Search Console prêtes à lancer,
+  en trois familles — diagnostiquer, piloter, produire.
+- **Skill `seo-benchmark`** : avant toute page, les trois meilleures pages
+  concurrentes, dans chaque langue du projet ; la page ne sort que si elle
+  les bat sur au moins cinq axes.
+- **`scripts/controle_contenu.py`** : contrôle bloquant avant publication
+  (textes provisoires, promesses invérifiables, interdits du client,
+  longueurs de title et meta, H1, alt). Lit le HTML, le Markdown et le JSON
+  des sites en code.
+- **`scripts/seo_live.py`** : santé du site en production (robots.txt,
+  sitemap, statut, noindex, canonical de chaque URL) et notification
+  IndexNow.
+- **`projet.py adopter`** : greffe la méthode sur le dépôt existant d'un
+  site, sans rien écraser.
+- **Deux modes de publication** : `cms` (API) et `depot` (branche, contrôles,
+  pull request ; la fusion est la mise en ligne).
+- `memoire/faits.md` dans le gabarit : les chiffres vérifiés du client, avec
+  leur source, que les contenus peuvent citer.
+- Tests (`tests/`, bibliothèque standard) et intégration continue : Python
+  3.10 et 3.13, validation du plugin, création d'un projet de bout en bout.
+- `SECURITY.md`.
+
+### Modifié
+
+- `seo-redaction` : passe anti-cannibalisation, thèse avant le plan, test
+  anti-remplissage, singularité des pages issues d'un gabarit.
+- `seo-netlinking` : ce que l'on offre en échange de chaque type de lien.
+- `geo-share-of-model` : distingue la visibilité non marquée de la
+  réputation de marque, trois formulations par sujet, tonalité.
+- La configuration se lit avec sa structure : `publication.mode: depot` ne
+  se confond plus avec le `mode` du projet.
+- Le groupe témoin n'est utilisé qu'au-delà de 200 clics.
+
+### Corrigé
+
+- La synchronisation signale un fichier du projet qui porte le nom d'un
+  fichier de méthode, au lieu de l'écraser.
+
+
 ## 3.0.0 — decupler-seo
 
 Nouveau dépôt, nouveau nom de plugin : `decupler-seo`. L'installation se

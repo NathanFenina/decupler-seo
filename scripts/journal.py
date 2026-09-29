@@ -34,7 +34,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _projet import charger_env, fichier_config, racine_projet  # noqa: E402
+from _projet import charger_env, lire_valeur, racine_projet  # noqa: E402
 
 COLONNES = [
     "id", "date", "url", "requete", "type", "niveau", "avant", "apres",
@@ -59,15 +59,11 @@ TEMOIN_CLICS_MIN = 200
 def reglages() -> dict:
     defauts = {"delai_jours": 28, "impressions_min_pour_juger": 100,
                "seuil_gain_pct": 10.0, "seuil_perte_pct": -15.0}
-    config = fichier_config()
-    if not config:
-        return defauts
-    for ligne in config.read_text(encoding="utf-8").splitlines():
-        nue = ligne.split("#", 1)[0].strip()
-        cle, _, valeur = nue.partition(":")
-        if cle.strip() in defauts and valeur.strip():
+    for cle in defauts:
+        valeur = lire_valeur(f"mesure.{cle}")
+        if valeur:
             try:
-                defauts[cle.strip()] = float(valeur)
+                defauts[cle] = float(valeur)
             except ValueError:
                 pass
     return defauts

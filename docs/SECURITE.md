@@ -11,9 +11,13 @@ qu'il peut faire, ce qu'il ne fera jamais, et comment l'arrêter.
 |------|--------------|
 | `safe` | Aucune écriture externe. Tout sort en fichier local que vous posez vous-même. Zéro risque. |
 | `assisted` | Écriture autorisée, mais chaque action est annoncée et attend un « oui ». |
-| `autonomous` | Écriture directe, sans demander. Les garde-fous durs s'appliquent toujours. **Défaut.** |
+| `autonomous` | Écriture directe, sans demander. Les garde-fous durs s'appliquent toujours. |
 
 Se règle dans `./decupler-seo.config.yml`, à la racine de chaque projet.
+Un projet créé par `projet.py init` ou `adopter` démarre en `assisted` :
+passez-le en `autonomous` une fois les premières mesures bonnes. Sans
+fichier de config dans le projet, c'est le modèle du plugin qui s'applique
+(`autonomous`), et `doctor.py` le signale.
 `SEO_SAFE_MODE=1` fonctionne aussi bien exporté dans le shell qu'écrit dans
 le `.env` du projet.
 
@@ -84,6 +88,21 @@ erreur désindexe un site en 48 heures.
 |--------|--------|---------|
 | Pages programmatiques | 100 | **500** sans audit qualité |
 | Pages locales | 30 | **50** (risque de doorway pages) |
+
+### Contrôle des contenus, bloquant
+`scripts/controle_contenu.py` passe avant toute publication, dans les deux
+modes (`cms` et `depot`). Il renvoie une erreur, et la publication s'arrête,
+sur un texte provisoire oublié, une promesse ou une preuve invérifiable
+(« n°1 », « résultats garantis », compteur de clients), un interdit propre
+au client (`regles.interdits`), un title ou une meta trop longs, plusieurs
+H1, une image sans alt. Une consigne s'oublie dans une longue session ; un
+code retour non nul, non.
+
+### Sur un site en code, une fusion est une mise en ligne
+En mode `depot`, le cycle travaille sur une branche et ouvre une pull
+request. Il ne fusionne qu'en mode `autonomous`, contrôles tous verts.
+Protégez la branche principale sur GitHub (contrôles requis avant fusion) :
+c'est le garde-fou qui tient même si tout le reste est mal configuré.
 
 ### Jamais de chiffre inventé
 Si une donnée n'est pas disponible, le dispositif écrit « donnée

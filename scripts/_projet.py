@@ -82,40 +82,66 @@ def _lignes_config() -> list[str]:
     return config.read_text(encoding="utf-8").splitlines() if config else []
 
 
-def lire_valeur(cle: str, defaut: str = "") -> str:
-    """Première valeur scalaire trouvée pour `cle`, quel que soit son niveau.
+def _trouver(chemin: str) -> tuple[int, str, list[str]] | None:
+    """Localise `a.b.c` dans la config en respectant l'imbrication.
 
-    Lecture volontairement minimale, sans PyYAML : les scripts de garde-fou
-    doivent tourner partout, y compris dans une routine sans dépendances.
+    Renvoie (index de ligne, valeur brute, lignes), ou None. Lecture
+    volontairement minimale, sans PyYAML : les garde-fous doivent tourner
+    partout. Mais elle respecte l'imbrication — `publication.mode` et `mode`
+    sont deux clés différentes ; les confondre plaçait tout projet en code en
+    mode safe.
     """
-    for ligne in _lignes_config():
-        nue = ligne.split("#", 1)[0].rstrip()
-        if nue.strip().startswith(f"{cle}:"):
-            valeur = nue.split(":", 1)[1].strip().strip("\"'")
-            if valeur:
-                return valeur
-    return defaut
-
-
-def lire_liste(cle: str) -> list[str]:
-    """Liste YAML sous `cle`, en blocs (« - valeur ») ou en ligne (« [a, b] »)."""
     lignes = _lignes_config()
-    for i, ligne in enumerate(lignes):
-        nue = ligne.split("#", 1)[0].rstrip()
-        if not nue.strip().startswith(f"{cle}:"):
-            continue
-        en_ligne = nue.split(":", 1)[1].strip()
-        if en_ligne.startswith("["):
-            return [v.strip().strip("\"'") for v in en_ligne.strip("[]").split(",") if v.strip()]
-        retrait = len(ligne) - len(ligne.lstrip())
-        valeurs = []
-        for suite in lignes[i + 1:]:
-            if not suite.strip() or suite.strip().startswith("#"):
+    parties = chemin.split(".")
+    debut, retrait_parent = 0, -1
+    for profondeur, cle in enumerate(parties):
+        trouve, retrait_niveau = None, None
+        for i in range(debut, len(lignes)):
+            texte = lignes[i].split(" #", 1)[0].rstrip()
+            if not texte.strip() or texte.lstrip().startswith("#"):
                 continue
-            if len(suite) - len(suite.lstrip()) <= retrait:
+            retrait = len(texte) - len(texte.lstrip())
+            if retrait <= retrait_parent:
+                break                                   # fin du bloc parent
+            if retrait_niveau is None:
+                retrait_niveau = retrait                # le niveau de ce bloc
+            if retrait == retrait_niveau and texte.strip().startswith(f"{cle}:"):
+                trouve = (i, retrait, texte.split(":", 1)[1].strip())
                 break
-            item = suite.strip()
-            if item.startswith("- "):
-                valeurs.append(item[2:].split(" #", 1)[0].strip().strip("\"'"))
-        return valeurs
-    return []
+        if trouve is None:
+            return None
+        i, retrait, valeur = trouve
+        if profondeur == len(parties) - 1:
+            return i, valeur, lignes
+        debut, retrait_parent = i + 1, retrait
+    return None
+
+
+def lire_valeur(chemin: str, defaut: str = "") -> str:
+    """Valeur scalaire au chemin `a.b` (ex. `mode`, `publication.mode`)."""
+    trouve = _trouver(chemin)
+    if not trouve:
+        return defaut
+    valeur = trouve[1].strip().strip("\"'")
+    return valeur if valeur else defaut
+
+
+def lire_liste(chemin: str) -> list[str]:
+    """Liste au chemin `a.b`, en blocs (« - valeur ») ou en ligne (« [a, b] »)."""
+    trouve = _trouver(chemin)
+    if not trouve:
+        return []
+    i, en_ligne, lignes = trouve
+    if en_ligne.startswith("["):
+        return [v.strip().strip("\"'") for v in en_ligne.strip("[]").split(",") if v.strip()]
+    retrait = len(lignes[i]) - len(lignes[i].lstrip())
+    valeurs = []
+    for suite in lignes[i + 1:]:
+        if not suite.strip() or suite.strip().startswith("#"):
+            continue
+        if len(suite) - len(suite.lstrip()) <= retrait:
+            break
+        item = suite.strip()
+        if item.startswith("- "):
+            valeurs.append(item[2:].split(" #", 1)[0].strip().strip("\"'"))
+    return valeurs

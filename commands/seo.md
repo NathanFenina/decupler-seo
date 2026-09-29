@@ -1,6 +1,6 @@
 ---
 description: Routeur principal Claude Code SEO Décupler — dirige vers le bon skill selon ce que vous demandez
-argument-hint: "[audit|quickwins|brief|article|onpage|page|fix|geo|backlink|publish|rapport|notion|doctor] <url ou sujet>"
+argument-hint: "[audit|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
 ---
 
 # /seo — routeur
@@ -60,6 +60,8 @@ laissez jamais l'utilisateur devant un menu.
 | `nouveau-projet`, `nouveau client` | `seo-nouveau-projet` |
 | `cycle`, `veille quotidienne`, `routine` | `seo-cycle` (préciser le mode) |
 | `journal`, `mesure`, `est-ce que ça a marché` | `seo-journal-mesure` |
+| `gsc`, `search console`, `cannibalisation`, `ctr` | `seo-gsc-analyses` |
+| `benchmark`, `faire mieux que` | `seo-benchmark` |
 
 Si la demande ne correspond à rien de précis, lancez `seo-audit-360` : c'est
 le point d'entrée qui produit le plus de valeur sans contexte.

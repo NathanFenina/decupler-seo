@@ -46,18 +46,43 @@ Gardez-le court et spécialisé : un agent qui fait tout ne fait rien bien.
 
 ## Les scripts Python
 
-- Stdlib uniquement quand c'est possible
-- `requests` et `beautifulsoup4` sont acceptables (déjà dans les dépendances)
+- Python 3.10+. **Bibliothèque standard uniquement** pour tout ce qui tourne
+  dans une routine cloud (`guard`, `projet`, `journal`, `gsc`,
+  `controle_contenu`, `seo_live`, `doctor`) : rien n'y est installé.
+- `requests` et `beautifulsoup4` sont acceptables pour les scripts
+  d'analyse de pages, déjà dans les dépendances.
+- Les réglages d'un projet se lisent avec `lire_valeur("section.cle")` et
+  `lire_liste(...)` de `scripts/_projet.py` — jamais en relisant le YAML à
+  la main : la configuration est imbriquée, et deux clés `mode` n'ont pas le
+  même sens selon leur section.
+- Dans un skill ou une commande, un script s'appelle par
+  `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/<script>.py"`, jamais par un
+  chemin relatif : le dossier courant est celui du projet, pas du plugin.
 - Français pour les messages utilisateur, les noms de variables et les
-  commentaires
-- Un commentaire n'explique jamais *ce que fait* le code, mais *pourquoi*
+  commentaires.
+- Un commentaire n'explique jamais *ce que fait* le code, mais *pourquoi*.
+- Aucun secret affiché : un script peut dire qu'une clé est présente ou
+  invalide, jamais en imprimer la valeur.
+
+## Tests
+
+```bash
+cd tests && python3 -m unittest discover -v
+```
+
+Chaque test tourne dans un dossier temporaire, sans réseau, avec un
+environnement débarrassé des variables `SEO_`, `GSC_`, `WP_`… de votre
+machine. Un correctif de script vient avec le test qui l'aurait attrapé.
 
 ## Avant d'ouvrir une PR
 
 ```bash
 python3 -m py_compile scripts/*.py
-python3 scripts/doctor.py
-python3 scripts/guard.py --statut
+(cd tests && python3 -m unittest discover)
+claude plugin validate .
 ```
+
+L'intégration continue rejoue ces trois contrôles sur Python 3.10 et 3.13,
+puis crée un projet de bout en bout et vérifie qu'aucun `{{…}}` n'y reste.
 
 Décrivez ce que votre changement apporte, et ce qu'il ne couvre pas.

@@ -1,10 +1,16 @@
 # Claude Code SEO Décupler — dépendances Python
 #
-# Installation :  pip install -r requirements.txt
+# Python 3.10 ou plus récent.
 #
-# Les scripts guard.py, doctor.py, internal_pagerank.py, gsc_analyse.py et
-# cms_restore.py (--lister) fonctionnent SANS aucune de ces dépendances.
-# Elles ne sont nécessaires que pour ce qui lit le web.
+# Aucune dépendance pour le cœur du dispositif : guard.py, doctor.py,
+# projet.py, journal.py, gsc.py (signature de la clé Google en Python pur),
+# controle_contenu.py, seo_live.py, internal_pagerank.py, gsc_analyse.py,
+# cms_restore.py --lister. C'est ce qui tourne dans les routines cloud.
+#
+# Les dépendances ci-dessous ne servent qu'aux scripts qui analysent des pages
+# web (crawl_site.py, onpage_score.py, audit_images.py, fetch_page.py…).
+#
+# Installation :  pip install -r requirements.txt
 
 beautifulsoup4>=4.12.0,<5.0.0     # parsing HTML
 requests>=2.32.4,<3.0.0           # requêtes HTTP

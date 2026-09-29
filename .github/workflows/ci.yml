@@ -1,0 +1,56 @@
+name: Contrôles
+
+# À chaque push et chaque pull request : le plugin doit s'installer, les
+# scripts compiler, les tests passer. Un utilisateur qui installe le plugin
+# après une fusion ne doit jamais tomber sur une version cassée.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Compilation des scripts
+        run: python -m py_compile scripts/*.py
+
+      - name: Tests
+        working-directory: tests
+        run: python -m unittest discover -v
+
+  plugin:
+    name: Validation du plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validateur officiel Claude Code
+        run: |
+          npm install --global @anthropic-ai/claude-code
+          claude plugin validate .
+
+      - name: Création d'un projet à partir du gabarit
+        run: |
+          python3 scripts/projet.py init /tmp/projet-ci --nom "CI" --domaine https://exemple.com
+          python3 scripts/projet.py statut /tmp/projet-ci
+          ! grep -rl "{{" /tmp/projet-ci --include="*.md" --include="*.yml"

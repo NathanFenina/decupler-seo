@@ -1,349 +1,270 @@
 # Claude Code SEO Décupler
 
-**La machine de guerre SEO + GEO pour Claude Code.**
-43 skills, 15 agents spécialisés, 13 MCP préconfigurés. Ça audite, ça corrige,
-ça rédige, ça publie, ça mesure — en autonomie.
+**Le SEO et le GEO de Décupler, en plugin Claude Code.**
+Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a marché**, et apprend de chaque site.
 
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-blue)](https://claude.ai/claude-code)
-[![Licence MIT](https://img.shields.io/badge/Licence-MIT-yellow.svg)](LICENSE)
-[![Français](https://img.shields.io/badge/Langue-Français-red.svg)](#)
+[![Contrôles](https://github.com/NathanFenina/decupler-seo/actions/workflows/ci.yml/badge.svg)](https://github.com/NathanFenina/decupler-seo/actions/workflows/ci.yml)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://code.claude.com)
+[![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
+[![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
----
-
-## Le problème
-
-Le SEO en 2026, ce n'est plus « écrire un article optimisé ». C'est croiser
-Search Console, la SERP live, les concurrents, les moteurs IA, corriger la
-technique, produire le contenu, le publier, et mesurer. Sept outils, quatre
-onglets, trois heures pour une tâche qui devrait en prendre dix minutes.
-
-Ce dépôt branche tout ça dans Claude Code et enchaîne les étapes tout seul.
-
-| Tâche | À la main | Ici |
-|-------|-----------|-----|
-| Quick wins du mois | ~2 h | 6 min |
-| Brief adossé à la SERP | ~1 h 30 | 4 min |
-| Article + visuels + publication | ~4 h | 9 min |
-| Mesure de visibilité IA | ~2 h | 5 min |
-| Rapport mensuel | ~3 h | 3 min |
+45 skills · 15 agents · 18 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 56 tests
 
 ---
 
-## Installation
+## Deux façons de l'utiliser
 
-### Option 1 — Plugin Claude Code (recommandé)
+| | **Travailler avec Claude** | **Piloter des sites en autonomie** |
+|---|---|---|
+| Pour | un audit, une page à optimiser, un brief, un article — en direct | laisser des routines faire le travail chaque semaine |
+| Installation | le plugin, en deux commandes | un dépôt privé par site, créé en une commande |
+| Ce que ça garde | rien : chaque session repart de zéro | la mémoire du site, ses décisions, ce qui a marché |
+| Qui | vous, votre équipe, vos clients | une agence, un consultant, un site avec de l'ambition |
+
+Les deux utilisent la même méthode. Commencez par le plugin ; passez aux
+projets quand vous voulez que ça tourne sans vous.
+
+---
+
+## Travailler avec Claude — 2 minutes
 
 ```
 /plugin marketplace add NathanFenina/decupler-seo
 /plugin install decupler-seo@decupler
 ```
 
-Skills, agents, commandes et MCP sont branchés d'un coup.
-
-### Option 2 — Script d'installation
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/NathanFenina/decupler-seo/main/install.sh | bash
-```
-
-Windows :
-```powershell
-irm https://raw.githubusercontent.com/NathanFenina/decupler-seo/main/install.ps1 | iex
-```
-
-### Option 3 — Manuelle
-
-```bash
-git clone https://github.com/NathanFenina/decupler-seo.git
-cd decupler-seo
-./install.sh
-```
-
-### Puis, dans Claude Code
+Puis, dans n'importe quel projet :
 
 ```
 /seo doctor
 ```
 
-Il vous dit ce qui est branché, ce qui manque, ce que ça coûte, et il lance
-la première action utile. **Vous n'avez rien à lire d'autre pour démarrer.**
+Il vous dit ce qui est branché, ce qui manque, combien ça coûte, et lance la
+première action utile. Vous n'avez rien d'autre à lire pour démarrer.
+
+Ensuite, parlez normalement :
+
+> *« Audite exemple.com »* · *« Pourquoi cette page ne ranke pas ? »* ·
+> *« Quelles pages rattraper ce mois-ci ? »* · *« Écris un article sur X »* ·
+> *« Pourquoi ChatGPT ne me cite pas ? »* · *« J'ai perdu du trafic »*
+
+Ou les commandes :
+
+| | |
+|---|---|
+| `/seo audit <url>` | audit complet, 8 spécialistes en parallèle, score /100, plan priorisé |
+| `/seo quickwins` | les pages en position 4-20 à rattraper, chiffrées, corrections écrites |
+| `/seo onpage <url> <mot-clé>` | note /100 critère par critère, **puis réécrit** la page |
+| `/seo fix <url>` | détecte **et corrige** la technique : robots, canonicals, redirections |
+| `/seo brief <mot-clé>` | brief adossé à la SERP réelle, réponse directe et FAQ déjà rédigées |
+| `/seo article` | rédaction : recherche obligatoire, thèse, zéro chiffre inventé |
+| `/seo geo <url>` | visibilité dans ChatGPT, Perplexity, AI Overviews, et comment y entrer |
+| `/seo rapport` | le mois écoulé : ce qui a bougé, **pourquoi**, et quoi faire |
 
 ---
 
-## Deux façons de l'utiliser
+## Piloter des sites en autonomie
 
-| | **Plugin** | **Projet** |
+Une routine Claude Code tourne dans le cloud, même ordinateur éteint — mais
+elle ne charge pas les plugins. Elle ne voit que ce qui est dans le dépôt
+qu'elle clone. Chaque site a donc **son dépôt privé**, avec la méthode
+embarquée et sa propre mémoire :
+
+```bash
+# un nouveau site
+python3 scripts/projet.py init ../mon-site --nom "Mon site" --domaine https://mon-site.com
+
+# un dépôt qui existe déjà — rien n'est écrasé sans le dire
+python3 scripts/projet.py adopter ../site-existant --nom "Site" --domaine https://site.com
+
+# mettre à jour la méthode d'un projet
+python3 .claude/decupler-seo/scripts/projet.py sync .
+```
+
+Ou dites simplement à Claude : *« nouveau projet »*.
+
+```
+mon-site/                       dépôt PRIVÉ
+├── CLAUDE.md                   la mémoire, chargée à chaque session et chaque routine
+├── decupler-seo.config.yml     mode, plafonds, règles propres au client
+├── memoire/
+│   ├── marque.md               voix, lexique, interdits
+│   ├── faits.md                la seule source des chiffres du site
+│   ├── decisions.md            ce qui a été validé ou refusé — ne revient pas
+│   └── apprentissages.md       ce qui marche sur CE site, mesuré
+├── journal/modifications.csv   chaque modification, et son effet à J+28
+├── ROUTINES.md                 les 4 routines, prêtes à créer
+└── .claude/                    la méthode, synchronisée depuis ce dépôt
+```
+
+### Quatre routines
+
+| | Quand | Publie seule | Vous soumet |
+|---|---|---|---|
+| **Veille** | chaque jour | rien — contrôle chaque URL du sitemap | les anomalies |
+| **Optimisation** | lundi | titles, metas, FAQ, schema, liens internes | les réécritures de sections |
+| **Contenu** | mercredi | rien | les pages neuves (brouillon ou pull request) |
+| **Rapport** | le 1er | le rapport | les retours arrière proposés |
+
+Votre temps : **30 minutes le lundi**, à lire `rapports/a-valider.md`.
+
+### Ce qui le distingue : la boucle de mesure
+
+Automatiser une modification est facile. Savoir si elle a aidé, presque
+personne ne le fait.
+
+Chaque modification publiée est inscrite avec ses chiffres Search Console
+des 28 jours précédents, puis **remesurée à J+28** contre un **groupe
+témoin** — les pages du site qui n'ont pas bougé. Si tout le site a pris
++12 % sur la période, une page à +17 % n'a gagné que 5 points grâce à la
+modification : verdict « neutre », pas « gain ».
+
+Les pertes sont proposées au retour arrière. Au bout de trois mesures du
+même type, un apprentissage entre dans la mémoire du site — et le cycle en
+tient compte : ce qui nuit **sur ce site-là** cesse d'être appliqué
+automatiquement.
+
+```bash
+python3 scripts/journal.py mesurer-tout --auto     # chiffres et témoin relevés dans Search Console
+python3 scripts/journal.py bilan                   # ce qui marche ici, et ce qui ne marche pas
+```
+
+Détail complet : [docs/PROJETS.md](docs/PROJETS.md)
+
+---
+
+## Les garde-fous
+
+Le mode autonome écrit sur des sites en production. Voilà ce qui l'empêche
+de mal faire.
+
+**Un kill-switch à trois niveaux** : `SEO_SAFE_MODE=1` (dans le shell ou le
+`.env` du projet), le flag `--safe`, ou `mode: safe` dans la config. Ou
+dites à Claude : *« passe en safe mode »*.
+
+**Ce qu'il ne fait jamais seul, quel que soit le mode :**
+- supprimer un contenu
+- poster sur un forum ou envoyer un email — le compte en jeu est le vôtre
+- écrire sur un domaine que vous n'avez pas déclaré
+- générer plus de 500 pages sans audit qualité d'un échantillon
+- toucher robots.txt, les redirections ou les canonicals sans montrer le diff
+
+**Ce qu'il fait toujours :** sauvegarder avant d'écrire, journaliser, passer
+un contrôle qualité bloquant (`controle_contenu.py`) avant de publier,
+laisser une trace de chaque exécution.
+
+**Ce qu'il n'invente jamais :** un chiffre. Une donnée absente s'écrit
+« nécessite tel outil ».
+
+Nouveau projet = mode `assisted` : tout est préparé, rien ne part sans vous.
+Passez en `autonomous` quand les premières mesures sont bonnes.
+→ [docs/SECURITE.md](docs/SECURITE.md)
+
+---
+
+## Les outils
+
+**Aucun n'est obligatoire.** Les skills s'adaptent à ce qui est branché et
+disent ce qui manque.
+
+| | Outils | Coût |
 |---|---|---|
-| Pour | travailler avec Claude, en direct | laisser tourner des routines sans vous |
-| Mise en place | `/plugin install` | un dépôt privé par site : `projet.py init` |
-| Mémoire du site | — | `CLAUDE.md` + `memoire/` |
-| Tourne dans une routine | non | **oui** |
+| **Le socle** | Search Console · GA4 · Chrome DevTools | gratuit |
+| **La donnée marché** | Firecrawl · DataForSEO · Ubersuggest | gratuit à quelques € |
+| **La production** | WordPress · Webflow · Notion · Semrush · Ahrefs | variable |
+| **La visibilité IA** | Perplexity · Reddit | quelques € |
 
-Une routine Claude Code ne charge pas les plugins : elle ne voit que ce qui
-est commité dans le dépôt qu'elle clone. Pour piloter un site en autonomie,
-créez-lui un projet — dites « nouveau projet » à Claude, ou lisez
-[docs/PROJETS.md](docs/PROJETS.md).
-
----
-
-## Ce que ça sait faire
-
-### Les 5 chaînes agentiques
-
-**1. Quick wins** — `/seo quickwins` *(≈ 6 min)*
-Search Console → repère les pages en position 4-20 → SERP live → scrape le
-top 3 → identifie l'écart éditorial → écrit les sections manquantes et les
-nouvelles balises → met à jour la page.
-
-**2. Brief adossé à la SERP** — `/seo brief <mot-clé>` *(≈ 4 min)*
-Expansion sémantique → volumes → SERP live → intention réelle → plans Hn des
-5 premiers → brief complet avec la réponse directe et la FAQ déjà rédigées →
-journalisé dans Notion.
-
-**3. Article vérifié** — `/seo article` *(≈ 9 min)*
-Lit le brief → recherche obligatoire → rédige (style humain, zéro chiffre
-inventé) → génère le schema → vérifie le rendu dans un navigateur réel →
-publie en brouillon.
-
-**4. Score de visibilité IA** — `/seo geo` *(≈ 5 min)*
-Pose 20 questions d'acheteur aux moteurs IA → relève qui est cité et dans
-quel ordre → calcule votre part de voix → compare aux concurrents →
-feuille de route 90 jours.
-
-**5. Rapport mensuel** — `/seo rapport` *(≈ 3 min)*
-Search Console + GA4 + positions + score GEO → évolutions M-1 et M-12 →
-**les causes**, pas seulement les courbes → ce qui a marché, ce qui n'a pas
-marché → les priorités du mois suivant.
-
-### Et aussi
-
-- **Corrige la technique tout seul** — robots.txt, canonicals, redirections,
-  balises, images, Core Web Vitals. Il détecte, il patche, il vérifie.
-- **Construit des pages HTML** prêtes à coller dans Elementor, Webflow ou
-  WordPress. Autonomes, responsive, accessibles.
-- **Génère des pages à l'échelle** avec des garde-fous durs contre le contenu
-  mince (blocage à 500 pages sans audit qualité).
-- **Pilote le netlinking** — prospection, qualification sur 20 points,
-  emails rédigés, suivi des liens perdus.
-- **Tient votre Notion à jour** — leads, objectifs, roadmap, contenus,
-  backlinks. Alimenté automatiquement à chaque action.
+Search Console, GA4 et Chrome DevTools couvrent l'essentiel, et sont gratuits.
+Search Console se lit aussi en direct, sans intermédiaire, avec
+`scripts/gsc.py` et une clé de compte de service.
+→ [docs/MCP.md](docs/MCP.md)
 
 ---
 
-## Les commandes
-
-| Commande | Ce qu'elle fait |
-|----------|-----------------|
-| `/seo doctor` | Diagnostic, onboarding, première action |
-| `/seo audit <url>` | Audit complet, 8 agents en parallèle, score /100 |
-| `/seo quickwins` | Les pages à rattraper, chiffrées |
-| `/seo fix <url>` | Détecte **et corrige** les problèmes techniques |
-| `/seo brief <mot-clé>` | Brief rédactionnel complet |
-| `/seo article` | Rédaction, style humain, sources vérifiées |
-| `/seo onpage <url> <mot-clé>` | Note /100 **puis réécrit** |
-| `/seo page <type> <sujet>` | Page HTML prête à coller |
-| `/seo geo <url>` | Visibilité dans les moteurs IA |
-| `/seo backlink <url>` | Campagne de netlinking |
-| `/seo publish` | Publication WordPress / Webflow |
-| `/seo rapport` | Rapport périodique |
-| `/seo notion setup` | Les 5 bases de pilotage |
-| `/seo veille` | Surveillance et alertes |
-
-Le routeur `/seo` comprend aussi le langage naturel : « audite mon site »,
-« pourquoi ChatGPT ne me cite pas », « j'ai perdu du trafic ».
-
----
-
-## Les 43 skills
+## La méthode
 
 <details>
-<summary><b>Diagnostic et technique</b> (8)</summary>
+<summary><b>45 skills</b>, en 8 familles</summary>
 
-`seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` ·
-`seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` ·
-`seo-migration` · `seo-veille`
+| Famille | Skills |
+|---|---|
+| **Diagnostic et technique** | `seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` · `seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` · `seo-migration` · `seo-veille` |
+| **Données Search Console** | `seo-gsc-analyses` — 20 analyses : content decay, gagnants et perdants, requêtes émergentes, saisonnalité, cannibalisation, pages à créer… |
+| **Recherche et stratégie** | `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
+| **Contenu** | `seo-brief` · `seo-redaction` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` |
+| **Structure et échelle** | `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-hreflang-i18n` · `seo-images` |
+| **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |
+| **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |
+| **Pilotage** | `seo-nouveau-projet` · `seo-cycle` · `seo-journal-mesure` · `seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` · `seo-dashboard` · `seo-ecommerce` |
+
+→ [docs/SKILLS.md](docs/SKILLS.md)
 </details>
 
 <details>
-<summary><b>Recherche et stratégie</b> (6)</summary>
+<summary><b>15 agents</b> spécialistes, exécutés en parallèle</summary>
 
-`seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-cocon-semantique` ·
-`seo-serp-analysis` · `seo-traffic-drop`
+`seo-manager` (pilote un projet) · `seo-technique` · `seo-performance` ·
+`seo-contenu` · `seo-redacteur` · `seo-data` · `seo-serp` · `seo-schema` ·
+`seo-geo` · `seo-netlinking` · `seo-frontend` · `seo-crawler` ·
+`seo-strategiste` · `seo-publisher` · `seo-analyste-concurrence`
+
+→ [docs/AGENTS.md](docs/AGENTS.md)
 </details>
 
 <details>
-<summary><b>Contenu</b> (7)</summary>
+<summary><b>Les principes</b> que tous suivent</summary>
 
-`seo-brief` · `seo-redaction` · `seo-optimisation-onpage` · `seo-meta-serp` ·
-`seo-faq-paa` · `seo-eeat` · `seo-comparatifs`
+1. **Jamais de chiffre inventé.** Donnée absente = « nécessite tel outil ».
+2. **Toujours quantifier.** « 23 pages, 3 400 impressions en jeu », jamais « plusieurs pages ».
+3. **Chaque constat a son correctif écrit**, prêt à appliquer.
+4. **Cinq urgences au plus.** Une liste de 40 problèmes n'est jamais traitée.
+5. **Une page ne sort que si elle bat la meilleure concurrente** sur au moins 5 axes.
+6. **Vérifier qu'il faut écrire** avant d'écrire : deux pages sur la même intention se neutralisent.
+7. **Ne jamais bloquer sur un outil manquant** : dire ce qui n'est pas couvert, et continuer.
 </details>
-
-<details>
-<summary><b>Structure et échelle</b> (6)</summary>
-
-`seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` ·
-`seo-schema-jsonld` · `seo-hreflang-i18n` · `seo-images`
-</details>
-
-<details>
-<summary><b>GEO / moteurs IA</b> (4)</summary>
-
-`geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` ·
-`geo-share-of-model`
-</details>
-
-<details>
-<summary><b>Autorité et acquisition</b> (4)</summary>
-
-`seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr`
-</details>
-
-<details>
-<summary><b>Production et pilotage</b> (8)</summary>
-
-`seo-nouveau-projet` · `seo-cycle` · `seo-journal-mesure` ·
-`seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` ·
-`seo-dashboard` · `seo-ecommerce`
-</details>
-
-Détail complet : [docs/SKILLS.md](docs/SKILLS.md)
-
----
-
-## Les 13 MCP
-
-Tous préconfigurés dans `.mcp.json`. **Aucun n'est obligatoire** : les skills
-s'adaptent à ce qui est branché et vous disent ce qui manque.
-
-| Niveau | Outils | Coût |
-|--------|--------|------|
-| **1 — le socle** | Search Console · GA4 · Chrome DevTools | gratuit |
-| **2 — la donnée marché** | Firecrawl · DataForSEO · Ubersuggest | gratuit à quelques € |
-| **3 — production** | WordPress · Webflow · Notion · Semrush · Ahrefs | variable |
-| **4 — visibilité IA** | Perplexity · Reddit | quelques € |
-
-**Les trois premiers sont gratuits et couvrent 70 % de la valeur.**
-Guide de branchement : [docs/MCP.md](docs/MCP.md)
-
----
-
-## Les 15 agents
-
-`seo-technique` · `seo-performance` · `seo-contenu` · `seo-redacteur` ·
-`seo-data` · `seo-serp` · `seo-schema` · `seo-geo` · `seo-netlinking` ·
-`seo-frontend` · `seo-crawler` · `seo-strategiste` · `seo-publisher` ·
-`seo-analyste-concurrence` · `seo-manager`
-
-Ils tournent **en parallèle** sur un audit : huit spécialistes plutôt qu'un
-généraliste qui passe huit fois.
-
----
-
-## Mode autonome et kill-switch
-
-Par défaut, le dispositif est en **mode autonome** : il écrit, il publie, il
-corrige. Trois façons de l'arrêter :
-
-```bash
-# 1 · la variable d'environnement — gagne toujours
-SEO_SAFE_MODE=1
-
-# 2 · le flag, sur n'importe quelle commande
-/seo fix https://exemple.com --safe
-
-# 3 · la config
-mode: safe        # dans ./decupler-seo.config.yml du projet
-```
-
-Ou dites simplement à Claude : « passe en safe mode ».
-
-### Les garde-fous qui ne se désactivent pas
-
-Ils existent parce que chacun correspond à une façon connue de se faire mal.
-
-- ❌ **Jamais de suppression de contenu.** Dépublier, oui. Supprimer, non.
-- ❌ **Jamais de post sur un forum ou de mail d'outreach sans validation.**
-  Le compte banni serait le vôtre.
-- ❌ **Jamais d'écriture sur un domaine non déclaré.**
-- ❌ **Jamais plus de 500 pages générées** sans audit qualité d'un échantillon.
-- ✅ **Sauvegarde systématique** avant toute écriture, avec restauration en
-  une commande.
-- ✅ **Diff obligatoire** sur robots.txt, redirections et canonicals.
-- ✅ **Jamais de chiffre inventé.** Donnée absente = « nécessite tel outil ».
-
----
-
-## Configuration
-
-```bash
-cp config/.env.example .env      # vos clés, dans le dossier du projet — jamais commité
-```
-
-Puis copiez `config/decupler-seo.config.yml` à la racine du projet et remplissez
-la section `projet` : domaine,
-proposition de valeur, concurrents, pages prioritaires, ton. Une fois pour
-toutes — tous les skills s'en servent et arrêtent de vous poser les mêmes
-questions.
 
 ---
 
 ## Prérequis
 
-- **Claude Code** (CLI, desktop, web ou extension IDE)
-- **Node** — pour les MCP en npx
-- **Python 3.8+** — pour les scripts d'analyse
-- **Chrome** — optionnel, pour les Core Web Vitals réels
+Claude Code · Node (pour les MCP) · Python 3.10+ · Chrome, optionnel.
 
-```bash
-pip install -r requirements.txt
-```
+Les scripts n'ont **aucune dépendance** — y compris la connexion à Search
+Console. Seuls le crawler et l'analyse de pages utilisent `requests` et
+`beautifulsoup4` : `pip install -r requirements.txt`.
 
 ---
 
 ## Documentation
 
-- [Installation](docs/INSTALLATION.md) — les trois méthodes, pas à pas
-- [Branchement des MCP](docs/MCP.md) — Search Console, GA4, et les 11 autres
-- [Les skills](docs/SKILLS.md) — ce que fait chacun, quand l'utiliser
-- [Les agents](docs/AGENTS.md)
-- [Piloter des projets en autonomie](docs/PROJETS.md) — mémoire, routines, mesure
-- [Les workflows](docs/WORKFLOWS.md) — les 5 chaînes, détaillées
-- [Sécurité et garde-fous](docs/SECURITE.md)
-- [Dépannage](docs/DEPANNAGE.md)
+| | |
+|---|---|
+| [Installation](docs/INSTALLATION.md) | les trois façons d'installer |
+| [Piloter des projets](docs/PROJETS.md) | mémoire, routines, boucle de mesure |
+| [Brancher les outils](docs/MCP.md) | Search Console, GA4, et les 11 autres |
+| [Les skills](docs/SKILLS.md) · [Les agents](docs/AGENTS.md) | ce que fait chacun |
+| [Les workflows](docs/WORKFLOWS.md) | les chaînes de bout en bout |
+| [Sécurité](docs/SECURITE.md) · [Dépannage](docs/DEPANNAGE.md) | |
+| [Contribuer](CONTRIBUTING.md) | |
 
 ---
 
 ## Ce que ça ne fait pas
 
-Par honnêteté, et pour vous éviter d'être déçu :
-
-- **Ça ne remplace pas un stratège SEO.** Ça exécute vite et bien, ça
-  priorise correctement, mais les arbitrages business restent les vôtres.
-- **Ça ne garantit aucun résultat.** Personne ne le peut. Ça fait le travail
-  correctement, ce qui est déjà la partie difficile.
-- **Ça ne triche pas.** Pas de génération de contenu vide à l'échelle, pas de
-  spam de forums, pas de faux avis. Les garde-fous sont là pour ça.
-- **Ça n'invente pas de chiffres.** Si la donnée manque, il le dit.
-
----
-
-## Licence
-
-MIT — voir [LICENSE](LICENSE). Faites-en ce que vous voulez.
-
----
-
-## Contribuer
-
-Les contributions sont bienvenues : un nouveau skill, un MCP supplémentaire,
-une correction. Voir [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Ça ne remplace pas un stratège.** Ça exécute vite et bien, ça priorise
+  correctement ; les arbitrages business restent les vôtres.
+- **Ça ne garantit aucun classement.** Personne ne le peut. Ça fait le travail
+  correctement — et ça mesure honnêtement s'il a porté.
+- **Ça ne crée pas d'autorité à votre place.** Les liens et les mentions
+  s'obtiennent auprès de vraies personnes. Le dispositif prépare tout, vous
+  envoyez.
+- **Ça ne triche pas.** Pas de contenu mince à la chaîne, pas de spam de
+  forums, pas de faux avis, pas de preuve inventée.
 
 ---
 
 <div align="center">
 
-**Construit par [Décupler](https://decupler.com)** — agence SEO & GEO
-
-[decupler.com](https://decupler.com) · [Nathan Fenina](https://www.linkedin.com/in/nathanfenina/)
+MIT · Construit par **[Décupler](https://decupler.com)**, agence SEO & GEO
 
 </div>

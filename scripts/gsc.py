@@ -42,7 +42,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _projet import charger_env, fichier_config, racine_projet, resoudre  # noqa: E402
+from _projet import charger_env, lire_valeur, racine_projet, resoudre  # noqa: E402
 
 API = "https://www.googleapis.com/webmasters/v3"
 INSPECT = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
@@ -242,14 +242,9 @@ def appel(url: str, corps: dict | None = None, methode: str | None = None, ecrit
 def site_par_defaut() -> str:
     if _env("GSC_SITE_URL"):
         return _env("GSC_SITE_URL")
-    config = fichier_config()
-    if config:
-        for ligne in config.read_text(encoding="utf-8").splitlines():
-            nue = ligne.split("#", 1)[0].strip()
-            if nue.startswith("domaine:"):
-                valeur = nue.partition(":")[2].strip().strip("\"'")
-                if valeur:
-                    return valeur.rstrip("/") + "/"
+    domaine = lire_valeur("projet.domaine")
+    if domaine:
+        return domaine.rstrip("/") + "/"
     raise ErreurGSC("Propriété inconnue : passez --site, ou définissez GSC_SITE_URL.")
 
 

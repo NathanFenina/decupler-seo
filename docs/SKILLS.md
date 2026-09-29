@@ -1,4 +1,4 @@
-# Les 43 skills
+# Les 45 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -28,13 +28,15 @@ aussi l'appeler par son nom.
 | `seo-cocon-semantique` | Silos, piliers, satellites, plan de maillage, calendrier | « cocon », « silo », « structurer mon contenu » |
 | `seo-serp-analysis` | Intention réelle, features, format attendu, difficulté vraie | « analyse la SERP », « qui ranke sur » |
 | `seo-traffic-drop` | Dater, isoler, expliquer, récupérer | « chute de trafic », « core update », « déclassé » |
+| `seo-gsc-analyses` | 20 analyses Search Console prêtes à lancer : cannibalisation, CTR anormal, content decay, requêtes neuves, page à créer, Google vs LLM… | « analyse la Search Console », « cannibalisation », « CTR », « pages qui déclinent » |
 
 ## Contenu
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
 | `seo-brief` | Brief complet, réponse directe et FAQ déjà rédigées | « brief », « plan d'article » |
-| `seo-redaction` | Rédaction SEO + GEO, style humain, sources vérifiées | « rédige », « écris un article » |
+| `seo-benchmark` | Les 3 meilleures pages concurrentes lues, grille « faire mieux » : 5 axes gagnés ou la page ne sort pas | « benchmark », « faire mieux que », avant toute page neuve |
+| `seo-redaction` | Rédaction SEO + GEO : anti-cannibalisation, thèse avant le plan, test anti-remplissage, sources vérifiées | « rédige », « écris un article » |
 | `seo-optimisation-onpage` | Note /100 par critère **puis réécrit** | « optimise cette page », « score SEO », « passe au vert » |
 | `seo-meta-serp` | 3 titles, 2 metas, aperçu SERP, comptage pixel | « title », « meta description », « CTR » |
 | `seo-faq-paa` | FAQ ciblant PAA, snippets et LLM, + schema | « FAQ », « People Also Ask » |

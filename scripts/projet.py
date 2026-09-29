@@ -136,6 +136,37 @@ def lire_manifeste(projet: Path) -> dict:
 
 # ─── Synchronisation ──────────────────────────────────────────────
 
+def collisions(projet: Path, plan: dict[Path, Path], ancien: dict) -> list[Path]:
+    """Fichiers présents dans le projet, jamais installés par la synchro, et différents.
+
+    Typiquement : des skills copiés à la main depuis une ancienne version. Les
+    écraser sans le dire ferait disparaître une éventuelle adaptation locale.
+    """
+    gerees = set(ancien["fichiers"])
+    trouvees = []
+    for rel, src in plan.items():
+        cible = projet / rel
+        if cible.is_file() and str(rel) not in gerees:
+            tempo = Path(tempfile.mkstemp()[1])
+            ecrire(src, tempo)
+            if empreinte(tempo) != empreinte(cible):
+                trouvees.append(rel)
+            tempo.unlink()
+    return trouvees
+
+
+def signaler_collisions(liste: list[Path]) -> None:
+    print(f"\n✗ {len(liste)} fichier(s) existent déjà dans ce projet sans avoir été installés par la")
+    print("  synchronisation, et diffèrent de la méthode :\n")
+    for rel in liste[:25]:
+        print(f"    {rel}")
+    if len(liste) > 25:
+        print(f"    … et {len(liste) - 25} autres")
+    print("\n  Souvent des copies d'une ancienne version. Vérifiez qu'aucun ne contient d'adaptation")
+    print("  propre au projet (à déplacer dans un skill .claude/skills/projet-…), puis relancez avec")
+    print("  --forcer pour les remplacer par la version courante.\n")
+
+
 def synchroniser(projet: Path, source: Path, forcer: bool = False, simuler: bool = False) -> int:
     ancien = lire_manifeste(projet)
     plan = fichiers_methode(source)
@@ -158,6 +189,11 @@ def synchroniser(projet: Path, source: Path, forcer: bool = False, simuler: bool
         print("  · la modification est propre à ce client → déplacez-la dans un skill")
         print(f"    .claude/skills/{PREFIXE_PROJET}…, que la synchronisation ne touche jamais.")
         print("\n  Relancez avec --forcer une fois ce choix fait.\n")
+        return 1
+
+    conflits = collisions(projet, plan, ancien)
+    if conflits and not forcer:
+        signaler_collisions(conflits)
         return 1
 
     # 2. Calculer ce qui change.
@@ -218,6 +254,23 @@ def remplir(texte: str, valeurs: dict[str, str]) -> str:
     return texte
 
 
+def valeurs_gabarit(args) -> dict[str, str]:
+    domaine = args.domaine.rstrip("/")
+    if "//" not in domaine:
+        domaine = "https://" + domaine
+    langues = [l.strip() for l in args.langues.split(",") if l.strip()]
+    return {
+        "NOM": args.nom, "DOMAINE": domaine,
+        "DOMAINE_NU": urlparse(domaine).netloc.removeprefix("www."),
+        "PAYS": args.pays, "LANGUES": ", ".join(langues), "LANGUES_YAML": ", ".join(langues),
+        "LANGUE_PRINCIPALE": langues[0] if langues else "fr", "CMS": args.cms,
+        "ACTIVITE": args.activite, "PROPOSITION_VALEUR": args.proposition, "TON": args.ton,
+        "VOUVOIEMENT": "true" if args.vouvoiement else "false", "PAGES_MAX": str(args.pages_max),
+        "MODE": args.mode, "PUBLICATION": args.publication,
+        "DATE": dt.date.today().isoformat(), "PAR": args.par,
+    }
+
+
 def initialiser(args) -> int:
     projet = Path(args.dossier).expanduser().resolve()
     if projet.exists() and any(p for p in projet.iterdir() if p.name != ".git"):
@@ -226,31 +279,7 @@ def initialiser(args) -> int:
                   "la méthode, ou --forcer pour réinitialiser le gabarit.")
             return 1
 
-    domaine = args.domaine.rstrip("/")
-    if "//" not in domaine:
-        domaine = "https://" + domaine
-    domaine_nu = urlparse(domaine).netloc.removeprefix("www.")
-    langues = [l.strip() for l in args.langues.split(",") if l.strip()]
-
-    valeurs = {
-        "NOM": args.nom,
-        "DOMAINE": domaine,
-        "DOMAINE_NU": domaine_nu,
-        "PAYS": args.pays,
-        "LANGUES": ", ".join(langues),
-        "LANGUES_YAML": ", ".join(langues),
-        "LANGUE_PRINCIPALE": langues[0] if langues else "fr",
-        "CMS": args.cms,
-        "ACTIVITE": args.activite,
-        "PROPOSITION_VALEUR": args.proposition,
-        "TON": args.ton,
-        "VOUVOIEMENT": "true" if args.vouvoiement else "false",
-        "PAGES_MAX": str(args.pages_max),
-        "MODE": args.mode,
-        "PUBLICATION": args.publication,
-        "DATE": dt.date.today().isoformat(),
-        "PAR": args.par,
-    }
+    valeurs = valeurs_gabarit(args)
 
     source, tempo = obtenir_source(args.depuis)
     try:
@@ -297,6 +326,70 @@ def initialiser(args) -> int:
     return code
 
 
+# ─── Adoption d'un dépôt existant ─────────────────────────────────
+
+LIGNES_GITIGNORE = [".env", ".env.*", "!.env.example", "secrets/", "*-service-account.json",
+                    ".seo-decupler/backups/"]
+
+
+def adopter(args) -> int:
+    """Branche la méthode sur un dépôt qui a déjà sa vie : rien n'est écrasé en silence.
+
+    - les fichiers du gabarit ne sont ajoutés que s'ils manquent ;
+    - un CLAUDE.md existant est gardé, et le gabarit est écrit à côté
+      (CLAUDE.decupler-seo.md) pour que vous fusionniez ce qui vous sert ;
+    - le .gitignore existant est complété, jamais remplacé ;
+    - les fichiers de méthode déjà présents sans avoir été installés par la
+      synchronisation arrêtent tout, sauf --forcer.
+    """
+    projet = Path(args.dossier).expanduser().resolve()
+    valeurs = valeurs_gabarit(args)
+    source, tempo = obtenir_source(args.depuis)
+    try:
+        plan = fichiers_methode(source)
+        conflits = collisions(projet, plan, lire_manifeste(projet))
+        if conflits and not args.forcer:
+            signaler_collisions(conflits)
+            return 1
+
+        ajoutes, a_cote = [], []
+        for f in (source / MODELE).rglob("*"):
+            if not f.is_file():
+                continue
+            rel = f.relative_to(source / MODELE)
+            cible = projet / rel
+            if rel.name == ".gitignore" and cible.exists():
+                actuelles = cible.read_text(encoding="utf-8").splitlines()
+                manquantes = [l for l in LIGNES_GITIGNORE if l not in actuelles]
+                if manquantes:
+                    with open(cible, "a", encoding="utf-8") as g:
+                        g.write("\n# decupler-seo : secrets et état local\n" + "\n".join(manquantes) + "\n")
+                    ajoutes.append(f"{rel} (complété)")
+                continue
+            if cible.exists():
+                if rel.name == "CLAUDE.md":
+                    cible = projet / "CLAUDE.decupler-seo.md"
+                    a_cote.append(cible.name)
+                else:
+                    continue
+            cible.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                cible.write_text(remplir(f.read_text(encoding="utf-8"), valeurs), encoding="utf-8")
+            except UnicodeDecodeError:
+                shutil.copy2(f, cible)
+            ajoutes.append(str(cible.relative_to(projet)))
+
+        print(f"\n  ✓ Gabarit : {len(ajoutes)} fichier(s) ajouté(s), rien d'existant écrasé")
+        for nom in a_cote:
+            print(f"  → {nom} : le gabarit de mémoire, écrit à côté de votre CLAUDE.md.")
+            print("    Reprenez-en ce qui vous sert (niveaux d'autonomie, imports @memoire/…), puis supprimez-le.")
+        code = synchroniser(projet, source, forcer=True)
+    finally:
+        if tempo:
+            tempo.cleanup()
+    return code
+
+
 # ─── Statut ───────────────────────────────────────────────────────
 
 def statut(args) -> int:
@@ -334,25 +427,27 @@ def main() -> int:
     p = argparse.ArgumentParser(description="Projets decupler-seo")
     sp = p.add_subparsers(dest="commande", required=True)
 
-    i = sp.add_parser("init", help="créer un projet à partir du gabarit")
-    i.add_argument("dossier")
-    i.add_argument("--nom", required=True)
-    i.add_argument("--domaine", required=True)
-    i.add_argument("--pays", default="FR")
-    i.add_argument("--langues", default="fr", help="ex. fr ou ar,en")
-    i.add_argument("--cms", default="wordpress")
-    i.add_argument("--publication", default="cms", choices=["cms", "depot"],
-                   help="depot pour un site en code : publier = fusionner une PR")
-    i.add_argument("--activite", default="")
-    i.add_argument("--proposition", default="")
-    i.add_argument("--ton", default="expert, direct, sans jargon inutile")
-    i.add_argument("--vouvoiement", action=argparse.BooleanOptionalAction, default=True)
-    i.add_argument("--pages-max", type=int, default=3)
-    i.add_argument("--mode", default="assisted", choices=["safe", "assisted", "autonomous"],
-                   help="assisted par défaut : un nouveau projet commence sous surveillance")
-    i.add_argument("--par", default="")
-    i.add_argument("--depuis", help="dossier ou URL git de decupler-seo")
-    i.add_argument("--forcer", action="store_true")
+    creation = sp.add_parser("init", help="créer un projet à partir du gabarit")
+    adoption = sp.add_parser("adopter", help="brancher la méthode sur un dépôt existant, sans rien écraser")
+    for sous in (creation, adoption):
+        sous.add_argument("dossier")
+        sous.add_argument("--nom", required=True)
+        sous.add_argument("--domaine", required=True)
+        sous.add_argument("--pays", default="FR")
+        sous.add_argument("--langues", default="fr", help="ex. fr ou ar,en")
+        sous.add_argument("--cms", default="wordpress")
+        sous.add_argument("--publication", default="cms", choices=["cms", "depot"],
+                          help="depot pour un site en code : publier = fusionner une PR")
+        sous.add_argument("--activite", default="")
+        sous.add_argument("--proposition", default="")
+        sous.add_argument("--ton", default="expert, direct, sans jargon inutile")
+        sous.add_argument("--vouvoiement", action=argparse.BooleanOptionalAction, default=True)
+        sous.add_argument("--pages-max", type=int, default=3)
+        sous.add_argument("--mode", default="assisted", choices=["safe", "assisted", "autonomous"],
+                          help="assisted par défaut : un nouveau projet commence sous surveillance")
+        sous.add_argument("--par", default="")
+        sous.add_argument("--depuis", help="dossier ou URL git de decupler-seo")
+        sous.add_argument("--forcer", action="store_true")
 
     s = sp.add_parser("sync", help="installer ou mettre à jour la méthode dans un projet")
     s.add_argument("dossier")
@@ -366,6 +461,8 @@ def main() -> int:
     args = p.parse_args()
     if args.commande == "init":
         return initialiser(args)
+    if args.commande == "adopter":
+        return adopter(args)
     if args.commande == "sync":
         projet = Path(args.dossier).expanduser().resolve()
         source, tempo = obtenir_source(args.depuis)

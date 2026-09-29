@@ -194,7 +194,7 @@ def main() -> int:
     ap.add_argument("--strict", action="store_true", help="les avertissements bloquent aussi")
     a = ap.parse_args()
 
-    interdits = compiler(lire_liste("interdits"))
+    interdits = compiler(lire_liste("regles.interdits"))
     r = Rapport()
     liste = fichiers(a.cibles)
     for f in liste:
