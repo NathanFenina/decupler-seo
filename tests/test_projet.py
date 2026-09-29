@@ -51,6 +51,16 @@ class TestProjet(DossierIsole):
         self.assertEqual(r.returncode, 1)
         self.assertIn("règle ajoutée à la main", skill.read_text(encoding="utf-8"))
 
+    def test_deja_a_jour_n_est_pas_une_modification(self):
+        # Manifeste en retard (autre branche, fichier ignoré par git) mais fichier déjà à la bonne version.
+        p = self.creer()
+        manifeste = p / ".claude/decupler-seo/FICHIERS.json"
+        donnees = json.loads(manifeste.read_text(encoding="utf-8"))
+        donnees["fichiers"][".claude/skills/seo-redaction/SKILL.md"] = "empreinte-perimee"
+        manifeste.write_text(json.dumps(donnees), encoding="utf-8")
+        r = lancer("projet.py", "sync", ".", cwd=p)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
     def test_forcer_restaure_la_methode(self):
         p = self.creer()
         skill = p / ".claude/skills/seo-redaction/SKILL.md"

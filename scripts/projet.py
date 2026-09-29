@@ -167,16 +167,29 @@ def signaler_collisions(liste: list[Path]) -> None:
     print("  --forcer pour les remplacer par la version courante.\n")
 
 
+def identique(src: Path | None, cible: Path) -> bool:
+    """La cible est-elle exactement ce que la synchro y écrirait ?"""
+    if src is None:
+        return False
+    tempo = Path(tempfile.mkstemp()[1])
+    ecrire(src, tempo)
+    egal = empreinte(tempo) == empreinte(cible)
+    tempo.unlink()
+    return egal
+
+
 def synchroniser(projet: Path, source: Path, forcer: bool = False, simuler: bool = False) -> int:
     ancien = lire_manifeste(projet)
     plan = fichiers_methode(source)
     version = version_de(source)
 
     # 1. Repérer les fichiers de méthode modifiés à la main dans le projet.
+    # Un fichier déjà identique à la nouvelle version n'est pas une modification locale
+    # (ex. fichier ignoré par git, mis à jour par une synchro faite sur une autre branche).
     modifies = []
     for rel, empreinte_connue in ancien["fichiers"].items():
         chemin = projet / rel
-        if chemin.is_file() and empreinte(chemin) != empreinte_connue:
+        if chemin.is_file() and empreinte(chemin) != empreinte_connue and not identique(plan.get(Path(rel)), chemin):
             modifies.append(rel)
 
     if modifies and not forcer:
