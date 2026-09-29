@@ -54,6 +54,11 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" ajouter \
   le même jour rend impossible de savoir lequel a agi. Si c'est inévitable,
   une seule ligne de type `contenu`, et on l'accepte.
 - Une page déjà en cours de mesure ne se modifie pas avant l'échéance.
+- **Site en mode `depot`** : la publication, c'est la fusion de la PR. Les
+  lignes du journal voyagent dans la PR, datées du jour où elle est ouverte ;
+  si elle est fusionnée plus de deux jours après, redater les lignes au jour
+  de la fusion, sinon la période « après » mélange l'ancienne et la nouvelle
+  version. Le dire dans la description de la PR.
 
 ## 2. Mesurer — à l'échéance
 
