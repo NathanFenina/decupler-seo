@@ -50,6 +50,10 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" ajouter \
 
 - `--avant` est ce qui permettra le retour arrière. Pour un title ou une
   meta, la valeur exacte. Pour un contenu, le chemin de la sauvegarde.
+- `--requete` : pour une **page neuve**, toutes les requêtes qu'elle vise,
+  séparées par `|` (ex. `"nitaqat | nitaqat calculator"`). Le classement des
+  opportunités s'en sert pour ne pas proposer de « créer » une page qui
+  existe déjà mais n'a pas encore d'impressions.
 - **Une modification par ligne.** Changer le title et la FAQ d'une même page
   le même jour rend impossible de savoir lequel a agi. Si c'est inévitable,
   une seule ligne de type `contenu`, et on l'accepte.

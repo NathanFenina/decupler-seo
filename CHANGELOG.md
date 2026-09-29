@@ -25,6 +25,9 @@
 
 ### Modifié
 
+- `opportunites.py` : une requête visée par une page du journal (colonne
+  `requete`, plusieurs requêtes séparées par `|`) n'est plus proposée « à
+  créer » ; elle est rattachée à la page, et gelée si la page est en mesure.
 - Meta description : zone verte 120-156 caractères partout.
 - `share_of_model.py` : gabarits de prompts par langue, analyse des
   homonymes et du côté vendeur, mode `--sans-web` pour la notoriété seule.

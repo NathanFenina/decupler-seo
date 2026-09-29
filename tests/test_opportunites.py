@@ -51,7 +51,7 @@ class TestOpportunites(DossierIsole):
             (self.dossier / "journal").mkdir()
             with open(self.dossier / "journal/modifications.csv", "w", newline="", encoding="utf-8") as f:
                 w = csv.writer(f)
-                w.writerow(["id", "date", "url", "verdict"])
+                w.writerow(["id", "date", "url", "verdict", "requete"][:len(journal[0])])
                 w.writerows(journal)
 
     def classer(self, *args):
@@ -101,6 +101,19 @@ class TestOpportunites(DossierIsole):
         self.assertEqual(invisibles, ["marque inpi prix"])
         couverture = {c["theme"]: c for c in res["couverture"]}
         self.assertIsNone(couverture["visa"]["meilleure_position"])
+
+    def test_page_neuve_du_journal_pas_proposee_a_creer(self):
+        # Page publiée hier, pas encore d'impressions : sa requête ne doit pas revenir « à créer ».
+        hier = (dt.date.today() - dt.timedelta(days=1)).isoformat()
+        self.preparer(journal=[("1", hier, "https://ex.com/visa", "", "visa affaires canada | visa pro")])
+        with open(self.dossier / "demande.csv", "w", newline="", encoding="utf-8") as f:
+            f.write("requete,volume,page\nvisa affaires canada,900,\nvisa pro,200,\nvisa etudiant,300,\n")
+        res = self.classer("--demande", "demande.csv")
+        lignes = {o["requete"]: o for o in res["opportunites"] if o["requete"].startswith("visa")}
+        self.assertEqual(lignes["visa affaires canada"]["page"], "https://ex.com/visa")
+        self.assertEqual(lignes["visa affaires canada"]["score"], 0)          # en mesure
+        self.assertEqual(lignes["visa pro"]["score"], 0)
+        self.assertEqual(lignes["visa etudiant"]["action"], "a-creer")
 
     def test_demande_seule_sans_search_console(self):
         # Site jeune ou accès pas encore donné : on classe, mais sans prétendre connaître les positions.

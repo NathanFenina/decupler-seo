@@ -191,6 +191,21 @@ def pages_en_mesure(delai: int) -> dict[str, str]:
     return en_mesure
 
 
+def pages_ciblees() -> dict[str, str]:
+    """Requête visée → page, d'après la colonne requete du journal (plusieurs requêtes séparées par | ou ;).
+    Une page neuve n'a pas encore d'impressions : sans ce lien, sa requête serait proposée « à créer »."""
+    journal = racine_projet() / "journal" / "modifications.csv"
+    if not journal.is_file():
+        return {}
+    ciblees = {}
+    with journal.open(encoding="utf-8") as f:
+        for l in csv.DictReader(f):
+            for requete in re.split(r"[|;]", l.get("requete") or ""):
+                if requete.strip() and l.get("url"):
+                    ciblees[requete.strip().lower()] = l["url"].strip()
+    return ciblees
+
+
 def normaliser(url: str) -> str:
     return url.split("#")[0].split("?")[0].rstrip("/").lower()
 
@@ -199,10 +214,11 @@ def normaliser(url: str) -> str:
 
 def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: int,
             demande: dict[str, tuple[float, str]] | None = None, en_mesure: dict[str, str] | None = None,
-            impressions_min: int = 30, gsc: bool = True) -> dict:
+            impressions_min: int = 30, gsc: bool = True, ciblees: dict[str, str] | None = None) -> dict:
     """`gsc=False` : aucune donnée Search Console. Une requête absente des
     données ne veut alors pas dire que le site en est absent."""
     en_mesure = en_mesure or {}
+    ciblees = ciblees or {}
     mensuel = 30 / max(jours, 1)
     par_requete: dict[str, dict] = {}
     for l in lignes:
@@ -271,6 +287,7 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
         if any(m.search(requete) for m in marque):
             continue
         theme, valeur = theme_de(requete, lexique)
+        page = page or ciblees.get(requete, "")
         if page:
             themes[theme]["pages"].add(page)        # la couverture compte la page, même sans volume
         if requete in connues or volume <= 0:
@@ -516,7 +533,7 @@ def main() -> int:
     demande = lire_demande(Path(a.demande)) if a.demande else None
     delai = int(lire_valeur("mesure.delai_jours", "28") or 28)
     res = classer(lignes, lexique, motifs_marque(), a.jours, demande, pages_en_mesure(delai), a.impressions_min,
-                  gsc=bool(lignes) or bool(a.csv))
+                  gsc=bool(lignes) or bool(a.csv), ciblees=pages_ciblees())
     texte_mix = a.mix or lire_valeur("opportunites.mix") or "60/25/15"
     mix = lire_mix(texte_mix)
     res = enrichir(res, lignes, lire_intentions(Path(a.demande)) if a.demande else None)
