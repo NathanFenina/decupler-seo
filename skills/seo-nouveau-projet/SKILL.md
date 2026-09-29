@@ -81,6 +81,22 @@ Suivre `ROUTINES.md`, généré dans le projet : quatre routines, un
 environnement cloud dédié dont le réseau autorise le domaine du projet, et
 uniquement les connecteurs utiles.
 
+Si c'est l'agent qui les crée (outil `create_trigger`), il ne peut pas leur
+donner de dépôt : une session neuve sans dépôt se termine sans rien faire,
+avec un statut « réussi ». Procédure qui marche :
+1. `create_session` avec `source_url` = le dépôt du projet, et une première
+   consigne de vérification (méthode, Search Console, accès au site, push) ;
+2. `create_trigger` avec `persistent_session_id` = cette session, une
+   routine par mode, chaque consigne commençant par
+   `git fetch origin && git checkout main && git pull --ff-only` et finissant
+   par « ne fusionne jamais dans main » sur un site en mode `depot` ;
+3. vérifier après la première exécution planifiée qu'une branche
+   `claude/veille-<date>` est bien apparue sur le dépôt. Pas de branche = la
+   routine ne marche pas, quel que soit son statut : la recréer depuis
+   claude.ai/code/routines en choisissant le dépôt. (Un déclenchement
+   manuel par `fire_trigger` ouvre une session neuve sans dépôt : il ne
+   teste pas ce montage.)
+
 ## 5. La première semaine
 
 Avant d'automatiser quoi que ce soit, établir le point de départ :

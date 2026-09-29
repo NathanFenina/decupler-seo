@@ -137,6 +137,16 @@ l'agent `seo-manager`. Chaque exécution écrit un journal dans
 dire que la session s'est terminée sans erreur d'infrastructure, pas que le
 travail a été fait. Le rapport mensuel vérifie qu'aucune n'a manqué.
 
+**Deux façons de les créer.** Depuis claude.ai/code/routines, en
+choisissant le dépôt du projet : chaque exécution part d'une session neuve,
+clonée sur ce dépôt. Ou par l'agent (skill `seo-nouveau-projet`) : l'outil
+de création ne permet pas de choisir un dépôt, et une session neuve sans
+dépôt ne fait rien — constaté, avec un statut « réussi ». L'agent crée donc
+une session dédiée au projet, clonée sur son dépôt, et les routines
+s'exécutent dans cette session, chaque consigne commençant par repartir de
+`main` à jour. Dans les deux cas, la preuve qu'une routine marche est la
+branche qu'elle pousse, pas son statut.
+
 Trois réglages font échouer une routine s'ils sont oubliés :
 - **Réseau** : l'environnement par défaut refuse les domaines hors liste.
   Ajoutez le domaine du projet, sinon toute lecture du site renvoie 403.
