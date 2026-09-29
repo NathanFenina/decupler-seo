@@ -4,7 +4,7 @@
     python3 opportunites.py                              # Search Console, 90 jours
     python3 opportunites.py --jours 28 --top 40
     python3 opportunites.py --csv export-gsc.csv         # export requête × page
-    python3 opportunites.py --demande mots-cles.csv      # + requêtes où le site n'apparaît pas
+    python3 opportunites.py --demande mots-cles.csv      # requete,volume[,page] : la demande où le site n'apparaît pas
     python3 opportunites.py --ecrire                     # → rapports/opportunites-AAAA-MM-JJ.md
 
 Le moteur est le même pour tous les clients ; ce qui change, c'est le
@@ -58,6 +58,7 @@ ACTIONS = {
     "cannibalisation": ("Consolider : plusieurs pages se disputent la requête", 0.6, "contenu"),
     "loin": ("Créer une page dédiée ou refondre : le site n'est pas en position de gagner", 0.25, "page-neuve"),
     "a-creer": ("Créer une page : demande réelle, le site n'y apparaît pas", 0.25, "page-neuve"),
+    "invisible": ("Page publiée mais absente des résultats : revoir l'angle, le maillage, les liens", 0.35, "contenu"),
 }
 
 
@@ -143,7 +144,8 @@ def lire_gsc(jours: int, site: str | None) -> list[dict]:
             for r in gsc.requete(site, ["query", "page"], debut, fin, 25000)]
 
 
-def lire_demande(chemin: Path) -> dict[str, float]:
+def lire_demande(chemin: Path) -> dict[str, tuple[float, str]]:
+    """requête → (volume mensuel, page qui la vise si elle existe déjà)."""
     with chemin.open(encoding="utf-8-sig") as f:
         lecteur = csv.DictReader(f)
         cols = {c.lower().strip(): c for c in lecteur.fieldnames or []}
@@ -151,7 +153,9 @@ def lire_demande(chemin: Path) -> dict[str, float]:
         c_vol = next((cols[c] for c in ("volume", "search volume", "volume de recherche", "search_volume") if c in cols), None)
         if not c_req or not c_vol:
             raise SystemExit(f"✗ {chemin} : colonnes attendues « requete » et « volume »")
-        return {l[c_req].strip().lower(): _nombre(l[c_vol]) for l in lecteur if l.get(c_req)}
+        c_page = next((cols[c] for c in ("page", "url") if c in cols), None)
+        return {l[c_req].strip().lower(): (_nombre(l[c_vol]), (l.get(c_page) or "").strip() if c_page else "")
+                for l in lecteur if l.get(c_req)}
 
 
 def pages_en_mesure(delai: int) -> dict[str, str]:
@@ -179,7 +183,7 @@ def normaliser(url: str) -> str:
 # ─── Le classement ────────────────────────────────────────────────
 
 def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: int,
-            demande: dict[str, float] | None = None, en_mesure: dict[str, str] | None = None,
+            demande: dict[str, tuple[float, str]] | None = None, en_mesure: dict[str, str] | None = None,
             impressions_min: int = 30) -> dict:
     en_mesure = en_mesure or {}
     mensuel = 30 / max(jours, 1)
@@ -245,18 +249,20 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
         })
 
     connues = set(par_requete)
-    for requete, volume in (demande or {}).items():
+    for requete, (volume, page) in (demande or {}).items():
         if requete in connues or any(m.search(requete) for m in marque) or volume <= 0:
             continue
         theme, valeur = theme_de(requete, lexique)
         gain = volume * ctr_attendu(8)
-        libelle, facilite, type_journal = ACTIONS["a-creer"]
+        action = "invisible" if page else "a-creer"
+        libelle, facilite, type_journal = ACTIONS[action]
+        bloque = en_mesure.get(normaliser(page)) if page else ""
         opportunites.append({
-            "requete": requete, "page": "", "theme": theme, "valeur": valeur,
+            "requete": requete, "page": page, "theme": theme, "valeur": valeur,
             "impressions_mois": 0, "clics_mois": 0, "position": None, "ctr_pct": 0,
-            "action": "a-creer", "a_faire": libelle, "type_journal": type_journal, "pages_concurrentes": [],
+            "action": action, "a_faire": libelle, "type_journal": type_journal, "pages_concurrentes": [],
             "volume_mois": volume, "gain_clics_mois": round(gain, 1),
-            "score": round(gain * valeur * facilite, 1), "en_mesure_jusqu_au": "",
+            "score": 0.0 if bloque else round(gain * valeur * facilite, 1), "en_mesure_jusqu_au": bloque or "",
         })
 
     opportunites.sort(key=lambda o: (-o["score"], -o["gain_clics_mois"]))
@@ -349,9 +355,14 @@ def main() -> int:
         try:
             lignes, source = lire_gsc(a.jours, a.site), "Search Console"
         except Exception as exc:  # ErreurGSC, réseau : on dit quoi faire plutôt que planter
-            print(f"✗ Search Console indisponible : {exc}\n  → exportez Performances (requêtes × pages) "
-                  "et relancez avec --csv", file=sys.stderr)
-            return 1
+            if not a.demande:
+                print(f"✗ Search Console indisponible : {exc}\n  → exportez Performances (requêtes × pages) "
+                      "et relancez avec --csv", file=sys.stderr)
+                return 1
+            # Site jeune ou accès pas encore donné : la demande seule classe déjà les pages à créer.
+            print(f"  ! Search Console indisponible ({str(exc)[:80]}) : classement sur la demande seule",
+                  file=sys.stderr)
+            lignes, source = [], "demande seule (Search Console indisponible)"
     demande = lire_demande(Path(a.demande)) if a.demande else None
     delai = int(lire_valeur("mesure.delai_jours", "28") or 28)
     res = classer(lignes, lexique, motifs_marque(), a.jours, demande, pages_en_mesure(delai), a.impressions_min)

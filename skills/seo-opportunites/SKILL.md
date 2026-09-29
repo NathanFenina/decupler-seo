@@ -56,9 +56,12 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --ecrire
 - Sans API Search Console : exporter Performances en requêtes × pages et
   passer `--csv export.csv`.
 - Pour voir aussi la demande où le site **n'apparaît pas** : un CSV
-  `requete,volume` issu de DataForSEO, Ubersuggest ou Semrush, en
-  `--demande mots-cles.csv`. C'est indispensable sur un site jeune, qui a
-  encore peu d'impressions.
+  `requete,volume,page` issu de DataForSEO, Ubersuggest ou Semrush, en
+  `--demande mots-cles.csv`. La colonne `page` (facultative) indique la page
+  publiée qui vise la requête : elle distingue « page à créer » de « page
+  publiée mais invisible ». C'est indispensable sur un site jeune, qui a
+  encore peu d'impressions — et le script fonctionne alors même sans accès
+  Search Console.
 - `--jours 90` par défaut : assez pour lisser les semaines, assez court
   pour rester actuel.
 
@@ -70,6 +73,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --ecrire
 | Enrichir, page 1 | position 4 à 10 | `seo-optimisation-onpage`, `seo-maillage-interne` |
 | Renforcer, page 2 | position 11 à 20 | `seo-quick-wins` (sections manquantes) |
 | Consolider | plusieurs pages du site se partagent la requête | `seo-gsc-analyses` → `cannibalisation.md` |
+| Publiée mais invisible | la page existe, la requête ne lui donne aucune impression | `seo-optimisation-onpage`, `seo-maillage-interne`, `seo-netlinking` |
 | Créer ou refondre | au-delà de la 20e place, ou absent | `seo-benchmark` → `seo-brief` → `seo-redaction` |
 
 Le gain estimé sert à **comparer** les actions entre elles, pas à promettre

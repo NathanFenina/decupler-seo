@@ -92,10 +92,13 @@ class TestOpportunites(DossierIsole):
     def test_theme_non_couvert_et_demande(self):
         self.preparer()
         with open(self.dossier / "demande.csv", "w", newline="", encoding="utf-8") as f:
-            f.write("requete,volume\nvisa affaires arabie saoudite,900\ntva arabie saoudite,500\n")
+            f.write("requete,volume,page\nvisa affaires arabie saoudite,900,\ntva arabie saoudite,500,\n"
+                    "marque arabie prix,300,https://ex.com/marque-cout\n")
         res = self.classer("--demande", "demande.csv")
         a_creer = [o for o in res["opportunites"] if o["action"] == "a-creer"]
         self.assertEqual([o["requete"] for o in a_creer], ["visa affaires arabie saoudite"])
+        invisibles = [o["requete"] for o in res["opportunites"] if o["action"] == "invisible"]
+        self.assertEqual(invisibles, ["marque arabie prix"])
         couverture = {c["theme"]: c for c in res["couverture"]}
         self.assertIsNone(couverture["visa"]["meilleure_position"])
 
