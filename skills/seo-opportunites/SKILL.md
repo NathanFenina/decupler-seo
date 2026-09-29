@@ -81,8 +81,10 @@ un trafic : le CTR réel dépend de la SERP (AI Overview, annonces, vidéos).
 Le vrai gain se lit à J+28 dans le journal.
 
 La **couverture par thème** est souvent la partie la plus utile : un thème
-de valeur 3 marqué « non couvert » est une page ou une section qui manque au
-site, et qui passe avant toute optimisation.
+de valeur 3 marqué « aucune page » est une page ou une section qui manque au
+site, et qui passe avant toute optimisation ; « invisible » veut dire que la
+page existe mais que Google ne la montre pas. Sans Search Console, la
+position est « ? » : le rapport ne prétend pas savoir ce qu'il ne mesure pas.
 
 ## 4. Ce qu'on en fait
 

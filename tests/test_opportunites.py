@@ -102,6 +102,18 @@ class TestOpportunites(DossierIsole):
         couverture = {c["theme"]: c for c in res["couverture"]}
         self.assertIsNone(couverture["visa"]["meilleure_position"])
 
+    def test_demande_seule_sans_search_console(self):
+        # Site jeune ou accès pas encore donné : on classe, mais sans prétendre connaître les positions.
+        self.preparer()
+        with open(self.dossier / "demande.csv", "w", newline="", encoding="utf-8") as f:
+            f.write("requete,volume,page\ncreer societe riyad,400,https://ex.com/riyad\nvisa affaires,900,\n")
+        r = lancer("opportunites.py", "--demande", "demande.csv", "--json", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        res = json.loads(r.stdout)
+        actions = {o["requete"]: o["action"] for o in res["opportunites"]}
+        self.assertEqual(actions, {"creer societe riyad": "a-verifier", "visa affaires": "a-creer"})
+        self.assertFalse(res["gsc"])
+
     def test_sans_lexique_le_rapport_le_dit(self):
         self.preparer()
         (self.dossier / "memoire/lexique.csv").unlink()

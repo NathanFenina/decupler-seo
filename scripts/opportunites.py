@@ -59,6 +59,7 @@ ACTIONS = {
     "loin": ("Créer une page dédiée ou refondre : le site n'est pas en position de gagner", 0.25, "page-neuve"),
     "a-creer": ("Créer une page : demande réelle, le site n'y apparaît pas", 0.25, "page-neuve"),
     "invisible": ("Page publiée mais absente des résultats : revoir l'angle, le maillage, les liens", 0.35, "contenu"),
+    "a-verifier": ("Page publiée, position inconnue sans Search Console : vérifier puis renforcer", 0.35, "contenu"),
 }
 
 
@@ -184,7 +185,9 @@ def normaliser(url: str) -> str:
 
 def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: int,
             demande: dict[str, tuple[float, str]] | None = None, en_mesure: dict[str, str] | None = None,
-            impressions_min: int = 30) -> dict:
+            impressions_min: int = 30, gsc: bool = True) -> dict:
+    """`gsc=False` : aucune donnée Search Console. Une requête absente des
+    données ne veut alors pas dire que le site en est absent."""
     en_mesure = en_mesure or {}
     mensuel = 30 / max(jours, 1)
     par_requete: dict[str, dict] = {}
@@ -198,7 +201,7 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
             r["pages"][l["page"]] = r["pages"].get(l["page"], 0.0) + l["impressions"]
 
     opportunites, marque_total, themes = [], {"clics": 0.0, "impressions": 0.0}, defaultdict(
-        lambda: {"requetes": 0, "clics": 0.0, "impressions": 0.0, "meilleure_position": None})
+        lambda: {"requetes": 0, "clics": 0.0, "impressions": 0.0, "meilleure_position": None, "pages": set()})
     for cle, r in par_requete.items():
         if any(m.search(r["requete"]) for m in marque):
             marque_total["clics"] += r["clics"]
@@ -212,6 +215,7 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
         t["requetes"] += 1
         t["clics"] += r["clics"]
         t["impressions"] += impr
+        t["pages"].update(r["pages"])
         if position and (t["meilleure_position"] is None or position < t["meilleure_position"]):
             t["meilleure_position"] = round(position, 1)
         if impr < impressions_min:
@@ -254,7 +258,9 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
             continue
         theme, valeur = theme_de(requete, lexique)
         gain = volume * ctr_attendu(8)
-        action = "invisible" if page else "a-creer"
+        action = ("invisible" if gsc else "a-verifier") if page else "a-creer"
+        if page:
+            themes[theme]["pages"].add(page)
         libelle, facilite, type_journal = ACTIONS[action]
         bloque = en_mesure.get(normaliser(page)) if page else ""
         opportunites.append({
@@ -285,13 +291,15 @@ def classer(lignes: list[dict], lexique: list, marque: list[re.Pattern], jours: 
         p["gain_clics_mois"] = round(p["gain_clics_mois"], 1)
 
     lexique_themes = {t for t, _, _ in lexique}
-    couverture = [{"theme": t, **{k: (round(v, 1) if isinstance(v, float) else v) for k, v in d.items()}}
+    couverture = [{"theme": t, **{k: (round(v, 1) if isinstance(v, float) else len(v) if isinstance(v, set) else v)
+                                  for k, v in d.items()}}
                   for t, d in themes.items()]
     for t in sorted(lexique_themes - set(themes)):
-        couverture.append({"theme": t, "requetes": 0, "clics": 0, "impressions": 0, "meilleure_position": None})
-    couverture.sort(key=lambda c: -c["impressions"])
+        couverture.append({"theme": t, "requetes": 0, "clics": 0, "impressions": 0, "meilleure_position": None,
+                           "pages": 0})
+    couverture.sort(key=lambda c: (-c["impressions"], -c["pages"]))
 
-    return {"opportunites": opportunites, "pages": pages, "couverture": couverture,
+    return {"gsc": gsc, "opportunites": opportunites, "pages": pages, "couverture": couverture,
             "marque": {k: round(v * mensuel) for k, v in marque_total.items()},
             "en_mesure": sorted(set(o["page"] for o in opportunites if o["en_mesure_jusqu_au"]))}
 
@@ -309,7 +317,7 @@ def rapport_markdown(res: dict, nom: str, jours: int, source: str, top: int, lex
           "|---|---|---|---|---|---|---|---|"]
     for i, o in enumerate([o for o in res["opportunites"] if o["score"] > 0][:top], 1):
         page = o["page"].split("://", 1)[-1] if o["page"] else "—"
-        pos = o["position"] if o["position"] is not None else "absent"
+        pos = o["position"] if o["position"] is not None else ("absent" if res["gsc"] else "?")
         impr = o["impressions_mois"] or f"vol. {o.get('volume_mois', 0):.0f}"
         l.append(f"| {i} | {o['requete']} | {page} | {pos} | {impr} | {o['theme']} ({o['valeur']}) "
                  f"| {o['a_faire']} | {o['gain_clics_mois']} |")
@@ -319,10 +327,15 @@ def rapport_markdown(res: dict, nom: str, jours: int, source: str, top: int, lex
         l.append(f"| {p['page'].split('://', 1)[-1]} | {p['score']} | {p['gain_clics_mois']} "
                  f"| {ACTIONS[p['action_principale']][0]} | {', '.join(p['requetes'][:4])} |")
     l += ["", "## Couverture par thème", "",
-          "| Thème | Requêtes | Impressions | Clics | Meilleure position |", "|---|---|---|---|---|"]
+          "| Thème | Pages | Requêtes | Impressions | Clics | Meilleure position |", "|---|---|---|---|---|---|"]
     for c in res["couverture"]:
-        pos = c["meilleure_position"] if c["meilleure_position"] is not None else "**non couvert**"
-        l.append(f"| {c['theme']} | {c['requetes']} | {c['impressions']:.0f} | {c['clics']:.0f} | {pos} |")
+        if c["meilleure_position"] is not None:
+            pos = c["meilleure_position"]
+        elif not c["pages"]:
+            pos = "**aucune page**"
+        else:
+            pos = "invisible" if res["gsc"] else "?"
+        l.append(f"| {c['theme']} | {c['pages']} | {c['requetes']} | {c['impressions']:.0f} | {c['clics']:.0f} | {pos} |")
     l += ["", f"Marque : {res['marque']['clics']} clics et {res['marque']['impressions']} impressions par mois "
               "(hors classement)."]
     if res["en_mesure"]:
@@ -365,7 +378,8 @@ def main() -> int:
             lignes, source = [], "demande seule (Search Console indisponible)"
     demande = lire_demande(Path(a.demande)) if a.demande else None
     delai = int(lire_valeur("mesure.delai_jours", "28") or 28)
-    res = classer(lignes, lexique, motifs_marque(), a.jours, demande, pages_en_mesure(delai), a.impressions_min)
+    res = classer(lignes, lexique, motifs_marque(), a.jours, demande, pages_en_mesure(delai), a.impressions_min,
+                  gsc=bool(lignes) or bool(a.csv))
 
     if a.json:
         print(json.dumps({"source": source, "jours": a.jours, **res}, ensure_ascii=False, indent=1))
