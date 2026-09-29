@@ -118,10 +118,23 @@ def empreinte(pages: list[dict]) -> dict:
         "h2_questions_pct": _pct(sum(1 for t in h2 if t.rstrip().endswith("?")), len(h2)),
         "ouvertures": ouvertures,
         "clotures_avec_appel": sum(1 for p in pages if C.cloture_avec_appel(p)),
-        "expressions": C.ngrammes_recurrents([p.get("texte") or "" for p in pages]),
+        **expressions_et_gabarit(C.ngrammes_recurrents([p.get("texte") or "" for p in pages]), len(pages)),
         "vocabulaire": [{"mot": formes[k], "pages": docs[k], "occurrences": vocab[k]} for k in signature],
         "fragile": len(pages) < 3 or mots < 1500,
     }
+
+
+def expressions_et_gabarit(expressions: list[dict], nb_pages: int) -> dict:
+    """Sépare les tics d'écriture des phrases posées par le gabarit du site.
+
+    Une expression présente sur (presque) toutes les pages, à peu près une fois
+    par page, vient d'un bloc répété (CTA, avertissement, pied d'article) : elle
+    ne dit rien de la plume."""
+    gabarit, style = [], []
+    for x in expressions:
+        repetee = nb_pages >= 5 and x["textes"] >= 0.85 * nb_pages and x["occurrences"] <= 2 * x["textes"]
+        (gabarit if repetee else style).append(x)
+    return {"expressions": style, "gabarit": gabarit}
 
 
 def regles(e: dict, vouvoiement_config: str = "") -> list[str]:
@@ -183,7 +196,13 @@ def fichier_style(e: dict, sources: list[str], echecs: list[dict], date: str, le
     L += ["## Expressions qui reviennent", ""]
     L += [f"- « {x['expression']} » — {x['textes']} page(s), {x['occurrences']} fois" for x in e["expressions"]] \
         or ["- aucune expression récurrente détectée"]
-    L += ["", "Les reprendre quand elles portent la marque ; les éviter quand ce sont des tics.", "",
+    L += ["", "Les reprendre quand elles portent la marque ; les éviter quand ce sont des tics.", ""]
+    if e.get("gabarit"):
+        L += ["## Répété par le gabarit (hors style)", "",
+              "Présent sur presque toutes les pages, une fois par page : CTA, avertissements, blocs communs. "
+              "Ne pas l'imiter dans le texte.", ""]
+        L += [f"- « {x['expression']} » — {x['textes']} page(s)" for x in e["gabarit"]] + [""]
+    L += [
           "## Vocabulaire de la maison", "",
           ", ".join(f"{x['mot']} ({x['pages']})" for x in e["vocabulaire"]) or "—", ""]
     L += [lecture.rstrip(), "", "## Pages mesurées", ""] + [f"- {s}" for s in sources]

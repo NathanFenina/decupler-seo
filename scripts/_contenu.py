@@ -224,6 +224,8 @@ VIDES = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "me
 BLOCS = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th", "blockquote", "pre", "dd", "dt",
          "figcaption", "div", "section", "article", "main", "header", "tr", "summary", "details", "ul",
          "ol", "table", "dl", "figure", "caption", "address"}
+# Éléments en ligne dont le texte ne se colle jamais au voisin (liens, boutons, libellés).
+SEPARES = {"a", "button", "label", "option", "svg"}
 # Une classe entière (« sub-menu », « site-navigation », « cookie-banner »), pas un fragment :
 # « elementor-widget » ou « sidebar-layout » enveloppent souvent le contenu lui-même.
 _DECOR = re.compile(r"(?:[a-z0-9]+[-_]){0,2}(?:nav|navbar|navigation|menu|sidebar|breadcrumbs?|fil-ariane|"
@@ -306,6 +308,8 @@ class _Lecteur(HTMLParser):
             drapeaux.add("main")
         if tag in BLOCS or drapeaux:
             self._vider()          # le texte déjà lu appartient à la zone d'avant
+        elif tag in SEPARES:
+            self.tampon.append(" ")    # deux boutons côte à côte ne font pas un mot
         self.pile.append((tag, drapeaux))
         if tag in BLOCS:
             self.type_bloc = self._type_contextuel("p" if tag == "p" else "texte")
@@ -335,6 +339,8 @@ class _Lecteur(HTMLParser):
             return
         if tag in BLOCS or any(d for _, d in self.pile[idx:]):
             self._vider()
+        elif tag in SEPARES:
+            self.tampon.append(" ")
         del self.pile[idx:]
         if tag in BLOCS:
             self.type_bloc = self._type_contextuel("texte")

@@ -67,6 +67,18 @@ class TestEmpreinte(unittest.TestCase):
         self.assertTrue(any("La config dit tutoiement" in x for x in r))
         self.assertFalse(any("config" in x for x in M.regles(self.e, "true")))
 
+    def test_gabarit_separe_du_style(self):
+        exprs = [{"expression": "premier échange gratuit", "textes": 8, "occurrences": 9},
+                 {"expression": "registre du commerce", "textes": 8, "occurrences": 36},
+                 {"expression": "en pratique cela", "textes": 3, "occurrences": 4}]
+        r = M.expressions_et_gabarit(exprs, 8)
+        self.assertEqual([x["expression"] for x in r["gabarit"]], ["premier échange gratuit"])
+        self.assertEqual([x["expression"] for x in r["expressions"]], ["registre du commerce", "en pratique cela"])
+
+    def test_boutons_voisins_ne_se_collent_pas(self):
+        page = C.lire_html('<main><h1>T</h1><p><a href="#">WhatsApp</a><a href="#">Parler de mon projet</a></p></main>')
+        self.assertIn("WhatsApp Parler", page["texte"])
+
     def test_ouverture_types(self):
         def p(texte):
             return {"paragraphes": [texte]}
