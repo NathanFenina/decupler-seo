@@ -59,7 +59,11 @@ def lire_etat(html: str) -> dict:
 
 def ecrire_etat(html: str, etat: dict) -> str:
     texte = json.dumps(etat, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    return BALISE.sub(lambda m: m.group(1) + texte + m.group(3), html, count=1)
+    html = BALISE.sub(lambda m: m.group(1) + texte + m.group(3), html, count=1)
+    if etat.get("titre"):                            # le nom de la page suit l'état (onglet, galerie)
+        titre = etat["titre"].replace("&", "&amp;").replace("<", "&lt;")
+        html = re.sub(r"<title>[^<]*</title>", lambda m: f"<title>{titre}</title>", html, count=1)
+    return html
 
 
 def projet_de(etat: dict, pid: str, creer: bool = False) -> dict | None:
@@ -359,6 +363,10 @@ def cmd_injecter(a) -> int:
     for cle in ("session", "depot"):
         if getattr(a, cle):
             p[cle] = getattr(a, cle)
+    if a.titre:
+        etat["titre"] = a.titre
+    if a.livrables:
+        p["livrables"] = json.loads(Path(a.livrables).read_text(encoding="utf-8"))
     ajoutees = 0
     if a.actions:
         nouvelles = json.loads(Path(a.actions).read_text(encoding="utf-8"))
@@ -367,6 +375,31 @@ def cmd_injecter(a) -> int:
     page.write_text(ecrire_etat(html, etat), encoding="utf-8")
     print(f"  ✓ {page} · projet {a.projet_id} · {ajoutees} action(s) ajoutée(s), "
           f"{sum(1 for x in p.get('actions', []) if x.get('statut') == 'proposee')} à valider")
+    return 0
+
+
+def cmd_ajouter(a) -> int:
+    """Consigne une action décidée ou faite hors des propositions du mois (depuis n'importe quelle conversation)."""
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = projet_de(etat, a.projet_id, creer=True)
+    date = dt.date.today().isoformat()
+    action = {"id": id_action(a.projet_id, "manuel", a.page or "", a.titre[:60]), "titre": a.titre, "type": a.type,
+              "page": a.page or "", "pourquoi": a.pourquoi or "", "gain": "", "effort": a.effort, "source": "conversation",
+              "mois": date[:7], "statut": a.statut, "maj": date}
+    if a.lien:
+        action["lien"] = a.lien
+    if a.note:
+        action["note"] = a.note
+    existante = next((x for x in p.setdefault("actions", []) if x["id"] == action["id"]), None)
+    if existante:
+        existante.update({k: v for k, v in action.items() if v})
+    else:
+        p["actions"].append(action)
+    etat["maj"] = date
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ {action['id']} [{a.statut}] {a.titre}")
     return 0
 
 
@@ -422,7 +455,21 @@ def main() -> int:
     p.add_argument("--actions")
     p.add_argument("--session", help="lien de la conversation dédiée au projet")
     p.add_argument("--depot", help="owner/repo")
+    p.add_argument("--titre", help="nom de la page (ex. « Pilotage Atlas Conseil »)")
+    p.add_argument("--livrables", help="JSON [{titre, url, note}] : pages de travail et comptes rendus liés")
     p.set_defaults(f=cmd_injecter)
+    p = sp.add_parser("ajouter", help="consigner une action faite ou décidée dans une conversation")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--titre", required=True)
+    p.add_argument("--type", default="optimisation", choices=["decision", "optimisation", "contenu", "technique"])
+    p.add_argument("--statut", default="faite", choices=STATUTS)
+    p.add_argument("--page")
+    p.add_argument("--pourquoi")
+    p.add_argument("--effort", default="M")
+    p.add_argument("--lien")
+    p.add_argument("--note")
+    p.set_defaults(f=cmd_ajouter)
     p = sp.add_parser("etat", help="actions d'un projet")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)

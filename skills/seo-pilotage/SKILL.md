@@ -5,8 +5,10 @@ description: Tableau de bord partagé de plusieurs projets et leur roadmap valid
 
 # Pilotage — la roadmap validée
 
-Le tableau de bord est une page publiée (Artifact) commune à tous les projets
-suivis. Son adresse est dans `decupler-seo.config.yml` (`pilotage.tableau_de_bord`),
+Chaque projet a **une seule** page de suivi publiée (Artifact) : roadmap,
+avancement, chiffres, cartographie, liens vers les livrables. Toutes les
+conversations et toutes les routines du projet passent par elle ; c'est ce qui
+évite de faire deux fois la même chose quand on jongle entre les conversations. Son adresse est dans `decupler-seo.config.yml` (`pilotage.tableau_de_bord`),
 l'identifiant du projet dans `pilotage.projet_id`. La page garde son état dans un
 bloc JSON : chiffres, cartographie et **actions** de chaque projet. Le client y
 clique « Valider » ou « Refuser » ; les routines n'exécutent que ce qui est validé.
@@ -25,6 +27,17 @@ Statuts d'une action : `proposee` → `validee` (ou `refusee`) → `en-cours` �
    l'étape 2, republier une fois.
 
 Ne jamais réécrire la page à la main : seul le bloc `etat` change.
+
+## Règle anti-doublon — dans toute conversation du projet
+
+- **Avant** de lancer une tâche : lire la page et vérifier qu'elle n'y est pas
+  déjà `en-cours` ou `faite` ; si oui, le dire au lieu de refaire.
+- **Après** toute tâche livrée, même hors roadmap (demandée en conversation) :
+  `pilotage.py ajouter --projet-id <id> --titre "<ce qui a été fait>" --statut faite --lien <PR ou URL>`,
+  puis republier. Une tâche décidée mais pas encore faite : `--statut validee`.
+- Les pages de compte rendu (livrables écrits à la main) restent des livrables :
+  on les relie depuis la page de suivi (`injecter --livrables`), on n'y écrit
+  pas l'état des actions.
 
 ## À l'ouverture de la conversation du projet
 

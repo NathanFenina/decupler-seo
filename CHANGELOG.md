@@ -1,5 +1,14 @@
 # Journal des versions
 
+## 3.5.1
+
+### Modifié
+
+- Une page de suivi par projet (titre propre, onglets masqués pour un seul
+  projet, section « Livrables et comptes rendus ») ; `pilotage.py ajouter`
+  consigne une action faite ou décidée dans n'importe quelle conversation ;
+  règle anti-doublon dans `seo-pilotage`.
+
 ## 3.5.0
 
 ### Ajouté

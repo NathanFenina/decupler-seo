@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-50 skills · 15 agents · 30 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 306 tests
+50 skills · 15 agents · 30 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 307 tests
 
 ---
 

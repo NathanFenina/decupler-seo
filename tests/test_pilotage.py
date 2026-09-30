@@ -114,6 +114,21 @@ class TestCommandes(DossierIsole):
         etat = P.lire_etat(page.read_text(encoding="utf-8"))
         self.assertEqual(etat["projets"][0]["nom"], "Atlas Conseil")
 
+    def test_titre_et_action_consignee_depuis_une_conversation(self):
+        page = self.dossier / "tableau.html"
+        page.write_text(GABARIT, encoding="utf-8")
+        r = lancer("pilotage.py", "injecter", "--html", "tableau.html", "--projet-id", "atlas", "--titre", "Pilotage Atlas Conseil",
+                   cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        for _ in range(2):                                   # consignée deux fois : une seule ligne
+            r = lancer("pilotage.py", "ajouter", "--html", "tableau.html", "--projet-id", "atlas", "--titre",
+                       "Refonte de la page TVA", "--statut", "faite", "--lien", "https://exemple.test/pr/3", cwd=self.dossier)
+            self.assertEqual(r.returncode, 0, r.stderr)
+        html = page.read_text(encoding="utf-8")
+        self.assertIn("<title>Pilotage Atlas Conseil</title>", html)
+        actions = P.lire_etat(html)["projets"][0]["actions"]
+        self.assertEqual([(a["statut"], a["source"]) for a in actions], [("faite", "conversation")])
+
 
 if __name__ == "__main__":
     unittest.main()

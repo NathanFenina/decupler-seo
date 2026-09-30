@@ -91,7 +91,7 @@ td.n{font-family:var(--chiffre);font-variant-numeric:tabular-nums;white-space:no
 (function(){
 "use strict";
 const LIBELLES={proposee:"À valider",validee:"Validée",["en-cours"]:"En cours",faite:"Faite",refusee:"Refusée"};
-const TYPES={decision:"Décision",optimisation:"Optimisation",contenu:"Contenu"};
+const TYPES={decision:"Décision",optimisation:"Optimisation",contenu:"Contenu",technique:"Technique"};
 const MOTEURS={openai:"ChatGPT",gemini:"Gemini",claude:"Claude"};
 const brut=document.getElementById("etat").textContent;
 let etat;try{etat=JSON.parse(brut)}catch(e){etat={maj:"",projets:[]}}
@@ -177,15 +177,16 @@ function projet(p){
     el("section",{class:"bloc","aria-labelledby":"t-chiffres"},el("h2",{id:"t-chiffres",texte:"Chiffres"}),chiffres(p),el("div",{class:"courbe"},el("h3",{texte:"Clics par semaine"}),courbe(p.serie)),
       p.kpis&&p.kpis.mois_cartographie?el("p",{class:"meta",texte:"Cartographie et relevé IA : "+p.kpis.mois_cartographie+" · chiffres Search Console au "+(p.maj||etat.maj)}):null),
     cartographie(p),
+    p.livrables&&p.livrables.length?el("section",{class:"bloc"},el("h2",{texte:"Livrables et comptes rendus"}),el("ul",{class:"routines"},...p.livrables.map(l=>el("li",{},el("a",{href:l.url,target:"_blank",rel:"noopener",texte:l.titre}),l.note?el("span",{texte:l.note}):null)))):null,
     p.routines&&p.routines.length?el("section",{class:"bloc"},el("h2",{texte:"Routines"}),el("ul",{class:"routines"},...p.routines.map(r=>el("li",{},el("strong",{texte:r.nom}),el("span",{texte:r.quand}))))):null);
 }
 function rendre(){
   const total=etat.projets.reduce((s,p)=>s+aValider(p),0);
-  const tete=el("header",{class:"tete"},el("div",{},el("h1",{texte:"Pilotage SEO"}),el("p",{texte:(etat.projets.length?etat.projets.length+" site(s) · "+total+" action(s) à valider":"Aucun site pour l'instant")+(etat.maj?" · mis à jour le "+etat.maj:"")})),el("div",{id:"enreg",class:"enreg","aria-live":"polite"}));
+  const tete=el("header",{class:"tete"},el("div",{},el("h1",{texte:etat.titre||"Pilotage SEO"}),el("p",{texte:(etat.projets.length?(etat.projets.length>1?etat.projets.length+" site(s) · ":"")+total+" action(s) à valider":"Aucun site pour l'instant")+(etat.maj?" · mis à jour le "+etat.maj:"")})),el("div",{id:"enreg",class:"enreg","aria-live":"polite"}));
   const onglets=el("div",{class:"onglets",role:"tablist","aria-label":"Sites"},...etat.projets.map(p=>el("button",{class:"onglet",role:"tab",type:"button","aria-selected":String(p.id===courant),"aria-controls":"panneau-"+p.id,
     onclick:()=>{courant=p.id;try{localStorage.setItem("pilotage-onglet",p.id)}catch(e){}rendre()}},p.nom||p.id,aValider(p)?el("span",{class:"pastille",texte:aValider(p)}):null)));
   const p=etat.projets.find(x=>x.id===courant);
-  app.replaceChildren(tete,lectureSeule?el("p",{class:"lecture-seule",texte:"Lecture seule : vous pouvez consulter la roadmap, pas la modifier."}):"",etat.projets.length?onglets:"",p?projet(p):el("p",{class:"vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
+  app.replaceChildren(tete,lectureSeule?el("p",{class:"lecture-seule",texte:"Lecture seule : vous pouvez consulter la roadmap, pas la modifier."}):"",etat.projets.length>1?onglets:"",p?projet(p):el("p",{class:"vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
   if(enAttente)dire("Modifications en attente d'enregistrement…");
 }
 let artifact=null;
@@ -196,7 +197,7 @@ function documentComplet(){
   const json=JSON.stringify(etat).replace(/<\//g,"<\\/");
   const police=document.querySelector('link[href*="fonts.googleapis.com"]');
   return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'
-    +'<title>Pilotage SEO</title>\n'+(police?'<link rel="stylesheet" href="'+police.getAttribute("href").replace(/&/g,"&amp;")+'">\n':"")
+    +'<title>'+(etat.titre||"Pilotage SEO").replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</title>\n'+(police?'<link rel="stylesheet" href="'+police.getAttribute("href").replace(/&/g,"&amp;")+'">\n':"")
     +'<style id="css">'+css+'</style>\n<main id="app"><p class="vide">Chargement du tableau de bord…</p></main>\n'
     +'<script type="application/json" id="etat">'+json+'<\/script>\n<script id="code">'+code+'<\/script></body></html>';
 }
