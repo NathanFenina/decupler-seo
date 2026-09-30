@@ -16,6 +16,15 @@ def l(cle, valeur, clics, impr, pos=5.0):
 
 
 class TestPeriodes(unittest.TestCase):
+    def test_runs_comptes_depuis_les_branches(self):
+        import rapport
+        refs = ["claude/veille-2026-09-30", "contenu/2026-09-28", "claude/optimisation-2026-10-01",
+                "main", "claude/meta-accueil"]
+        self.assertEqual(rapport.runs_des_branches(refs),
+                         ["2026-09-30-veille.md", "2026-09-28-contenu.md", "2026-10-01-optimisation.md"])
+        b = rapport.bilan_runs(rapport.runs_des_branches(refs) + ["2026-09-30-veille.md"], "2026-09")
+        self.assertEqual(b["trouves"], {"veille": 2, "contenu": 1})
+
     def test_bornes_et_decalages(self):
         self.assertEqual(rapport.bornes("2026-02"), ("2026-02-01", "2026-02-28"))
         self.assertEqual(rapport.decaler("2026-01", -1), "2025-12")

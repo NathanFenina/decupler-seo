@@ -26,6 +26,7 @@ import csv
 import datetime as dt
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -104,6 +105,31 @@ def bilan_journal(journal: list[dict], mois: str) -> dict:
             "pertes": verdicts.get("perte", 0), "insuffisants": verdicts.get("insuffisant", 0),
             "pertes_detail": [{"id": l.get("id"), "url": l.get("url"), "type": l.get("type")}
                               for l in mesurees if l["verdict"] == "perte"]}
+
+
+BRANCHE_RUN = re.compile(r"(?:^|/)(veille|optimisation|contenu|rapport)[-/](\d{4}-\d\d-\d\d)$")
+
+
+def runs_des_branches(refs: list[str]) -> list[str]:
+    """Branches poussées par les routines (claude/veille-AAAA-MM-JJ, contenu/AAAA-MM-JJ…) → noms de journaux.
+
+    Chaque routine travaille sur sa propre branche : son journal de run n'arrive
+    sur la branche principale qu'à la fusion. La branche prouve déjà l'exécution."""
+    noms = []
+    for ref in refs:
+        m = BRANCHE_RUN.search(ref.strip())
+        if m:
+            noms.append(f"{m.group(2)}-{m.group(1)}.md")
+    return noms
+
+
+def branches_distantes(racine: Path) -> list[str]:
+    try:
+        sortie = subprocess.run(["git", "-C", str(racine), "ls-remote", "--heads", "origin"],
+                                capture_output=True, text=True, timeout=60).stdout
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return [ligne.split("refs/heads/", 1)[-1] for ligne in sortie.splitlines() if "refs/heads/" in ligne]
 
 
 def bilan_runs(noms: list[str], mois: str) -> dict:
@@ -212,7 +238,7 @@ def collecter(mois: str, site: str | None) -> dict:
             "requetes": ecarts(req_prec, req, "requete"),
             "requetes_nouvelles": requetes_nouvelles(req_prec, req),
             "journal": bilan_journal(journal, mois),
-            "runs": bilan_runs(noms, mois),
+            "runs": bilan_runs(sorted(set(noms) | set(runs_des_branches(branches_distantes(racine)))), mois),
             "a_valider": a_valider(fichier_av.read_text(encoding="utf-8")) if fichier_av.is_file() else 0,
             "cartographie": cartographie(racine, mois)}
 

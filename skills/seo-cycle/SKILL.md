@@ -232,9 +232,15 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
 7. **Opportunités** : `opportunites.py --ecrire`, et dans le rapport les
    cinq premières actions, les thèmes de valeur 3 non couverts, et ce qui a
    changé depuis le classement du mois précédent.
-8. **Vérifier les routines** : compter les fichiers de `rapports/runs/` du
-   mois. Environ 30 veilles, 4 optimisations, 4 contenus attendus. Toute
-   absence est signalée en tête du rapport.
+8. **Vérifier les routines** : `rapport.py` compte les journaux de
+   `rapports/runs/` **et** les branches poussées par les routines
+   (`claude/veille-AAAA-MM-JJ`, `claude/optimisation-…`, `contenu/…`) : une
+   routine travaille sur sa branche, son journal n'atteint la branche
+   principale qu'à la fusion. Environ 30 veilles, 4 optimisations, 4 contenus
+   attendus. Toute absence est signalée en tête du rapport. Recopier ensuite
+   dans la branche du rapport les journaux de veille du mois (`git show
+   origin/claude/veille-<date>:rapports/runs/<date>-veille.md`), pour qu'ils
+   arrivent sur la branche principale avec lui.
 
 ## Le journal de run — obligatoire, dans tous les modes
 
