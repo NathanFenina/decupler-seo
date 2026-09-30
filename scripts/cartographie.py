@@ -406,13 +406,29 @@ def fusionner(existantes: list[dict], propositions: list[dict], date: str,
 
 
 def doublons(lignes: list[dict]) -> dict[str, list[str]]:
-    """Mots-clés principaux portés par plusieurs lignes : la cannibalisation annoncée."""
-    par_mc: dict[str, list[str]] = {}
+    """Mots-clés principaux portés par plusieurs lignes d'une même langue : la cannibalisation annoncée.
+
+    La page FR et la page EN d'un même sujet peuvent partager un mot-clé (un nom
+    de marque, un terme anglais) : ce sont deux résultats de recherche distincts."""
+    par_mc: dict[tuple[str, str], list[str]] = {}
     for l in lignes:
         mc = normaliser_requete(l.get("mot_cle_principal", ""))
         if mc:
-            par_mc.setdefault(mc, []).append(chemin_de(l["url"]) if l.get("url") else "(à créer)")
-    return {mc: pages for mc, pages in par_mc.items() if len(pages) > 1}
+            cle = ((l.get("langue") or "").lower(), mc)
+            par_mc.setdefault(cle, []).append(chemin_de(l["url"]) if l.get("url") else "(à créer)")
+    resultat: dict[str, list[str]] = {}
+    for (langue, mc), pages in par_mc.items():
+        if len(pages) > 1:
+            resultat[mc if mc not in resultat else f"{mc} ({langue})"] = pages
+    return resultat
+
+
+def hors_sitemap(propositions: list[dict], urls_sitemap: list[str]) -> tuple[list[dict], int]:
+    """Écarte les pages vues par Search Console mais absentes du sitemap (anciennes adresses redirigées,
+    paramètres, pages supprimées) : elles n'ont rien à faire dans la cartographie."""
+    connues = {normaliser_url(u) for u in urls_sitemap}
+    gardees = [p for p in propositions if p.get("_source") != "gsc" or normaliser_url(p.get("url", "")) in connues]
+    return gardees, len(propositions) - len(gardees)
 
 
 # ─── Initialiser : collecte ───────────────────────────────────────
@@ -474,8 +490,11 @@ def cmd_initialiser(a) -> int:
         if url_sitemap:
             try:
                 urls = lire_sitemap(url_sitemap, a.sitemap_max)
+                propositions, ecartees = hors_sitemap(propositions, urls)
                 propositions += [{"url": u, "statut": "existante", "_source": "sitemap"} for u in urls]
-                print(f"  ✓ sitemap : {len(urls)} page(s)")
+                print(f"  ✓ sitemap : {len(urls)} page(s)"
+                      + (f" · {ecartees} adresse(s) vue(s) par Search Console mais hors sitemap, écartée(s)"
+                         if ecartees else ""))
             except Exception as exc:
                 print(f"  ! sitemap injoignable ({url_sitemap}) : {str(exc)[:80]}", file=sys.stderr)
 

@@ -152,6 +152,19 @@ class TestCalculsPurs(unittest.TestCase):
                   {"url": "", "mot_cle_principal": "sci"}]
         self.assertEqual(carto.doublons(lignes), {"tva": ["/a", "/b"]})
 
+    def test_meme_mot_cle_dans_deux_langues_n_est_pas_une_cannibalisation(self):
+        lignes = [{"url": "https://a.example/qui-sommes-nous/", "mot_cle_principal": "Atlas Conseil", "langue": "fr"},
+                  {"url": "https://a.example/en/about-us/", "mot_cle_principal": "atlas conseil", "langue": "en"}]
+        self.assertEqual(carto.doublons(lignes), {})
+
+    def test_adresses_hors_sitemap_ecartees(self):
+        props = [{"url": "https://www.a.example/pages/ancienne/", "_source": "gsc"},
+                 {"url": "https://a.example/tva", "_source": "gsc"},
+                 {"url": "", "_source": "calendrier"}]
+        gardees, n = carto.hors_sitemap(props, ["https://a.example/tva/"])
+        self.assertEqual(n, 1)
+        self.assertEqual([p["url"] for p in gardees], ["https://a.example/tva", ""])
+
     def test_sitemap_et_calendrier(self):
         xml = ("<urlset><url><loc>https://a.example/x?a=1&amp;b=2</loc><image:image><image:loc>https://a.example/i.jpg"
                "</image:loc></image:image></url></urlset>")
