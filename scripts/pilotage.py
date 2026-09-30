@@ -15,12 +15,12 @@ bloc : jamais au reste de la page.
     python3 pilotage.py proposer --mois 2026-10 --sortie donnees/actions-2026-10.json
 
     # 3. Les reporter dans la page (lue auparavant avec l'outil Artifact)
-    python3 pilotage.py injecter --html tableau.html --projet-id tasis \\
+    python3 pilotage.py injecter --html tableau.html --projet-id atlas \\
         --donnees donnees/pilotage.json --actions donnees/actions-2026-10.json
 
     # 4. Ce qui est validé pour ce projet, et le noter une fois fait
-    python3 pilotage.py etat --html tableau.html --projet-id tasis --statut validee
-    python3 pilotage.py marquer --html tableau.html --projet-id tasis --id a1b2c3d4 \\
+    python3 pilotage.py etat --html tableau.html --projet-id atlas --statut validee
+    python3 pilotage.py marquer --html tableau.html --projet-id atlas --id a1b2c3d4 \\
         --statut faite --lien https://github.com/…/pull/12
 
 Une action validée n'est jamais reproposée ni écrasée : l'injection ajoute les
