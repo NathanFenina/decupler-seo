@@ -1,0 +1,216 @@
+<title>Pilotage SEO</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style id="css">
+/* Console de pilotage : une bande par site, la roadmap à valider en premier, les chiffres ensuite. */
+:root{
+  --fond:#f3f4f1;--carte:#ffffff;--encre:#17211d;--doux:#5b6661;--trait:#dfe3de;--trait-fort:#c7cdc7;
+  --accent:#2f5e52;--accent-doux:#e3ece8;--attente:#9a5b12;--attente-doux:#f7ecdc;--ok:#2d6a3e;--ok-doux:#e2efe5;
+  --non:#8f2f2b;--non-doux:#f4e3e1;--info:#2c4f7c;--info-doux:#e3eaf4;
+  --titre:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --texte:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --chiffre:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fond:#121715;--carte:#1a211e;--encre:#e7ece9;--doux:#9aa6a0;--trait:#2a332f;--trait-fort:#3a4540;
+  --accent:#86c2ae;--accent-doux:#20302a;--attente:#e0a45a;--attente-doux:#342817;--ok:#84c795;--ok-doux:#1d2d22;
+  --non:#e39590;--non-doux:#3a2220;--info:#9dbbe6;--info-doux:#1e2837;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --fond:#121715;--carte:#1a211e;--encre:#e7ece9;--doux:#9aa6a0;--trait:#2a332f;--trait-fort:#3a4540;
+  --accent:#86c2ae;--accent-doux:#20302a;--attente:#e0a45a;--attente-doux:#342817;--ok:#84c795;--ok-doux:#1d2d22;
+  --non:#e39590;--non-doux:#3a2220;--info:#9dbbe6;--info-doux:#1e2837;color-scheme:dark}
+body{background:var(--fond);color:var(--encre);font:15px/1.5 var(--texte)}
+#app{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--titre);margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:1.9rem;font-weight:700}
+h2{font-size:1.25rem;font-weight:600}
+h3{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--doux)}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tete{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+.tete p{margin:4px 0 0;color:var(--doux)}
+.enreg{font-size:.85rem;color:var(--doux);min-height:1.2em}
+.onglets{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--trait);padding-bottom:12px}
+.onglet{font:600 .95rem var(--titre);letter-spacing:.02em;border:1px solid var(--trait-fort);background:var(--carte);color:var(--encre);border-radius:6px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.onglet[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--carte)}
+.pastille{font:500 .75rem var(--chiffre);background:var(--attente-doux);color:var(--attente);border-radius:10px;padding:1px 7px}
+.onglet[aria-selected="true"] .pastille{background:var(--carte);color:var(--accent)}
+.projet{display:grid;gap:20px}
+.bandeau{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.liens{display:flex;flex-wrap:wrap;gap:12px;font-size:.9rem}
+.bloc{background:var(--carte);border:1px solid var(--trait);border-radius:8px;padding:16px;display:grid;gap:12px;min-width:0}
+.chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.chiffre{display:grid;gap:2px;padding:12px;border-left:3px solid var(--trait-fort)}
+.chiffre b{font:500 1.6rem var(--chiffre);font-variant-numeric:tabular-nums}
+.chiffre span{font-size:.85rem;color:var(--doux)}
+.var-plus{color:var(--ok)}.var-moins{color:var(--non)}
+.courbe svg{width:100%;height:auto;display:block}
+.filtres{display:flex;flex-wrap:wrap;gap:6px}
+.filtre{font:500 .85rem var(--texte);border:1px solid var(--trait-fort);background:transparent;color:var(--encre);border-radius:14px;padding:3px 10px;cursor:pointer}
+.filtre[aria-pressed="true"]{background:var(--encre);color:var(--fond);border-color:var(--encre)}
+.actions{display:grid;gap:10px;list-style:none;margin:0;padding:0}
+.action{display:grid;grid-template-columns:1fr auto;gap:8px 16px;padding:12px;border:1px solid var(--trait);border-radius:6px;border-left:4px solid var(--trait-fort)}
+.action[data-statut="proposee"]{border-left-color:var(--attente)}
+.action[data-statut="validee"],.action[data-statut="en-cours"]{border-left-color:var(--info)}
+.action[data-statut="faite"]{border-left-color:var(--ok)}
+.action[data-statut="refusee"]{border-left-color:var(--non);opacity:.75}
+.action .corps{display:grid;gap:4px;min-width:0}
+.action .titre{font-weight:600}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.85rem;color:var(--doux)}
+.meta code{font:.8rem var(--chiffre)}
+.type{font:600 .72rem var(--titre);text-transform:uppercase;letter-spacing:.08em;border-radius:4px;padding:1px 6px;background:var(--accent-doux);color:var(--accent)}
+.type[data-type="decision"]{background:var(--attente-doux);color:var(--attente)}
+.type[data-type="contenu"]{background:var(--info-doux);color:var(--info)}
+.statut{font:500 .8rem var(--texte)}
+.boutons{display:flex;flex-wrap:wrap;gap:6px;align-items:start;justify-content:end}
+.btn{font:600 .85rem var(--texte);border-radius:6px;padding:6px 12px;cursor:pointer;border:1px solid var(--trait-fort);background:var(--carte);color:var(--encre)}
+.btn.oui{background:var(--accent);border-color:var(--accent);color:var(--carte)}
+.btn.non{color:var(--non)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.note{grid-column:1/-1;display:flex;gap:8px}
+.note input{flex:1;min-width:0;font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--trait-fort);border-radius:6px;background:var(--fond);color:var(--encre)}
+.vide{color:var(--doux);font-style:italic;margin:0}
+.table{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--trait);vertical-align:top}
+th{font:600 .75rem var(--titre);text-transform:uppercase;letter-spacing:.06em;color:var(--doux)}
+td.n{font-family:var(--chiffre);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ia{display:flex;gap:4px;flex-wrap:wrap}
+.ia i{font:500 .72rem var(--chiffre);font-style:normal;border-radius:4px;padding:0 5px;background:var(--trait);color:var(--doux)}
+.ia i.cite{background:var(--ok-doux);color:var(--ok)}
+.ia i.nomme{background:var(--info-doux);color:var(--info)}
+.routines{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:.9rem}
+.routines li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--trait);padding-bottom:6px}
+.routines li span{color:var(--doux)}
+.lecture-seule{background:var(--info-doux);color:var(--info);border-radius:6px;padding:8px 12px;font-size:.9rem}
+@media (max-width:560px){.action{grid-template-columns:1fr}.boutons{justify-content:start}h1{font-size:1.5rem}}
+@media (prefers-reduced-motion:no-preference){.action{transition:border-color .2s}}
+</style>
+<main id="app"><p class="vide">Chargement du tableau de bord…</p></main>
+<script type="application/json" id="etat">{"maj":"","projets":[]}</script>
+<script id="code">
+(function(){
+"use strict";
+const LIBELLES={proposee:"À valider",validee:"Validée",["en-cours"]:"En cours",faite:"Faite",refusee:"Refusée"};
+const TYPES={decision:"Décision",optimisation:"Optimisation",contenu:"Contenu"};
+const MOTEURS={openai:"ChatGPT",gemini:"Gemini",claude:"Claude"};
+const brut=document.getElementById("etat").textContent;
+let etat;try{etat=JSON.parse(brut)}catch(e){etat={maj:"",projets:[]}}
+let courant=null,filtre="proposee",lectureSeule=false,minuteur=null,enAttente=false;
+try{courant=(location.hash||"").slice(1)||localStorage.getItem("pilotage-onglet")}catch(e){}
+if(!etat.projets.some(p=>p.id===courant))courant=etat.projets[0]&&etat.projets[0].id;
+const app=document.getElementById("app");
+const el=(t,a,...enfants)=>{const n=document.createElement(t);for(const k in a||{}){if(k==="texte")n.textContent=a[k];else if(k.startsWith("on"))n.addEventListener(k.slice(2),a[k]);else if(a[k]!==undefined&&a[k]!==null&&a[k]!==false)n.setAttribute(k,a[k])}for(const c of enfants.flat())if(c!=null)n.append(c.nodeType?c:document.createTextNode(String(c)));return n};
+const RTL=/([\u0590-\u08FF][\u0590-\u08FF\s\d٪%،؟.-]*[\u0590-\u08FF]|[\u0590-\u08FF])/;
+const bidi=t=>{const n=document.createDocumentFragment();String(t||"").split(RTL).forEach((m,i)=>{if(!m)return;n.append(i%2?el("bdi",{dir:"rtl",texte:m}):document.createTextNode(m))});return n};
+const fr=n=>n==null||n===""?"—":Number(n).toLocaleString("fr-FR");
+const pos=n=>n==null?"—":Number(n).toLocaleString("fr-FR",{maximumFractionDigits:1});
+const aValider=p=>(p.actions||[]).filter(a=>a.statut==="proposee").length;
+function dire(msg){const z=document.getElementById("enreg");if(z)z.textContent=msg}
+function courbe(serie){
+  if(!serie||serie.length<2)return el("p",{class:"vide",texte:"Moins de deux semaines de données Search Console : la courbe apparaît dès la deuxième semaine."});
+  const L=640,H=140,m={g:36,d:12,h:12,b:26},max=Math.max(1,...serie.map(s=>s.clics));
+  const x=i=>m.g+i*(L-m.g-m.d)/(serie.length-1),y=v=>H-m.b-(v/max)*(H-m.h-m.b);
+  const ns="http://www.w3.org/2000/svg",svg=document.createElementNS(ns,"svg");
+  svg.setAttribute("viewBox",`0 0 ${L} ${H}`);svg.setAttribute("role","img");
+  svg.setAttribute("aria-label","Clics par semaine sur les 12 dernières semaines, maximum "+max);
+  const ajout=(t,a)=>{const n=document.createElementNS(ns,t);for(const k in a)n.setAttribute(k,a[k]);svg.append(n);return n};
+  [0,.5,1].forEach(f=>{const v=Math.round(max*f),yy=y(v);ajout("line",{x1:m.g,x2:L-m.d,y1:yy,y2:yy,stroke:"var(--trait)","stroke-width":1});
+    ajout("text",{x:m.g-6,y:yy+4,"text-anchor":"end","font-size":11,fill:"var(--doux)","font-family":"var(--chiffre)"}).textContent=v});
+  const pts=serie.map((s,i)=>`${x(i)},${y(s.clics)}`).join(" ");
+  ajout("polygon",{points:`${x(0)},${y(0)} ${pts} ${x(serie.length-1)},${y(0)}`,fill:"var(--accent-doux)"});
+  ajout("polyline",{points:pts,fill:"none",stroke:"var(--accent)","stroke-width":2,"stroke-linejoin":"round"});
+  const der=serie[serie.length-1];ajout("circle",{cx:x(serie.length-1),cy:y(der.clics),r:4,fill:"var(--accent)"});
+  [0,serie.length-1].forEach(i=>ajout("text",{x:x(i),y:H-6,"text-anchor":i?"end":"start","font-size":11,fill:"var(--doux)"}).textContent="sem. du "+serie[i].semaine.slice(8,10)+"/"+serie[i].semaine.slice(5,7));
+  return svg;
+}
+function chiffres(p){
+  const k=p.kpis||{},v=k.clics_4s_prec?Math.round((k.clics_4s-k.clics_4s_prec)/k.clics_4s_prec*100):null;
+  const tuile=(val,lib,extra)=>el("div",{class:"chiffre"},el("b",{texte:val}),el("span",{},lib,extra||""));
+  return el("div",{class:"chiffres"},
+    tuile(fr(k.clics_4s),"clics sur 4 semaines ",v==null?"":el("strong",{class:v>=0?"var-plus":"var-moins",texte:(v>=0?"+":"")+v+" %"})),
+    tuile(fr(k.impressions_4s),"impressions sur 4 semaines"),
+    tuile(k.top_10==null?"—":fr(k.top_10)+(k.pages_suivies?"/"+fr(k.pages_suivies):""),"pages en top 10 sur leur mot-clé"),
+    tuile(k.prompts||"—","prompts principaux où le site est cité"));
+}
+function carteAction(p,a){
+  const li=el("li",{class:"action","data-statut":a.statut});
+  const meta=el("div",{class:"meta"},el("span",{class:"type","data-type":a.type,texte:TYPES[a.type]||a.type}),
+    a.page?el("code",{texte:a.page}):null,a.gain?el("span",{texte:a.gain}):null,a.effort?el("span",{texte:"effort "+a.effort}):null,
+    el("span",{class:"statut",texte:LIBELLES[a.statut]+(a.maj?" · "+a.maj:"")}));
+  const corps=el("div",{class:"corps"},el("div",{class:"titre"},bidi(a.titre)),a.pourquoi?el("div",{class:"meta"},bidi(a.pourquoi)):null,meta,
+    a.note?el("div",{class:"meta",texte:"Note : "+a.note}):null,a.lien?el("a",{href:a.lien,target:"_blank",rel:"noopener",texte:"Voir le résultat"}):null);
+  const b=el("div",{class:"boutons"});
+  const changer=s=>()=>{const n=document.getElementById("note-"+a.id);if(n&&n.value.trim())a.note=n.value.trim();a.statut=s;a.maj=new Date().toISOString().slice(0,10);programmer();rendre()};
+  if(a.statut==="proposee"){b.append(el("button",{class:"btn oui",type:"button",disabled:lectureSeule,onclick:changer("validee"),texte:"Valider"}),
+    el("button",{class:"btn non",type:"button",disabled:lectureSeule,onclick:changer("refusee"),texte:"Refuser"}))}
+  else if(a.statut==="validee"||a.statut==="refusee"){b.append(el("button",{class:"btn",type:"button",disabled:lectureSeule,onclick:changer("proposee"),texte:"Remettre à valider"}))}
+  li.append(corps,b);
+  if(a.statut==="proposee"&&!lectureSeule)li.append(el("div",{class:"note"},el("input",{id:"note-"+a.id,type:"text",placeholder:"Consigne pour la routine (facultatif)","aria-label":"Consigne pour "+a.titre,value:a.note||""})));
+  return li;
+}
+function roadmap(p){
+  const toutes=p.actions||[],compte=s=>toutes.filter(a=>a.statut===s).length;
+  const f=el("div",{class:"filtres",role:"group","aria-label":"Filtrer par statut"},
+    ...Object.keys(LIBELLES).map(s=>el("button",{class:"filtre",type:"button","aria-pressed":String(filtre===s),onclick:()=>{filtre=s;rendre()},texte:`${LIBELLES[s]} (${compte(s)})`})));
+  const liste=toutes.filter(a=>a.statut===filtre);
+  return el("section",{class:"bloc","aria-labelledby":"t-roadmap"},el("h2",{id:"t-roadmap",texte:"Roadmap"}),
+    el("p",{class:"meta",texte:"Chaque mois, les routines proposent les actions. Validez celles à lancer : les routines d'optimisation et de contenu n'exécutent que les actions validées, puis les passent en « Faite » avec le lien du résultat."}),
+    f,liste.length?el("ul",{class:"actions"},...liste.map(a=>carteAction(p,a))):el("p",{class:"vide",texte:filtre==="proposee"?"Rien à valider pour l'instant. Les propositions du mois arrivent le 1er, avec le rapport.":"Aucune action dans cet état."}));
+}
+function cartographie(p){
+  const lignes=p.cartographie||[];
+  if(!lignes.length)return el("section",{class:"bloc"},el("h2",{texte:"Cartographie"}),el("p",{class:"vide",texte:"La cartographie arrive avec le premier rapport mensuel."}));
+  const ia=l=>el("div",{class:"ia"},...Object.keys(MOTEURS).filter(m=>l.ia&&l.ia[m]).map(m=>{const v=String(l.ia[m]);return el("i",{class:v.startsWith("cite")?"cite":v==="nomme"?"nomme":"",title:MOTEURS[m]+" : "+v,texte:MOTEURS[m]+(v.startsWith("cite")?" ✓":v==="nomme"?" ~":" ✗")})}));
+  return el("section",{class:"bloc","aria-labelledby":"t-carto"},el("h2",{id:"t-carto",texte:"Cartographie"}),
+    el("p",{class:"meta",texte:"Chaque page, son mot-clé principal et son prompt principal. Position de la page sur ce mot-clé ; Δ en places gagnées sur le mois. IA : ✓ cité en source, ~ nommé sans lien, ✗ absent."}),
+    el("div",{class:"table"},el("table",{},el("thead",{},el("tr",{},...["Page","Mot-clé principal","Pos.","Δ","Prompt principal","IA"].map(t=>el("th",{scope:"col",texte:t})))),
+      el("tbody",{},...lignes.map(l=>el("tr",{},el("td",{},el("code",{texte:l.page})),el("td",{},l.mot_cle?bidi(l.mot_cle):"—"),el("td",{class:"n",texte:pos(l.position)}),
+        el("td",{class:"n "+(l.delta>0?"var-plus":l.delta<0?"var-moins":""),texte:l.delta==null?"—":(l.delta>0?"+":"")+pos(l.delta)}),el("td",{},l.prompt?bidi(l.prompt):"—"),el("td",{},ia(l))))))));
+}
+function projet(p){
+  const liens=el("div",{class:"liens"},p.site?el("a",{href:(p.site.startsWith("http")?"":"https://")+p.site,target:"_blank",rel:"noopener",texte:p.site.replace(/^https?:\/\//,"")}):null,
+    p.session?el("a",{href:p.session,target:"_blank",rel:"noopener",texte:"Conversation du projet"}):null,
+    p.depot?el("a",{href:"https://github.com/"+p.depot,target:"_blank",rel:"noopener",texte:"Dépôt"}):null);
+  return el("div",{class:"projet",id:"panneau-"+p.id,role:"tabpanel"},
+    el("div",{class:"bandeau"},el("h2",{texte:p.nom||p.id}),liens),
+    roadmap(p),
+    el("section",{class:"bloc","aria-labelledby":"t-chiffres"},el("h2",{id:"t-chiffres",texte:"Chiffres"}),chiffres(p),el("div",{class:"courbe"},el("h3",{texte:"Clics par semaine"}),courbe(p.serie)),
+      p.kpis&&p.kpis.mois_cartographie?el("p",{class:"meta",texte:"Cartographie et relevé IA : "+p.kpis.mois_cartographie+" · chiffres Search Console au "+(p.maj||etat.maj)}):null),
+    cartographie(p),
+    p.routines&&p.routines.length?el("section",{class:"bloc"},el("h2",{texte:"Routines"}),el("ul",{class:"routines"},...p.routines.map(r=>el("li",{},el("strong",{texte:r.nom}),el("span",{texte:r.quand}))))):null);
+}
+function rendre(){
+  const total=etat.projets.reduce((s,p)=>s+aValider(p),0);
+  const tete=el("header",{class:"tete"},el("div",{},el("h1",{texte:"Pilotage SEO"}),el("p",{texte:(etat.projets.length?etat.projets.length+" site(s) · "+total+" action(s) à valider":"Aucun site pour l'instant")+(etat.maj?" · mis à jour le "+etat.maj:"")})),el("div",{id:"enreg",class:"enreg","aria-live":"polite"}));
+  const onglets=el("div",{class:"onglets",role:"tablist","aria-label":"Sites"},...etat.projets.map(p=>el("button",{class:"onglet",role:"tab",type:"button","aria-selected":String(p.id===courant),"aria-controls":"panneau-"+p.id,
+    onclick:()=>{courant=p.id;try{localStorage.setItem("pilotage-onglet",p.id)}catch(e){}rendre()}},p.nom||p.id,aValider(p)?el("span",{class:"pastille",texte:aValider(p)}):null)));
+  const p=etat.projets.find(x=>x.id===courant);
+  app.replaceChildren(tete,lectureSeule?el("p",{class:"lecture-seule",texte:"Lecture seule : vous pouvez consulter la roadmap, pas la modifier."}):"",etat.projets.length?onglets:"",p?projet(p):el("p",{class:"vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
+  if(enAttente)dire("Modifications en attente d'enregistrement…");
+}
+let artifact=null;
+function programmer(){enAttente=true;clearTimeout(minuteur);minuteur=setTimeout(enregistrer,1500)}
+function documentComplet(){
+  const reset=(document.querySelector("head style")||{}).textContent||"";
+  const code=document.getElementById("code").textContent,css=document.getElementById("css").textContent;
+  const json=JSON.stringify(etat).replace(/<\//g,"<\\/");
+  const police=document.querySelector('link[href*="fonts.googleapis.com"]');
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'
+    +'<title>Pilotage SEO</title>\n'+(police?'<link rel="stylesheet" href="'+police.getAttribute("href").replace(/&/g,"&amp;")+'">\n':"")
+    +'<style id="css">'+css+'</style>\n<main id="app"><p class="vide">Chargement du tableau de bord…</p></main>\n'
+    +'<script type="application/json" id="etat">'+json+'<\/script>\n<script id="code">'+code+'<\/script></body></html>';
+}
+async function enregistrer(){
+  if(!artifact){dire("Enregistrement impossible ici : ouvrez la page dans claude.ai.");return}
+  dire("Enregistrement…");
+  try{await artifact.publish(documentComplet());enAttente=false;dire("Enregistré. Les routines exécuteront les actions validées.")}
+  catch(e){const c=e&&e.code;enAttente=false;
+    if(c==="conflict")dire("Une autre modification vient d'être enregistrée : la page se recharge, refaites votre choix si besoin.");
+    else if(c==="not_writer"||c==="not_granted"){lectureSeule=true;rendre();dire("Lecture seule : votre modification n'a pas été enregistrée.")}
+    else dire("Échec de l'enregistrement ("+(c||"erreur")+"). Réessayez dans un instant.")}
+}
+rendre();
+if(window.claude&&window.claude.use){window.claude.use("artifact").then(a=>{artifact=a;if(!a){lectureSeule=true;rendre()}}).catch(()=>{lectureSeule=true;rendre()})}
+else{lectureSeule=true;rendre()}
+})();
+</script>

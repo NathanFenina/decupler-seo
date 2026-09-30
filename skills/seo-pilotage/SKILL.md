@@ -1,0 +1,57 @@
+---
+name: seo-pilotage
+description: Tableau de bord partagé de plusieurs projets et leur roadmap validée par le client — propositions du mois, validation, exécution par les routines, statut « faite » avec le lien du résultat. Déclencher sur « roadmap », « tableau de bord », « actions à valider », « qu'est-ce qu'on lance », « lance les tâches validées », à l'ouverture de la conversation dédiée à un projet, et dans les routines de rapport, d'optimisation et de contenu.
+---
+
+# Pilotage — la roadmap validée
+
+Le tableau de bord est une page publiée (Artifact) commune à tous les projets
+suivis. Son adresse est dans `decupler-seo.config.yml` (`pilotage.tableau_de_bord`),
+l'identifiant du projet dans `pilotage.projet_id`. La page garde son état dans un
+bloc JSON : chiffres, cartographie et **actions** de chaque projet. Le client y
+clique « Valider » ou « Refuser » ; les routines n'exécutent que ce qui est validé.
+
+Statuts d'une action : `proposee` → `validee` (ou `refusee`) → `en-cours` → `faite`.
+
+## Lire et écrire la page
+
+1. `Artifact` action `read` avec l'adresse du tableau de bord ; enregistrer le
+   HTML reçu tel quel dans `donnees/tableau-de-bord.html` (jamais commité : il
+   contient les données de tous les projets).
+2. `scripts/pilotage.py` travaille sur ce fichier (`etat`, `injecter`, `marquer`).
+3. `Artifact` publish avec `url` = l'adresse du tableau de bord et `file_path` =
+   ce fichier. Sans `capabilities` (la page garde les siennes). En cas de conflit
+   (quelqu'un a validé entre-temps), repartir de la version renvoyée, refaire
+   l'étape 2, republier une fois.
+
+Ne jamais réécrire la page à la main : seul le bloc `etat` change.
+
+## À l'ouverture de la conversation du projet
+
+Montrer la roadmap du projet, sans rien lancer :
+`python3 <scripts>/pilotage.py etat --html donnees/tableau-de-bord.html --projet-id <id>`
+— à valider, validées (prêtes à lancer), en cours, faites ce mois-ci. Proposer de
+lancer les actions validées ; lancer celles que l'utilisateur désigne.
+
+## Routine de rapport — le 1er du mois
+
+Après `cartographie.py mensuel` et `rapport.py` :
+```bash
+python3 <scripts>/pilotage.py donnees --sortie donnees/pilotage.json
+python3 <scripts>/pilotage.py proposer --mois <AAAA-MM> --projet-id <id> --sortie donnees/actions-<AAAA-MM>.json
+python3 <scripts>/pilotage.py injecter --html donnees/tableau-de-bord.html --projet-id <id> \
+  --donnees donnees/pilotage.json --actions donnees/actions-<AAAA-MM>.json
+```
+puis publier. Au plus 8 actions par mois, dont au plus 3 décisions. Une action
+refusée ne revient pas ; une décision prise n'est jamais écrasée.
+
+## Routines d'optimisation et de contenu
+
+1. Lire la page ; `pilotage.py etat --statut validee` pour ce projet et ce type
+   (`optimisation` ou `contenu` ; les `decision` attendent l'humain).
+2. Avant de commencer : `marquer --statut en-cours`, publier.
+3. Exécuter selon les skills habituels ; la note du client sur l'action fait foi.
+4. Fini : `marquer --statut faite --lien <PR ou URL>`, publier. Bloqué :
+   remettre `validee` avec `--note` qui dit pourquoi.
+5. Sans action validée, la routine fait son travail ordinaire dans les limites
+   de `decupler-seo.config.yml` (optimisations à faible risque seulement).

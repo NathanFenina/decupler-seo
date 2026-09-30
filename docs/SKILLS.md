@@ -1,4 +1,4 @@
-# Les 49 skills
+# Les 50 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -82,6 +82,7 @@ aussi l'appeler par son nom.
 |---|---|---|
 | `seo-nouveau-projet` | Crée le dépôt privé d'un site : mémoire, config, méthode embarquée, routines | « nouveau projet », « nouveau client » |
 | `seo-cycle` | Le cycle des routines : veille, optimisation, contenu, rapport | « lance le cycle », « mode optimisation » |
+| `seo-pilotage` | Tableau de bord partagé et roadmap : propositions du mois, validation par le client, exécution par les routines, suivi jusqu'au résultat | « roadmap », « tableau de bord », « actions à valider », « lance les tâches validées » |
 | `seo-journal-mesure` | Journalise chaque modification, la mesure à J+28 contre un témoin, propose les retours arrière | « est-ce que ça a marché », « bilan » |
 
 ## Production et pilotage

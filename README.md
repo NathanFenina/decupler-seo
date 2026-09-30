@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-49 skills · 15 agents · 29 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 297 tests
+50 skills · 15 agents · 30 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 306 tests
 
 ---
 
@@ -197,7 +197,7 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>49 skills</b>, en 8 familles</summary>
+<summary><b>50 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
@@ -208,7 +208,7 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 | **Structure et échelle** | `seo-design-pages` · `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-entites-triplets` · `seo-hreflang-i18n` · `seo-images` |
 | **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |
 | **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |
-| **Pilotage** | `seo-nouveau-projet` · `seo-cycle` · `seo-journal-mesure` · `seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` · `seo-dashboard` · `seo-ecommerce` |
+| **Pilotage** | `seo-nouveau-projet` · `seo-cycle` · `seo-pilotage` · `seo-journal-mesure` · `seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` · `seo-dashboard` · `seo-ecommerce` |
 
 → [docs/SKILLS.md](docs/SKILLS.md)
 </details>

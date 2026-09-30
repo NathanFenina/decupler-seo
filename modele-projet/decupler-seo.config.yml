@@ -91,3 +91,8 @@ opportunites:
 sorties:
   dossier: ./contenus
   langue: {{LANGUE_PRINCIPALE}}
+
+# Tableau de bord partagé (skill seo-pilotage) : roadmap validée par le client.
+pilotage:
+  tableau_de_bord: ""        # adresse claude.ai/artifact/… de la page
+  projet_id: ""              # identifiant du projet dans la page

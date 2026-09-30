@@ -1,5 +1,20 @@
 # Journal des versions
 
+## 3.5.0
+
+### Ajouté
+
+- **Tableau de bord partagé et roadmap validée** : `scripts/pilotage.py`,
+  `templates/pilotage.html` et le skill `seo-pilotage`. Une page (Artifact) pour
+  tous les projets : chiffres Search Console, cartographie, et chaque mois les
+  actions proposées (au plus 8, dont 3 décisions) que le client valide d'un clic.
+  Les routines n'exécutent que ce qui est validé et notent le résultat.
+- `rapport.py` compte les routines aussi par leurs branches.
+
+### Modifié
+
+- Cartographie : cannibalisation par langue ; adresses hors sitemap écartées.
+
 ## 3.4.0
 
 ### Ajouté

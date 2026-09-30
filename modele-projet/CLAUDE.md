@@ -77,3 +77,9 @@ Plafond : **{{PAGES_MAX}} pages neuves par semaine**, qualité avant volume.
 @memoire/faits.md
 @memoire/decisions.md
 @memoire/apprentissages.md
+
+## Quand on ouvre cette conversation
+
+Commencer par la roadmap du projet (skill `seo-pilotage`) : lire le tableau de
+bord (`pilotage.tableau_de_bord` dans la config), montrer les actions à valider,
+validées, en cours et faites, puis proposer de lancer les actions validées.

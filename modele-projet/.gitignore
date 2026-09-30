@@ -15,3 +15,4 @@ __pycache__/
 # Système
 .DS_Store
 Thumbs.db
+donnees/tableau-de-bord.html
