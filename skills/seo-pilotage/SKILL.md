@@ -35,9 +35,15 @@ Ne jamais réécrire la page à la main : seul le bloc `etat` change.
 - **Après** toute tâche livrée, même hors roadmap (demandée en conversation) :
   `pilotage.py ajouter --projet-id <id> --titre "<ce qui a été fait>" --statut faite --lien <PR ou URL>`,
   puis republier. Une tâche décidée mais pas encore faite : `--statut validee`.
-- Les pages de compte rendu (livrables écrits à la main) restent des livrables :
-  on les relie depuis la page de suivi (`injecter --livrables`), on n'y écrit
-  pas l'état des actions.
+- **Une seule page par projet.** Si le projet a déjà une page interne (un
+  suivi de chantiers, un journal), on y loge le tableau de bord plutôt que d'en
+  créer une autre : `pilotage.py integrer --hote <page lue> --etat-depuis <suivi>
+  --sortie hub.html`. Le contenu d'origine est conservé tel quel sous la roadmap
+  (`<template id="hote">`) ; pour le mettre à jour ensuite, on modifie ce bloc,
+  jamais le reste de la page.
+- **Jamais dans une page lue par le client** (compte rendu partagé, rapport
+  client) : la roadmap interne et ses boutons n'y ont pas leur place. On la
+  garde dans une page interne et on relie les livrables client depuis elle.
 
 ## À l'ouverture de la conversation du projet
 

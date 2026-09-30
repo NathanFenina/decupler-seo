@@ -46,6 +46,23 @@ class TestEtat(unittest.TestCase):
             P.marquer_action(p, "a", "inconnu")
 
 
+class TestIntegration(unittest.TestCase):
+    HOTE = ('<!doctype html><html><head><meta charset=utf8><style>:root{color-scheme:light}</style></head><body>\n'
+            '<title>Chantiers Atlas</title>\n<style>.bloc{color:red}</style><div class="wrap"><h1>Compte rendu</h1></div>\n'
+            '</body></html>')
+
+    def test_contenu_d_origine_conserve_et_titre_repris(self):
+        etat = {"projets": [{"id": "atlas", "actions": [{"id": "a", "titre": "T", "statut": "proposee"}]}]}
+        html = P.integrer(GABARIT, self.HOTE, etat)
+        self.assertIn('<template id="hote"><style>.bloc{color:red}</style><div class="wrap"><h1>Compte rendu</h1></div></template>', html)
+        self.assertIn("<title>Chantiers Atlas</title>", html)
+        self.assertNotIn('<style id="css-page">body', html)                   # le fond reste celui de l'hôte
+        self.assertEqual(P.lire_etat(html)["projets"][0]["actions"][0]["id"], "a")
+        # réintégrer une page déjà intégrée ne l'emboîte pas
+        deux = P.integrer(GABARIT, html, P.lire_etat(html))
+        self.assertEqual(deux.count('<template id="hote"><style>.bloc'), 1)
+
+
 class TestPropositions(unittest.TestCase):
     def test_opportunites_hors_pages_en_mesure(self):
         res = {"opportunites": [

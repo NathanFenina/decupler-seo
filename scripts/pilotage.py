@@ -378,6 +378,44 @@ def cmd_injecter(a) -> int:
     return 0
 
 
+def corps_de(html: str) -> tuple[str, str]:
+    """(titre, contenu) d'une page publiée : ce qui est entre <body> et </body>, sans sa balise <title>."""
+    m = re.search(r"<body[^>]*>(.*)</body>", html, re.S | re.I)
+    corps = m.group(1) if m else html
+    t = re.search(r"<title>([^<]*)</title>", corps, re.I)
+    titre = t.group(1).strip() if t else ""
+    return titre, re.sub(r"<title>[^<]*</title>\s*", "", corps, count=1, flags=re.I).strip()
+
+
+def integrer(gabarit: str, hote_html: str, etat: dict) -> str:
+    """Page de suivi logée dans une page existante : le tableau de bord en tête, le contenu d'origine dessous, intact.
+
+    Le contenu d'origine est rangé dans <template id="hote"> : la page le rend, et le republie tel quel à chaque
+    validation. Le fond de page reste celui de l'hôte."""
+    titre, contenu = corps_de(hote_html)
+    if 'id="hote"' in hote_html:                     # déjà intégrée : on repart de son contenu d'origine
+        m = re.search(r'<template id="hote">(.*?)</template>', hote_html, re.S)
+        contenu = m.group(1) if m else contenu
+    if "</template>" in contenu:
+        raise SystemExit("✗ la page hôte contient déjà une balise <template> : intégration manuelle requise")
+    html = re.sub(r'<style id="css-page">.*?</style>\n?', "", gabarit, count=1, flags=re.S)
+    html = html.replace('<script type="application/json" id="etat">',
+                        f'<template id="hote">{contenu}</template>\n<script type="application/json" id="etat">', 1)
+    etat = {**etat, "titre": etat.get("titre") or titre}
+    return ecrire_etat(html, etat)
+
+
+def cmd_integrer(a) -> int:
+    gabarit = (Path(__file__).resolve().parent.parent / "templates" / "pilotage.html").read_text(encoding="utf-8")
+    etat = lire_etat(Path(a.etat_depuis).read_text(encoding="utf-8")) if a.etat_depuis else {"projets": []}
+    if a.titre:
+        etat["titre"] = a.titre
+    sortie = integrer(gabarit, Path(a.hote).read_text(encoding="utf-8"), etat)
+    Path(a.sortie).write_text(sortie, encoding="utf-8")
+    print(f"  ✓ {a.sortie} · contenu de {a.hote} conservé sous le tableau de bord")
+    return 0
+
+
 def cmd_ajouter(a) -> int:
     """Consigne une action décidée ou faite hors des propositions du mois (depuis n'importe quelle conversation)."""
     page = Path(a.html)
@@ -458,6 +496,12 @@ def main() -> int:
     p.add_argument("--titre", help="nom de la page (ex. « Pilotage Atlas Conseil »)")
     p.add_argument("--livrables", help="JSON [{titre, url, note}] : pages de travail et comptes rendus liés")
     p.set_defaults(f=cmd_injecter)
+    p = sp.add_parser("integrer", help="loger le tableau de bord dans une page existante (Artifact déjà en place)")
+    p.add_argument("--hote", required=True, help="HTML de la page existante (lue avec l'outil Artifact)")
+    p.add_argument("--etat-depuis", help="page de suivi dont on reprend l'état (roadmap, chiffres)")
+    p.add_argument("--titre", help="par défaut, le titre de la page existante")
+    p.add_argument("--sortie", required=True)
+    p.set_defaults(f=cmd_integrer)
     p = sp.add_parser("ajouter", help="consigner une action faite ou décidée dans une conversation")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)

@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 3.5.2
+
+### Ajouté
+
+- `pilotage.py integrer` : loge le tableau de bord dans une page de suivi qui
+  existe déjà, contenu d'origine conservé ; styles isolés (préfixe `pl-`) pour
+  cohabiter avec la charte de la page hôte.
+
 ## 3.5.1
 
 ### Modifié
