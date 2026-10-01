@@ -45,6 +45,11 @@ LIEUX = {"FR": "France", "BE": "Belgium", "CH": "Switzerland", "CA": "Canada", "
          "US": "United States", "GB": "United Kingdom", "DE": "Germany", "ES": "Spain", "IT": "Italy"}
 
 
+# Marché de repli quand la base Labs n'a pas la langue demandée pour le pays
+# du projet (ex. anglais en France : « Invalid Field: 'language_code' »).
+MARCHE_DE_LA_LANGUE = {"en": "US", "fr": "FR", "ar": "SA", "de": "DE", "es": "ES", "it": "IT"}
+
+
 class ErreurAPI(RuntimeError):
     pass
 
@@ -137,7 +142,16 @@ def cmd_idees(a) -> dict:
         tache = {"keyword": graine, "location_name": lieu, "language_code": langue, "limit": a.max}
         if a.mode == "proches":
             tache["depth"] = 1
-        res, c = appel(chemin, [tache])
+        try:
+            res, c = appel(chemin, [tache])
+        except ErreurAPI as e:
+            repli = LIEUX.get(MARCHE_DE_LA_LANGUE.get(langue, ""))
+            if "language_code" not in str(e) or a.pays or a.lieu or not repli or repli == lieu:
+                raise
+            print(f"  ! Pas de base « {langue} » pour {lieu} : demande lue sur {repli} "
+                  f"(--pays pour choisir un autre marché)", file=sys.stderr)
+            lieu = tache["location_name"] = repli
+            res, c = appel(chemin, [tache])
         cout += c
         for r in res:
             for it in r.get("items") or []:

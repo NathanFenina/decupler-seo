@@ -10,6 +10,13 @@
 - `docs/PROJETS.md` : pièges constatés en production et « Travailler projet
   par projet » (un dépôt, une conversation, une page de suivi par projet).
 
+### Corrigé
+
+- `demande.py idees` : quand la base DataForSEO Labs n'a pas la langue
+  demandée pour le pays du projet (anglais en France), la demande est lue
+  sur le marché naturel de la langue (États-Unis pour l'anglais) au lieu
+  d'échouer ; `--pays` reste prioritaire.
+
 ## 3.5.3
 
 ### Corrigé
