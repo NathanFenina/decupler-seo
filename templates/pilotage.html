@@ -9,12 +9,18 @@
   --titre:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --texte:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --chiffre:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --cta:var(--accent);--cta-texte:var(--carte);--lien:var(--accent);--rayon:8px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #app{
   --fond:#121715;--carte:#1a211e;--encre:#e7ece9;--doux:#9aa6a0;--trait:#2a332f;--trait-fort:#3a4540;
   --accent:#86c2ae;--accent-doux:#20302a;--attente:#e0a45a;--attente-doux:#342817;--ok:#84c795;--ok-doux:#1d2d22;
   --non:#e39590;--non-doux:#3a2220;--info:#9dbbe6;--info-doux:#1e2837;color-scheme:dark}}
 :root[data-theme="dark"] #app{
+  --fond:#121715;--carte:#1a211e;--encre:#e7ece9;--doux:#9aa6a0;--trait:#2a332f;--trait-fort:#3a4540;
+  --accent:#86c2ae;--accent-doux:#20302a;--attente:#e0a45a;--attente-doux:#342817;--ok:#84c795;--ok-doux:#1d2d22;
+  --non:#e39590;--non-doux:#3a2220;--info:#9dbbe6;--info-doux:#1e2837;color-scheme:dark}
+/* Un projet peut imposer sa charte (theme.mode = "sombre") : la page suit alors la marque, pas le thème du lecteur. */
+#app.pl-sombre{
   --fond:#121715;--carte:#1a211e;--encre:#e7ece9;--doux:#9aa6a0;--trait:#2a332f;--trait-fort:#3a4540;
   --accent:#86c2ae;--accent-doux:#20302a;--attente:#e0a45a;--attente-doux:#342817;--ok:#84c795;--ok-doux:#1d2d22;
   --non:#e39590;--non-doux:#3a2220;--info:#9dbbe6;--info-doux:#1e2837;color-scheme:dark}
@@ -25,7 +31,7 @@
 #app h2{font-size:1.25rem;font-weight:600}
 #app h3{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--doux)}
 #app p{margin:0}
-#app a{color:var(--accent)}
+#app a{color:var(--lien)}
 #app a:focus-visible,#app button:focus-visible,#app input:focus-visible,#app summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .pl-tete{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
 .pl-tete p{margin:4px 0 0;color:var(--doux)}
@@ -42,7 +48,7 @@
 .pl-bandeau{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
 .pl-liens{display:flex;flex-wrap:wrap;gap:12px;font-size:.9rem}
 .pl-panneau{display:grid;gap:20px}
-.pl-bloc{background:var(--carte);border:1px solid var(--trait);border-radius:8px;padding:16px;display:grid;gap:12px;align-content:start;min-width:0;margin:0}
+.pl-bloc{background:var(--carte);border:1px solid var(--trait);border-radius:var(--rayon);padding:16px;display:grid;gap:12px;align-content:start;min-width:0;margin:0}
 .pl-groupe>details{border-top:1px solid var(--trait);padding-top:8px}
 .pl-groupe>details>summary{font-size:.98rem}
 .pl-bloc.pl-decider{border-color:var(--attente);border-width:1px 1px 1px 4px}
@@ -73,7 +79,7 @@
 .pl-statut{font:500 .8rem var(--texte)}
 .pl-boutons{display:flex;flex-wrap:wrap;gap:6px;align-items:start;justify-content:end}
 .pl-btn{font:600 .85rem var(--texte);border-radius:6px;padding:6px 12px;cursor:pointer;border:1px solid var(--trait-fort);background:var(--carte);color:var(--encre)}
-.pl-btn.pl-oui{background:var(--accent);border-color:var(--accent);color:var(--carte)}
+.pl-btn.pl-oui{background:var(--cta);border-color:var(--cta);color:var(--cta-texte)}
 .pl-btn.pl-non{color:var(--non)}
 .pl-btn:disabled{opacity:.45;cursor:not-allowed}
 .pl-note{grid-column:1/-1;display:flex;gap:8px}
@@ -294,12 +300,23 @@ function projet(p){
     onclick:()=>{moisChoisi=mm;rendre()}},nomMois(mm),mm===ceMois&&nb?el("span",{class:"pl-pastille",title:nb+" à décider",texte:nb}):null)));
   return el("div",{class:"pl-projet",id:"panneau-"+p.id},el("div",{class:"pl-bandeau"},el("h2",{texte:p.nom||p.id}),liens),onglets,panneau(p,moisChoisi));
 }
+const VARS_THEME={fond:"--fond",carte:"--carte",encre:"--encre",doux:"--doux",trait:"--trait",trait_fort:"--trait-fort",
+  accent:"--accent",accent_doux:"--accent-doux",cta:"--cta",cta_texte:"--cta-texte",lien:"--lien",titre:"--titre",texte:"--texte",rayon:"--rayon"};
+function appliquerTheme(p){
+  const t=(p&&p.theme)||{};
+  app.classList.toggle("pl-sombre",t.mode==="sombre");
+  for(const k in VARS_THEME){if(t[k])app.style.setProperty(VARS_THEME[k],t[k]);else app.style.removeProperty(VARS_THEME[k])}
+  document.body.style.background=t.fond||"";
+  if(t.polices&&/^https:\/\/fonts\.googleapis\.com\//.test(t.polices)&&!document.querySelector('link[data-theme-polices]')){
+    const l=document.createElement("link");l.rel="stylesheet";l.href=t.polices;l.setAttribute("data-theme-polices","");document.head.append(l)}
+}
 function rendre(){
   const total=etat.projets.reduce((s,p)=>s+ouvertes(p).length,0);
   const tete=el("header",{class:"pl-tete"},el("div",{},el("h1",{texte:etat.titre||"Pilotage SEO"}),el("p",{texte:(etat.projets.length?(etat.projets.length>1?etat.projets.length+" sites · ":"")+total+" à décider":"Aucun site pour l'instant")+(etat.maj?" · mis à jour le "+dateCourte(etat.maj)+"/"+etat.maj.slice(0,4):"")})),el("div",{id:"enreg",class:"pl-enreg","aria-live":"polite"}));
   const onglets=el("div",{class:"pl-onglets",role:"tablist","aria-label":"Sites"},...etat.projets.map(p=>el("button",{class:"pl-onglet",role:"tab",type:"button","aria-selected":String(p.id===courant),
     onclick:()=>{courant=p.id;moisChoisi=null;try{localStorage.setItem("pilotage-onglet",p.id)}catch(e){}rendre()}},p.nom||p.id,ouvertes(p).length?el("span",{class:"pl-pastille",texte:ouvertes(p).length}):null)));
   const p=etat.projets.find(x=>x.id===courant);
+  appliquerTheme(p);
   app.replaceChildren(tete,lectureSeule?el("p",{class:"pl-lecture-seule",texte:"Lecture seule : vous pouvez consulter la page, pas la modifier."}):"",etat.projets.length>1?onglets:"",p?projet(p):el("p",{class:"pl-vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
   if(enAttente)dire("Modifications en attente d'enregistrement…");
 }

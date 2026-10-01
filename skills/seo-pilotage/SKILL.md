@@ -36,6 +36,15 @@ Le bilan d'une semaine ou d'un mois s'écrit avec `pilotage.py mois --fichier
 lien de la base Notion des contenus va dans le projet (`notion`), celui de
 chaque contenu dans sa ligne.
 
+## Aux couleurs du projet
+
+Chaque projet garde sa charte : `pilotage.py injecter --theme theme.json`, avec
+les jetons du design system du client (`mode` sombre ou clair, `fond`, `carte`,
+`encre`, `doux`, `trait`, `accent`, `accent_doux`, `cta`, `cta_texte`, `lien`,
+`titre`, `texte`, `polices` = URL Google Fonts). En mode sombre, la page suit
+la marque quel que soit le thème du lecteur. Vérifier les contrastes (texte
+4,5:1, bouton `cta` / `cta_texte` compris) avant de publier.
+
 ## Rien ne se perd
 
 - La page publiée garde ses versions, et un conflit d'enregistrement est

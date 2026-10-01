@@ -188,6 +188,19 @@ class TestCommandes(DossierIsole):
         self.assertNotEqual(r.returncode, 0)                 # jamais la copie d'un projet dans un autre
 
 
+    def test_charte_du_projet(self):
+        page = self.dossier / "tableau.html"
+        page.write_text(GABARIT, encoding="utf-8")
+        (self.dossier / "theme.json").write_text(json.dumps({"mode": "sombre", "fond": "#07080f", "accent": "#9d86ff"}),
+                                                 encoding="utf-8")
+        r = lancer("pilotage.py", "injecter", "--html", "tableau.html", "--projet-id", "atlas", "--theme", "theme.json",
+                   cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        p = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]
+        self.assertEqual(p["theme"]["mode"], "sombre")
+        self.assertIn("appliquerTheme", GABARIT)                      # la page applique la charte du projet
+
+
 class TestMois(unittest.TestCase):
     def test_semaine_remplacee_et_wins_mis_a_jour(self):
         p = {"id": "atlas"}

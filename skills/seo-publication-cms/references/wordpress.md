@@ -100,7 +100,36 @@ ou le script ne s'exécute plus. `wp.py` retire ces lignes vides avant
 l'envoi et remet chaque `<noscript>` sur une ligne. Un conteneur qui mélange
 des enfants en ligne (`<span>`, `<a>`) et des blocs (`<div>`, `<p>`) reçoit
 aussi un `</p>` orphelin qui décale grilles et flex : gardez des enfants
-homogènes.
+homogènes. Filet de sécurité côté CSS de la page : `p:empty{display:none}`
+dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
+`content.rendered`, ou la page servie), jamais seulement le source envoyé.
+
+## Elementor et thèmes à page builder
+
+- Page construite dans Elementor (`_elementor_edit_mode = builder`) : le rendu
+  vient de la méta `_elementor_data`, pas de `content`. Modifier les deux, et
+  sauvegarder les deux avant.
+- Une écriture de `_elementor_data` par l'API est enregistrée mais **pas
+  affichée** tant que le cache CSS/HTML d'Elementor n'est pas purgé (un petit
+  plugin maison peut purger à chaque modification).
+- Gabarit `elementor_canvas` : pas d'en-tête ni de pied de page du site, donc
+  aucun script posé dans l'en-tête ne s'y exécute.
+- Double H1 : beaucoup de thèmes (Astra, etc.) affichent le titre de la page
+  en plus du H1 du contenu ; le masquer par les métas du thème, page par page.
+- En-tête et pied de page en templates Elementor : un correctif global (CSS,
+  script) va dans ces templates, avec sauvegarde, plutôt que dans chaque page.
+
+## Petites surprises de l'API
+
+- Yoast n'expose pas le canonical à l'écriture par REST sans champ déclaré
+  (voir plus haut) ; il ne publie l'Organisation dans son graphe que si le
+  logo est réglé.
+- Une politique de mots de passe (Wordfence, etc.) refuse par l'API un mot de
+  passe sans symbole : à prévoir pour toute création ou réinitialisation de compte.
+- Site piraté : chercher les comptes administrateurs créés directement en base
+  (sans email, date d'inscription incohérente) ; les rétrograder et changer
+  leur mot de passe avant de supprimer, et **ne jamais** écrire leurs
+  identifiants dans un dépôt public.
 
 ## Carte de contenu
 

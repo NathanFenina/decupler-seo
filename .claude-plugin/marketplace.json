@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Marketplace Décupler — outillage SEO & GEO agentique pour Claude Code.",
-    "version": "3.7.0"
+    "version": "3.7.1"
   },
   "plugins": [
     {
       "name": "decupler-seo",
       "source": "./",
       "description": "50 skills SEO/GEO, 15 agents spécialisés, 13 MCP préconfigurés. De l'audit à la publication, en autonomie.",
-      "version": "3.7.0",
+      "version": "3.7.1",
       "category": "seo",
       "keywords": ["seo", "geo", "aeo", "content", "netlinking", "technique"]
     }

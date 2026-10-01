@@ -1,5 +1,16 @@
 # Journal des versions
 
+## 3.7.1
+
+### Ajouté
+
+- Page de suivi **aux couleurs du projet** : `pilotage.py injecter --theme`
+  (mode sombre ou clair, couleurs, polices Google Fonts) ; en mode sombre la
+  page suit la marque quel que soit le thème du lecteur.
+- `seo-publication-cms` : pièges Elementor (rendu par `_elementor_data`,
+  cache, gabarit canvas), double H1 des thèmes, filet `p:empty`, politique
+  de mots de passe, comptes créés par un piratage.
+
 ## 3.7.0
 
 ### Ajouté

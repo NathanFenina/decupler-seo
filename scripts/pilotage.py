@@ -400,6 +400,8 @@ def cmd_injecter(a) -> int:
         etat["titre"] = a.titre
     if a.livrables:
         p["livrables"] = json.loads(Path(a.livrables).read_text(encoding="utf-8"))
+    if a.theme:
+        p["theme"] = json.loads(Path(a.theme).read_text(encoding="utf-8"))
     ajoutees = 0
     if a.actions:
         nouvelles = json.loads(Path(a.actions).read_text(encoding="utf-8"))
@@ -600,6 +602,8 @@ def main() -> int:
     p.add_argument("--depot", help="owner/repo")
     p.add_argument("--titre", help="nom de la page (ex. « Pilotage Atlas Conseil »)")
     p.add_argument("--livrables", help="JSON [{titre, url, note}] : pages de travail et comptes rendus liés")
+    p.add_argument("--theme", help="JSON de la charte du projet : {mode: sombre|clair, fond, carte, encre, doux, trait, "
+                                   "accent, accent_doux, cta, cta_texte, lien, titre, texte, polices (URL Google Fonts)}")
     p.set_defaults(f=cmd_injecter)
     p = sp.add_parser("integrer", help="loger le tableau de bord dans une page existante (Artifact déjà en place)")
     p.add_argument("--hote", required=True, help="HTML de la page existante (lue avec l'outil Artifact)")
