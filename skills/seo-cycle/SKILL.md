@@ -93,6 +93,9 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
    n'est resté douteux, et que le mode est `autonomous`. Sinon, laisser la
    PR ouverte et écrire dans sa description ce qui bloque. Le déploiement
    suit la fusion : sur ce type de site, une fusion est une mise en ligne.
+   Si la session refuse la fusion (permissions), même chose : PR ouverte,
+   « à fusionner par un humain » dans la description et le journal de run,
+   puis terminer — une routine n'attend jamais de réponse.
 5. Après déploiement : `seo_live.py --ping` (IndexNow si `INDEXNOW_KEY`
    est défini).
 

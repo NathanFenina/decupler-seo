@@ -12,7 +12,11 @@ __pycache__/
 *.pyc
 .venv/
 
+# Tableau de bord : copie de travail et fichiers intermédiaires des routines
+donnees/tableau-de-bord.html
+donnees/pilotage.json
+donnees/actions-*.json
+
 # Système
 .DS_Store
 Thumbs.db
-donnees/tableau-de-bord.html

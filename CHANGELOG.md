@@ -1,5 +1,16 @@
 # Journal des versions
 
+## 3.5.3
+
+### Corrigé
+
+- Les fichiers de travail du tableau de bord (`donnees/pilotage.json`,
+  `donnees/actions-*.json`) sont ignorés par git : ils laissaient l'arbre
+  « sale » à la fin de la routine de rapport.
+- Une routine dont la fusion de PR est refusée par les permissions ne reste
+  plus en attente : PR laissée ouverte, signalée dans le journal de run et sur
+  la page de suivi (`seo-pilotage`, `seo-cycle`).
+
 ## 3.5.2
 
 ### Ajouté

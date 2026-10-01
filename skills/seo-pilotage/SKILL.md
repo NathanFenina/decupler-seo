@@ -61,7 +61,9 @@ python3 <scripts>/pilotage.py proposer --mois <AAAA-MM> --projet-id <id> --sorti
 python3 <scripts>/pilotage.py injecter --html donnees/tableau-de-bord.html --projet-id <id> \
   --donnees donnees/pilotage.json --actions donnees/actions-<AAAA-MM>.json
 ```
-puis publier. Au plus 8 actions par mois, dont au plus 3 décisions. Une action
+puis publier. `donnees/pilotage.json` et `donnees/actions-*.json` sont des
+fichiers de travail ignorés par git, comme la copie de la page : ne pas les
+commiter, ne pas les supprimer, ils sont réécrits le mois suivant. Au plus 8 actions par mois, dont au plus 3 décisions. Une action
 refusée ne revient pas ; une décision prise n'est jamais écrasée.
 
 ## Routines d'optimisation et de contenu
@@ -74,3 +76,14 @@ refusée ne revient pas ; une décision prise n'est jamais écrasée.
    remettre `validee` avec `--note` qui dit pourquoi.
 5. Sans action validée, la routine fait son travail ordinaire dans les limites
    de `decupler-seo.config.yml` (optimisations à faible risque seulement).
+
+## Une routine ne reste jamais bloquée
+
+Personne ne répond pendant une routine. Si une action est refusée par les
+permissions de la session (fusion d'une pull request, suppression de
+fichier, push sur main…), ne pas insister et ne pas attendre de réponse :
+laisser la PR ouverte, l'écrire dans le journal de run et dans la PR
+(« à fusionner par un humain »), ajouter sur la page de suivi
+`pilotage.py ajouter --titre "Fusionner la PR <n°>" --statut validee --lien <PR>`,
+publier, et terminer. Le tableau de bord est mis à jour **avant** la livraison
+git : un refus de fusion ne doit jamais coûter la roadmap du mois.
