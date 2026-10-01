@@ -1,5 +1,24 @@
 # Journal des versions
 
+## 3.7.0
+
+### Ajouté
+
+- **Rythme hebdo par défaut** : une seule routine par projet, le vendredi
+  (`routines/hebdo.md`, mode `hebdo` de `seo-cycle`). Elle contrôle le site,
+  mesure, exécute les actions validées et écrit le bilan de la semaine ; le
+  premier vendredi du mois, elle fait aussi le rapport et les propositions.
+  Les quatre routines séparées restent possibles pour les gros sites.
+- **Page de suivi en onglets par mois** : « À décider » (bloqué, puis à
+  valider rangé par chantier, avec remarque pour Claude), reporting, fait,
+  à faire par chantier, wins, contenus avec lien Notion, semaine par semaine.
+- `pilotage.py` : statut `bloquee` (`--attend` : qui ou quoi), chantiers
+  (`--chantier`), historique daté (`ajouter --date`), `mois` (bilan de la
+  semaine ou du mois, rejouable sans doublon), `sauvegarder` et `restaurer`
+  (copie de la roadmap dans `journal/pilotage.json`, commitée).
+- `rapport.py` compte les passages hebdo (un par vendredi) au lieu des veilles
+  quand le projet tourne au rythme hebdo.
+
 ## 3.6.0
 
 ### Ajouté

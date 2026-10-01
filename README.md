@@ -93,20 +93,24 @@ mon-site/                       dépôt PRIVÉ
 │   ├── decisions.md            ce qui a été validé ou refusé — ne revient pas
 │   └── apprentissages.md       ce qui marche sur CE site, mesuré
 ├── journal/modifications.csv   chaque modification, et son effet à J+28
-├── ROUTINES.md                 les 4 routines, prêtes à créer
+├── ROUTINES.md                 la routine du vendredi, prête à créer
 └── .claude/                    la méthode, synchronisée depuis ce dépôt
 ```
 
-### Quatre routines
+### Une routine par semaine, un onglet par mois
 
-| | Quand | Publie seule | Vous soumet |
-|---|---|---|---|
-| **Veille** | chaque jour | rien — contrôle chaque URL du sitemap | les anomalies |
-| **Optimisation** | lundi | titles, metas, FAQ, schema, liens internes | les réécritures de sections |
-| **Contenu** | mercredi | rien | les pages neuves (brouillon ou pull request) |
-| **Rapport** | le 1er | le rapport | les retours arrière proposés |
+La routine **hebdo** tourne le vendredi : contrôle de chaque URL du sitemap,
+exécution des actions validées, mesure à J+28, puis le bilan de la semaine
+dans la page de suivi — fait, à faire par chantier, bloquants, wins, contenus,
+reporting. Le premier vendredi du mois, elle ajoute le rapport et les
+propositions du mois. Les quatre routines séparées (veille, optimisation,
+contenu, rapport) restent disponibles pour les gros sites.
 
-Votre temps : **30 minutes le lundi**, à lire `rapports/a-valider.md`.
+| | Publie seule | Vous soumet |
+|---|---|---|
+| **Hebdo** | titles, metas, FAQ, schema, liens internes | pages neuves et réécritures (brouillon ou PR), décisions, bloquants |
+
+Votre temps : **20 minutes le vendredi**, sur l'onglet du mois de la page de suivi.
 
 ### De l'idée au rapport, avec des chiffres à chaque étape
 

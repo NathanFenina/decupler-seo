@@ -24,7 +24,7 @@ qui est commité dans le dépôt qu'elle clone : `CLAUDE.md`, `.claude/skills`,
 mon-projet/                      dépôt PRIVÉ
 ├── CLAUDE.md                    mémoire, chargée à chaque session
 ├── decupler-seo.config.yml      mode, plafonds, règles propres au client
-├── ROUTINES.md                  les 4 routines, prêtes à créer
+├── ROUTINES.md                  la routine du vendredi, prête à créer
 ├── .mcp.json                    serveurs MCP lus par les routines
 ├── memoire/
 │   ├── marque.md                voix, lexique, chiffres officiels, interdits

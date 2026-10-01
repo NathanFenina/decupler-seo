@@ -16,6 +16,7 @@ __pycache__/
 donnees/tableau-de-bord.html
 donnees/pilotage.json
 donnees/actions-*.json
+donnees/semaine.json
 
 # Système
 .DS_Store

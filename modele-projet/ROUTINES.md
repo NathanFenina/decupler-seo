@@ -1,9 +1,19 @@
 # Les routines de {{NOM}}
 
-Quatre routines font tourner ce projet en autonomie. Créez-les sur
-https://claude.ai/code/routines → **New routine** → **Cloud**.
+**Une seule routine par projet, le vendredi** (`hebdo`) : elle contrôle le
+site, exécute les actions validées, mesure, et écrit le bilan de la semaine
+dans l'onglet du mois de la page de suivi ; le premier vendredi du mois, elle
+fait aussi le rapport et les propositions. C'est le rythme par défaut : sur un
+site à quelques centaines de clics par mois, Search Console bouge trop
+lentement pour qu'un passage quotidien trouve autre chose que du bruit.
 
-## Réglages communs aux quatre
+Les quatre routines séparées (veille quotidienne, optimisation, contenu,
+rapport) restent possibles pour un gros site, où une journée de panne coûte
+cher. Ne jamais faire tourner les deux formules à la fois.
+
+Créez la routine sur https://claude.ai/code/routines → **New routine** → **Cloud**.
+
+## Réglages communs
 
 - **Dépôt** : ce dépôt uniquement. Une routine à un seul dépôt lit son
   `CLAUDE.md`, ses skills, ses agents et son `.mcp.json`.
@@ -43,6 +53,8 @@ un fichier du dépôt, depuis n'importe quelle conversation, sans la recréer.
 
 | Routine | `<mode>` | Quand (Europe/Paris) |
 |---|---|---|
+| **Hebdo (par défaut)** | `hebdo` | le vendredi, 7 h 07 |
+| *ou, pour un gros site :* | | |
 | Veille | `veille` | tous les jours, 7 h 07 |
 | Optimisation | `optimisation` | le lundi, 7 h 17 |
 | Contenu | `contenu` | le mercredi, 7 h 17 |
@@ -59,8 +71,9 @@ et s'est terminée sans erreur d'infrastructure, **pas** que le travail a été
 fait. Chaque exécution écrit donc `rapports/runs/<date>-<mode>.md`, et la
 routine de rapport vérifie qu'aucune n'a manqué.
 
-## Votre temps : 30 minutes le lundi
+## Votre temps : 20 minutes le vendredi
 
-1. Ouvrir la page de suivi du projet : valider ou refuser les actions du mois
-2. Lire `rapports/a-valider.md`, consigner les décisions dans `memoire/decisions.md`
+1. Ouvrir la page de suivi, onglet du mois : lire « À décider », valider ou
+   refuser, laisser une remarque si besoin (la routine la lit comme une consigne)
+2. Débloquer ce qui vous attend (« bloquée » : la page dit qui ou quoi)
 3. Fusionner les PR marquées « à fusionner par un humain »

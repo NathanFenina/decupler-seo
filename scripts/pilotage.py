@@ -23,6 +23,14 @@ bloc : jamais au reste de la page.
     python3 pilotage.py marquer --html tableau.html --projet-id atlas --id a1b2c3d4 \\
         --statut faite --lien https://github.com/…/pull/12
 
+    # 5. Le bilan de la semaine dans l'onglet du mois, puis la copie de sûreté dans git
+    python3 pilotage.py mois --html tableau.html --projet-id atlas --fichier donnees/semaine.json
+    python3 pilotage.py sauvegarder --html tableau.html --projet-id atlas
+
+La page a un onglet par mois : ce qui attend une décision (à valider, bloqué),
+ce qui a été fait, ce qui reste à faire par chantier, les wins, les contenus
+publiés et le reporting. Chaque vendredi, la routine hebdo y écrit la semaine.
+
 Une action validée n'est jamais reproposée ni écrasée : l'injection ajoute les
 nouvelles propositions et garde les décisions déjà prises.
 """
@@ -42,8 +50,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _projet import charger_env, lire_valeur, racine_projet  # noqa: E402
 
-STATUTS = ("proposee", "validee", "refusee", "en-cours", "faite")
+STATUTS = ("proposee", "validee", "refusee", "en-cours", "bloquee", "faite")
 MAX_ACTIONS = 8
+# Les chantiers rangent la roadmap dans la page (onglet du mois, « à faire »).
+CHANTIERS = ("contenus", "optimisation", "technique", "off-page", "geo", "international",
+             "securite", "indexation", "design", "pilotage")
+SAUVEGARDE = "journal/pilotage.json"
 BALISE = re.compile(r'(<script type="application/json" id="etat">)(.*?)(</script>)', re.S)
 
 
@@ -100,7 +112,10 @@ def fusionner_actions(existantes: list[dict], nouvelles: list[dict], date: str) 
     return existantes, ajoutees
 
 
-def marquer_action(p: dict, aid: str, statut: str, lien: str = "", note: str = "", date: str = "") -> dict:
+def marquer_action(p: dict, aid: str, statut: str, lien: str = "", note: str = "", date: str = "",
+                   attend: str = "") -> dict:
+    """Change le statut d'une action. « bloquee » dit qui ou quoi on attend (`attend`) ;
+    l'attente est effacée dès que l'action repart."""
     if statut not in STATUTS:
         raise SystemExit(f"✗ statut « {statut} » : attendu {', '.join(STATUTS)}")
     for a in p.get("actions", []):
@@ -111,6 +126,11 @@ def marquer_action(p: dict, aid: str, statut: str, lien: str = "", note: str = "
                 a["lien"] = lien
             if note:
                 a["note"] = note
+            if statut == "bloquee":
+                if attend:
+                    a["attend"] = attend
+            else:
+                a.pop("attend", None)
             return a
     raise SystemExit(f"✗ action {aid} introuvable dans le projet {p.get('id')}")
 
@@ -203,6 +223,19 @@ def depuis_points_ouverts(texte: str, projet: str) -> list[dict]:
         actions.append({"id": id_action(projet, "point", "", titre[:60]), "titre": titre[:200], "type": "decision",
                         "page": "", "pourquoi": "point ouvert", "gain": "", "effort": "M", "source": "points-ouverts"})
     return actions
+
+
+def chantier_de(a: dict) -> str:
+    """Chantier d'une action proposée par le script, quand elle n'en a pas."""
+    if a.get("chantier") in CHANTIERS:
+        return a["chantier"]
+    if a.get("type") == "contenu":
+        return "contenus"
+    if a.get("type") == "technique":
+        return "technique"
+    if a.get("source") == "points-ouverts":
+        return "pilotage"
+    return "optimisation"
 
 
 def sans_doublons(actions: list[dict]) -> list[dict]:
@@ -341,7 +374,7 @@ def cmd_proposer(a) -> int:
         if (racine / fichier).is_file():
             actions += depuis_points_ouverts((racine / fichier).read_text(encoding="utf-8"), pid)
     mois = a.mois or dt.date.today().strftime("%Y-%m")
-    actions = [{**x, "mois": mois} for x in prioriser(sans_doublons(actions), a.max)]
+    actions = [{**x, "mois": mois, "chantier": chantier_de(x)} for x in prioriser(sans_doublons(actions), a.max)]
     sortie = json.dumps(actions, ensure_ascii=False, indent=1)
     if a.sortie:
         Path(a.sortie).write_text(sortie, encoding="utf-8")
@@ -422,14 +455,14 @@ def cmd_ajouter(a) -> int:
     html = page.read_text(encoding="utf-8")
     etat = lire_etat(html)
     p = projet_de(etat, a.projet_id, creer=True)
-    date = dt.date.today().isoformat()
+    date = a.date or dt.date.today().isoformat()
     action = {"id": id_action(a.projet_id, "manuel", a.page or "", a.titre[:60]), "titre": a.titre, "type": a.type,
-              "page": a.page or "", "pourquoi": a.pourquoi or "", "gain": "", "effort": a.effort, "source": "conversation",
-              "mois": date[:7], "statut": a.statut, "maj": date}
-    if a.lien:
-        action["lien"] = a.lien
-    if a.note:
-        action["note"] = a.note
+              "page": a.page or "", "pourquoi": a.pourquoi or "", "gain": a.gain or "", "effort": a.effort,
+              "source": "conversation", "mois": date[:7], "statut": a.statut, "maj": date,
+              "chantier": a.chantier or chantier_de({"type": a.type})}
+    for cle in ("lien", "note", "attend"):
+        if getattr(a, cle):
+            action[cle] = getattr(a, cle)
     existante = next((x for x in p.setdefault("actions", []) if x["id"] == action["id"]), None)
     if existante:
         existante.update({k: v for k, v in action.items() if v})
@@ -464,10 +497,82 @@ def cmd_marquer(a) -> int:
     p = projet_de(etat, a.projet_id)
     if p is None:
         raise SystemExit(f"✗ projet {a.projet_id} absent du tableau de bord")
-    x = marquer_action(p, a.id, a.statut, a.lien or "", a.note or "")
+    x = marquer_action(p, a.id, a.statut, a.lien or "", a.note or "", attend=a.attend or "")
     etat["maj"] = dt.date.today().isoformat()
     page.write_text(ecrire_etat(html, etat), encoding="utf-8")
     print(f"  ✓ {x['id']} → {x['statut']} : {x['titre']}")
+    return 0
+
+
+def fusionner_mois(p: dict, bilan: dict) -> dict:
+    """Reporte un bilan dans l'onglet de son mois, sans perdre ce qui y est déjà.
+
+    `bilan` : {"mois": "AAAA-MM", "synthese", "reporting": {…}, "wins": [{texte, lien}],
+    "contenus": [{titre, url, statut, notion, date}], "semaine": {"date", "resume", …}}.
+    Un win ou un contenu déjà présent (même texte, même URL) est mis à jour, pas dupliqué ;
+    une semaine déjà écrite (même date) est remplacée : relancer la routine ne double rien."""
+    cle = bilan.get("mois") or dt.date.today().strftime("%Y-%m")
+    m = p.setdefault("mois", {}).setdefault(cle, {})
+    for champ in ("synthese",):
+        if bilan.get(champ):
+            m[champ] = bilan[champ]
+    if bilan.get("reporting"):
+        m.setdefault("reporting", {}).update(bilan["reporting"])
+    for champ, ident in (("wins", "texte"), ("contenus", "url")):
+        liste = m.setdefault(champ, [])
+        for el in bilan.get(champ) or []:
+            k = (el.get(ident) or el.get("titre") or "").strip().lower()
+            existant = next((x for x in liste if (x.get(ident) or x.get("titre") or "").strip().lower() == k), None)
+            if existant:
+                existant.update({c: v for c, v in el.items() if v})
+            else:
+                liste.append(el)
+    if bilan.get("semaine"):
+        semaines = [s for s in m.setdefault("semaines", []) if s.get("date") != bilan["semaine"].get("date")]
+        m["semaines"] = sorted(semaines + [bilan["semaine"]], key=lambda s: s.get("date", ""))
+    return m
+
+
+def cmd_mois(a) -> int:
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = projet_de(etat, a.projet_id, creer=True)
+    bilan = json.loads(Path(a.fichier).read_text(encoding="utf-8"))
+    m = fusionner_mois(p, bilan)
+    etat["maj"] = dt.date.today().isoformat()
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ onglet {bilan.get('mois') or 'du mois'} · {len(m.get('semaines', []))} semaine(s), "
+          f"{len(m.get('wins', []))} win(s), {len(m.get('contenus', []))} contenu(s)")
+    return 0
+
+
+def cmd_sauvegarder(a) -> int:
+    """Copie de sûreté du projet dans git : la page publiée n'est pas la seule à garder la roadmap.
+
+    Seule la part de ce projet est écrite (la page peut porter d'autres projets)."""
+    p = projet_de(lire_etat(Path(a.html).read_text(encoding="utf-8")), a.projet_id)
+    if p is None:
+        raise SystemExit(f"✗ projet {a.projet_id} absent du tableau de bord")
+    sortie = Path(a.sortie)
+    sortie.parent.mkdir(parents=True, exist_ok=True)
+    sortie.write_text(json.dumps(p, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"  ✓ {sortie} · {len(p.get('actions', []))} action(s), {len(p.get('mois', {}))} mois")
+    return 0
+
+
+def cmd_restaurer(a) -> int:
+    """Remet dans la page la part d'un projet depuis sa copie git (page abîmée, ou nouvelle page)."""
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    copie = json.loads(Path(a.depuis).read_text(encoding="utf-8"))
+    if copie.get("id") != a.projet_id:
+        raise SystemExit(f"✗ la copie est celle du projet {copie.get('id')}, pas {a.projet_id}")
+    etat["projets"] = [x for x in etat.get("projets", []) if x.get("id") != a.projet_id] + [copie]
+    etat["maj"] = dt.date.today().isoformat()
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ {page} · projet {a.projet_id} restauré ({len(copie.get('actions', []))} action(s))")
     return 0
 
 
@@ -508,11 +613,15 @@ def main() -> int:
     p.add_argument("--titre", required=True)
     p.add_argument("--type", default="optimisation", choices=["decision", "optimisation", "contenu", "technique"])
     p.add_argument("--statut", default="faite", choices=STATUTS)
+    p.add_argument("--chantier", choices=CHANTIERS, help="rangement dans la page (défaut : déduit du type)")
     p.add_argument("--page")
     p.add_argument("--pourquoi")
+    p.add_argument("--gain")
     p.add_argument("--effort", default="M")
     p.add_argument("--lien")
     p.add_argument("--note")
+    p.add_argument("--attend", help="action bloquée : qui ou quoi on attend")
+    p.add_argument("--date", help="AAAA-MM-JJ : date de l'action (défaut : aujourd'hui), pour reprendre un historique")
     p.set_defaults(f=cmd_ajouter)
     p = sp.add_parser("etat", help="actions d'un projet")
     p.add_argument("--html", required=True)
@@ -527,7 +636,23 @@ def main() -> int:
     p.add_argument("--statut", required=True, choices=STATUTS)
     p.add_argument("--lien")
     p.add_argument("--note")
+    p.add_argument("--attend", help="avec --statut bloquee : qui ou quoi on attend")
     p.set_defaults(f=cmd_marquer)
+    p = sp.add_parser("mois", help="reporter le bilan de la semaine (ou du mois) dans l'onglet du mois")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--fichier", required=True, help="JSON {mois, synthese, reporting, wins, contenus, semaine}")
+    p.set_defaults(f=cmd_mois)
+    p = sp.add_parser("sauvegarder", help="copie de sûreté du projet dans git")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--sortie", default=SAUVEGARDE)
+    p.set_defaults(f=cmd_sauvegarder)
+    p = sp.add_parser("restaurer", help="remettre un projet dans la page depuis sa copie git")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--depuis", default=SAUVEGARDE)
+    p.set_defaults(f=cmd_restaurer)
     a = ap.parse_args()
     return a.f(a)
 

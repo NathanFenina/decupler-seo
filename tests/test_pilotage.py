@@ -146,6 +146,72 @@ class TestCommandes(DossierIsole):
         actions = P.lire_etat(html)["projets"][0]["actions"]
         self.assertEqual([(a["statut"], a["source"]) for a in actions], [("faite", "conversation")])
 
+    def test_chantier_bloquee_et_historique(self):
+        page = self.dossier / "tableau.html"
+        page.write_text(GABARIT, encoding="utf-8")
+        r = lancer("pilotage.py", "ajouter", "--html", "tableau.html", "--projet-id", "atlas", "--titre", "Scan Wordfence",
+                   "--type", "technique", "--chantier", "securite", "--statut", "bloquee", "--attend", "la freelance",
+                   cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        r = lancer("pilotage.py", "ajouter", "--html", "tableau.html", "--projet-id", "atlas", "--titre", "Pages villes",
+                   "--type", "contenu", "--date", "2026-09-24", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        actions = {a["titre"]: a for a in P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["actions"]}
+        self.assertEqual((actions["Scan Wordfence"]["chantier"], actions["Scan Wordfence"]["attend"]), ("securite", "la freelance"))
+        self.assertEqual((actions["Pages villes"]["chantier"], actions["Pages villes"]["maj"], actions["Pages villes"]["mois"]),
+                         ("contenus", "2026-09-24", "2026-09"))          # un historique se range dans son mois
+
+    def test_bilan_de_semaine_rejoue_sans_doublon_puis_sauvegarde_et_restauration(self):
+        page = self.dossier / "tableau.html"
+        page.write_text(GABARIT, encoding="utf-8")
+        bilan = {"mois": "2026-10", "synthese": "Mois de reprise.",
+                 "wins": [{"texte": "/jev-seo/ en page 1", "lien": "https://exemple.test/jev"}],
+                 "contenus": [{"titre": "Jev SEO", "url": "https://exemple.test/jev", "statut": "publié"}],
+                 "semaine": {"date": "2026-10-02", "resume": "3 actions livrées"}}
+        (self.dossier / "semaine.json").write_text(json.dumps(bilan), encoding="utf-8")
+        for _ in range(2):                                   # la routine relancée ne double rien
+            r = lancer("pilotage.py", "mois", "--html", "tableau.html", "--projet-id", "atlas", "--fichier", "semaine.json",
+                       cwd=self.dossier)
+            self.assertEqual(r.returncode, 0, r.stderr)
+        m = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["mois"]["2026-10"]
+        self.assertEqual((len(m["wins"]), len(m["contenus"]), len(m["semaines"])), (1, 1, 1))
+        r = lancer("pilotage.py", "sauvegarder", "--html", "tableau.html", "--projet-id", "atlas", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        copie = json.loads((self.dossier / "journal" / "pilotage.json").read_text(encoding="utf-8"))
+        self.assertEqual(copie["id"], "atlas")
+        page.write_text(GABARIT, encoding="utf-8")           # page perdue : on la reconstruit depuis git
+        r = lancer("pilotage.py", "restaurer", "--html", "tableau.html", "--projet-id", "atlas", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["mois"]["2026-10"]["synthese"],
+                         "Mois de reprise.")
+        r = lancer("pilotage.py", "restaurer", "--html", "tableau.html", "--projet-id", "autre", cwd=self.dossier)
+        self.assertNotEqual(r.returncode, 0)                 # jamais la copie d'un projet dans un autre
+
+
+class TestMois(unittest.TestCase):
+    def test_semaine_remplacee_et_wins_mis_a_jour(self):
+        p = {"id": "atlas"}
+        P.fusionner_mois(p, {"mois": "2026-10", "semaine": {"date": "2026-10-02", "resume": "v1"},
+                             "wins": [{"texte": "Top 3 sur « tva »"}]})
+        P.fusionner_mois(p, {"mois": "2026-10", "semaine": {"date": "2026-10-02", "resume": "v2"},
+                             "wins": [{"texte": "top 3 sur « tva »", "lien": "https://exemple.test"}]})
+        m = p["mois"]["2026-10"]
+        self.assertEqual([s["resume"] for s in m["semaines"]], ["v2"])
+        self.assertEqual(len(m["wins"]), 1)
+        self.assertEqual(m["wins"][0]["lien"], "https://exemple.test")
+
+    def test_bloquee_efface_l_attente_en_repartant(self):
+        p = {"id": "atlas", "actions": [{"id": "a", "titre": "T", "statut": "validee"}]}
+        P.marquer_action(p, "a", "bloquee", attend="accès FTP")
+        self.assertEqual(p["actions"][0]["attend"], "accès FTP")
+        P.marquer_action(p, "a", "validee")
+        self.assertNotIn("attend", p["actions"][0])
+
+    def test_chantier_deduit(self):
+        self.assertEqual(P.chantier_de({"type": "contenu"}), "contenus")
+        self.assertEqual(P.chantier_de({"type": "decision", "source": "points-ouverts"}), "pilotage")
+        self.assertEqual(P.chantier_de({"type": "optimisation", "chantier": "geo"}), "geo")
+
 
 if __name__ == "__main__":
     unittest.main()

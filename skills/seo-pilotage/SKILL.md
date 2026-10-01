@@ -13,7 +13,36 @@ l'identifiant du projet dans `pilotage.projet_id`. La page garde son état dans 
 bloc JSON : chiffres, cartographie et **actions** de chaque projet. Le client y
 clique « Valider » ou « Refuser » ; les routines n'exécutent que ce qui est validé.
 
-Statuts d'une action : `proposee` → `validee` (ou `refusee`) → `en-cours` → `faite`.
+Statuts d'une action : `proposee` → `validee` (ou `refusee`) → `en-cours` → `faite`,
+et `bloquee` quand elle attend quelqu'un ou quelque chose (`--attend "la freelance"`,
+`"accès FTP"`, `"réponse de Google"`) : elle remonte alors dans « À décider ».
+
+Chaque action a un **chantier**, qui la range dans la page : `contenus`,
+`optimisation`, `technique`, `off-page`, `geo`, `international`, `securite`,
+`indexation`, `design`, `pilotage`.
+
+## Un onglet par mois
+
+La page montre un onglet par mois. Le mois en cours : **À décider** (à valider
+et bloquées, avec boutons et remarque pour Claude), reporting, **Fait**, **À
+faire** par chantier, **Wins**, **Contenus** (lien vers la page et vers
+Notion), semaine par semaine, puis cartographie, livrables et routines. Les
+mois passés gardent leur fait, leurs wins, leurs contenus et leur reporting.
+Une action faite se range dans le mois de sa date (`maj`) ; pour reprendre un
+historique : `ajouter --date AAAA-MM-JJ`.
+
+Le bilan d'une semaine ou d'un mois s'écrit avec `pilotage.py mois --fichier
+<json>` (format dans `routines/hebdo.md`) : relancé, il ne double rien. Le
+lien de la base Notion des contenus va dans le projet (`notion`), celui de
+chaque contenu dans sa ligne.
+
+## Rien ne se perd
+
+- La page publiée garde ses versions, et un conflit d'enregistrement est
+  signalé, jamais silencieux.
+- Après chaque republication : `pilotage.py sauvegarder --html … --projet-id …`
+  écrit la part du projet dans `journal/pilotage.json`, **commité** avec le reste.
+- Page abîmée ou à recréer : `pilotage.py restaurer --html <page> --projet-id …`.
 
 ## Lire et écrire la page
 
@@ -52,7 +81,14 @@ Montrer la roadmap du projet, sans rien lancer :
 — à valider, validées (prêtes à lancer), en cours, faites ce mois-ci. Proposer de
 lancer les actions validées ; lancer celles que l'utilisateur désigne.
 
-## Routine de rapport — le 1er du mois
+## Routine hebdo — le vendredi (par défaut)
+
+Elle fait tout en un passage : lire la page, exécuter les actions validées
+(comme ci-dessous), écrire le bilan de la semaine (`mois`), republier,
+sauvegarder. Le premier vendredi du mois, elle ajoute les propositions du mois
+(comme la routine de rapport). Détail : `routines/hebdo.md`.
+
+## Routine de rapport — le 1er du mois (ou premier vendredi au rythme hebdo)
 
 Après `cartographie.py mensuel` et `rapport.py` :
 ```bash
@@ -72,8 +108,8 @@ refusée ne revient pas ; une décision prise n'est jamais écrasée.
    (`optimisation` ou `contenu` ; les `decision` attendent l'humain).
 2. Avant de commencer : `marquer --statut en-cours`, publier.
 3. Exécuter selon les skills habituels ; la note du client sur l'action fait foi.
-4. Fini : `marquer --statut faite --lien <PR ou URL>`, publier. Bloqué :
-   remettre `validee` avec `--note` qui dit pourquoi.
+4. Fini : `marquer --statut faite --lien <PR ou URL>`, publier. Bloqué par
+   quelqu'un ou quelque chose : `marquer --statut bloquee --attend "<qui ou quoi>"`.
 5. Sans action validée, la routine fait son travail ordinaire dans les limites
    de `decupler-seo.config.yml` (optimisations à faible risque seulement).
 

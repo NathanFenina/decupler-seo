@@ -3,8 +3,8 @@ name: seo-nouveau-projet
 description: >
   Crée un nouveau projet SEO piloté en autonomie : dépôt privé à partir du
   gabarit, mémoire du projet (CLAUDE.md, marque, décisions, apprentissages),
-  méthode embarquée pour les routines, configuration, et les quatre routines
-  prêtes à créer. Déclencher sur "nouveau projet", "nouveau client", "lancer
+  méthode embarquée pour les routines, configuration, et la routine du
+  vendredi prête à créer. Déclencher sur "nouveau projet", "nouveau client", "lancer
   un site", "onboarder un client", "créer le repo du projet", "mettre un
   client sous pilotage", "ajouter un site au portefeuille".
 ---
@@ -84,7 +84,7 @@ Vérifier avant le premier push que `.env` n'est pas suivi :
 
 ## 4. Les routines
 
-Suivre `ROUTINES.md`, généré dans le projet : quatre routines, un
+Suivre `ROUTINES.md`, généré dans le projet : une routine hebdo (le vendredi), un
 environnement cloud dédié dont le réseau autorise le domaine du projet, et
 uniquement les connecteurs utiles.
 

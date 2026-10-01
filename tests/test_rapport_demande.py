@@ -70,6 +70,11 @@ class TestCalculs(unittest.TestCase):
         self.assertEqual((r["veille_trouvees"], r["veille_attendues"], r["trouves"]["optimisation"]), (2, 30, 1))
         self.assertEqual(rapport.a_valider("- [ ] a\n- [x] b\n- c\n"), 2)
 
+    def test_rythme_hebdo_compte_les_vendredis(self):
+        refs = ["claude/hebdo-2026-10-02", "claude/hebdo-2026-10-09"]
+        r = rapport.bilan_runs(rapport.runs_des_branches(refs), "2026-10")
+        self.assertEqual((r["mode"], r["veille_trouvees"], r["veille_attendues"]), ("hebdo", 2, 5))  # 5 vendredis en octobre 2026
+
 
 class TestDemande(unittest.TestCase):
     def test_pays_inconnu_demande_un_lieu(self):

@@ -336,7 +336,7 @@ def initialiser(args) -> int:
     print("  Prochaines étapes :")
     print("    1. Compléter memoire/marque.md — c'est lui qui rend le contenu propre à ce client")
     print("    2. git init && créer le dépôt PRIVÉ sur GitHub, puis pousser")
-    print("    3. Créer les 4 routines décrites dans ROUTINES.md\n")
+    print("    3. Créer la routine du vendredi décrite dans ROUTINES.md\n")
     return code
 
 
@@ -344,7 +344,7 @@ def initialiser(args) -> int:
 
 LIGNES_GITIGNORE = [".env", ".env.*", "!.env.example", "secrets/", "*-service-account.json",
                     ".seo-decupler/backups/", "__pycache__/", "*.pyc", "donnees/tableau-de-bord.html",
-                    "donnees/pilotage.json", "donnees/actions-*.json"]
+                    "donnees/pilotage.json", "donnees/actions-*.json", "donnees/semaine.json"]
 
 
 def adopter(args) -> int:

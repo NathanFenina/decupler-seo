@@ -107,7 +107,7 @@ def bilan_journal(journal: list[dict], mois: str) -> dict:
                               for l in mesurees if l["verdict"] == "perte"]}
 
 
-BRANCHE_RUN = re.compile(r"(?:^|/)(veille|optimisation|contenu|rapport)[-/](\d{4}-\d\d-\d\d)$")
+BRANCHE_RUN = re.compile(r"(?:^|/)(hebdo|veille|optimisation|contenu|rapport)[-/](\d{4}-\d\d-\d\d)$")
 
 
 def runs_des_branches(refs: list[str]) -> list[str]:
@@ -141,7 +141,12 @@ def bilan_runs(noms: list[str], mois: str) -> dict:
             compte[m.group(1)] += 1
     a, mm = map(int, mois.split("-"))
     jours = calendar.monthrange(a, mm)[1]
-    return {"trouves": dict(compte), "veille_attendues": jours, "veille_trouvees": compte.get("veille", 0)}
+    if compte.get("hebdo") and not compte.get("veille"):
+        # Rythme hebdo : un passage par vendredi du mois, au lieu d'une veille par jour.
+        vendredis = sum(1 for j in range(1, jours + 1) if calendar.weekday(a, mm, j) == 4)
+        return {"trouves": dict(compte), "mode": "hebdo", "veille_attendues": vendredis,
+                "veille_trouvees": compte["hebdo"]}
+    return {"trouves": dict(compte), "mode": "veille", "veille_attendues": jours, "veille_trouvees": compte.get("veille", 0)}
 
 
 def cartographie(racine: Path, mois: str) -> dict | None:
@@ -274,8 +279,9 @@ def markdown(r: dict) -> str:
          "> Chiffres calculés par `rapport.py` depuis Search Console et le journal. "
          "Ne pas les modifier à la main : relancer le script.", ""]
     if r["runs"]["veille_trouvees"] < r["runs"]["veille_attendues"]:
-        l += [f"**⚠️ Routines : {r['runs']['veille_trouvees']} veilles trouvées sur "
-              f"{r['runs']['veille_attendues']} jours.** Détail : {r['runs']['trouves'] or 'aucune exécution'}.", ""]
+        unite = ("passages hebdo trouvés sur", "vendredis") if r["runs"].get("mode") == "hebdo" else ("veilles trouvées sur", "jours")
+        l += [f"**⚠️ Routines : {r['runs']['veille_trouvees']} {unite[0]} "
+              f"{r['runs']['veille_attendues']} {unite[1]}.** Détail : {r['runs']['trouves'] or 'aucune exécution'}.", ""]
     l += ["## Trafic organique", "",
           "| | Mois | Mois précédent | Même mois, an passé |", "|---|---|---|---|",
           f"| Clics | {m['clics']} | {p['clics']} ({pct(t['clics_variation_pct'])}) | {a['clics']} ({pct(t['clics_variation_an_pct'])}) |",

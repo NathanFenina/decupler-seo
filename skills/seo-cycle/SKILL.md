@@ -1,13 +1,16 @@
 ---
 name: seo-cycle
 description: >
-  Le cycle SEO autonome d'un projet, en quatre modes : veille (quotidienne),
-  optimisation (hebdo), contenu (hebdo), rapport (mensuel). Lit la mémoire du
+  Le cycle SEO autonome d'un projet : le mode hebdo (le vendredi, par défaut,
+  qui enchaîne contrôle, actions validées, mesure et bilan de la semaine dans
+  la page de suivi), ou quatre modes séparés pour un gros site : veille
+  (quotidienne), optimisation (hebdo), contenu (hebdo), rapport (mensuel). Lit la mémoire du
   projet, décide sur les données Search Console, agit dans les limites des
   niveaux d'autonomie, journalise chaque modification et laisse une trace de
   chaque exécution. C'est le skill que lancent les routines. Déclencher sur
   "lance le cycle", "mode veille", "mode optimisation", "mode contenu",
-  "mode rapport", "cycle hebdo", "routine SEO", ou quand une routine le demande.
+  "mode rapport", "mode hebdo", "cycle hebdo", "routine du vendredi",
+  "routine SEO", ou quand une routine le demande.
 ---
 
 # Le cycle SEO autonome
@@ -24,7 +27,7 @@ découlent, avant tout le reste :
 3. **Chaque exécution laisse une trace**, y compris quand il n'y avait rien
    à faire. C'est le seul moyen de savoir qu'une routine a réellement tourné.
 
-## Étape 0 — Commune aux quatre modes
+## Étape 0 — Commune à tous les modes
 
 1. Lire `CLAUDE.md`, `decupler-seo.config.yml`, `memoire/decisions.md`,
    `memoire/apprentissages.md`. Une proposition déjà refusée dans
@@ -40,6 +43,28 @@ découlent, avant tout le reste :
    Console, export CSV déposé dans `donnees/`. **Si aucune n'est disponible,
    le dire dans le journal de run et s'arrêter** — on ne pilote pas à
    l'aveugle.
+
+## Mode hebdo — le vendredi, la routine par défaut
+
+Un seul passage par semaine fait le travail des quatre modes ci-dessous, dans
+cet ordre, et le consigne dans la page de suivi (skill `seo-pilotage`) :
+
+1. **Contrôle** : le mode veille ci-dessous (lecture seule).
+2. **Mesure** : instantané Search Console, puis les mesures dues
+   (`seo-journal-mesure`) avant toute nouvelle modification.
+3. **Actions validées** sur la page de suivi, tous chantiers confondus, selon
+   les règles des modes optimisation et contenu (plafonds, niveaux
+   d'autonomie, journal). Une action qui attend quelqu'un passe en `bloquee`
+   avec `--attend` : elle remonte dans « À décider ».
+4. **Sans action validée** : le travail automatique du mode optimisation.
+   Aucune page neuve sans action validée.
+5. **Premier vendredi du mois** : le mode rapport, puis les propositions du
+   mois (`pilotage.py proposer` et `injecter`).
+6. **Bilan de la semaine** dans l'onglet du mois : `pilotage.py mois` (résumé,
+   wins mesurés, contenus avec leur lien Notion, reporting), republication, puis
+   `pilotage.py sauvegarder` (copie `journal/pilotage.json` dans git).
+
+Le détail de chaque étape est dans `routines/hebdo.md` du projet.
 
 ## Mode veille — quotidien, lecture seule
 
@@ -237,10 +262,11 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
    changé depuis le classement du mois précédent.
 8. **Vérifier les routines** : `rapport.py` compte les journaux de
    `rapports/runs/` **et** les branches poussées par les routines
-   (`claude/veille-AAAA-MM-JJ`, `claude/optimisation-…`, `contenu/…`) : une
+   (`claude/hebdo-AAAA-MM-JJ`, `claude/veille-…`, `claude/optimisation-…`, `contenu/…`) : une
    routine travaille sur sa branche, son journal n'atteint la branche
-   principale qu'à la fusion. Environ 30 veilles, 4 optimisations, 4 contenus
-   attendus. Toute absence est signalée en tête du rapport. Recopier ensuite
+   principale qu'à la fusion. Au rythme hebdo : un passage par vendredi du
+   mois ; avec les quatre routines : environ 30 veilles, 4 optimisations,
+   4 contenus. Toute absence est signalée en tête du rapport. Recopier ensuite
    dans la branche du rapport les journaux de veille du mois (`git show
    origin/claude/veille-<date>:rapports/runs/<date>-veille.md`), pour qu'ils
    arrivent sur la branche principale avec lui.
