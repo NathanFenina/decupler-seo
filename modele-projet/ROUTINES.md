@@ -26,51 +26,31 @@ https://claude.ai/code/routines → **New routine** → **Cloud**.
 - **Heure** : quelques minutes après l'heure pile (7 h 07 et non 7 h 00),
   sinon le départ peut glisser de plusieurs minutes.
 
-## 1 · Veille — tous les jours, 7 h 07
+## Le prompt de chaque routine : court, il renvoie au dépôt
+
+Les consignes vivent dans `routines/<mode>.md`, versionnées avec le projet.
+Le prompt de la routine ne fait que les lire :
 
 ```
-Tu es le SEO manager de ce projet. Lis CLAUDE.md.
-Lance le skill seo-cycle en mode veille.
-N'écris rien sur le site. Si tout va bien, termine sans rien produire
-d'autre que le journal de run. S'il y a une anomalie, décris-la dans
-rapports/a-valider.md avec quoi, depuis quand, combien ça coûte, quoi faire.
-Commite et pousse sur une branche claude/veille-<date>.
+Routine de <mode> de {{NOM}}. Commence par `git fetch origin main`, puis lis
+les instructions à jour avec `git show origin/main:routines/<mode>.md` et
+suis-les à la lettre, étape par étape.
 ```
 
-## 2 · Optimisation — le lundi, 7 h 17
+Pourquoi : le prompt d'une routine ne se modifie que depuis la conversation
+qui l'a créée. Avec ce prompt court, améliorer une routine revient à modifier
+un fichier du dépôt, depuis n'importe quelle conversation, sans la recréer.
 
-```
-Tu es le SEO manager de ce projet. Lis CLAUDE.md.
-Lance le skill seo-cycle en mode optimisation.
-Respecte strictement les niveaux d'autonomie de CLAUDE.md et les plafonds de
-decupler-seo.config.yml. Journalise chaque modification publiée avec
-seo-journal-mesure AVANT de passer à la suivante.
-Commite et pousse sur une branche claude/optimisation-<date>.
-```
+| Routine | `<mode>` | Quand (Europe/Paris) |
+|---|---|---|
+| Veille | `veille` | tous les jours, 7 h 07 |
+| Optimisation | `optimisation` | le lundi, 7 h 17 |
+| Contenu | `contenu` | le mercredi, 7 h 17 |
+| Rapport et roadmap | `rapport` | le 1er du mois, 7 h 27 |
 
-## 3 · Contenu — le mercredi, 7 h 17
-
-```
-Tu es le SEO manager de ce projet. Lis CLAUDE.md.
-Lance le skill seo-cycle en mode contenu.
-Produis au plus le nombre de pages neuves autorisé par semaine, publiées
-selon publication.mode de la config (brouillon CMS, ou pull request sur un
-site en code), et liste-les dans rapports/a-valider.md.
-Commite et pousse sur une branche claude/contenu-<date>.
-```
-
-## 4 · Rapport — le 1er du mois, 7 h 27
-
-```
-Tu es le SEO manager de ce projet. Lis CLAUDE.md.
-Lance le skill seo-cycle en mode rapport : mesure toutes les modifications
-arrivées à échéance (seo-journal-mesure), mets à jour
-memoire/apprentissages.md, relève la cartographie du mois
-(cartographie.py mensuel → rapports/cartographie-<AAAA-MM>.md), puis écris
-rapports/<AAAA-MM>.md et rapports/<AAAA-MM>.json. Vérifie aussi rapports/runs/ : signale toute
-routine qui n'a pas produit son journal de run ce mois-ci.
-Commite et pousse sur une branche claude/rapport-<date>.
-```
+Sur plusieurs projets, décalez les heures de 5 minutes d'un projet à l'autre,
+et l'optimisation d'un jour par rapport à toute autre routine qui écrit les
+mêmes fichiers.
 
 ## Pourquoi un journal de run
 
@@ -81,6 +61,6 @@ routine de rapport vérifie qu'aucune n'a manqué.
 
 ## Votre temps : 30 minutes le lundi
 
-1. Lire `rapports/a-valider.md`
-2. Valider ou refuser, et consigner dans `memoire/decisions.md`
-3. Fusionner les branches `claude/` que vous acceptez
+1. Ouvrir la page de suivi du projet : valider ou refuser les actions du mois
+2. Lire `rapports/a-valider.md`, consigner les décisions dans `memoire/decisions.md`
+3. Fusionner les PR marquées « à fusionner par un humain »

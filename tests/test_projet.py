@@ -19,6 +19,7 @@ class TestProjet(DossierIsole):
         p = self.creer()
         for f in ("CLAUDE.md", "decupler-seo.config.yml", "memoire/marque.md", "memoire/faits.md",
                   "journal/modifications.csv", "ROUTINES.md", ".mcp.json", ".gitignore",
+                  "routines/_commun.md", "routines/rapport.md",
                   ".claude/skills/projet-marque/SKILL.md", ".claude/skills/seo-cycle/SKILL.md",
                   ".claude/agents/seo-manager.md", ".claude/decupler-seo/scripts/guard.py"):
             self.assertTrue((p / f).exists(), f)

@@ -1,5 +1,15 @@
 # Journal des versions
 
+## 3.6.0
+
+### Ajouté
+
+- Gabarit `routines/` (règles communes + veille, optimisation, contenu,
+  rapport) : les consignes des routines sont versionnées dans le dépôt du
+  projet, et le prompt de chaque routine se contente de les lire.
+- `docs/PROJETS.md` : pièges constatés en production et « Travailler projet
+  par projet » (un dépôt, une conversation, une page de suivi par projet).
+
 ## 3.5.3
 
 ### Corrigé

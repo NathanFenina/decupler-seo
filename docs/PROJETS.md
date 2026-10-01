@@ -154,6 +154,44 @@ Trois réglages font échouer une routine s'ils sont oubliés :
   inclus, écritures comprises. N'incluez que ceux dont elle a besoin.
 - **Clés** : dans l'environnement cloud, jamais dans le dépôt.
 
+
+### Pièges constatés en production
+
+- **Session vide = faux succès.** Une routine créée par l'agent sans dépôt
+  s'affiche « réussie » et ne fait rien. Session dédiée au projet, ou
+  routine créée depuis claude.ai/code/routines sur le dépôt.
+- **Prompt figé.** Le prompt d'une routine ne se modifie que depuis la
+  conversation qui l'a créée. D'où le prompt court qui lit
+  `routines/<mode>.md` sur `origin/main` (gabarit dans `ROUTINES.md`).
+- **Fusion refusée.** La session peut refuser qu'une routine fusionne sa
+  propre PR sans relecture. Les consignes prévoient ce cas : PR laissée
+  ouverte, signalée sur la page de suivi, routine terminée. La roadmap est
+  publiée avant la livraison git pour ne jamais la perdre.
+- **Arbre sale.** Les fichiers de travail du tableau de bord sont dans le
+  `.gitignore` du gabarit ; une routine ne supprime jamais un fichier pour
+  « nettoyer ».
+- **Page de suivi.** Une seule par projet, interne. Lire la version en
+  ligne avant de republier (sinon la publication est refusée) ; jamais
+  dans un compte rendu lu par le client.
+
+## Travailler projet par projet
+
+Chaque projet se pilote **depuis son propre dépôt**, dans sa propre
+conversation : c'est là que vivent sa mémoire (`memoire/`), ses consignes
+de routines (`routines/`), sa page de suivi (adresse dans la config) et
+ce qu'il reste à faire (`memoire/passation.md` quand il existe).
+
+- **Travail sur le site** : ouvrir le dépôt du projet seul. Le `CLAUDE.md`
+  ouvre sur la roadmap ; toute tâche livrée est consignée sur la page de
+  suivi (`pilotage.py ajouter`), ce qui évite les doublons entre conversations.
+- **Améliorer la méthode** (un skill, un script, un MCP) : ouvrir
+  decupler-seo, corriger, tester, publier ; puis dans chaque projet
+  `python3 .claude/decupler-seo/scripts/projet.py sync .`. Une règle
+  propre à un seul client va dans un skill `projet-…` du dépôt du projet,
+  jamais dans la méthode.
+- **MCP** : la liste commune est dans `.mcp.json` du gabarit (voir
+  `docs/MCP.md`) ; les clés restent dans l'environnement cloud du projet.
+
 ---
 
 ## La boucle de mesure
