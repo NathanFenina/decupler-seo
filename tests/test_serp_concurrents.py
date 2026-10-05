@@ -269,7 +269,101 @@ class TestAgregation(unittest.TestCase):
         self.assertEqual(S.slug("Pompe à chaleur : prix 2026 ?"), "pompe-a-chaleur-prix-2026")
 
 
+class TestEntitesEtMedias(unittest.TestCase):
+    def test_entites_nommees(self):
+        texte = ("Pour être cité par ChatGPT, Perplexity et Google AI Overviews, soignez votre E-E-A-T.\n"
+                 "L'audit mesure la visibilité dans les LLM. Google Search Console ne le montre pas.\n"
+                 "Perplexity cite ses sources. Ensuite, on agit. Selon Gartner, le trafic baisse.")
+        e = {x["entite"]: x["occurrences"] for x in C.entites_nommees(texte)}
+        self.assertEqual(e["Perplexity"], 2)                 # en tête de phrase, mais vu ailleurs au milieu
+        for attendu in ("ChatGPT", "Google AI Overviews", "E-E-A-T", "LLM", "Google Search Console", "Gartner"):
+            self.assertIn(attendu, e)
+        self.assertNotIn("ChatGPT Perplexity", e)            # la virgule coupe la suite
+        for absent in ("Ensuite", "Pour", "Selon", "L'audit"):
+            self.assertNotIn(absent, e)
+
+    def test_videos(self):
+        html = '<main><p>x</p><iframe src="https://www.youtube.com/embed/abc"></iframe><video src="a.mp4"></video></main>'
+        self.assertEqual(C.lire_html(html)["videos"], 2)
+        self.assertEqual(C.lire_markdown("Voir [la démo](https://www.youtube.com/watch?v=abc).")["videos"], 1)
+
+    def test_entites_communes_sans_le_mot_cle(self):
+        extra = " Google Search Console et ChatGPT le confirment. Le GEO aussi."
+        pages = [page_concurrente(f"https://{x}.fr/p", i, ["Prix", "Aides"], mots_par_section=150, extra=extra)
+                 for i, x in enumerate("ab", 1)]
+        pages.append(page_concurrente("https://c.fr/p", 3, ["Prix"], mots_par_section=250, extra=" Selon Semrush."))
+        en = S.entites_communes(pages, "audit geo")
+        communes = {x["entite"]: x["pages"] for x in en["communes"]}
+        self.assertEqual(communes["Google Search Console"], 2)
+        self.assertNotIn("GEO", communes)
+        self.assertIn("Semrush", {x["entite"] for x in en["isolees"]})
+
+
+class TestReplisSansDataForSEO(unittest.TestCase):
+    def test_serp_firecrawl(self):
+        brut = {"success": True, "data": {"web": [
+            {"url": "https://b.fr/x", "title": "B", "description": "d", "position": 2},
+            {"url": "https://www.a.fr/y", "title": "A", "description": "d", "position": 1}]}}
+        s = S.lire_serp_firecrawl(brut)
+        self.assertEqual([(o["rang"], o["domaine"]) for o in s["organique"]], [(1, "a.fr"), (2, "b.fr")])
+        self.assertEqual(s["source"], "Firecrawl")
+        self.assertFalse(s["ai_overview"]["mesure"])         # non mesuré, pas « absent »
+        self.assertEqual(S.lire_serp_firecrawl([{"url": "https://c.fr"}])["organique"][0]["rang"], 1)
+
+    def test_rapport_dit_non_mesure(self):
+        s = S.lire_serp_firecrawl({"web": [{"url": "https://a.fr/pac", "title": "A"}]})
+        r = S.construire("pompe à chaleur", "France", "fr", s, [], None, "2026-10-05")
+        md = S.markdown(r)
+        self.assertIn("| AI Overview | non mesuré", md)
+        self.assertIn("SERP Firecrawl", md)
+        self.assertTrue(S.lire_serp([])["ai_overview"]["mesure"])
+
+    def test_questions_et_pages_relevees(self):
+        self.assertEqual(S.lire_questions("# PAA du 5/10\n- Qu'est-ce que le GEO ?\n\nCombien coûte un audit ?\n"),
+                         ["Qu'est-ce que le GEO ?", "Combien coûte un audit ?"])
+        md = "# Titre\n\n## Prix\n\n" + "La pompe à chaleur air-eau réduit la facture de chauffage. " * 40
+        relevees = S.lire_pages_json([{"url": "https://a.fr/pac", "markdown": md},
+                                      {"data": {"markdown": md, "metadata": {"sourceURL": "https://b.fr/pac",
+                                                                             "title": "B"}}},
+                                      {"url": "https://vide.fr"}])
+        self.assertEqual(sorted(relevees), ["https://a.fr/pac", "https://b.fr/pac"])
+        page, raison, cout = S.lire_page("https://b.fr/pac", "fr", False, relevees)
+        self.assertEqual((raison, cout, page["titre"]), (None, 0.0, "Titre"))
+        self.assertGreater(page["mots"], 200)
+
+    def test_candidats_maillage(self):
+        urls = ["https://www.decupler.com/", "https://www.decupler.com/audit-geo/",
+                "https://www.decupler.com/blog/visibilite-chatgpt/", "https://www.decupler.com/mentions-legales/",
+                "https://www.decupler.com/blog/geo-ou-seo/"]
+        champ = {"expressions": [], "mots": [{"terme": "visibilité"}, {"terme": "chatgpt"}]}
+        c = S.candidats_maillage(urls, "audit geo", champ)
+        self.assertEqual(c[0]["url"], "https://www.decupler.com/audit-geo/")
+        trouvees = [x["url"] for x in c]
+        self.assertIn("https://www.decupler.com/blog/visibilite-chatgpt/", trouvees)
+        self.assertNotIn("https://www.decupler.com/mentions-legales/", trouvees)
+
+
 class TestCommande(DossierIsole):
+    def test_hors_ligne_depuis_firecrawl(self):
+        md = "# Audit GEO\n\n## Méthode\n\n" + "L'audit GEO mesure la visibilité dans ChatGPT et Perplexity. " * 40
+        serp = self.ecrire("serp.json", json.dumps({"data": {"web": [
+            {"url": "https://a.fr/audit-geo", "title": "A", "position": 1}]}}))
+        pages = self.ecrire("pages.json", json.dumps([{"url": "https://a.fr/audit-geo", "markdown": md}]))
+        paa = self.ecrire("paa.txt", "Qu'est-ce qu'un audit GEO ?\n")
+        plan = self.ecrire("sitemap.xml", "<urlset><url><loc>https://x.fr/audit-geo/</loc></url>"
+                                          "<url><loc>https://x.fr/contact/</loc></url></urlset>")
+        r = lancer("serp_concurrents.py", "--mot", "audit geo", "--langue", "fr", "--pays", "FR",
+                   "--serp-firecrawl", str(serp), "--pages-json", str(pages), "--questions", str(paa),
+                   "--sitemap", str(plan), "--json", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        d = json.loads(r.stdout)
+        self.assertEqual(d["serp"]["source"], "Firecrawl")
+        self.assertEqual(d["pages"][0]["mots"], C.lire_markdown(md)["mots"])
+        self.assertEqual(d["questions"][0]["question"], "Qu'est-ce qu'un audit GEO ?")
+        self.assertEqual([x["url"] for x in d["maillage"]["candidats"]], ["https://x.fr/audit-geo/"])
+        rapport = next((self.dossier / "recherche").glob("serp-audit-geo-*[0-9].md")).read_text(encoding="utf-8")
+        self.assertIn("## Maillage interne — candidates du sitemap", rapport)
+
     def test_hors_ligne_depuis_une_serp_enregistree(self):
         # Sans résultat organique, aucune page n'est téléchargée : le test reste hors réseau.
         serp = [{"item_types": ["people_also_ask"], "items": [

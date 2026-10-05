@@ -182,7 +182,7 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
      (plan Hn, longueur, FAQ, schémas), questions « Autres questions
      posées », AI Overview et ses sources, termes du top absents chez nous ;
    - `seo-benchmark` (au moins 5 axes gagnés, sinon la page n'est pas prête) ;
-   - `seo-brief` (14 sections + triplets à affirmer, écrit dans
+   - `seo-brief` (18 sections + triplets à affirmer, écrit dans
      `recherche/briefs/`), dans le style mesuré de `memoire/style.md` ;
    - `seo-redaction` (+ `projet-marque`, et la passe anti-cannibalisation) ;
    - `seo-design-pages` : gabarit du type de page, CTA, bannières, plan

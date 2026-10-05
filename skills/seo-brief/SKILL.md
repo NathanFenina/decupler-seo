@@ -1,14 +1,16 @@
 ---
 name: seo-brief
 description: >
-  Produit un brief SEO consolidé en 14 sections, en deux variantes :
+  Produit un brief SEO/GEO consolidé en 18 sections, en deux variantes :
   CRÉATION d'une page neuve ou OPTIMISATION d'un contenu existant (verdict,
-  décisions structurelles section par section). Données d'abord (SERP live et
-  top 5 lu et mesuré, PAA, AI Overview, Search Console, cannibalisation,
-  style mesuré du client), puis intention, X-Ray
-  du top 5, information gain, mix de mots-clés, noyau sémantique, H1 et
-  intro rédigés, plan Hn détaillé, prompts GEO, maillage et priorités
-  chiffrées. Déclencher sur "brief", "brief SEO", "brief rédactionnel",
+  décisions structurelles section par section). Données d'abord (SERP live
+  DataForSEO ou repli Firecrawl, top 5 lu et mesuré : Hn, longueur, entités,
+  formats, FAQ, schémas, médias ; PAA, AI Overview, Search Console,
+  cannibalisation, style mesuré du client, sitemap), puis intention, X-Ray
+  du top 5, gap et information gain, mix de mots-clés, noyau sémantique et
+  entités, réponse directe, H1 et intro rédigés, plan Hn chiffré, FAQ
+  rédigée, prompts IA et fan-out, données structurées, sources E-E-A-T,
+  checklist GEO, maillage et priorités chiffrées. Déclencher sur "brief", "brief SEO", "brief rédactionnel",
   "brief d'optimisation", "plan d'article", "plan Hn", "que dois-je écrire
   sur", "cahier des charges rédaction", "structure d'article", "je veux
   écrire sur", "optimiser ce contenu existant".
@@ -24,8 +26,8 @@ brief est incomplet.
 
 | Variante | Quand | Sections |
 |---|---|---|
-| **CRÉATION** | la page n'existe pas | 0 à 13, **sans 2 ni 9** |
-| **OPTIMISATION** | une URL sert déjà l'intention | 0 à 13, toutes |
+| **CRÉATION** | la page n'existe pas | 0 à 17, **sans 2 ni 9** |
+| **OPTIMISATION** | une URL sert déjà l'intention | 0 à 17, toutes |
 
 Fichier produit, dans un projet : `recherche/briefs/<slug>.md`.
 
@@ -59,10 +61,39 @@ différence entre un brief et une supposition.
    Une page illisible (403, rendu JavaScript) est signalée, pas inventée :
    `--repli-dataforseo` la relit par DataForSEO (payant, coût affiché), ou
    lisez-la avec Firecrawl.
+
+   **Quelle source pour la SERP** — la première qui répond, dans cet ordre :
+
+   | Source | Ce qu'elle donne | Ce qui reste à relever |
+   |---|---|---|
+   | DataForSEO (`serp_concurrents.py`) | top 10, PAA, AI Overview et ses sources, features | rien |
+   | MCP Firecrawl (`firecrawl_search`, puis `firecrawl_scrape` sur le top 5, formats `markdown` + `html`) | top organique, pages rendues (JavaScript compris) | PAA, AI Overview, features : **non mesurés** |
+   | MCP Ubersuggest (`serp_analysis`, `locId` du pays) | top 10 avec trafic et autorité des domaines | PAA, AI Overview |
+   | Aucune | — | lecture manuelle de la SERP, signalée en tête du brief |
+
+   Avec Firecrawl, enregistrez les réponses (`serp.json`, `pages.json` :
+   `[{"url", "html", "markdown"}]`) et passez-les au même script, qui
+   produit le même rapport sans DataForSEO :
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/serp_concurrents.py" --mot "<mot-clé>" --langue fr \
+       --serp-firecrawl serp.json --pages-json pages.json --questions paa.txt
+   ```
+   `paa.txt` : une question par ligne, relevée ailleurs (PAA vues à la
+   main, questions Ubersuggest `keyword_suggestions`, Search Console). Ce
+   que la source ne donne pas s'écrit **non mesuré**, jamais « absent ».
+
+   Le rapport mesure, page par page : title, meta, plan H1-H3, mots,
+   listes, tableaux, FAQ, schémas, images et vidéos, liens, dates, ton,
+   **entités nommées** (noms propres, outils, sigles ; celles que 2 pages
+   ou plus citent forment le socle), puis le champ sémantique commun.
 2. **Secondaires et longue traîne**, avec volume, KD, intention et tendance :
    ```bash
    python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" idees --graines "<mot-clé>, <variante>" --langue fr
    ```
+   Sans DataForSEO : MCP Ubersuggest `keyword_overview` et
+   `keyword_suggestions` avec le `locId` du pays (`location_suggest` pour
+   le trouver ; sans `locId`, les volumes sont mondiaux : le dire). Un
+   volume qu'aucun appel n'a renvoyé s'écrit `n.d.`.
 3. **Style de la maison** : `memoire/style.md`. S'il manque, mesurez-le sur
    5 à 10 pages écrites par le client (articles, pages de service) :
    ```bash
@@ -79,6 +110,13 @@ différence entre un brief et une supposition.
 6. **Vocabulaire réel de l'audience** : Reddit, forums, avis clients.
 7. **Positionnement et contraintes** : `decupler-seo.config.yml` → `projet`,
    `memoire/faits.md` (chiffres vérifiés), gabarit CMS de la page.
+8. **Pages internes à lier** : le sitemap du client, lu par le même
+   script, sort les pages dont l'adresse parle du sujet (section 12) :
+   `serp_concurrents.py … --sitemap https://<domaine>/sitemap.xml`.
+9. **Prompts IA** : les relevés de `geo-share-of-model`
+   (`releves-ia-<mois>.csv`) ou du MCP Ubersuggest (`brand_prompts`) s'ils
+   existent pour ce sujet ; sinon les prompts de la section 13 sont des
+   **formulations proposées, non mesurées**, à relever avant publication.
 
 **Mode dégradé.** Si les métriques ou la SERP ne remontent pas (identifiants
 absents, API en erreur, scraping bloqué), le brief est **produit quand
@@ -107,9 +145,9 @@ Une page de service ou de catégorie vit dans un gabarit : blocs fixes (hero,
 réassurance, formulaire, CTA), emplacements limités. Le brief s'y plie.
 **Ce qui n'entre pas dans le gabarit ne se force pas** : un développement
 pédagogique trop long pour une page service devient un article de blog qui
-renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 13).
+renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 17).
 
-## Les 14 sections
+## Les 18 sections
 
 ### 0. Paramètres du contenu
 
@@ -149,10 +187,12 @@ renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 13).
 
 ### 3. X-Ray SERP — top 5
 
-| Source | Angle | Structure Hn | Point fort | Faille à exploiter |
-|---|---|---|---|---|
+| # | Source | Mots | H2 / H3 | Formats (listes, tableaux, FAQ) | Schémas | Médias | Angle | Point fort | Faille à exploiter |
+|---|---|---|---|---|---|---|---|---|---|
 
-Structure, longueur, formats et date viennent du rapport SERP ; angle,
+Sous le tableau, les **entités** que le top cite (au moins 2 pages) et
+celles qu'une seule page apporte. Structure, longueur, formats, schémas,
+médias, entités et date viennent du rapport SERP ; angle,
 point fort et faille, de la lecture de `-contenus.md`. Sous le tableau :
 **AI Overview présent ?** oui/non, quelles sources il cite, et ce que dit
 son extrait — c'est la réponse que l'IA retient déjà : la page la couvre
@@ -167,19 +207,28 @@ vidéo, pack local), fourchette de longueur.
   top : **non** », les sujets qu'une seule page traite, ce que l'extrait de
   l'AI Overview ne dit pas. Ce que tout le top fait (sujets récurrents) est
   le ticket d'entrée, pas la différence.
+- **Matrice de gap** : une ligne par sujet ou question qui compte, une
+  colonne par page du top (✓ / —), une colonne « nous ». Ce que tout le
+  monde couvre = socle ; ce que 1 page couvre = piste ; ce que **personne**
+  ne couvre et qui sert l'intention = angle différenciant.
+
+  | Sujet / question | #1 | #2 | #3 | #4 | #5 | Nous |
+  |---|---|---|---|---|---|---|
+
 - **3 à 5 axes de valeur** : donnée propre, cas vécu, outil, grille de
   décision, cas particuliers. Ils alimentent la grille de `seo-benchmark`
   (au moins 5 axes gagnés avant publication).
 
 ### 5. Mix de mots-clés
 
-| Priorité | Mot-clé | Section d'intégration |
-|---|---|---|
-| Principal | | H1, intro, un H2, CTA final |
-| Secondaire | | |
-| HAUTE | | |
-| MOYENNE | | |
-| COMPLÉMENTAIRE | | |
+| Priorité | Mot-clé | Volume · KD (source) | Section d'intégration |
+|---|---|---|---|
+| Principal | | | H1, intro, un H2, CTA final |
+| Secondaire | | | |
+| HAUTE | | | |
+| MOYENNE | | | |
+| COMPLÉMENTAIRE | | | |
+| Longue traîne | requêtes de 4 mots et plus, questions | | H3, FAQ |
 
 Règle : **chaque terme HAUTE comble une lacune relevée en section 2** (en
 CRÉATION : une faille de la section 3). En OPTIMISATION, les « termes du
@@ -216,9 +265,15 @@ les entités principales avec leur QID (`memoire/entites.csv`) et celle qui
 va en `about`. Méthode, gabarit de la section et contrôle :
 `seo-entites-triplets` (`scripts/triplets.py verifier`).
 
-### 7. H1 & introduction
+### 7. H1, réponse directe & introduction
 
 `DÉCISION : MODIFIER / GARDER / ENRICHIR`
+
+- **Réponse directe RÉDIGÉE, 40 à 60 mots**, placée juste sous le H1 :
+  le sujet nommé en première phrase (« Un audit GEO est… »), une réponse
+  complète à la requête principale (définition, chiffre ou verdict), aucun
+  pronom sans référent, compréhensible copiée seule. C'est le passage que
+  l'AI Overview, ChatGPT ou Perplexity reprennent. Comptez les mots.
 
 - ❌ H1 actuel : « … »
 - ✅ H1 proposé : 50-60 caractères, mot-clé en tête, année si le sujet
@@ -318,10 +373,66 @@ terrain à raconter, la position assumée, le contre-argument à traiter.
   page service du cluster → pages de conversion → contenus satellites.
 - Les pages qui devront lier **vers** ce contenu une fois publié.
 - **Ne jamais supprimer un lien interne existant** : on en ajoute.
-- 2-3 sources externes d'autorité, et le schema à poser (Article, FAQPage,
-  Service, HowTo…) avec `seo-schema-jsonld`.
+- **Pages cibles réelles** : tirées du sitemap (`--sitemap`, section
+  « Maillage interne » du rapport SERP) ou de l'inventaire du projet,
+  jamais une adresse supposée. Sans sitemap lisible, écrivez-le.
+- Sources externes : section 15 ; schema : section 14.
 
-### 13. Priorités
+### 13. Prompts IA & fan-out
+
+La requête Google n'est pas la question posée à une IA. Listez :
+
+- **5 à 10 prompts neutres** (sans la marque) tels qu'un utilisateur les
+  tape dans ChatGPT, Perplexity ou Gemini : conversationnels, en
+  situation (« Je dirige une PME, comment savoir si ChatGPT parle de mon
+  entreprise ? »). Pour chacun : mesuré (relevé, date, marques citées) ou
+  **proposé, non mesuré**.
+- **Le fan-out** : les 6 à 10 sous-questions qu'un moteur génératif
+  décompose pour répondre (prix, délai, pour qui, étapes, outils,
+  comparatif, risques, alternatives). Pour chacune, la section du plan qui
+  y répond **dans ses premières lignes**. Une sous-question sans section
+  = un H2 ou une question de FAQ à ajouter. Objectif : 100 % couvertes
+  (le seuil `geo-ready` est 70 %).
+
+| Sous-question (fan-out) | Section qui répond | Couverte par le top ? |
+|---|---|---|
+
+### 14. Données structurées recommandées
+
+Le `@graph` de la page, nœud par nœud, avec `seo-schema-jsonld` :
+`WebPage` (ou `Article` / `BlogPosting`, `Service` pour une offre) +
+`BreadcrumbList` + `FAQPage` si la FAQ est visible + `Person` (auteur) +
+`Organization`. `about` et `mentions` portent les entités de la section 6
+(avec QID Wikidata). Indiquez ce que le top utilise (rapport SERP) et ce
+qui manque. **Jamais un schéma qui affirme ce que la page ne montre pas.**
+
+### 15. Sources & E-E-A-T à apporter
+
+- **Sources externes** (2 à 4) : institution, étude, norme, documentation
+  officielle d'un moteur — avec leur lien, jamais un concurrent direct.
+- **Preuves propriétaires** : chiffre interne, cas client, capture,
+  méthode maison (`memoire/faits.md`). Ce qui manque s'écrit
+  `[À COMPLÉTER : …]`, jamais inventé.
+- **Auteur** : nom, rôle, expérience vécue sur le sujet, page auteur ;
+  date de publication et de mise à jour visibles. Grille : `seo-eeat`.
+
+### 16. Checklist GEO avant publication
+
+- [ ] Réponse directe de 40-60 mots sous le H1, sujet nommé
+- [ ] Chaque H2 formulé comme une question ou une intention, réponse en 1-3 phrases dessous
+- [ ] Premier paragraphe de chaque H2 compréhensible seul (40-120 mots)
+- [ ] Définition explicite « X est un… qui… »
+- [ ] Au moins une donnée chiffrée sourcée et datée, idéalement propriétaire
+- [ ] Tableau dès qu'il y a comparaison ou chiffres ; liste numérotée pour les étapes
+- [ ] FAQ de 3 à 6 questions réelles, réponses de 40-60 mots
+- [ ] Fan-out couvert (section 13)
+- [ ] Marque nommée à côté de son expertise dans les passages clés
+- [ ] Auteur identifié, dates visibles, `dateModified` cohérent
+- [ ] JSON-LD valide (`schema_validate.py`) et conforme au contenu visible
+- [ ] Contenu lisible sans JavaScript ; robots.txt ouvert aux robots IA (`geo-llms-txt`)
+- [ ] Prompts de la section 13 relevés avant publication, puis à J+30 (`geo-share-of-model`)
+
+### 17. Priorités
 
 **Modifications CRITIQUES — impact SEO X/10**
 1. …
@@ -330,6 +441,14 @@ terrain à raconter, la position assumée, le contre-argument à traiter.
 1. …
 
 Le GAP CRITIQUE de la section 2 figure toujours en tête des critiques.
+
+## Traçabilité — chaque chiffre a son origine
+
+En tête du brief, un bloc **Sources de données** : pour chaque mesure
+(volume, KD, positions, longueurs, PAA, AI Overview), l'outil appelé, la
+date et le paramètre de lieu. Une valeur qu'aucun appel n'a renvoyée
+s'écrit `n.d.` ou **non mesuré**. Les noms des concurrents restent dans le
+brief (section 3) et **jamais dans la page**.
 
 ---
 
@@ -356,8 +475,8 @@ s'écrit pas — ni dans le brief, ni dans la page.
 - `recherche/briefs/<slug>.md` — le brief complet, qui cite en tête le
   rapport SERP dont il part (`recherche/serp-<slug>-<date>.md`)
 - `champ-semantique.csv` — noyau sémantique et entités
-- Le H1, l'introduction et la FAQ **déjà rédigés** — pas à faire par le
-  rédacteur
+- Le H1, la réponse directe (40-60 mots), l'introduction et la FAQ
+  **déjà rédigés** — pas à faire par le rédacteur
 
 Enchaînez : `seo-benchmark` pour valider les axes, puis `/seo article`
 (`seo-redaction`) pour la rédaction.

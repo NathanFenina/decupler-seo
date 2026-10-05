@@ -176,6 +176,68 @@ def termes(texte: str) -> tuple[Counter, dict]:
     return compte, formes
 
 
+_JETON_BRUT = re.compile(r"[^\W_]+(?:[-'’.][^\W_]+)*")
+_ELISION = re.compile(r"^[ldjqnsmtcLDJQNSMTC]['’]")
+
+
+def _nomme(jeton: str) -> bool:
+    """Majuscule initiale (Google), majuscule intérieure (ChatGPT) ou sigle (E-E-A-T)."""
+    return len(jeton) > 1 and not jeton.isdigit() and (jeton[0].isupper() or any(c.isupper() for c in jeton[1:]))
+
+
+def _sigle(jeton: str) -> bool:
+    lettres = [c for c in jeton if c.isalpha()]
+    return len(lettres) >= 2 and all(c.isupper() for c in lettres)
+
+
+def entites_nommees(texte: str, maxi: int = 25) -> list[dict]:
+    """Noms propres, marques, sigles et outils cités par un texte : une heuristique sans dépendance.
+
+    Une suite de mots à majuscule (« Google Search Console », « ChatGPT », « E-E-A-T ») est une entité
+    candidate. En début de phrase ou de ligne, la majuscule ne prouve rien : un mot isolé n'y compte que
+    s'il apparaît ailleurs en milieu de phrase. Ce n'est pas une reconnaissance d'entités : la liste se
+    trie à la lecture (une marque concurrente n'entre jamais dans le noyau sémantique).
+    """
+    milieu, debut, formes = Counter(), Counter(), {}
+    for ligne in (texte or "").splitlines():
+        for phrase in decouper_phrases(ligne):
+            trouves = list(_JETON_BRUT.finditer(phrase))
+            mots = [_ELISION.sub("", m.group()) for m in trouves]
+            i = 0
+            while i < len(mots):
+                if not _nomme(mots[i]):
+                    i += 1
+                    continue
+                j = i + 1      # une virgule ou un deux-points coupe la suite : « ChatGPT, Perplexity » = deux entités
+                while j < len(mots) and _nomme(mots[j]) and not phrase[trouves[j - 1].end():trouves[j].start()].strip():
+                    j += 1
+                a, b = i, j
+                while a < b and sans_accents(mots[a]) in MOTS_VIDES:     # « Le », « Pour » en tête de phrase
+                    a += 1
+                while b > a and sans_accents(mots[b - 1]) in MOTS_VIDES:
+                    b -= 1
+                if a < b:
+                    forme = " ".join(mots[a:b]).rstrip(".")
+                    cle = sans_accents(forme)
+                    formes.setdefault(cle, Counter())[forme] += 1
+                    seul_en_tete = a == 0 and b == 1 and not _sigle(mots[0]) \
+                        and not any(c.isupper() for c in mots[0][1:])
+                    (debut if seul_en_tete else milieu)[cle] += 1
+                i = j
+    compte = Counter({k: n + debut.get(k, 0) for k, n in milieu.items()})
+    return [{"entite": formes[k].most_common(1)[0][0], "cle": k, "occurrences": n}
+            for k, n in compte.most_common(maxi)]
+
+
+_VIDEO = re.compile(r"<video\b|<iframe[^>]+(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com|wistia|dailymotion)"
+                    r"|\]\(https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/|vimeo\.com/\d)", re.I)
+
+
+def compter_videos(source: str) -> int:
+    """Vidéos intégrées (balise <video>, lecteur YouTube/Vimeo) dans un HTML ou un Markdown."""
+    return len(_VIDEO.findall(source or ""))
+
+
 def ngrammes_recurrents(textes: list[str], tailles=(3, 4, 5), mini_docs: int = 2, maxi: int = 15) -> list[dict]:
     """Expressions de 3 à 5 mots qui reviennent d'un texte à l'autre : les tics de la maison."""
     par_doc: list[Counter] = []
@@ -469,6 +531,7 @@ def _page(url, titre, meta, blocs_tous, zone, elements_zone, schemas, dates, mic
         "liens_internes": internes, "liens_externes": externes, "gras": compte["gras"],
         "faq": bool(faq), "schemas": sorted(set(schemas)), "dates": dates,
         "questions_titres": [t["texte"] for t in titres if t["texte"].rstrip().endswith("?")],
+        "entites": entites_nommees(texte, maxi=20), "videos": 0,
         "texte": texte, "paragraphes": paragraphes, "markdown": en_markdown(blocs),
     }
 
@@ -513,7 +576,9 @@ def lire_html(html: str, url: str = "") -> dict:
                           or m.get("datemodified") or (max(lecteur.temps) if lecteur.temps else None)),
     }
     meta = m.get("description") or m.get("og:description") or ""
-    return _page(url, lecteur.titre, meta, blocs, zone, [e for e in elements if zone(e)], schemas, dates)
+    page = _page(url, lecteur.titre, meta, blocs, zone, [e for e in elements if zone(e)], schemas, dates)
+    page["videos"] = compter_videos(html)
+    return page
 
 
 def lire_markdown(md: str, url: str = "") -> dict:
@@ -571,7 +636,9 @@ def lire_markdown(md: str, url: str = "") -> dict:
         else:
             para.append(s)
     fermer()
-    return _page(url, titre, "", blocs, lambda b: True, elements, [], {"publiee": None, "modifiee": None})
+    page = _page(url, titre, "", blocs, lambda b: True, elements, [], {"publiee": None, "modifiee": None})
+    page["videos"] = compter_videos(md)
+    return page
 
 
 def lire_texte_brut(texte: str, url: str = "") -> dict:

@@ -1,5 +1,22 @@
 # Journal des versions
 
+## Non publié
+
+### Ajouté
+
+- `seo-brief` passe à **18 sections** : réponse directe de 40-60 mots
+  rédigée, matrice de gap face au top 5, volumes et longue traîne tracés
+  par source, **prompts IA et fan-out** (section 13), données structurées
+  recommandées (14), sources et E-E-A-T à apporter (15), checklist GEO
+  avant publication (16), bloc de traçabilité des données.
+- `serp_concurrents.py` fonctionne **sans DataForSEO** : `--serp-firecrawl`
+  (recherche Firecrawl enregistrée, PAA et AI Overview notés « non
+  mesurés »), `--pages-json` (pages déjà relevées, HTML ou Markdown),
+  `--questions` (PAA relevées ailleurs), `--sitemap` (pages du client
+  candidates au maillage interne).
+- Lecture des pages : **entités nommées** (noms propres, outils, sigles)
+  par page et communes au top, **vidéos** intégrées.
+
 ## 3.7.1
 
 ### Ajouté

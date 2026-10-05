@@ -21,6 +21,17 @@
 4. Avec --url (ou projet.domaine) : la page du client lue de la même façon,
    et ce qui lui manque face au top — sujets, termes, questions, longueur.
 
+Sans DataForSEO (repli documenté dans `seo-brief`) : la SERP vient d'une
+recherche Firecrawl enregistrée (--serp-firecrawl, top organique seulement :
+ni PAA ni AI Overview, notés « non mesurés »), les questions d'un fichier
+(--questions : PAA relevées à la main, Ubersuggest, Search Console) et les
+pages d'un relevé Firecrawl déjà fait (--pages-json : url + html ou
+markdown). Avec --sitemap, les pages du site du client les plus proches du
+sujet sortent comme candidates au maillage interne.
+
+    python3 serp_concurrents.py --mot "audit geo" --serp-firecrawl serp.json \
+        --pages-json pages.json --questions paa.txt --sitemap https://exemple.fr/sitemap.xml
+
 Écrit recherche/serp-<slug>-<date>.md (le rapport) et
 recherche/serp-<slug>-<date>-contenus.md (le contenu structuré de chaque
 concurrent, titres et listes conservés, à lire avant d'écrire le brief).
@@ -108,9 +119,35 @@ def lire_serp(resultats: list[dict]) -> dict:
             vus.add(s["url"])
             sources.append(s)
     aio["sources"] = sources
-    return {"organique": organique, "questions": list(dict.fromkeys(questions)),
+    aio["mesure"] = True
+    return {"source": "DataForSEO", "organique": organique, "questions": list(dict.fromkeys(questions)),
             "recherches_associees": [a for a in dict.fromkeys(associees) if a],
             "ai_overview": aio, "extrait_optimise": extrait_position0, "features": sorted(features)}
+
+
+def lire_serp_firecrawl(brut) -> dict:
+    """Une recherche Firecrawl (firecrawl_search, MCP ou API) réduite au même format que lire_serp.
+
+    Firecrawl ne renvoie que le classement organique : PAA, AI Overview, extrait optimisé et features
+    restent « non mesurés » (et non « absents ») — le rapport le dit, le brief les relève autrement.
+    """
+    if isinstance(brut, dict):
+        brut = (brut.get("data") or brut)
+        brut = brut.get("web") or brut.get("results") or [] if isinstance(brut, dict) else brut
+    organique = []
+    for i, it in enumerate(x for x in brut or [] if isinstance(x, dict) and x.get("url")):
+        organique.append({"rang": it.get("position") or i + 1, "url": it["url"], "domaine": domaine(it["url"]),
+                          "titre": it.get("title") or "", "description": it.get("description") or ""})
+    organique.sort(key=lambda o: o["rang"])
+    return {"source": "Firecrawl", "organique": organique, "questions": [], "recherches_associees": [],
+            "ai_overview": {"present": False, "mesure": False, "sources": [], "extrait": ""},
+            "extrait_optimise": None, "features": []}
+
+
+def lire_questions(texte: str) -> list[str]:
+    """Une question par ligne ; lignes vides et commentaires (#) ignorés."""
+    return [l.strip().lstrip("-* ").strip() for l in (texte or "").splitlines()
+            if l.strip() and not l.lstrip().startswith("#")]
 
 
 # ─── Agrégation ───────────────────────────────────────────────────
@@ -231,8 +268,53 @@ def ton_du_top(pages: list[dict]) -> dict:
             "lisibilite_mediane": round(C.mediane(lis), 1) if lis else None}
 
 
+def entites_communes(pages: list[dict], cle: str = "", maxi: int = 30) -> dict:
+    """Entités nommées (noms propres, outils, sigles) par nombre de pages du top qui les citent.
+
+    Celles qu'au moins deux pages citent forment le socle attendu ; les autres sont des pistes.
+    Le mot-clé lui-même est écarté (« GEO » sur « audit geo » n'apprend rien).
+    """
+    lues = [p for p in pages if p.get("mots", 0) >= MOTS_MINI]
+    docs, total, formes = {}, {}, {}
+    mots_cle = C.sans_accents(cle)
+    for p in lues:
+        for e in p.get("entites") or C.entites_nommees(p.get("texte") or ""):
+            k = e["cle"]
+            if k == mots_cle or set(k.split()) <= set(mots_cle.split()):
+                continue
+            docs[k] = docs.get(k, 0) + 1
+            total[k] = total.get(k, 0) + e["occurrences"]
+            formes.setdefault(k, e["entite"])
+    ordre = sorted(docs, key=lambda k: (-docs[k], -total[k]))
+    lignes = [{"entite": formes[k], "pages": docs[k], "occurrences": total[k]} for k in ordre]
+    return {"pages_lues": len(lues), "communes": [l for l in lignes if l["pages"] >= 2][:maxi],
+            "isolees": [l for l in lignes if l["pages"] == 1][:maxi]}
+
+
+def candidats_maillage(urls: list[str], mot: str, champ: dict | None = None, maxi: int = 12) -> list[dict]:
+    """Pages du site du client dont l'adresse parle du sujet : candidates au maillage interne.
+
+    Score = radicaux du mot-clé présents dans le chemin (×3) + termes du champ commun (×1). Un lien se
+    décide à la lecture de la page cible ; la liste dit seulement où regarder d'abord.
+    """
+    cle = C.radicaux_utiles(mot)
+    champ_r = set()
+    for x in (champ or {}).get("expressions", []) + (champ or {}).get("mots", []):
+        champ_r |= C.radicaux_utiles(x["terme"])
+    champ_r -= cle
+    sortie = []
+    for u in dict.fromkeys(urls):
+        chemin = urlparse(u).path.replace("-", " ").replace("_", " ").replace("/", " ")
+        r = C.radicaux_utiles(chemin)
+        score = 3 * len(r & cle) + len(r & champ_r)
+        if score:
+            sortie.append({"url": u, "score": score, "communs": sorted((r & cle) | (r & champ_r))})
+    sortie.sort(key=lambda x: (-x["score"], len(x["url"])))
+    return sortie[:maxi]
+
+
 def construire(mot: str, lieu: str, langue: str, serp: dict, pages: list[dict], client: dict | None,
-               date: str, echecs: list[dict] | None = None) -> dict:
+               date: str, echecs: list[dict] | None = None, sitemap: list[str] | None = None) -> dict:
     """Assemble le rapport à partir de la SERP et des pages déjà lues. Pur : aucun réseau."""
     lues = [p for p in pages if p.get("mots", 0) >= MOTS_MINI]
     tous_sujets = sujets(lues, mot)
@@ -259,15 +341,21 @@ def construire(mot: str, lieu: str, langue: str, serp: dict, pages: list[dict], 
             "avec_liste": sum(1 for p in lues if p["listes"]["puces"] + p["listes"]["numerotees"]),
             "h2_mediane": C.mediane([sum(1 for n, _ in p["plan"] if n == 2) for p in lues]) if lues else None,
             "images_mediane": C.mediane([p["images"] for p in lues]) if lues else None,
+            "avec_video": sum(1 for p in lues if p.get("videos")),
             "schemas": sorted({s for p in lues for s in p["schemas"]}),
         },
         "sujets_recurrents": recurrents,
         "sujets_isoles": isoles[:15],
         "questions": questions,
         "champ": champ_commun(pages, client, cle=mot),
+        "entites": entites_communes(pages, mot),
         "ton": ton_du_top(pages),
         "client": None,
+        "maillage": None,
     }
+    if sitemap is not None:
+        rapport["maillage"] = {"urls_sitemap": len(sitemap),
+                               "candidats": candidats_maillage(sitemap, mot, rapport["champ"])}
     if client:
         titres_client = [t for _, t in client.get("plan") or []]
         dom = domaine(client["url"])
@@ -303,19 +391,23 @@ def markdown(r: dict) -> str:
     s, lg, st = r["serp"], r["longueur"], r["structure"]
     aio = s["ai_overview"]
     L = [f"# SERP — « {r['mot']} »", "",
-         f"{r['lieu']} · {r['langue']} · relevé le {r['date']} · {st['pages_lues']} page(s) concurrente(s) lue(s)", "",
+         f"{r['lieu']} · {r['langue']} · relevé le {r['date']} · SERP {s.get('source', 'DataForSEO')} · "
+         f"{st['pages_lues']} page(s) concurrente(s) lue(s)", "",
          "## Synthèse", "", "| Signal | Mesure |", "|---|---|",
          f"| Longueur du top (mots) | " + (f"médiane {lg['mediane']} · 3e quartile {lg['p75']} · "
                                           f"de {lg['min']} à {lg['max']} ({lg['pages']} pages)" if lg else "n.d.") + " |",
          f"| **Fourchette cible** | " + (("**environ {0} mots**" if lg["fourchette"][0] == lg["fourchette"][1]
                                         else "**{0} à {1} mots**").format(*lg["fourchette"]) if lg else "n.d.") + " |",
-         f"| AI Overview | {'oui' if aio['present'] else 'non'}"
-         + (f" · {len(aio['sources'])} source(s) citée(s)" if aio["present"] else "") + " |",
+         f"| AI Overview | " + ("non mesuré (SERP sans features)" if not aio.get("mesure", True)
+                                 else ("oui" if aio["present"] else "non")
+                                 + (f" · {len(aio['sources'])} source(s) citée(s)" if aio["present"] else "")) + " |",
          f"| Extrait optimisé (position 0) | "
-         + (f"{s['extrait_optimise']['domaine']}" if s["extrait_optimise"] else "non") + " |",
+         + (f"{s['extrait_optimise']['domaine']}" if s["extrait_optimise"]
+            else "non" if aio.get("mesure", True) else "non mesuré") + " |",
          f"| FAQ / tableau / liste | {st['avec_faq']} / {st['avec_tableau']} / {st['avec_liste']} "
          f"sur {st['pages_lues']} pages |",
          f"| H2 par page (médiane) | {_cellule(st['h2_mediane'])} |",
+         f"| Vidéo intégrée | {st.get('avec_video', 0)} sur {st['pages_lues']} pages |",
          f"| Schémas vus | {', '.join(st['schemas']) or 'aucun'} |",
          f"| Features de la SERP | {', '.join(s['features']) or 'n.d.'} |", ""]
     if r["ton"]:
@@ -324,24 +416,25 @@ def markdown(r: dict) -> str:
               f"phrase moyenne {_cellule(t['phrase_moyenne_mediane'])} mots · lisibilité "
               f"{_cellule(t['lisibilite_mediane'])} (Kandel-Moles, indicatif).", ""]
 
-    L += ["## Top organique", "", "| # | Domaine | Title | Mots | H2 | Listes | Tabl. | FAQ | Schémas | Mise à jour |",
-          "|---|---|---|---|---|---|---|---|---|---|"]
+    L += ["## Top organique", "",
+          "| # | Domaine | Title | Mots | H2 | Listes | Tabl. | Img / vid. | FAQ | Schémas | Mise à jour |",
+          "|---|---|---|---|---|---|---|---|---|---|---|"]
     lues = {p["url"]: p for p in r["pages"]}
     dom_client = domaine(r["client"]["url"]) if r["client"] else None
     for o in s["organique"]:
         p = lues.get(o["url"])
         if o["domaine"] == dom_client:
             L.append(f"| {o['rang']} | **{o['domaine']}** (client) | {_cellule(o['titre'])} | "
-                     f"{_cellule(r['client']['mots'])} | | | | | | |")
+                     f"{_cellule(r['client']['mots'])} | | | | | | | |")
             continue
         if p:
             nb_h2 = sum(1 for n, _ in p["plan"] if n == 2)
             L.append(f"| {o['rang']} | {o['domaine']} | {_cellule(o['titre'])} | {p['mots']} | {nb_h2} | "
                      f"{p['listes']['puces'] + p['listes']['numerotees']} | {p['tableaux']} | "
-                     f"{'oui' if p['faq'] else 'non'} | {', '.join(p['schemas'][:4]) or '—'} | "
+                     f"{p['images']} / {p.get('videos', 0)} | {'oui' if p['faq'] else 'non'} | {', '.join(p['schemas'][:4]) or '—'} | "
                      f"{p['dates'].get('modifiee') or p['dates'].get('publiee') or '—'} |")
         else:
-            L.append(f"| {o['rang']} | {o['domaine']} | {_cellule(o['titre'])} | — | | | | | | |")
+            L.append(f"| {o['rang']} | {o['domaine']} | {_cellule(o['titre'])} | — | | | | | | | |")
     if r["echecs"]:
         L += ["", "Pages non lues : " + " · ".join(f"{e['url']} ({e['raison']})" for e in r["echecs"])]
     L.append("")
@@ -368,7 +461,10 @@ def markdown(r: dict) -> str:
     L.append("")
 
     L += ["## AI Overview", ""]
-    if aio["present"]:
+    if not aio.get("mesure", True):
+        L.append("Non mesuré : la SERP vient d'une source sans features (Firecrawl). À relever à la main "
+                 "ou par DataForSEO avant d'écrire la section 3 du brief.")
+    elif aio["present"]:
         L += [f"> {aio['extrait']}" if aio["extrait"] else "> (contenu non renvoyé)", "", "Sources citées :", ""]
         L += [f"- {x['domaine']} — {x['titre'] or x['url']}" for x in aio["sources"]] or ["- aucune renvoyée"]
     else:
@@ -387,6 +483,26 @@ def markdown(r: dict) -> str:
     else:
         L.append("n.d. : moins de deux pages lues.")
     L.append("")
+
+    en = r.get("entites") or {}
+    L += ["## Entités nommées du top", ""]
+    if en.get("communes") or en.get("isolees"):
+        L += ["Heuristique (noms propres, outils, sigles) : à trier, une marque concurrente n'entre pas dans le "
+              "noyau.", "",
+              "**Citées par au moins 2 pages** : "
+              + (", ".join(f"{x['entite']} ({x['pages']})" for x in en.get("communes", [])) or "—"), "",
+              "**Citées par une seule page** : " + (", ".join(x["entite"] for x in en.get("isolees", [])[:20]) or "—")]
+    else:
+        L.append("n.d. : aucune page lue.")
+    L.append("")
+
+    m = r.get("maillage")
+    if m is not None:
+        L += ["## Maillage interne — candidates du sitemap", "",
+              f"{m['urls_sitemap']} adresse(s) lue(s) dans le sitemap. Pages dont le chemin parle du sujet "
+              "(à confirmer à la lecture) :", ""]
+        L += [f"- {x['url']} — {', '.join(x['communs'])}" for x in m["candidats"]] or ["- aucune"]
+        L.append("")
 
     c = r["client"]
     if c:
@@ -448,9 +564,42 @@ def lire_dataforseo(url: str, langue: str) -> tuple[dict, float]:
     return C.lire_markdown(md, url), cout
 
 
-def lire_page(url: str, langue: str, repli: bool) -> tuple[dict | None, str | None, float]:
+def lire_pages_json(brut) -> dict[str, dict]:
+    """Pages déjà relevées (Firecrawl scrape, export d'outil) : liste de {url, html | markdown}, ou un
+    dictionnaire {url: {html | markdown}}. La réponse brute de firecrawl_scrape (clé « data ») est acceptée."""
+    if isinstance(brut, dict) and not brut.get("url"):
+        brut = [{"url": u, **(v if isinstance(v, dict) else {"markdown": v})} for u, v in brut.items()]
+    sortie = {}
+    for it in brut if isinstance(brut, list) else [brut]:
+        if not isinstance(it, dict):
+            continue
+        d = it.get("data") if isinstance(it.get("data"), dict) else it
+        url = it.get("url") or d.get("url") or (d.get("metadata") or {}).get("sourceURL")
+        if url and (d.get("html") or d.get("rawHtml") or d.get("markdown")):
+            sortie[url] = d
+    return sortie
+
+
+def lire_page_relevee(url: str, d: dict) -> dict:
+    """Le HTML d'abord (schémas, dates, méta), le Markdown sinon."""
+    html = d.get("rawHtml") or d.get("html")
+    page = C.lire_html(html, url) if html else C.lire_markdown(d.get("markdown") or "", url)
+    if html and d.get("markdown") and page["mots"] < MOTS_MINI:
+        page = C.lire_markdown(d["markdown"], url)     # HTML rendu côté client : le Markdown du relevé est plus sûr
+    meta = d.get("metadata") or {}
+    page["titre"] = page["titre"] or meta.get("title") or ""
+    page["meta"] = page["meta"] or meta.get("description") or ""
+    return page
+
+
+def lire_page(url: str, langue: str, repli: bool, relevees: dict | None = None) -> tuple[dict | None, str | None, float]:
     """(page, raison de l'échec, coût). Ne lève jamais : une page illisible est une ligne du rapport."""
     raison, cout = None, 0.0
+    if relevees and url in relevees:
+        page = lire_page_relevee(url, relevees[url])
+        if page["mots"] >= MOTS_MINI:
+            return page, None, 0.0
+        return page, f"{page['mots']} mots dans le relevé fourni", 0.0
     try:
         html, finale = C.telecharger(url, langue=langue)
         page = C.lire_html(html, url)
@@ -480,7 +629,11 @@ def main() -> int:
     ap.add_argument("--url", help="page du client à comparer (sinon : celle de projet.domaine si elle ranke)")
     ap.add_argument("--repli-dataforseo", action="store_true",
                     help="relire par DataForSEO les pages illisibles (payant)")
-    ap.add_argument("--serp-json", help="réponse SERP déjà enregistrée (évite de repayer l'appel)")
+    ap.add_argument("--serp-json", help="réponse SERP DataForSEO déjà enregistrée (évite de repayer l'appel)")
+    ap.add_argument("--serp-firecrawl", help="résultat d'une recherche Firecrawl enregistré (repli sans DataForSEO)")
+    ap.add_argument("--questions", help="fichier de questions (une par ligne) : PAA relevées ailleurs")
+    ap.add_argument("--pages-json", help="pages déjà relevées : [{url, html | markdown}] (ex. Firecrawl scrape)")
+    ap.add_argument("--sitemap", help="sitemap du client (URL ou fichier) : candidates au maillage interne")
     ap.add_argument("--sortie", help="dossier de sortie, défaut : recherche/ du projet")
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
@@ -488,7 +641,9 @@ def main() -> int:
     lieu, langue = demande.lieu_et_langue(a)
     cout = 0.0
     try:
-        if a.serp_json:
+        if a.serp_firecrawl:
+            resultats = None
+        elif a.serp_json:
             brut = json.loads(Path(a.serp_json).read_text(encoding="utf-8"))
             resultats = [r for t in brut.get("tasks", []) for r in t.get("result") or []] \
                 if isinstance(brut, dict) else brut
@@ -500,7 +655,12 @@ def main() -> int:
     except demande.ErreurAPI as exc:
         print(f"✗ DataForSEO : {exc}", file=sys.stderr)
         return 1
-    serp = lire_serp(resultats)
+    serp = lire_serp_firecrawl(json.loads(Path(a.serp_firecrawl).read_text(encoding="utf-8"))) \
+        if a.serp_firecrawl else lire_serp(resultats)
+    if a.questions:
+        serp["questions"] = list(dict.fromkeys(serp["questions"]
+                                               + lire_questions(Path(a.questions).read_text(encoding="utf-8"))))
+    relevees = lire_pages_json(json.loads(Path(a.pages_json).read_text(encoding="utf-8"))) if a.pages_json else {}
 
     dom_client = domaine(a.url) if a.url else domaine(lire_valeur("projet.domaine"))
     url_client = a.url or next((o["url"] for o in serp["organique"] if dom_client and o["domaine"] == dom_client),
@@ -509,7 +669,7 @@ def main() -> int:
 
     pages, echecs = [], []
     for o in cibles:
-        page, raison, c = lire_page(o["url"], langue, a.repli_dataforseo)
+        page, raison, c = lire_page(o["url"], langue, a.repli_dataforseo, relevees)
         cout += c
         if c:
             print(f"  repli {o['domaine']} : {c:.4f} $", file=sys.stderr)
@@ -523,13 +683,24 @@ def main() -> int:
 
     client = None
     if url_client:
-        client, raison, c = lire_page(url_client, langue, a.repli_dataforseo)
+        client, raison, c = lire_page(url_client, langue, a.repli_dataforseo, relevees)
         cout += c
         if raison:
             print(f"  · page du client : {raison}", file=sys.stderr)
 
     date = dt.date.today().isoformat()
-    rapport = construire(a.mot, lieu, langue, serp, pages, client, date, echecs)
+    sitemap = None
+    if a.sitemap:
+        import cartographie  # noqa: E402 — seulement si l'option est demandée
+        try:
+            if Path(a.sitemap).exists():
+                locs, _ = cartographie.urls_du_sitemap(Path(a.sitemap).read_text(encoding="utf-8"))
+                sitemap = [u for u in locs if not cartographie.PAS_UNE_PAGE.search(u)]
+            else:
+                sitemap = cartographie.lire_sitemap(a.sitemap)
+        except Exception as exc:  # noqa: BLE001 — un sitemap illisible n'empêche pas le rapport
+            print(f"  · sitemap illisible : {str(exc)[:80]}", file=sys.stderr)
+    rapport = construire(a.mot, lieu, langue, serp, pages, client, date, echecs, sitemap)
     dossier = Path(a.sortie) if a.sortie else racine_projet() / "recherche"
     dossier.mkdir(parents=True, exist_ok=True)
     base = f"serp-{slug(a.mot)}-{date}"
@@ -541,8 +712,10 @@ def main() -> int:
         print(json.dumps(rapport, ensure_ascii=False, indent=1))
     else:
         lg = rapport["longueur"]
-        print(f"\n  « {a.mot} » · {lieu} · {langue} · AI Overview : "
-              f"{'oui' if serp['ai_overview']['present'] else 'non'} · {len(pages)} page(s) lue(s)")
+        aio = serp["ai_overview"]
+        print(f"\n  « {a.mot} » · {lieu} · {langue} · SERP {serp['source']} · AI Overview : "
+              f"{'non mesuré' if not aio['mesure'] else 'oui' if aio['present'] else 'non'} · "
+              f"{len(pages)} page(s) lue(s)")
         print(f"  fourchette cible : {lg['fourchette'][0]}-{lg['fourchette'][1]} mots" if lg
               else "  fourchette cible : n.d.")
         print(f"  sujets récurrents : {len(rapport['sujets_recurrents'])} · questions : {len(rapport['questions'])}")

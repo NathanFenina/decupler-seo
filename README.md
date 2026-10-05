@@ -118,7 +118,7 @@ Votre temps : **20 minutes le vendredi**, sur l'onglet du mois de la page de sui
 |---|---|---|
 | Idées | `demande.py idees --lexique` (DataForSEO, sans connecteur) | la demande réelle : volume, difficulté, intention, tendance |
 | Priorités | `opportunites.py --calendrier` | actions classées par valeur pour **ce** client, funnel, calendrier éditorial |
-| Brief | `serp_concurrents.py` + `seo-benchmark` + `seo-brief` | top 5 lu et mesuré (longueur cible, sujets récurrents, questions non traitées, AI Overview), puis brief en 14 sections : failles des concurrents, plan, H1 et intro rédigés |
+| Brief | `serp_concurrents.py` + `seo-benchmark` + `seo-brief` | top 5 lu et mesuré (longueur cible, sujets récurrents, questions non traitées, AI Overview), puis brief en 18 sections : gap face au top 5, plan chiffré, réponse directe, H1, intro et FAQ rédigés, prompts IA et fan-out, schémas, checklist GEO ; repli Firecrawl sans DataForSEO |
 | Rédaction | `style_maison.py` + `seo-redaction` + `controle_contenu.py` | texte écrit dans le style mesuré du client, relu, contrôlé, bloqué s'il contient une promesse ou un chiffre non sourcé |
 | Publication | `wp.py` (WordPress) | brouillon par défaut, révision à valider pour une page en ligne, meta relue puis journalisée, carte de contenu et maillage |
 | Mesure | `journal.py` | chaque modification jugée à J+28 contre un témoin |
