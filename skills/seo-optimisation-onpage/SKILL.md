@@ -20,8 +20,17 @@ Ce skill fait les deux.
 
 - Le contenu : URL (à récupérer) ou texte collé
 - Le mot-clé cible principal — **s'il n'est pas donné, demandez-le.** Sans
-  cible, il n'y a pas d'optimisation possible.
+  cible, il n'y a pas d'optimisation possible. Si personne ne peut répondre
+  (routine, lot de pages), déduisez-le du title, du H1 et de l'URL,
+  **annoncez-le** en tête du rapport (« audité sur : … — à corriger si
+  l'extension SEO visait autre chose ») et marquez le score « sous réserve ».
+  Pour comparer avec le score de Yoast ou Rank Math, il faut **le même**
+  mot-clé que le leur : sinon on compare deux cibles.
 - Les secondaires, si connus
+- La liste des pages du site (carte de contenu `wp.py carte`, sitemap) :
+  c'est elle qui permet de poser de vrais liens internes à la réécriture.
+  Sans elle, l'emplacement est marqué `[lien interne : sujet]`, jamais une
+  URL devinée
 - Le type de livrable : **OPTIMISATION** (page existante) ou **CRÉATION**
   (page neuve), et le format (texte à coller ou Word)
 

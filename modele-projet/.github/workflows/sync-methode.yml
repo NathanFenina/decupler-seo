@@ -1,0 +1,65 @@
+# Met à jour la méthode decupler-seo dans ce projet, chaque lundi.
+#
+# Ce que ça fait : récupère la dernière version publique de decupler-seo,
+# lance `projet.py sync` (qui ne touche jamais à la mémoire, à la config, au
+# journal, aux données ni aux skills `projet-…`), et, s'il y a du changement,
+# ouvre une pull request « Méthode decupler-seo <version> ». Rien n'arrive sur
+# la branche principale sans votre validation.
+#
+# Prérequis (une fois, par dépôt) : Settings › Actions › General ›
+# « Allow GitHub Actions to create and approve pull requests » coché.
+name: Synchro de la méthode decupler-seo
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"   # lundi 6h17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-methode
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Synchroniser depuis github.com/NathanFenina/decupler-seo
+        run: |
+          set -e
+          SCRIPT=.claude/decupler-seo/scripts/projet.py
+          if [ ! -f "$SCRIPT" ]; then
+            git clone --depth 1 https://github.com/NathanFenina/decupler-seo /tmp/decupler-seo
+            SCRIPT=/tmp/decupler-seo/scripts/projet.py
+          fi
+          python3 "$SCRIPT" sync . --depuis https://github.com/NathanFenina/decupler-seo
+
+      - name: Ouvrir une pull request si la méthode a changé
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Méthode déjà à jour."
+            exit 0
+          fi
+          VERSION=$(cat .claude/decupler-seo/VERSION 2>/dev/null || echo "?")
+          BRANCHE="methode/decupler-seo-${VERSION//[^A-Za-z0-9._-]/-}"
+          git config user.name "decupler-seo"
+          git config user.email "decupler-seo@users.noreply.github.com"
+          git checkout -B "$BRANCHE"
+          git add -A
+          git commit -m "Méthode decupler-seo $VERSION"
+          git push --force -u origin "$BRANCHE"
+          if gh pr view "$BRANCHE" >/dev/null 2>&1; then
+            echo "Pull request déjà ouverte, mise à jour poussée."
+          else
+            gh pr create --head "$BRANCHE" --base "${{ github.event.repository.default_branch }}" \
+              --title "Méthode decupler-seo $VERSION" \
+              --body "Mise à jour automatique de la méthode (skills, agents, commandes, scripts, SOP). La mémoire, la config, le journal, les données et les skills \`projet-…\` ne sont pas touchés. Notes de version : https://github.com/NathanFenina/decupler-seo/blob/main/CHANGELOG.md"
+          fi

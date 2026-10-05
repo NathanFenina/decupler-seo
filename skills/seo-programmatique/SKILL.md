@@ -86,6 +86,18 @@ skill.
 **Visez au moins 60 % de contenu unique par page.** En dessous, c'est de la
 duplication à l'échelle.
 
+Mesurez-le, ne l'estimez pas — avant publication, sur le lot entier :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/similarite_lot.py" contenus/villes/ --strict
+```
+
+Le script compte les phrases communes à chaque paire de pages (seuil : 4)
+et la part du texte de chaque page qu'on ne retrouve nulle part ailleurs
+(seuil : 60 %). Ce qui est identique par construction — en-tête, bande de
+logos, bloc auteur, CTA final — se marque `data-gabarit="commun"` et sort du
+calcul : sinon l'alerte sonne sur le chrome, et on finit par l'ignorer.
+
 Le « texte à trous » (`Vous cherchez un {métier} à {ville} ? Nos {métier}s
 à {ville} sont…`) est la signature du contenu mince. Générez la prose **à
 partir des données** : « Sur cette liaison, le prix médian est de 89 €,

@@ -1,8 +1,34 @@
 # Journal des versions
 
-## Non publié
+## 3.8.0
 
 ### Ajouté
+
+- **Les 14 SOP** dans `docs/sop/` : une procédure par action (topical map,
+  ligne éditoriale, brief, rédaction, on-page, maillage, entités, données
+  structurées, design, intégration CMS, indexation, analyse GSC/GA4,
+  visibilité IA, reporting), chacune reliée au skill qui l'exécute. Source
+  unique, embarquée dans chaque projet (`.claude/decupler-seo/docs/sop/`).
+- **Synchro automatique des projets** : `modele-projet/.github/workflows/sync-methode.yml`,
+  installé par `init` et `adopter`. Chaque lundi, il synchronise la méthode
+  depuis GitHub et ouvre une pull request si elle a changé.
+- **Registre des projets** : `projets.json` et `python3 scripts/projet.py registre`
+  (version embarquée de chaque projet, synchro auto présente ou non, ce qui
+  est à synchroniser).
+- `seo-audit-contenu` et `scripts/audit_contenu.py` : passe chaque contenu du
+  site au crible (vide, mort, daté, mince, à pousser, technique) en croisant
+  la carte de contenu et la Search Console.
+- `seo-lead-magnet` : une page qui donne tout, ranke, et capture l'email
+  (pop-up obligatoire seulement pour le trafic de campagne, livrable verrouillé).
+- `scripts/similarite_lot.py` : détecte les pages trop semblables dans un lot
+  (phrases communes, part de contenu unique).
+- Enrichis avec ce qui a été appris sur des projets réels : `seo-entites-triplets`
+  (fiche d'identité, un `@id` par entité, doublons de Person), `seo-netlinking`
+  (qualification, relances), `seo-optimisation-onpage`, `seo-programmatique`,
+  `seo-pilotage-notion`, `seo-publication-cms` (pièges WordPress),
+  `seo-design-pages` (checklist design, intégration).
+
+### Brief SEO/GEO
 
 - `seo-brief` passe à **18 sections** : réponse directe de 40-60 mots
   rédigée, matrice de gap face au top 5, volumes et longue traîne tracés

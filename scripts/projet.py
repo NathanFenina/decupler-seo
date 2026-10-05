@@ -5,6 +5,7 @@
     python3 scripts/projet.py sync ../mon-projet
     python3 scripts/projet.py sync . --depuis https://github.com/NathanFenina/decupler-seo
     python3 scripts/projet.py statut ../mon-projet
+    python3 scripts/projet.py registre          # tous les projets de projets.json
 
 Pourquoi embarquer la méthode dans chaque projet : une routine Claude Code
 tourne dans une session cloud qui ne charge pas les plugins installés via
@@ -41,7 +42,7 @@ PREFIXE_PROJET = "projet-"
 JETON = "${CLAUDE_PLUGIN_ROOT}"
 
 # Ressources de la méthode copiées sous .claude/decupler-seo/.
-RESSOURCES = ("scripts", "schema", "templates", "config", "hooks")
+RESSOURCES = ("scripts", "schema", "templates", "config", "hooks", "docs")
 
 
 # ─── Utilitaires ──────────────────────────────────────────────────
@@ -453,6 +454,48 @@ def statut(args) -> int:
     return 0
 
 
+REGISTRE = "projets.json"
+WORKFLOW_SYNC = ".github/workflows/sync-methode.yml"
+
+
+def registre(args) -> int:
+    """État de la méthode dans chaque projet du registre (projets.json)."""
+    chemin = RACINE_METHODE / REGISTRE
+    if not chemin.is_file():
+        print(f"\n  Aucun registre : {chemin} n'existe pas.\n")
+        return 1
+    projets = json.loads(chemin.read_text(encoding="utf-8")).get("projets", [])
+    reference = version_de(RACINE_METHODE).rpartition("+")[0] or version_de(RACINE_METHODE)
+    print(f"\n  Méthode de référence : {version_de(RACINE_METHODE)}\n")
+    print(f"  {'Projet':<22} {'Méthode embarquée':<22} {'Synchro auto':<13} État")
+    en_retard = 0
+    for entree in projets:
+        depot = entree["depot"]
+        url = depot if "://" in depot else f"https://github.com/{depot}"
+        with tempfile.TemporaryDirectory() as tmp:
+            clone = subprocess.run(["git", "clone", "--quiet", "--depth", "1", "--no-checkout", url, tmp],
+                                   capture_output=True, text=True, timeout=180)
+            if clone.returncode != 0:
+                print(f"  {entree.get('nom', depot):<22} {'illisible':<22} {'?':<13} ✗ accès refusé ou dépôt introuvable")
+                continue
+            lire = lambda rel: subprocess.run(["git", "-C", tmp, "show", f"HEAD:{rel}"],
+                                              capture_output=True, text=True).stdout.strip()
+            version = lire(str(DOSSIER_EMBARQUE / "VERSION")) or "aucune"
+            auto = "oui" if lire(WORKFLOW_SYNC) else "non"
+        a_jour = version == version_de(RACINE_METHODE)
+        en_retard += 0 if a_jour else 1
+        if a_jour:
+            etat = "✓ à jour"
+        elif version.split("+")[0] == reference:
+            etat = "→ correctifs à synchroniser"
+        else:
+            etat = "→ à synchroniser"
+        print(f"  {entree.get('nom', depot):<22} {version:<22} {auto:<13} {etat}")
+    print(f"\n  {en_retard} projet(s) à synchroniser. Avec la synchro auto, une PR arrive le lundi ;")
+    print("  sinon : python3 scripts/projet.py sync <dossier du projet>\n")
+    return 0
+
+
 def derniere_publiee() -> str:
     try:
         sortie = subprocess.run(["git", "ls-remote", DEPOT_DEFAUT, "HEAD"], capture_output=True,
@@ -497,6 +540,8 @@ def main() -> int:
     t = sp.add_parser("statut", help="version et intégrité de la méthode embarquée")
     t.add_argument("dossier")
 
+    sp.add_parser("registre", help="version de la méthode dans chaque projet de projets.json")
+
     args = p.parse_args()
     if args.commande == "init":
         return initialiser(args)
@@ -510,6 +555,8 @@ def main() -> int:
         finally:
             if tempo:
                 tempo.cleanup()
+    if args.commande == "registre":
+        return registre(args)
     return statut(args)
 
 

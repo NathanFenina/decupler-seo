@@ -102,6 +102,23 @@ Ne démarchez pas au hasard. Notez chaque prospect sur 20 :
 
 **Seuil : 13/20.** En dessous, le temps est mieux investi ailleurs.
 
+**Sans Ahrefs, avec Ubersuggest** : `backlinks_overview` (réponse compacte)
+pour qualifier en lot ; `domain_overview` (réponse très volumineuse)
+seulement pour les 4-5 cibles prioritaires, sinon le contexte sature ;
+`domain_top_pages` pour choisir la page précise où viser le lien. **Un
+domaine qui remonte autorité 1 et 0 backlink n'a pas un mauvais profil : il
+n'a aucune donnée** (domaine mort, ou hors index de l'outil). Écartez-le et
+dites pourquoi. L'autorité d'un outil (DA Ubersuggest, DR Ahrefs, DA Moz)
+ne se compare jamais à celle d'un autre, et le trafic affiché est une
+estimation : écrivez-le à chaque fois.
+
+**Ne réordonnez jamais par autorité seule.** Un site à DA 90 injoignable vaut
+moins qu'un DA 15 qui répond sous huit jours : l'autorité compte sur une
+échelle logarithmique (passer de 10 à 30 change tout, de 70 à 90 beaucoup
+moins), et c'est le bas du classement qui contient les liens qu'on obtient.
+Chaque prospect porte la **donnée mesurée** qui justifie son score : elle
+interdit d'inventer.
+
 Signaux d'alerte, à écarter systématiquement : ratio de liens sortants
 aberrant, sujets sans aucun rapport entre eux sur le même site, tarif
 public affiché pour un « article invité », trafic organique nul malgré un DR
@@ -120,6 +137,27 @@ L'outreach fonctionne quand il ne ressemble pas à de l'outreach.
 
 Ce qui ne fonctionne pas : « Bonjour, j'ai lu votre excellent article »,
 un email de 400 mots, cinq relances, un template envoyé à 300 personnes.
+
+Et quatre règles qui font la différence :
+- **L'offre avant la demande** : le premier paragraphe donne, le dernier
+  demande — **une seule** demande, en une phrase.
+- **Une porte de sortie explicite** (« si ça ne vous intéresse pas,
+  dites-le, je ne reviendrai pas ») : elle augmente le taux de réponse.
+- **Objet de 6 à 9 mots**, descriptif, sans fausse urgence ni majuscules
+  d'emphase.
+- **Les champs à personnaliser restent vides** dans les gabarits
+  (`{article lu}`, `{remarque}`) : ils forcent la personnalisation à la
+  main. Ne jamais les pré-remplir avec du plausible inventé.
+
+**Séquence** : J+0, **J+7** relance avec un apport neuf, **J+18** relance de
+clôture, puis on s'arrête. Jamais de troisième relance, toujours dans le
+même fil.
+
+**Ne promettez pas un livrable qui n'existe pas.** Si l'étude n'est pas
+produite, l'email qui la promet ne part pas : on ne grille un média qu'une
+fois. Le prospect passe en statut `bloqué`, avec ce qu'il faut produire
+d'abord. Et annoncez un résultat en fourchette basse avec son délai
+(« 3 à 6 liens en 3 mois »), jamais un chiffre rond et flatteur.
 
 Taux de réponse réalistes : mentions non liées 30-40 % · liens cassés
 10-15 % · article invité 5-10 % · démarchage à froid 2-5 %.

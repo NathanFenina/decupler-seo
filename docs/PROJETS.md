@@ -120,6 +120,37 @@ remonte dans decupler-seo, une règle propre au client va dans un skill
 python3 .claude/decupler-seo/scripts/projet.py statut .
 ```
 
+### Automatiquement, chaque semaine
+
+Chaque projet créé par `init` ou greffé par `adopter` reçoit
+`.github/workflows/sync-methode.yml`. Le lundi, il lance la synchronisation
+depuis GitHub et, si la méthode a changé, ouvre une pull request
+« Méthode decupler-seo <version> ». Rien n'arrive sur la branche principale
+sans votre validation. Une fois par dépôt : Settings › Actions › General ›
+« Allow GitHub Actions to create and approve pull requests ».
+
+Pour un projet plus ancien, copiez ce fichier depuis
+`modele-projet/.github/workflows/` dans le dépôt.
+
+### Tous les projets d'un coup d'œil
+
+`projets.json`, à la racine de decupler-seo, liste les dépôts qui embarquent
+la méthode. Depuis decupler-seo :
+
+```bash
+python3 scripts/projet.py registre
+```
+
+affiche, pour chacun, la version embarquée, la présence de la synchro
+automatique, et ce qui est à synchroniser. Ajoutez une ligne au registre à
+chaque nouveau projet.
+
+### Les SOP
+
+Les 14 procédures (`docs/sop/`) sont embarquées avec la méthode, dans
+`.claude/decupler-seo/docs/sop/`. Dans un projet : « suis la SOP brief pour
+"<mot-clé>" », Claude lit la fiche et lance le skill qu'elle cite.
+
 ---
 
 ## Les routines

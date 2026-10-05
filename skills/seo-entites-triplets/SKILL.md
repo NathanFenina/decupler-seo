@@ -13,7 +13,9 @@ description: >
   connaissances", "saillance", "salience", "cohérence des faits",
   "contradictions entre pages", "chiffres différents selon les pages",
   "sameAs", "QID", "Wikidata", "DefinedTerm", "knowsAbout", "about /
-  mentions", "faits clés", "extractibilité".
+  mentions", "faits clés", "extractibilité", "trio sémantique", "Google ne
+  sait pas qui on est", "ChatGPT ne nous cite pas comme expert", "page
+  auteur", "entity home".
 ---
 
 # Triplets et entités — dire une chose, une fois, de la même façon partout
@@ -107,6 +109,52 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/triplets.py" wikidata "Atlas Conseil" --s
 Avec `--site`, seul l'élément dont le site officiel (P856) est ce domaine
 est marqué ✅ : un homonyme (une maison d'édition du même nom) n'est pas
 votre entité. Sans réseau, le script le dit et on inscrit l'entité sans QID.
+
+## 2 bis. L'entité du site elle-même — le trio sémantique
+
+Avant les entités dont parle la page, il y a celles qui **parlent** :
+l'organisation et ses auteurs. Un moteur cite quelqu'un quand trois couches
+concordent : **qui est-ce** (l'entité), **comment le sait-il sans
+ambiguïté** (les données structurées), **est-ce que tout ce qu'il lit
+concorde** (le contenu, sur le site et ailleurs). Qu'une couche flanche, et
+l'expert devient trois inconnus.
+
+**La fiche d'identité, vérifiée — jamais devinée.** Raison sociale, forme,
+numéro d'immatriculation, date de création, siège, dirigeant : relevés dans
+le registre officiel des entreprises (en France, le RNE : outil infosociétés
+`search_company` puis `get_company` s'il est branché, sinon
+annuaire-entreprises.data.gouv.fr), avec la date du relevé. Les profils
+(LinkedIn entreprise et personne, chaîne vidéo, newsletter, fiche
+d'établissement) sont ouverts un par un : un profil qui ne répond pas n'entre
+pas dans `sameAs`. Un fait qu'on ne peut pas sourcer ne va ni dans le
+JSON-LD ni dans le texte. La fiche entre au registre (`entites.csv`).
+
+**Une entité, un `@id`, partout.** `https://exemple.com/#organization` pour
+l'organisation, un `@id` stable par personne (voir `seo-schema-jsonld`).
+Chaque bloc qui parle d'elles **référence** cet `@id`
+(`"author": {"@id": "…"}`) au lieu de les redécrire : sinon le moteur voit
+une personne de plus. Signaux d'alerte, à relever sur 3-4 pages clés :
+- une `Organization` sans `sameAs` ;
+- plusieurs `@id` pour la même personne — typiquement l'empreinte générée
+  par l'extension SEO (`#/schema/person/<empreinte>`) **et** un `@id` maison :
+  fusionner dans un seul, côté serveur, sur toutes les pages ;
+- des blocs `"@type": "Person"` sans `@id` ;
+- deux URL différentes pour le même profil.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" https://exemple.com/ --socle socle-global.json
+```
+
+**Une page d'entité par entité** (« entity home ») : la page qui décrit la
+personne ou l'organisation — parcours vérifiable, profils, publications —
+vers laquelle pointent les `sameAs`, les bylines et le bloc auteur. Faits
+sourcés uniquement, validée par la personne avant publication.
+
+**Hors du site** : fiche d'établissement, LinkedIn, annuaires
+professionnels, Wikidata **seulement** si les critères de notoriété sont
+remplis (un élément créé pour une entité non notable est supprimé). Même
+nom, même adresse, même description courte partout — `geo-llms-txt` pour la
+cohérence de marque, `seo-eeat` pour la page auteur.
 
 ## 3. Le registre — une valeur par sujet et prédicat
 

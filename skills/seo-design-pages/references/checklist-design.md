@@ -21,7 +21,18 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" page-<slug>.html --st
 - [ ] Le premier écran contient le H1, la réponse directe ou la promesse
       chiffrée, et (page commerciale) l'action principale
 - [ ] Au moins une section propre à cette page, absente des pages sœurs
-- [ ] Bandes alternées : jamais deux fonds identiques d'affilée
+- [ ] Bandes alternées : jamais deux fonds identiques d'affilée, et jamais
+      plus de deux bandes claires consécutives sans une bande photo, un
+      ruban ou une bande sombre entre elles
+- [ ] Grilles sans cellule orpheline : nombre de cartes multiple du nombre
+      de colonnes (pas une ligne de 3 puis une ligne de 2)
+- [ ] Au moins deux vraies photos, dont une dans la seconde moitié de la
+      page — pas une image en haut puis des milliers de pixels de texte
+- [ ] Un bloc qui engage : « ce que nous ne faisons pas », limites, parti
+      pris signé — pas uniquement des affirmations positives interchangeables
+- [ ] Test des trois secondes : la capture pleine page réduite à 200 px de
+      large montre au moins quatre zones distinctes ; une colonne uniforme
+      est une page plate, quel que soit son contenu
 - [ ] Aucun bloc de liens en pied de page ; liens internes dans le texte
 - [ ] FAQ en `<details>`, contenu dans le HTML initial
 

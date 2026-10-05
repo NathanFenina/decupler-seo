@@ -1,4 +1,4 @@
-# Les 50 skills
+# Les 52 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -15,6 +15,7 @@ aussi l'appeler par son nom.
 | `seo-crawl-architecture` | Crawl, arborescence, orphelines, profondeur, autorité interne | « crawl », « architecture », « pages orphelines » |
 | `seo-core-web-vitals` | LCP, INP, CLS mesurés, causes, correctifs front | « CWV », « site lent », « PageSpeed » |
 | `seo-indexation` | Pourquoi Google ignore vos pages, sitemaps, budget de crawl | « pas indexé », « couverture », « sitemap » |
+| `seo-audit-contenu` | Un verdict et une action par page publiée : vide, morte, périmée, mince, à pousser, saine, technique — 410, 301, fusion, mise à jour ; Search Console 180 jours + carte de contenu + signaux d'obsolescence | « pages pourries », « audit de contenu », « quelles pages supprimer », « pages obsolètes » |
 | `seo-migration` | Refonte sans perte : inventaire, redirections, surveillance J+90 | « migration », « refonte », « j'ai perdu du trafic après » |
 | `seo-veille` | Surveillance continue, alertes diagnostiquées | « veille », « monitoring », « alerte » |
 
@@ -44,6 +45,7 @@ aussi l'appeler par son nom.
 | `seo-faq-paa` | FAQ ciblant PAA, snippets et LLM, + schema | « FAQ », « People Also Ask » |
 | `seo-eeat` | Score /40, verdict, correctifs localisés | « E-E-A-T », « autorité », « crédibilité » |
 | `seo-comparatifs` | Pages « X vs Y » et « alternative à », cadre juridique inclus | « comparatif », « vs », « alternative à » |
+| `seo-lead-magnet` | Page ressource contre email qui ranke et capture : mot-clé + prompt principal, blocs authentiques, livrable verrouillé sans cacher le contenu à Google, parcours de capture vérifiés | « lead magnet », « guide gratuit contre email », « kit à télécharger », « contenu verrouillé » |
 
 ## Structure et échelle
 
@@ -51,10 +53,10 @@ aussi l'appeler par son nom.
 |-------|---------------|--------------|
 | `seo-design-pages` | Design d'une page qui convertit : gabarit par type de page, placement des CTA, bannières, plan d'images et génération, tokens, checklist avant publication | « design de la page », « où mettre les CTA », « bannière », « plan d'images » |
 | `seo-page-builder-html` | Pages HTML autonomes, prêtes à coller, avec 15 composants (hero, sommaire, chiffres clés, tableau, témoignages, lead magnet, auteur…) | « page HTML », « Elementor », « landing page » |
-| `seo-programmatique` | Pages à l'échelle, garde-fous anti-contenu mince | « pages à l'échelle », « pages ville », « pSEO » |
+| `seo-programmatique` | Pages à l'échelle, garde-fous anti-contenu mince, part de contenu unique mesurée sur le lot (`similarite_lot.py`) | « pages à l'échelle », « pages ville », « pSEO » |
 | `seo-maillage-interne` | Orphelines, flux d'autorité, plan de liens exécutable | « maillage », « liens internes » |
 | `seo-schema-jsonld` | Détection, validation, génération, dépréciations | « schema », « JSON-LD », « rich results » |
-| `seo-entites-triplets` | Faits en triplets sujet — prédicat — objet, entités reliées à Wikidata, JSON-LD `about`/`mentions`, cohérence des valeurs sur tout le site | « triplets », « entités », « knowledge graph », « cohérence des faits » |
+| `seo-entites-triplets` | Faits en triplets sujet — prédicat — objet, entités reliées à Wikidata, JSON-LD `about`/`mentions`, cohérence des valeurs sur tout le site ; trio sémantique de l'organisation et de ses auteurs (fiche d'identité vérifiée au registre, un `@id` par entité, page d'entité) | « triplets », « entités », « knowledge graph », « cohérence des faits », « trio sémantique » |
 | `seo-hreflang-i18n` | Validation et génération hreflang, architecture i18n | « hreflang », « multilingue », « international » |
 | `seo-images` | Poids, formats, alt, lazy loading, impact LCP et CLS | « images », « WebP », « alt » |
 

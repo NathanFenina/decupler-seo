@@ -183,6 +183,14 @@ bout de trois semaines. Chaque skill écrit dans sa base :
 | `seo-reporting` | Objectifs & KPI — les valeurs du mois |
 | `geo-share-of-model` | Objectifs & KPI — le score GEO |
 
+**Lire ou écrire en masse : l'API, pas le MCP.** Les outils du MCP Notion
+conviennent pour créer une base, une vue, quelques lignes. La lecture en
+masse d'une source de données y est limitée de façon imprévisible : ne vous
+en servez pas pour énumérer toutes les lignes d'une base. Au-delà de
+quelques dizaines de lignes, passez par l'API REST officielle (jeton
+d'intégration dans `NOTION_TOKEN`), paginée, en respectant ses limites de
+débit (environ 3 requêtes par seconde).
+
 Règle : **ne jamais écraser une note humaine.** Complétez les champs
 automatiques, laissez les champs de commentaire intacts.
 

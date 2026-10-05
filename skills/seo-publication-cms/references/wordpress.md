@@ -126,6 +126,21 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
   logo est réglé.
 - Une politique de mots de passe (Wordfence, etc.) refuse par l'API un mot de
   passe sans symbole : à prévoir pour toute création ou réinitialisation de compte.
+- **Un statut forcé déprogramme.** Un `POST` avec `"status": "draft"` sur un
+  article planifié (`future`) le déprogramme sans avertissement : un script
+  de mise à jour relit le statut existant et ne l'envoie pas (c'est ce que
+  fait `wp.py`).
+- **Les médias ne se dédoublonnent pas.** Un second envoi de
+  `image-guide.webp` devient `image-guide-1.webp`, et le slug du média
+  d'origine peut glisser en `-2`. Chercher le média par son slug avant tout
+  envoi, et le réutiliser.
+- **Une URL supprimée répond souvent 410, pas 404.** Un contrôle de liens
+  qui ne cherche que 404 la croit vivante : comptez 404 et 410 comme mortes,
+  et ne les utilisez jamais en maillage.
+- **Pas de rafale.** Au-delà d'une dizaine de requêtes concurrentes,
+  beaucoup d'hébergements renvoient des réponses incohérentes (des comptes
+  qui changent d'un appel à l'autre) : un audit par l'API est séquentiel,
+  quitte à être lent.
 - Site piraté : chercher les comptes administrateurs créés directement en base
   (sans email, date d'inscription incohérente) ; les rétrograder et changer
   leur mot de passe avant de supprimer, et **ne jamais** écrire leurs

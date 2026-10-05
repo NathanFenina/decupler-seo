@@ -84,7 +84,8 @@ tableaux ne se cite pas. Visez un élément riche pour deux paragraphes.
 Même colonne que la page service, avec une exigence de plus : **ce qui est
 propre à la ville est rédigé ville par ville**. Un premier jet mécanique
 produit couramment 30 à 40 % de phrases identiques entre deux villes, ce qui
-fait échouer tout le lot (voir `seo-programmatique`).
+fait échouer tout le lot (voir `seo-programmatique`). Mesure avant publication :
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/similarite_lot.py" <dossier-du-lot> --strict`.
 
 | # | Section | Contenu | CTA |
 |---|---|---|---|

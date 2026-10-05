@@ -64,6 +64,14 @@ ainsi. Quatre conséquences :
   `flex: 1 1 100%` sur la colonne principale.
 - **CSS scopé** sous une classe racine préfixée : un `h2 { color: … }` non
   scopé repeint tout le site.
+- **La couleur des titres se redéclare.** Beaucoup de thèmes posent un
+  `color` explicite sur `h1`-`h3` ; une valeur explicite bat toujours une
+  valeur héritée, donc `color` sur le conteneur ne suffit pas et les titres
+  restent sombres sur une bande sombre. Redéclarez-la dans le scope :
+  `.dcp-page h1,.dcp-page h2,.dcp-page h3{color:var(--dcp-texte)}`.
+- **Une police déclarée n'est pas une police chargée.** `font-family` sans la
+  police chargée par le thème (ou auto-hébergée) fait tomber toute la page en
+  police système — invisible dans un aperçu local qui, lui, l'a chargée.
 
 ### Droits et cache
 
@@ -170,5 +178,11 @@ composants**.
   texte tient là où il débordera en production. Pour juger un brouillon sans
   le publier : injectez le fragment dans une copie locale d'une page réelle
   du site (thème, polices et images rapatriés).
+- **La capture ne fait pas foi, le DOM si.** Un navigateur sans interface
+  peut mettre en page à une largeur et photographier à une autre : une
+  capture montre alors un débordement qui n'existe pas (ou en cache un).
+  Comptez dans la page réelle, après chargement des images, les éléments
+  dont le bord droit dépasse `document.documentElement.clientWidth` : c'est
+  cette sonde qui tranche.
 - Le MCP Chrome DevTools fait tout cela : `resize_page`, `take_screenshot`,
   `evaluate_script`, `lighthouse_audit`.

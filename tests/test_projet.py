@@ -23,10 +23,20 @@ class TestProjet(DossierIsole):
                   ".claude/skills/projet-marque/SKILL.md", ".claude/skills/seo-cycle/SKILL.md",
                   ".claude/agents/seo-manager.md", ".claude/decupler-seo/scripts/guard.py"):
             self.assertTrue((p / f).exists(), f)
+        # .github/ est exclu : la syntaxe des workflows (${{ … }}) n'est pas un champ du gabarit.
         restants = [f for f in p.rglob("*") if f.is_file() and f.suffix in {".md", ".yml"}
+                    and ".github" not in f.relative_to(p).parts
                     and "{{" in f.read_text(encoding="utf-8")]
         self.assertEqual(restants, [])
         self.assertIn("mode: depot", (p / "decupler-seo.config.yml").read_text(encoding="utf-8"))
+
+    def test_synchro_automatique_et_sop_embarquees(self):
+        p = self.creer()
+        workflow = p / ".github/workflows/sync-methode.yml"
+        self.assertTrue(workflow.is_file())
+        self.assertIn("projet.py", workflow.read_text(encoding="utf-8"))
+        sop = sorted((p / ".claude/decupler-seo/docs/sop").glob("[0-9]*.md"))
+        self.assertEqual(len(sop), 14)
 
     def test_les_skills_pointent_vers_les_scripts_embarques(self):
         p = self.creer()
