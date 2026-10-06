@@ -25,6 +25,7 @@
 
 ## En automatique
 
+- **À chaque déploiement** en production (site en code sur Vercel ou Netlify) : le même workflow se déclenche sur l'événement `deployment_status`, comme l'indexation instantanée de Rank Math se déclenche à la publication. Site déployé à la main (FTP) : ajouter `indexation.py annoncer <URL…>` à la fin du script de déploiement.
 - **Chaque jour** (`.github/workflows/indexation.yml`, installé par `projet.py init` ou `completer`) : `indexation.py auto --sans-registre` annonce les pages dont la date de modification dans le sitemap est récente. Il faut trois secrets dans le dépôt : `GSC_SA_JSON`, `GSC_SITE_URL`, `INDEXNOW_KEY`.
 - **Chaque mercredi** (routine `hebdo`) : `indexation.py auto` puis `suivre`. Ce qui n'est toujours pas indexé est regroupé par cause dans `rapports/a-valider.md`, avec une proposition par groupe. Le script ne décide rien : enrichir, mailler, sortir du sitemap ou restaurer une page reste une décision humaine, dans le projet concerné.
 - **Sur WordPress**, l'extension `templates/wordpress/plugins/seo-indexnow/` prévient IndexNow à chaque publication, comme Rank Math.

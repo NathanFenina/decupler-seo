@@ -1,4 +1,8 @@
-# Indexation automatique : chaque jour, les pages publiées ou modifiées
+# Indexation automatique, comme l'« indexation instantanée » de Rank Math :
+# - juste après chaque déploiement réussi en production (Vercel, Netlify… qui
+#   publient un « deployment_status » sur GitHub) ;
+# - et chaque jour en filet de sécurité (site WordPress, déploiement FTP) ;
+# les pages publiées ou modifiées
 # (date lastmod du sitemap) sont annoncées à IndexNow (Bing, Yandex, Seznam,
 # Naver, Yep) et les sitemaps sont resoumis à Google par l'API Search Console.
 # Rien n'est écrit dans le dépôt : le suivi (indexée ou non, et ce qu'il faut
@@ -13,6 +17,7 @@
 name: Indexation automatique
 
 on:
+  deployment_status:
   schedule:
     - cron: "41 5 * * *"
   workflow_dispatch:
@@ -26,6 +31,11 @@ permissions:
 
 jobs:
   annoncer:
+    # Après un déploiement : seulement s'il a réussi, en production.
+    if: >-
+      github.event_name != 'deployment_status' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

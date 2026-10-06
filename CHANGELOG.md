@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 3.10.1
+
+- **Indexation au déploiement**, comme l'indexation instantanée de Rank Math : le
+  workflow `indexation.yml` se déclenche aussi sur `deployment_status` (déploiement
+  réussi en production sur Vercel, Netlify…), en plus du passage quotidien. SOP 11 :
+  site déployé à la main, `indexation.py annoncer` en fin de script de déploiement.
+
 ## 3.10.0
 
 ### Ajouté
