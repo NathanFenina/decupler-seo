@@ -6,7 +6,7 @@
 
 **Objectif** : Choisir les 3 à 5 actions du mois par ce qu'elles rapportent, avec les mêmes critères pour le contenu, la technique et le GEO, et dire ce qu'on ne fait pas.
 
-**Quand** : Le premier vendredi du mois, avec le rapport (SOP 14), et chaque fois qu'une idée nouvelle arrive.
+**Quand** : Le premier mercredi du mois, avec le rapport (SOP 14), et chaque fois qu'une idée nouvelle arrive.
 
 **Dis à Claude** : « Propose les actions du mois : contenu, technique et GEO, chiffrées, et dis-moi ce qu'on laisse de côté et pourquoi. »
 

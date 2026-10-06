@@ -29,7 +29,7 @@ bloc : jamais au reste de la page.
 
 La page a un onglet par mois : ce qui attend une décision (à valider, bloqué),
 ce qui a été fait, ce qui reste à faire par chantier, les wins, les contenus
-publiés et le reporting. Chaque vendredi, la routine hebdo y écrit la semaine.
+publiés et le reporting. Chaque mercredi, la routine hebdo y écrit la semaine.
 
 Une action validée n'est jamais reproposée ni écrasée : l'injection ajoute les
 nouvelles propositions et garde les décisions déjà prises.

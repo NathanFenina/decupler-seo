@@ -6,6 +6,9 @@ gabarit d'un projet client. On l'utilise de trois façons. Trouvez la vôtre,
 suivez ses étapes dans l'ordre, et vous n'avez rien d'autre à lire pour
 commencer.
 
+**Première fois ?** Suivez d'abord la [prise en main pas à pas](PRISE-EN-MAIN.md) :
+chaque étape y dit ce que vous devez voir et quoi faire si ça bloque.
+
 | Vous êtes | Votre chemin | Temps |
 |---|---|---|
 | Vous découvrez, vous voulez l'essayer sur votre site | [A. Essayer](#a-essayer-le-plugin-sur-votre-site) | 10 minutes |
@@ -30,7 +33,7 @@ appelle des scripts ; les scripts interrogent les outils et écrivent dans le
 projet ; la mémoire du projet (marque, style, faits) rend le résultat propre à
 ce client ; le journal garde la trace pour mesurer à J+28.
 
-**Comment un projet avance seul.** Une routine, le vendredi, lit
+**Comment un projet avance seul.** Une routine, le mercredi, lit
 `routines/hebdo.md` dans le dépôt : contrôle, chiffres, actions validées,
 notes, bilan sur la page de suivi. Vous validez en 20 minutes (SOP 15).
 
@@ -84,7 +87,7 @@ n'installez pas le plugin.
 3. Pousser le dépôt en **privé**, activer « Allow GitHub Actions to create and
    approve pull requests » (Settings › Actions › General) pour la mise à jour
    automatique de la méthode.
-4. Créer **une** routine, le vendredi : [modele-projet/ROUTINES.md](../modele-projet/ROUTINES.md).
+4. Créer **une** routine, le mercredi : [modele-projet/ROUTINES.md](../modele-projet/ROUTINES.md).
 5. Ajouter le dépôt à `projets.json` ; `projet.py registre` montre l'état de
    tous les projets.
 6. Votre semaine : [SOP 15 · La semaine type](sop/15-semaine-type.md). Vos
@@ -147,7 +150,7 @@ python3 scripts/projet.py adopter ../site-existant --nom "Site" --domaine https:
 ```
 
 Puis : dépôt **privé** sur GitHub, une ligne dans `projets.json`, la routine du
-vendredi (`ROUTINES.md`), et « Allow GitHub Actions to create and approve pull
+mercredi (`ROUTINES.md`), et « Allow GitHub Actions to create and approve pull
 requests » dans les réglages du dépôt.
 
 ### 5. Confier une tâche à un prestataire

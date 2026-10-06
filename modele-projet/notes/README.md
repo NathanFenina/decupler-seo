@@ -5,7 +5,7 @@ captures. Écrivez librement, depuis Obsidian ou n'importe quel éditeur.
 
 Deux étiquettes suffisent pour que Claude agisse :
 
-- `#a-traiter` : la routine du vendredi lit la note, la transforme en action
+- `#a-traiter` : la routine du mercredi lit la note, la transforme en action
   sur la page de suivi (ou en ligne de `memoire/decisions.md` si c'est une
   décision), puis remplace l'étiquette par `#traite` avec un lien vers ce
   qu'elle a créé ;

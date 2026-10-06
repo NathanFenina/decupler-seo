@@ -107,6 +107,7 @@ def bilan_journal(journal: list[dict], mois: str) -> dict:
                               for l in mesurees if l["verdict"] == "perte"]}
 
 
+JOUR_HEBDO = 2  # mercredi (calendar : lundi = 0)
 BRANCHE_RUN = re.compile(r"(?:^|/)(hebdo|veille|optimisation|contenu|rapport)[-/](\d{4}-\d\d-\d\d)$")
 
 
@@ -135,16 +136,22 @@ def branches_distantes(racine: Path) -> list[str]:
 def bilan_runs(noms: list[str], mois: str) -> dict:
     """Exécutions trouvées dans rapports/runs/ (fichiers AAAA-MM-JJ-<mode>.md)."""
     compte = Counter()
+    jours_hebdo: Counter = Counter()
     for n in noms:
-        m = re.match(rf"^{re.escape(mois)}-\d\d-([a-z-]+)\.md$", n)
+        m = re.match(rf"^{re.escape(mois)}-(\d\d)-([a-z-]+)\.md$", n)
         if m:
-            compte[m.group(1)] += 1
+            compte[m.group(2)] += 1
+            if m.group(2) == "hebdo":
+                jours_hebdo[int(m.group(1))] += 1
     a, mm = map(int, mois.split("-"))
     jours = calendar.monthrange(a, mm)[1]
     if compte.get("hebdo") and not compte.get("veille"):
-        # Rythme hebdo : un passage par vendredi du mois, au lieu d'une veille par jour.
-        vendredis = sum(1 for j in range(1, jours + 1) if calendar.weekday(a, mm, j) == 4)
-        return {"trouves": dict(compte), "mode": "hebdo", "veille_attendues": vendredis,
+        # Rythme hebdo : un passage par semaine, le jour où la routine tourne
+        # (déduit des passages trouvés ; mercredi par défaut), au lieu d'une veille par jour.
+        jours_semaine = Counter(calendar.weekday(a, mm, j) for j in jours_hebdo.elements())
+        jour = jours_semaine.most_common(1)[0][0] if jours_semaine else JOUR_HEBDO
+        attendus = sum(1 for j in range(1, jours + 1) if calendar.weekday(a, mm, j) == jour)
+        return {"trouves": dict(compte), "mode": "hebdo", "veille_attendues": attendus,
                 "veille_trouvees": compte["hebdo"]}
     return {"trouves": dict(compte), "mode": "veille", "veille_attendues": jours, "veille_trouvees": compte.get("veille", 0)}
 
@@ -279,7 +286,7 @@ def markdown(r: dict) -> str:
          "> Chiffres calculés par `rapport.py` depuis Search Console et le journal. "
          "Ne pas les modifier à la main : relancer le script.", ""]
     if r["runs"]["veille_trouvees"] < r["runs"]["veille_attendues"]:
-        unite = ("passages hebdo trouvés sur", "vendredis") if r["runs"].get("mode") == "hebdo" else ("veilles trouvées sur", "jours")
+        unite = ("passages hebdo trouvés sur", "semaines") if r["runs"].get("mode") == "hebdo" else ("veilles trouvées sur", "jours")
         l += [f"**⚠️ Routines : {r['runs']['veille_trouvees']} {unite[0]} "
               f"{r['runs']['veille_attendues']} {unite[1]}.** Détail : {r['runs']['trouves'] or 'aucune exécution'}.", ""]
     l += ["## Trafic organique", "",

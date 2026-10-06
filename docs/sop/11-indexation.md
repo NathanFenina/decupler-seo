@@ -8,7 +8,7 @@
 
 **Quand** : Après chaque publication, et chaque semaine pour les pages importantes.
 
-**Dis à Claude** : « Annonce les pages publiées aujourd'hui » (juste après une mise en ligne), puis le vendredi : « Suis l'indexation et donne-moi les URL à demander. »
+**Dis à Claude** : « Annonce les pages publiées aujourd'hui » (juste après une mise en ligne), puis le mercredi : « Suis l'indexation et donne-moi les URL à demander. »
 
 ## Étapes
 
@@ -22,6 +22,12 @@
 **MCP nécessaires** : Search Console, avec un compte de service. L'écriture complète n'est nécessaire que pour resoumettre les sitemaps.
 
 **Livrable** : L'état d'indexation page par page et la liste priorisée des demandes du jour.
+
+## En automatique
+
+- **Chaque jour** (`.github/workflows/indexation.yml`, installé par `projet.py init` ou `completer`) : `indexation.py auto --sans-registre` annonce les pages dont la date de modification dans le sitemap est récente. Il faut trois secrets dans le dépôt : `GSC_SA_JSON`, `GSC_SITE_URL`, `INDEXNOW_KEY`.
+- **Chaque mercredi** (routine `hebdo`) : `indexation.py auto` puis `suivre`. Ce qui n'est toujours pas indexé est regroupé par cause dans `rapports/a-valider.md`, avec une proposition par groupe. Le script ne décide rien : enrichir, mailler, sortir du sitemap ou restaurer une page reste une décision humaine, dans le projet concerné.
+- **Sur WordPress**, l'extension `templates/wordpress/plugins/seo-indexnow/` prévient IndexNow à chaque publication, comme Rank Math.
 
 ## Pièges
 

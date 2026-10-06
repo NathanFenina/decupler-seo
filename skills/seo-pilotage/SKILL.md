@@ -90,14 +90,14 @@ Montrer la roadmap du projet, sans rien lancer :
 — à valider, validées (prêtes à lancer), en cours, faites ce mois-ci. Proposer de
 lancer les actions validées ; lancer celles que l'utilisateur désigne.
 
-## Routine hebdo — le vendredi (par défaut)
+## Routine hebdo — le mercredi (par défaut)
 
 Elle fait tout en un passage : lire la page, exécuter les actions validées
 (comme ci-dessous), écrire le bilan de la semaine (`mois`), republier,
-sauvegarder. Le premier vendredi du mois, elle ajoute les propositions du mois
+sauvegarder. Le premier mercredi du mois, elle ajoute les propositions du mois
 (comme la routine de rapport). Détail : `routines/hebdo.md`.
 
-## Routine de rapport — le 1er du mois (ou premier vendredi au rythme hebdo)
+## Routine de rapport — le 1er du mois (ou premier mercredi au rythme hebdo)
 
 Après `cartographie.py mensuel` et `rapport.py` :
 ```bash

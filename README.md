@@ -8,11 +8,11 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-54 skills · 15 agents · 37 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 17 SOP · 403 tests
+54 skills · 15 agents · 37 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 17 SOP · 406 tests
 
-> **Nouveau ici, prestataire sur un projet, ou plusieurs sites à piloter ?** Commencez par le
-> [Manuel](docs/MANUEL.md) : comment ça marche en deux minutes, votre chemin pas à pas, et les tutos
-> (mettre à jour, faire remonter une amélioration, confier une tâche).
+> **Par où commencer ?** [Prise en main pas à pas](docs/PRISE-EN-MAIN.md) : le plugin en
+> 15 minutes, votre premier projet en 1 heure, ou rejoindre un projet comme prestataire, avec ce que
+> vous devez voir à chaque étape. Puis le [Manuel](docs/MANUEL.md) : comment tout s'articule.
 
 ---
 
@@ -97,16 +97,16 @@ mon-site/                       dépôt PRIVÉ
 │   ├── decisions.md            ce qui a été validé ou refusé — ne revient pas
 │   └── apprentissages.md       ce qui marche sur CE site, mesuré
 ├── journal/modifications.csv   chaque modification, et son effet à J+28
-├── ROUTINES.md                 la routine du vendredi, prête à créer
+├── ROUTINES.md                 la routine du mercredi, prête à créer
 └── .claude/                    la méthode, synchronisée depuis ce dépôt
 ```
 
 ### Une routine par semaine, un onglet par mois
 
-La routine **hebdo** tourne le vendredi : contrôle de chaque URL du sitemap,
+La routine **hebdo** tourne le mercredi : contrôle de chaque URL du sitemap,
 exécution des actions validées, mesure à J+28, puis le bilan de la semaine
 dans la page de suivi — fait, à faire par chantier, bloquants, wins, contenus,
-reporting. Le premier vendredi du mois, elle ajoute le rapport et les
+reporting. Le premier mercredi du mois, elle ajoute le rapport et les
 propositions du mois. Les quatre routines séparées (veille, optimisation,
 contenu, rapport) restent disponibles pour les gros sites.
 
@@ -114,7 +114,7 @@ contenu, rapport) restent disponibles pour les gros sites.
 |---|---|---|
 | **Hebdo** | titles, metas, FAQ, schema, liens internes | pages neuves et réécritures (brouillon ou PR), décisions, bloquants |
 
-Votre temps : **20 minutes le vendredi**, sur l'onglet du mois de la page de suivi.
+Votre temps : **20 minutes le mercredi**, sur l'onglet du mois de la page de suivi.
 
 ### De l'idée au rapport, avec des chiffres à chaque étape
 

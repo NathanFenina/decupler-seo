@@ -1,7 +1,7 @@
 ---
 name: seo-cycle
 description: >
-  Le cycle SEO autonome d'un projet : le mode hebdo (le vendredi, par défaut,
+  Le cycle SEO autonome d'un projet : le mode hebdo (le mercredi, par défaut,
   qui enchaîne contrôle, actions validées, mesure et bilan de la semaine dans
   la page de suivi), ou quatre modes séparés pour un gros site : veille
   (quotidienne), optimisation (hebdo), contenu (hebdo), rapport (mensuel). Lit la mémoire du
@@ -9,7 +9,7 @@ description: >
   niveaux d'autonomie, journalise chaque modification et laisse une trace de
   chaque exécution. C'est le skill que lancent les routines. Déclencher sur
   "lance le cycle", "mode veille", "mode optimisation", "mode contenu",
-  "mode rapport", "mode hebdo", "cycle hebdo", "routine du vendredi",
+  "mode rapport", "mode hebdo", "cycle hebdo", "routine du mercredi",
   "routine SEO", ou quand une routine le demande.
 ---
 
@@ -44,7 +44,7 @@ découlent, avant tout le reste :
    le dire dans le journal de run et s'arrêter** — on ne pilote pas à
    l'aveugle.
 
-## Mode hebdo — le vendredi, la routine par défaut
+## Mode hebdo — le mercredi, la routine par défaut
 
 Un seul passage par semaine fait le travail des quatre modes ci-dessous, dans
 cet ordre, et le consigne dans la page de suivi (skill `seo-pilotage`) :
@@ -58,7 +58,7 @@ cet ordre, et le consigne dans la page de suivi (skill `seo-pilotage`) :
    avec `--attend` : elle remonte dans « À décider ».
 4. **Sans action validée** : le travail automatique du mode optimisation.
    Aucune page neuve sans action validée.
-5. **Premier vendredi du mois** : le mode rapport, puis les propositions du
+5. **Premier mercredi du mois** : le mode rapport, puis les propositions du
    mois (`pilotage.py proposer` et `injecter`).
 6. **Bilan de la semaine** dans l'onglet du mois : `pilotage.py mois` (résumé,
    wins mesurés, contenus avec leur lien Notion, reporting), republication, puis
@@ -264,7 +264,7 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
    `rapports/runs/` **et** les branches poussées par les routines
    (`claude/hebdo-AAAA-MM-JJ`, `claude/veille-…`, `claude/optimisation-…`, `contenu/…`) : une
    routine travaille sur sa branche, son journal n'atteint la branche
-   principale qu'à la fusion. Au rythme hebdo : un passage par vendredi du
+   principale qu'à la fusion. Au rythme hebdo : un passage par semaine du
    mois ; avec les quatre routines : environ 30 veilles, 4 optimisations,
    4 contenus. Toute absence est signalée en tête du rapport. Recopier ensuite
    dans la branche du rapport les journaux de veille du mois (`git show

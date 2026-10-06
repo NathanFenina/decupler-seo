@@ -1,4 +1,4 @@
-# Hebdo — le vendredi
+# Hebdo — le mercredi
 
 La seule routine du projet quand il tourne au rythme hebdomadaire. Elle fait
 en un passage ce que faisaient la veille, l'optimisation, le contenu et le
@@ -14,10 +14,10 @@ robots.txt, sitemap. Retour du spam ou page clé cassée → une action
 été fait avant d'en faire plus.
 
 ## 2 bis. L'indexation
-`python3 .claude/decupler-seo/scripts/indexation.py suivre` : les URL annoncées
-depuis au moins 3 jours, indexées ou non. Les URL à demander à la main vont dans
-le bilan (« À faire »), pour un humain. Après toute mise en ligne faite par la
-routine : `indexation.py annoncer <URL…>`.
+`indexation.py auto` (pages du sitemap modifiées dans la semaine), puis
+`indexation.py suivre` : les URL annoncées depuis au moins 3 jours, indexées ou
+non. Le constat part dans `rapports/a-valider.md`, regroupé par cause : c'est un
+humain qui décide. Les URL à demander à la main vont dans le bilan.
 
 ## 3. Les actions validées
 Lis la page de suivi ; `pilotage.py etat --statut validee`. Exécute-les, la
@@ -34,7 +34,7 @@ une ligne de `memoire/decisions.md` si c'est une décision. Remplace ensuite
 l'étiquette par `#traite` suivie du lien vers ce que tu as créé. Un
 `#fait-client` ne va dans `memoire/faits.md` qu'avec sa source et sa date.
 
-## 4. Le premier vendredi du mois, en plus
+## 4. Le premier mercredi du mois, en plus
 Le rapport du mois écoulé (skill `seo-cycle`, mode rapport) et les propositions
 du mois (`pilotage.py donnees`, `proposer`, `injecter`).
 

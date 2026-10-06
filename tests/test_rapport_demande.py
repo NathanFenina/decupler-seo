@@ -75,6 +75,11 @@ class TestCalculs(unittest.TestCase):
         r = rapport.bilan_runs(rapport.runs_des_branches(refs), "2026-10")
         self.assertEqual((r["mode"], r["veille_trouvees"], r["veille_attendues"]), ("hebdo", 2, 5))  # 5 vendredis en octobre 2026
 
+    def test_rythme_hebdo_le_mercredi(self):
+        refs = ["claude/hebdo-2026-10-07", "claude/hebdo-2026-10-14"]
+        r = rapport.bilan_runs(rapport.runs_des_branches(refs), "2026-10")
+        self.assertEqual((r["mode"], r["veille_trouvees"], r["veille_attendues"]), ("hebdo", 2, 4))  # 4 mercredis en octobre 2026
+
 
 class TestDemande(unittest.TestCase):
     def test_pays_inconnu_demande_un_lieu(self):

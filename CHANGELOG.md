@@ -1,5 +1,29 @@
 # Journal des versions
 
+## 3.10.0
+
+### Ajouté
+
+- **Indexation automatique** : `indexation.py auto` lit le sitemap (robots.txt,
+  index de sitemaps) et annonce les pages dont le `lastmod` est récent ;
+  gabarit `.github/workflows/indexation.yml` (chaque jour, sans rien écrire
+  dans le dépôt ; secrets `GSC_SA_JSON`, `GSC_SITE_URL`, `INDEXNOW_KEY`).
+- **Le constat remonte au projet** : `indexation.py suivre` regroupe les URL
+  non indexées par cause (404, explorée non indexée, détectée non indexée,
+  inconnue, bloquée) avec une proposition par groupe dans
+  `rapports/a-valider.md`. Le script ne décide rien.
+- **`docs/PRISE-EN-MAIN.md`** : trois parcours cochables (plugin en 15 min,
+  premier projet en 1 h, prestataire), avec ce qu'on doit voir à chaque étape
+  et un tableau « quand ça bloque ». Lien en tête du README et du manuel.
+
+### Modifié
+
+- **La routine hebdo passe au mercredi** (gabarit, skills seo-cycle,
+  seo-pilotage, seo-nouveau-projet, SOP 11, 14, 15, 16, manuel) ; rapport le
+  premier mercredi du mois. `rapport.py` déduit le jour de la routine des
+  passages trouvés (mercredi par défaut) au lieu de compter les vendredis.
+- SOP 15 réordonnée autour du mercredi.
+
 ## 3.9.1
 
 Retours d'un projet en production : cinq skills propres au projet fusionnés

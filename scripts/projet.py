@@ -339,7 +339,7 @@ def initialiser(args) -> int:
     print("  Prochaines étapes :")
     print("    1. Compléter memoire/marque.md — c'est lui qui rend le contenu propre à ce client")
     print("    2. git init && créer le dépôt PRIVÉ sur GitHub, puis pousser")
-    print("    3. Créer la routine du vendredi décrite dans ROUTINES.md\n")
+    print("    3. Créer la routine du mercredi décrite dans ROUTINES.md\n")
     return code
 
 

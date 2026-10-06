@@ -21,6 +21,12 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/indexation.py" annoncer <URL…>   # Inde
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/indexation.py" suivre            # à partir de J+3 : liste du jour
 ```
 
+En automatique : `indexation.py auto` lit le sitemap et annonce les pages
+dont le `lastmod` est récent (GitHub Actions chaque jour, gabarit
+`.github/workflows/indexation.yml`) ; la routine du mercredi lance `auto`
+puis `suivre`, qui **remonte le constat dans `rapports/a-valider.md`** du
+projet, regroupé par cause avec une proposition. Rien n'est décidé seul.
+
 `annoncer` envoie les URL à IndexNow (Bing, Yandex, Seznam, Naver, Yep ;
 Google n'y participe pas), resoumet les sitemaps par l'API Search Console et
 les inscrit dans `donnees/indexation.csv`. `suivre` inspecte les URL

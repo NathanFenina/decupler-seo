@@ -6,7 +6,7 @@
 
 **Objectif** : Un bilan mensuel où chaque chiffre vient d'un script et chaque courbe a sa cause.
 
-**Quand** : Le premier vendredi du mois.
+**Quand** : Le premier mercredi du mois.
 
 **Dis à Claude** : « Fais le rapport du mois : ce qui a bougé, pourquoi, ce qui n'a pas marché, et les 5 actions du mois prochain. »
 

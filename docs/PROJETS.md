@@ -25,7 +25,7 @@ mon-projet/                      dépôt PRIVÉ, ouvrable tel quel comme coffre 
 ├── Accueil.md                   point d'entrée : liens vers tout ce qui suit
 ├── CLAUDE.md                    mémoire, chargée à chaque session
 ├── decupler-seo.config.yml      mode, plafonds, règles propres au client
-├── ROUTINES.md                  la routine du vendredi, prête à créer
+├── ROUTINES.md                  la routine du mercredi, prête à créer
 ├── .mcp.json                    serveurs MCP du projet (clés en variables, jamais en clair)
 ├── .env.example                 les variables attendues, sans valeur
 ├── memoire/                     CE QU'ON SAIT — écrit par les humains et la routine
@@ -80,7 +80,7 @@ lisent les mêmes fichiers ; graphe et rétroliens montrent la mémoire, la
 cartographie et les décisions d'un coup d'œil. L'extension communautaire
 **Obsidian Git** synchronise avec GitHub (tirer à l'ouverture, pousser
 toutes les 10 minutes). Vos idées et retours client vont dans `notes/` avec
-`#a-traiter` : la routine du vendredi les transforme en actions. Plusieurs
+`#a-traiter` : la routine du mercredi les transforme en actions. Plusieurs
 projets : clonez-les dans un même dossier et ouvrez ce dossier, vous avez un
 seul coffre et un graphe commun. Un serveur MCP Obsidian n'apporte rien
 ici : Claude lit déjà les fichiers, et il ne tournerait pas dans une routine.

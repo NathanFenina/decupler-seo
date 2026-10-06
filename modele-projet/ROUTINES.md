@@ -1,8 +1,8 @@
 # Les routines de {{NOM}}
 
-**Une seule routine par projet, le vendredi** (`hebdo`) : elle contrôle le
+**Une seule routine par projet, le mercredi** (`hebdo`) : elle contrôle le
 site, exécute les actions validées, mesure, et écrit le bilan de la semaine
-dans l'onglet du mois de la page de suivi ; le premier vendredi du mois, elle
+dans l'onglet du mois de la page de suivi ; le premier mercredi du mois, elle
 fait aussi le rapport et les propositions. C'est le rythme par défaut : sur un
 site à quelques centaines de clics par mois, Search Console bouge trop
 lentement pour qu'un passage quotidien trouve autre chose que du bruit.
@@ -53,7 +53,7 @@ un fichier du dépôt, depuis n'importe quelle conversation, sans la recréer.
 
 | Routine | `<mode>` | Quand (Europe/Paris) |
 |---|---|---|
-| **Hebdo (par défaut)** | `hebdo` | le vendredi, 7 h 07 |
+| **Hebdo (par défaut)** | `hebdo` | le mercredi, 7 h 07 |
 | *ou, pour un gros site :* | | |
 | Veille | `veille` | tous les jours, 7 h 07 |
 | Optimisation | `optimisation` | le lundi, 7 h 17 |
@@ -71,7 +71,7 @@ et s'est terminée sans erreur d'infrastructure, **pas** que le travail a été
 fait. Chaque exécution écrit donc `rapports/runs/<date>-<mode>.md`, et la
 routine de rapport vérifie qu'aucune n'a manqué.
 
-## Votre temps : 20 minutes le vendredi
+## Votre temps : 20 minutes le mercredi
 
 1. Ouvrir la page de suivi, onglet du mois : lire « À décider », valider ou
    refuser, laisser une remarque si besoin (la routine la lit comme une consigne)

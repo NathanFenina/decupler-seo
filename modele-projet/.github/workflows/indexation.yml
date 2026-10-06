@@ -1,0 +1,42 @@
+# Indexation automatique : chaque jour, les pages publiées ou modifiées
+# (date lastmod du sitemap) sont annoncées à IndexNow (Bing, Yandex, Seznam,
+# Naver, Yep) et les sitemaps sont resoumis à Google par l'API Search Console.
+# Rien n'est écrit dans le dépôt : le suivi (indexée ou non, et ce qu'il faut
+# décider) est fait par la routine du mercredi (`indexation.py suivre`).
+#
+# Secrets du dépôt (Settings › Secrets and variables › Actions) :
+#   GSC_SA_JSON    clé du compte de service Search Console (JSON ou base64)
+#   GSC_SITE_URL   propriété, ex. sc-domain:exemple.com (sinon projet.propriete_gsc de la config)
+#   INDEXNOW_KEY   clé publiée à la racine du site dans <clé>.txt (indexation.py cle)
+# Un secret absent n'arrête rien : la brique correspondante est sautée et le dit.
+
+name: Indexation automatique
+
+on:
+  schedule:
+    - cron: "41 5 * * *"
+  workflow_dispatch:
+    inputs:
+      jours:
+        description: "Fenêtre de modification à annoncer, en jours"
+        default: "2"
+
+permissions:
+  contents: read
+
+jobs:
+  annoncer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Annoncer les pages récentes
+        env:
+          GSC_SA_JSON: ${{ secrets.GSC_SA_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: |
+          python3 .claude/decupler-seo/scripts/indexation.py auto \
+            --jours "${{ github.event.inputs.jours || '2' }}" --sans-registre
