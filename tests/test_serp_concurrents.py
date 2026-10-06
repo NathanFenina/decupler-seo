@@ -382,3 +382,17 @@ class TestCommande(DossierIsole):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSlug(unittest.TestCase):
+    def test_requetes_arabes_distinctes_ne_s_ecrasent_pas(self):
+        import serp_concurrents as s
+        a, b = s.slug("تسجيل علامة تجارية في السعودية"), s.slug("رخصة استثمار")
+        self.assertNotEqual(a, b)
+        self.assertTrue(a.startswith("تسجيل-علامة"))
+        self.assertNotIn("/", a + b)
+
+    def test_latin_inchange(self):
+        import serp_concurrents as s
+        self.assertEqual(s.slug("Établir société"), "etablir-societe")
+        self.assertEqual(s.slug("Premium Residency Saudi Arabia"), "premium-residency-saudi-arabia")

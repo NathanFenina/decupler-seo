@@ -48,6 +48,7 @@ import argparse
 import datetime as dt
 import json
 import math
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -547,7 +548,15 @@ def contenus(r: dict, pages: list[dict]) -> str:
 
 
 def slug(texte: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", C.sans_accents(texte)).strip("-")[:60] or "requete"
+    """Nom de fichier lisible et unique par requête. Les écritures non latines (arabe…)
+    n'ont aucun caractère [a-z0-9] : on garde alors les lettres Unicode, plus une
+    empreinte courte, pour que deux requêtes différentes n'écrasent jamais le même rapport."""
+    latin = re.sub(r"[^a-z0-9]+", "-", C.sans_accents(texte).lower()).strip("-")[:60]
+    if latin:
+        return latin
+    unicode_ = re.sub(r"[^\w]+", "-", texte.strip().lower()).strip("-_")[:40]
+    empreinte = hashlib.sha1(texte.strip().encode("utf-8")).hexdigest()[:8]
+    return f"{unicode_}-{empreinte}" if unicode_ else f"requete-{empreinte}"
 
 
 # ─── Réseau ───────────────────────────────────────────────────────
