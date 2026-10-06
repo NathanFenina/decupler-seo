@@ -23,6 +23,27 @@
   premier mercredi du mois. `rapport.py` déduit le jour de la routine des
   passages trouvés (mercredi par défaut) au lieu de compter les vendredis.
 - SOP 15 réordonnée autour du mercredi.
+## 3.9.2
+
+Retours de decupler.com (06/10/2026).
+
+### Ajouté
+
+- **`scripts/liens.py`** : profil de liens DataForSEO trié entre domaines
+  propres et spam automatique (score de spam ≥ 30), spam compté par mois
+  d'apparition (`resume`, `domaines --json`). Le chiffre utile est celui des
+  domaines propres, pas le total.
+- **`gsc.py inspect --json`** : une ligne JSON par URL (verdict, couverture,
+  dernier passage, canonique Google et déclarée, sitemaps, liens vers) pour
+  croiser l'indexation avec un crawl.
+
+### Corrigé
+
+- **Une routine ne fusionne jamais sa propre PR** (`hebdo`, `_commun`,
+  `rapport`, `optimisation`, `seo-pilotage`) : la fusion sans relecture est
+  refusée par la politique des sessions, et la question « fusionner ? » a
+  bloqué la routine du 02/10/2026. La PR devient une action `bloquee` dans
+  « À décider ».
 
 ## 3.9.1
 
