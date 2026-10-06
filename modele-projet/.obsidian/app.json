@@ -1,0 +1,15 @@
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative",
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "notes",
+  "attachmentFolderPath": "notes/pieces-jointes",
+  "showUnsupportedFiles": false,
+  "userIgnoreFilters": [
+    ".claude/",
+    ".github/",
+    "donnees/",
+    "__pycache__/"
+  ]
+}

@@ -8,11 +8,12 @@
 
 **Quand** : Après chaque publication, et chaque semaine pour les pages importantes.
 
-**Dis à Claude** : « Inspecte les pages publiées ce mois-ci, resoumets les sitemaps et prépare-moi les 10 URL à demander aujourd'hui. »
+**Dis à Claude** : « Annonce les pages publiées aujourd'hui » (juste après une mise en ligne), puis le vendredi : « Suis l'indexation et donne-moi les URL à demander. »
 
 ## Étapes
 
-1. Inspection par l'API de Search Console (`gsc.py inspect --fichier urls.txt`) : indexée ou non, date du dernier passage, canonique retenue par Google.
+0. Juste après chaque mise en ligne : `indexation.py annoncer <URL…>`. Le script envoie les URL à IndexNow (Bing et les moteurs partenaires ; Bing alimente Copilot), resoumet les sitemaps à Google par l'API, et inscrit chaque URL dans `donnees/indexation.csv`. C'est ce que font les extensions d'« indexation instantanée » de WordPress, sans l'Indexing API de Google. Clé IndexNow : `indexation.py cle`, une seule fois par site.
+1. À partir de J+3 : `indexation.py suivre`. Le script inspecte les URL annoncées par l'API, met le registre à jour et sort les 10 URL non indexées à passer à la main. Pour une inspection ponctuelle : Inspection par l'API de Search Console (`gsc.py inspect --fichier urls.txt`) : indexée ou non, date du dernier passage, canonique retenue par Google.
 2. Diagnostic des pages non indexées : découverte mais pas explorée, explorée mais pas indexée, canonique, noindex, doublon.
 3. Des sitemaps propres (seulement des URL indexables), resoumis par l'API (`gsc.py sitemap --resoumettre`).
 4. Un lien vers chaque page neuve depuis une page que Google visite souvent : l'accueil ou une page hub.
@@ -25,9 +26,10 @@
 ## Pièges
 
 - Croire qu'une API permet de « Demander l'indexation » : il n'en existe pas de publique. L'Indexing API ne couvre que les offres d'emploi et les vidéos en direct.
-- Payer un service d'indexation : ça ne sert à rien.
+- Payer un service d'indexation, ou brancher l'Indexing API de Google sur des articles (c'est ce que fait l'extension « Instant Indexing for Google ») : Google l'a réservée aux offres d'emploi et aux vidéos en direct, et a écrit en 2024 que les abus peuvent faire couper l'accès.
+- Croire qu'IndexNow touche Google : Google n'y participe pas. Pour Google, c'est le sitemap, les liens internes et la demande manuelle.
 - Se fier au rapport d'indexation, qui a plusieurs jours de retard. La vérité page par page vient de l'inspection.
 
-**Astuce, à tester** : Claude Code peut piloter ton Chrome (`claude --chrome`, extension Claude in Chrome) dans ta session déjà connectée. Tu peux lui demander d'ouvrir l'inspection de chaque URL de la liste du jour et de cliquer sur « Demander l'indexation ». Je ne l'ai pas encore éprouvé à grande échelle : regarde-le faire la première fois, reste à une dizaine d'URL par jour, et il s'arrête de lui-même sur un CAPTCHA.
+**Astuce, à tester avec prudence** : Claude Code peut piloter ton Chrome (`claude --chrome`, extension Claude in Chrome) dans ta session déjà connectée, et cliquer sur « Demander l'indexation » pour les URL de la liste du jour. Google ne publie pas le quota (environ une dizaine par jour et par propriété, d'après des tests extérieurs) et dit qu'insister n'accélère rien. Réserve-le à quelques URL stratégiques, reste devant l'écran, et ne le mets jamais dans une routine.
 
 > Chez nous : Semaine du 22 au 25/09/2026 sur decupler.com : 459 URL inspectées une par une par l'API, sitemaps resoumis (154 pages lues, zéro erreur).

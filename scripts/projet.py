@@ -6,6 +6,8 @@
     python3 scripts/projet.py sync . --depuis https://github.com/NathanFenina/decupler-seo
     python3 scripts/projet.py statut ../mon-projet
     python3 scripts/projet.py registre          # tous les projets de projets.json
+    python3 scripts/projet.py completer .       # ajouter les nouveautés du gabarit (Obsidian, notes…)
+    python3 scripts/projet.py remonter .        # renvoyer vers decupler-seo une amélioration faite dans un projet
 
 Pourquoi embarquer la méthode dans chaque projet : une routine Claude Code
 tourne dans une session cloud qui ne charge pas les plugins installés via
@@ -345,7 +347,8 @@ def initialiser(args) -> int:
 
 LIGNES_GITIGNORE = [".env", ".env.*", "!.env.example", "secrets/", "*-service-account.json",
                     ".seo-decupler/backups/", "__pycache__/", "*.pyc", "donnees/tableau-de-bord.html",
-                    "donnees/pilotage.json", "donnees/actions-*.json", "donnees/semaine.json"]
+                    "donnees/pilotage.json", "donnees/actions-*.json", "donnees/semaine.json",
+                    ".obsidian/workspace*.json", ".obsidian/cache", ".trash/"]
 
 
 def adopter(args) -> int:
@@ -409,6 +412,61 @@ def adopter(args) -> int:
     return code
 
 
+# ─── Compléter un projet existant avec les nouveautés du gabarit ──
+
+def completer(args) -> int:
+    """Ajoute les fichiers du gabarit apparus depuis la création du projet.
+
+    `sync` ne touche qu'à la méthode ; le gabarit (Accueil.md, notes/,
+    .obsidian/, une nouvelle routine…) n'est copié qu'à la création. Cette
+    commande ajoute ce qui manque, sans jamais remplacer un fichier existant
+    ni le CLAUDE.md du projet.
+    """
+    projet = Path(args.dossier).expanduser().resolve()
+    config = projet / "decupler-seo.config.yml"
+    texte = config.read_text(encoding="utf-8") if config.is_file() else ""
+    lire = lambda cle: (re.search(rf"^\s*{cle}:\s*\"?([^\"\n#]*)", texte, re.M) or [None, ""])[1].strip()
+    domaine = lire("domaine").rstrip("/")
+    valeurs = {"NOM": lire("nom") or projet.name, "DOMAINE": domaine,
+               "DOMAINE_NU": urlparse(domaine).netloc.removeprefix("www.") if domaine else ""}
+    source, tempo = obtenir_source(args.depuis)
+    try:
+        ajoutes, a_remplir = [], set()
+        for f in sorted((source / MODELE).rglob("*")):
+            rel = f.relative_to(source / MODELE)
+            cible = projet / rel
+            if not f.is_file() or cible.exists() or rel.name == "CLAUDE.md":
+                continue
+            ajoutes.append(str(rel))
+            if args.simuler:
+                continue
+            cible.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                contenu = remplir(f.read_text(encoding="utf-8"), valeurs)
+                a_remplir.update(re.findall(r"\{\{([A-Z_]+)\}\}", contenu) if rel.suffix in {".md", ".yml"} else [])
+                cible.write_text(contenu, encoding="utf-8")
+            except UnicodeDecodeError:
+                shutil.copy2(f, cible)
+    finally:
+        if tempo:
+            tempo.cleanup()
+    gitignore = projet / ".gitignore"
+    if gitignore.is_file() and not args.simuler:
+        actuelles = gitignore.read_text(encoding="utf-8").splitlines()
+        manquantes = [l for l in LIGNES_GITIGNORE if l not in actuelles]
+        if manquantes:
+            with open(gitignore, "a", encoding="utf-8") as g:
+                g.write("\n# decupler-seo : secrets et état local\n" + "\n".join(manquantes) + "\n")
+            ajoutes.append(".gitignore (complété)")
+    print(f"\n  {len(ajoutes)} élément(s) du gabarit ajouté(s)" + (" (simulation)" if args.simuler else ""))
+    for rel in ajoutes:
+        print(f"    + {rel}")
+    if a_remplir:
+        print(f"  ! Champs à remplir à la main : {', '.join(sorted(a_remplir))}")
+    print()
+    return 0
+
+
 # ─── Statut ───────────────────────────────────────────────────────
 
 def statut(args) -> int:
@@ -451,6 +509,109 @@ def statut(args) -> int:
         else:
             print(f"  → Mise à jour disponible ({publiee[:7]}) : python3 {DOSSIER_EMBARQUE}/scripts/projet.py sync .")
     print()
+    return 0
+
+
+# ─── Remontée d'une amélioration vers la méthode ──────────────────
+
+def texte_source(local: Path, src: Path) -> str:
+    """Retrouve, pour un Markdown modifié dans un projet, le texte à écrire dans decupler-seo.
+
+    La synchro remplace ${CLAUDE_PLUGIN_ROOT} par .claude/decupler-seo dans le
+    Markdown. On rétablit le jeton sur les lignes inchangées (en reprenant la
+    ligne d'origine) et sur les lignes modifiées seulement si la source
+    l'utilise déjà.
+    """
+    import difflib
+    origine = src.read_text(encoding="utf-8").splitlines(keepends=True)
+    installe = [l.replace(JETON, str(DOSSIER_EMBARQUE)) for l in origine]
+    actuel = local.read_text(encoding="utf-8").splitlines(keepends=True)
+    avec_jeton = JETON in "".join(origine)
+    sortie: list[str] = []
+    for op, a1, a2, b1, b2 in difflib.SequenceMatcher(a=installe, b=actuel, autojunk=False).get_opcodes():
+        if op == "equal":
+            sortie.extend(origine[a1:a2])
+        else:
+            for ligne in actuel[b1:b2]:
+                sortie.append(ligne.replace(str(DOSSIER_EMBARQUE) + "/", JETON + "/") if avec_jeton else ligne)
+    return "".join(sortie)
+
+
+def remonter(args) -> int:
+    """Copie les fichiers de méthode modifiés dans un projet vers decupler-seo, sur une branche.
+
+    C'est le chemin retour de la synchro : une amélioration trouvée en
+    travaillant sur un client profite ensuite à tous les projets.
+    """
+    projet = Path(args.dossier).expanduser().resolve()
+    manifeste = lire_manifeste(projet)
+    if not manifeste["version"]:
+        print(f"\n  Aucune méthode synchronisée dans {projet}.\n")
+        return 1
+    modifies = [rel for rel, e in manifeste["fichiers"].items()
+                if (projet / rel).is_file() and empreinte(projet / rel) != e]
+    if args.fichiers:
+        voulus = {str(Path(f)) for f in args.fichiers}
+        modifies = [rel for rel in modifies if rel in voulus]
+    if not modifies:
+        print("\n  Aucun fichier de méthode modifié dans ce projet : rien à remonter.\n")
+        return 0
+
+    if args.vers:
+        source = Path(args.vers).expanduser().resolve()
+    else:
+        source = Path(tempfile.mkdtemp(prefix="decupler-seo-remontee-")) / "decupler-seo"
+        resultat = subprocess.run(["git", "clone", "--quiet", DEPOT_DEFAUT, str(source)],
+                                  capture_output=True, text=True, timeout=300)
+        if resultat.returncode != 0:
+            print(f"✗ Clonage impossible de {DEPOT_DEFAUT} :\n{resultat.stderr.strip()}")
+            return 1
+    if not (source / "skills").is_dir():
+        print(f"✗ {source} n'est pas un dépôt decupler-seo.")
+        return 1
+
+    inverse = {str(rel): src for rel, src in fichiers_methode(source).items()}
+    nom = re.sub(r"[^a-z0-9]+", "-", projet.name.lower()).strip("-")
+    branche = f"remontee/{nom}-{dt.date.today().isoformat()}"
+    git = lambda *a: subprocess.run(["git", "-C", str(source), *a], capture_output=True, text=True)
+    if not args.simuler:
+        if git("checkout", "-B", branche).returncode != 0:
+            print(f"✗ Impossible de créer la branche {branche} dans {source}.")
+            return 1
+
+    copies, ignores = [], []
+    for rel in modifies:
+        src = inverse.get(rel)
+        if src is None:
+            ignores.append(rel)
+            continue
+        local = projet / rel
+        if not args.simuler:
+            if src.suffix == ".md":
+                src.write_text(texte_source(local, src), encoding="utf-8")
+            else:
+                shutil.copy2(local, src)
+        copies.append(f"{rel}  →  {src.relative_to(source)}")
+
+    print(f"\n  {len(copies)} fichier(s) remonté(s) vers {source}" + (" (simulation)" if args.simuler else ""))
+    for ligne in copies:
+        print(f"    {ligne}")
+    for rel in ignores:
+        print(f"    ! {rel} : n'existe plus dans la méthode, à reporter à la main")
+    if args.simuler or not copies:
+        print()
+        return 0
+    git("add", "-A")
+    message = args.message or f"Remontée depuis {projet.name} : {len(copies)} fichier(s)"
+    git("commit", "-q", "-m", message)
+    print(f"\n  ✓ Commit sur la branche {branche}.")
+    if args.pousser:
+        pousse = git("push", "-u", "origin", branche)
+        print("  ✓ Branche poussée : ouvrez la pull request sur GitHub." if pousse.returncode == 0
+              else f"  ✗ Push refusé :\n{pousse.stderr.strip()}")
+    else:
+        print(f"  Reste à faire : git -C {source} push -u origin {branche}, puis ouvrir la pull request.")
+    print("  Une fois fusionnée et publiée, `projet.py sync .` réaligne ce projet sur la méthode.\n")
     return 0
 
 
@@ -542,6 +703,19 @@ def main() -> int:
 
     sp.add_parser("registre", help="version de la méthode dans chaque projet de projets.json")
 
+    c = sp.add_parser("completer", help="ajouter à un projet existant les nouveaux fichiers du gabarit")
+    c.add_argument("dossier")
+    c.add_argument("--depuis", help="dossier ou URL git de decupler-seo")
+    c.add_argument("--simuler", action="store_true", help="montrer sans écrire")
+
+    r = sp.add_parser("remonter", help="renvoyer vers decupler-seo les fichiers de méthode modifiés dans un projet")
+    r.add_argument("dossier")
+    r.add_argument("fichiers", nargs="*", help="limiter à ces fichiers (chemins du projet)")
+    r.add_argument("--vers", help="clone local de decupler-seo (sinon clonage depuis GitHub)")
+    r.add_argument("--message", help="message du commit")
+    r.add_argument("--pousser", action="store_true", help="pousser la branche après le commit")
+    r.add_argument("--simuler", action="store_true", help="montrer sans écrire")
+
     args = p.parse_args()
     if args.commande == "init":
         return initialiser(args)
@@ -557,6 +731,10 @@ def main() -> int:
                 tempo.cleanup()
     if args.commande == "registre":
         return registre(args)
+    if args.commande == "completer":
+        return completer(args)
+    if args.commande == "remonter":
+        return remonter(args)
     return statut(args)
 
 

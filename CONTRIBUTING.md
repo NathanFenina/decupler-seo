@@ -2,6 +2,21 @@
 
 Les contributions sont bienvenues.
 
+## Remonter une amélioration trouvée sur un projet
+
+C'est le cas le plus fréquent : en travaillant chez un client, vous corrigez
+un skill, une SOP ou un script embarqué dans `.claude/`. Depuis le projet :
+
+```bash
+python3 .claude/decupler-seo/scripts/projet.py remonter . --pousser
+```
+
+Le script copie les fichiers de méthode modifiés vers decupler-seo, sur une
+branche `remontee/<projet>-<date>`, en rétablissant les chemins
+`${CLAUDE_PLUGIN_ROOT}` du Markdown. Ouvrez la pull request, décrivez le cas
+réel qui l'a motivée, et retirez tout ce qui est propre au client (nom,
+domaine, chiffres) : ce dépôt est public.
+
 ## Ajouter un skill
 
 1. Créez `skills/<nom>/SKILL.md`

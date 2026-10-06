@@ -21,6 +21,13 @@ livrée : `--statut faite --lien <URL>` ; impossible sans quelqu'un :
 Rien de validé : le travail automatique du mode optimisation, dans ses plafonds.
 Une page neuve ne part jamais sans action validée.
 
+## 3 bis. Les notes humaines
+Lis les notes de `notes/` étiquetées `#a-traiter` (voir `notes/README.md`) :
+chacune devient une action `a-valider` ou `validee` sur la page de suivi, ou
+une ligne de `memoire/decisions.md` si c'est une décision. Remplace ensuite
+l'étiquette par `#traite` suivie du lien vers ce que tu as créé. Un
+`#fait-client` ne va dans `memoire/faits.md` qu'avec sa source et sa date.
+
 ## 4. Le premier vendredi du mois, en plus
 Le rapport du mois écoulé (skill `seo-cycle`, mode rapport) et les propositions
 du mois (`pilotage.py donnees`, `proposer`, `injecter`).

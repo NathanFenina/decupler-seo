@@ -36,7 +36,7 @@ class TestProjet(DossierIsole):
         self.assertTrue(workflow.is_file())
         self.assertIn("projet.py", workflow.read_text(encoding="utf-8"))
         sop = sorted((p / ".claude/decupler-seo/docs/sop").glob("[0-9]*.md"))
-        self.assertEqual(len(sop), 14)
+        self.assertGreaterEqual(len(sop), 14)
 
     def test_les_skills_pointent_vers_les_scripts_embarques(self):
         p = self.creer()
@@ -61,6 +61,49 @@ class TestProjet(DossierIsole):
         r = lancer("projet.py", "sync", ".", cwd=p)
         self.assertEqual(r.returncode, 1)
         self.assertIn("règle ajoutée à la main", skill.read_text(encoding="utf-8"))
+
+    def test_remontee_vers_la_methode(self):
+        # Une amélioration faite dans un projet repart vers decupler-seo, jeton de chemin rétabli.
+        import shutil
+        from _outils import RACINE
+        p = self.creer()
+        methode = self.dossier / "methode"
+        shutil.copytree(RACINE, methode, ignore=shutil.ignore_patterns(".git", "__pycache__", "tests"))
+        for commande in (["init", "-q"], ["add", "-A"],
+                         ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "base"]):
+            subprocess.run(["git", "-C", str(methode), *commande], check=True, capture_output=True)
+        skill = p / ".claude/skills/seo-audit-contenu/SKILL.md"
+        skill.write_text(skill.read_text(encoding="utf-8") + "\nAmélioration trouvée sur un client.\n",
+                         encoding="utf-8")
+        env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t",
+               "GIT_COMMITTER_EMAIL": "t@t"}
+        r = lancer("projet.py", "remonter", ".", "--vers", str(methode), cwd=p, **env)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        source = (methode / "skills/seo-audit-contenu/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Amélioration trouvée sur un client.", source)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}", source)
+        self.assertNotIn(".claude/decupler-seo/scripts", source)
+        branche = subprocess.run(["git", "-C", str(methode), "branch", "--show-current"],
+                                 capture_output=True, text=True).stdout.strip()
+        self.assertTrue(branche.startswith("remontee/"), branche)
+
+    def test_completer_un_projet_existant(self):
+        p = self.creer()
+        (p / "Accueil.md").unlink()
+        (p / "CLAUDE.md").write_text("mémoire du client", encoding="utf-8")
+        r = lancer("projet.py", "completer", ".", cwd=p)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        accueil = (p / "Accueil.md").read_text(encoding="utf-8")
+        self.assertIn("Projet Test", accueil)
+        self.assertNotIn("{{", accueil)
+        self.assertEqual((p / "CLAUDE.md").read_text(encoding="utf-8"), "mémoire du client")
+        self.assertTrue((p / ".obsidian/app.json").is_file())
+
+    def test_rien_a_remonter(self):
+        p = self.creer()
+        r = lancer("projet.py", "remonter", ".", "--simuler", cwd=p)
+        self.assertEqual(r.returncode, 0)
+        self.assertIn("rien à remonter", r.stdout)
 
     def test_deja_a_jour_n_est_pas_une_modification(self):
         # Manifeste en retard (autre branche, fichier ignoré par git) mais fichier déjà à la bonne version.

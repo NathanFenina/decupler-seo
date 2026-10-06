@@ -14,6 +14,24 @@ description: >
 Une page non indexée ne rapporte rien, quelle que soit sa qualité. Avant
 d'optimiser quoi que ce soit, assurez-vous que Google la voit.
 
+## Après chaque publication : annoncer, puis suivre
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/indexation.py" annoncer <URL…>   # IndexNow + sitemaps + registre
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/indexation.py" suivre            # à partir de J+3 : liste du jour
+```
+
+`annoncer` envoie les URL à IndexNow (Bing, Yandex, Seznam, Naver, Yep ;
+Google n'y participe pas), resoumet les sitemaps par l'API Search Console et
+les inscrit dans `donnees/indexation.csv`. `suivre` inspecte les URL
+annoncées (API URL Inspection, lecture seule) et sort au plus 10 URL non
+indexées à demander à la main dans Search Console. Clé IndexNow, une fois
+par site : `indexation.py cle`.
+
+Jamais l'Indexing API de Google pour des articles ou des pages : elle est
+réservée aux offres d'emploi et aux vidéos en direct, et Google a prévenu
+en 2024 que les abus peuvent faire couper l'accès.
+
 ## Diagnostic en 4 questions, dans cet ordre
 
 **1. La page est-elle accessible ?** → code 200, pas de blocage robots.txt,

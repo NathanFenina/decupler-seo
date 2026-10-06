@@ -1,6 +1,6 @@
 ---
 description: Routeur principal Claude Code SEO Décupler — dirige vers le bon skill selon ce que vous demandez
-argument-hint: "[audit|opportunites|cartographie|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor] <url ou sujet>"
+argument-hint: "[audit|opportunites|cartographie|quickwins|gsc|brief|benchmark|article|onpage|page|fix|geo|backlink|publish|rapport|notion|cycle|doctor|humanise|maj] <url ou sujet>"
 ---
 
 # /seo — routeur
@@ -24,7 +24,7 @@ laissez jamais l'utilisateur devant un menu.
 | `technique`, `fix`, `corrige` | `seo-technique-autofix` |
 | `crawl`, `architecture` | `seo-crawl-architecture` |
 | `perf`, `cwv`, `vitesse` | `seo-core-web-vitals` |
-| `index`, `indexation` | `seo-indexation` |
+| `index`, `indexation`, `annoncer`, `indexnow` | `seo-indexation` (`indexation.py annoncer`, puis `suivre`) |
 | `migration`, `refonte` | `seo-migration` |
 | `motscles`, `keywords` | `seo-keyword-research` |
 | `concurrent`, `gap` | `seo-competitor-gap` |
@@ -33,6 +33,7 @@ laissez jamais l'utilisateur devant un menu.
 | `chute`, `baisse` | `seo-traffic-drop` |
 | `brief` | `seo-brief` |
 | `article`, `rédige` | `seo-redaction` |
+| `humanise`, `ça sonne IA`, `tics IA`, `relis le style` | `seo-humanisation` |
 | `onpage`, `score`, `optimise` | `seo-optimisation-onpage` |
 | `meta`, `title` | `seo-meta-serp` |
 | `faq` | `seo-faq-paa` |
@@ -62,6 +63,7 @@ laissez jamais l'utilisateur devant un menu.
 | `veille`, `monitoring` | `seo-veille` |
 | `doctor`, `install`, `configure` | `seo-onboarding` |
 | `nouveau-projet`, `nouveau client` | `seo-nouveau-projet` |
+| `maj`, `mettre à jour`, `remonter`, `synchroniser` | la commande `/seo-maj` |
 | `cycle`, `veille quotidienne`, `routine` | `seo-cycle` (préciser le mode) |
 | `journal`, `mesure`, `est-ce que ça a marché` | `seo-journal-mesure` |
 | `gsc`, `search console`, `cannibalisation`, `ctr` | `seo-gsc-analyses` |

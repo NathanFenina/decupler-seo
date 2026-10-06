@@ -21,26 +21,69 @@ qui est commité dans le dépôt qu'elle clone : `CLAUDE.md`, `.claude/skills`,
 ## Anatomie d'un projet
 
 ```
-mon-projet/                      dépôt PRIVÉ
+mon-projet/                      dépôt PRIVÉ, ouvrable tel quel comme coffre Obsidian
+├── Accueil.md                   point d'entrée : liens vers tout ce qui suit
 ├── CLAUDE.md                    mémoire, chargée à chaque session
 ├── decupler-seo.config.yml      mode, plafonds, règles propres au client
 ├── ROUTINES.md                  la routine du vendredi, prête à créer
-├── .mcp.json                    serveurs MCP lus par les routines
-├── memoire/
-│   ├── marque.md                voix, lexique, chiffres officiels, interdits
-│   ├── decisions.md             ce qui a été validé ou refusé
-│   └── apprentissages.md        ce qui marche sur CE site, mesuré
-├── journal/
-│   └── modifications.csv        chaque modification + son effet à J+28
-├── donnees/                     instantanés Search Console
-├── rapports/                    mensuels, à valider, journaux de run
+├── .mcp.json                    serveurs MCP du projet (clés en variables, jamais en clair)
+├── .env.example                 les variables attendues, sans valeur
+├── memoire/                     CE QU'ON SAIT — écrit par les humains et la routine
+│   ├── marque.md  style.md      voix, cible, interdits ; style mesuré sur les pages du client
+│   ├── faits.md                 la seule source des chiffres publiés
+│   ├── decisions.md             ce qui a été validé ou refusé (lu avant toute proposition)
+│   ├── apprentissages.md        ce qui marche sur CE site, mesuré à J+28
+│   ├── cartographie.csv         une page = un mot-clé principal + un prompt principal
+│   └── entites.csv  triplets.csv  lexique.csv
+├── notes/                       BOÎTE D'ENTRÉE HUMAINE — #a-traiter, #fait-client
+├── journal/modifications.csv    CE QU'ON A FAIT — chaque modification + son effet à J+28
+├── donnees/                     instantanés Search Console, registre d'indexation
+├── recherche/                   SERP relevées, benchmarks « faire mieux »
+├── rapports/                    mensuels, a-valider.md, runs/ (journal de chaque routine)
 ├── contenus/                    brouillons
+├── routines/                    consignes des routines (hebdo.md…), lues à chaque passage
+├── .github/workflows/           sync-methode.yml : PR de mise à jour de la méthode le lundi
+├── .obsidian/                   réglages partagés du coffre (l'état de l'écran est ignoré)
 └── .claude/
     ├── skills/projet-*          propre au client — jamais touché par la synchro
-    ├── skills/…                 méthode decupler-seo — synchronisée
-    ├── agents/  commands/       méthode decupler-seo — synchronisée
-    └── decupler-seo/            scripts, modèles, version
+    ├── agents/projet-*.md       idem pour un agent propre au client
+    ├── skills/  agents/  commands/   méthode decupler-seo — synchronisée
+    └── decupler-seo/            scripts, modèles, hooks, SOP (docs/sop/), version
 ```
+
+### Qui écrit quoi
+
+| Couche | Écrit par | Modifiée comment | Jamais |
+|---|---|---|---|
+| Méthode (`.claude/skills/seo-*`, agents, commandes, scripts, SOP) | decupler-seo | `projet.py sync` (PR du lundi) | modifiée à la main dans un projet : on la remonte (`projet.py remonter`) |
+| Spécifique client (`.claude/skills/projet-*`) | vous, Claude | directement dans le projet | dupliquer une méthode générique : on paramètre, on ne recopie pas |
+| Mémoire (`memoire/`) | humains, routine | commit | un chiffre absent de `faits.md` |
+| Notes (`notes/`) | humains | Obsidian ou éditeur | lues par la routine sans étiquette |
+| Journal, données, rapports | scripts, routine | automatique | écrits à la main |
+| MCP (`.mcp.json`) et secrets | vous | `.mcp.json` + variables d'environnement | une clé dans le dépôt |
+
+### Skill de méthode ou skill `projet-` ?
+
+Une seule méthode, des paramètres par client. Un savoir-faire qui servirait
+sur un autre site va dans decupler-seo, écrit de façon générique, et lit ce
+qui change d'un client à l'autre dans le projet : `memoire/marque.md`,
+`memoire/style.md`, `decupler-seo.config.yml`, la charte. Un skill
+`projet-…` ne garde que ce qui n'a de sens que pour ce client (sa charte
+graphique, ses gabarits, ses extensions maison). Jamais deux versions du
+même skill : elles divergent dès la deuxième semaine.
+
+### Obsidian
+
+Le dépôt s'ouvre tel quel comme coffre (Obsidian → « Ouvrir un dossier comme
+coffre »). Liens Markdown relatifs, pour que GitHub, Obsidian et Claude
+lisent les mêmes fichiers ; graphe et rétroliens montrent la mémoire, la
+cartographie et les décisions d'un coup d'œil. L'extension communautaire
+**Obsidian Git** synchronise avec GitHub (tirer à l'ouverture, pousser
+toutes les 10 minutes). Vos idées et retours client vont dans `notes/` avec
+`#a-traiter` : la routine du vendredi les transforme en actions. Plusieurs
+projets : clonez-les dans un même dossier et ouvrez ce dossier, vous avez un
+seul coffre et un graphe commun. Un serveur MCP Obsidian n'apporte rien
+ici : Claude lit déjà les fichiers, et il ne tournerait pas dans une routine.
 
 **La règle de partage** : ce qui vaut pour tous les clients est dans
 decupler-seo. Ce qui ne vaut que pour un client est dans son projet, dans
@@ -129,8 +172,26 @@ depuis GitHub et, si la méthode a changé, ouvre une pull request
 sans votre validation. Une fois par dépôt : Settings › Actions › General ›
 « Allow GitHub Actions to create and approve pull requests ».
 
-Pour un projet plus ancien, copiez ce fichier depuis
-`modele-projet/.github/workflows/` dans le dépôt.
+Pour un projet plus ancien : `projet.py completer .` l'ajoute, avec les
+autres nouveautés du gabarit (Accueil.md, notes/, .obsidian/), sans rien
+remplacer.
+
+### En travaillant sur un projet : `/seo-maj`
+
+La commande fait le tour dans le bon ordre : statut, remontée des
+améliorations faites ici, synchro sur une branche, nouveautés du gabarit,
+PR, et la mise à jour du plugin sur votre poste.
+
+### Le chemin retour : une amélioration trouvée chez un client
+
+```bash
+python3 .claude/decupler-seo/scripts/projet.py remonter . --pousser
+```
+
+Copie les fichiers de méthode modifiés dans ce projet vers decupler-seo, sur
+une branche `remontee/<projet>-<date>` (le chemin des scripts est rétabli
+dans le Markdown), et la pousse : il reste à ouvrir la pull request. Une
+fois fusionnée et publiée, tous les projets la reçoivent le lundi suivant.
 
 ### Tous les projets d'un coup d'œil
 
@@ -147,7 +208,7 @@ chaque nouveau projet.
 
 ### Les SOP
 
-Les 14 procédures (`docs/sop/`) sont embarquées avec la méthode, dans
+Les procédures (`docs/sop/`) sont embarquées avec la méthode, dans
 `.claude/decupler-seo/docs/sop/`. Dans un projet : « suis la SOP brief pour
 "<mot-clé>" », Claude lit la fiche et lance le skill qu'elle cite.
 

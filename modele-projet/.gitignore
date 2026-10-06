@@ -18,6 +18,12 @@ donnees/pilotage.json
 donnees/actions-*.json
 donnees/semaine.json
 
+# Obsidian : la configuration partagée est versionnée, l'état de l'écran non
+.obsidian/workspace*.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+.trash/
+
 # Système
 .DS_Store
 Thumbs.db

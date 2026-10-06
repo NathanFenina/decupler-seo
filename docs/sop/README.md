@@ -1,4 +1,4 @@
-# Les 14 SOP
+# Les SOP
 
 Une SOP dit **quoi faire et dans quel ordre** ; le skill qu'elle cite le **fait**.
 C'est ce qui rend le travail reproductible d'un site à l'autre.
@@ -27,6 +27,9 @@ la commande, les étapes, les MCP nécessaires, le livrable, les pièges.
 | [Analyse GSC / GA4](12-analyse-gsc-ga4.md) | `seo-gsc-analyses`, `seo-quick-wins` | `/seo quickwins, ou /seo gsc` |
 | [Visibilité IA](13-visibilite-ia.md) | `geo-share-of-model`, `geo-visibilite-ia`, `geo-citation-tracker` | `/seo geo <url>, ou /seo share-of-model` |
 | [Reporting](14-reporting.md) | `seo-reporting`, `seo-dashboard`, `seo-pilotage` | `/seo rapport, puis /seo dashboard` |
+| [La semaine type](15-semaine-type.md) | `seo-cycle`, `seo-pilotage`, `seo-journal-mesure` | routine `hebdo`, puis `/seo-maj` le lundi |
+| [Arbitrer les actions](16-arbitrer-les-actions.md) | `seo-opportunites`, `seo-pilotage` | `/seo opportunites` |
+| [Travailler avec un prestataire](17-travailler-avec-un-prestataire.md) | tous, selon la tâche | `/seo doctor`, puis la SOP de la tâche |
 
 Dans Claude Code : « suis la SOP brief pour "<mot-clé>" » suffit, Claude lit la
 fiche et lance le skill.
