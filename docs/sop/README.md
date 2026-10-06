@@ -16,7 +16,7 @@ la commande, les étapes, les MCP nécessaires, le livrable, les pièges.
 | [Topical map](01-topical-map.md) | `seo-cartographie`, `seo-cocon-semantique` | `/seo cartographie, puis /seo cocon` |
 | [Ligne éditoriale](02-ligne-editoriale.md) | `seo-opportunites`, `seo-keyword-research` | `/seo opportunites` |
 | [Brief SEO/GEO](03-brief-seo-geo.md) | `seo-brief`, `seo-benchmark`, `seo-serp-analysis` | `/seo brief "<mot-clé>"` |
-| [Rédaction](04-redaction.md) | `seo-redaction`, `seo-eeat` | `/seo article` |
+| [Rédaction](04-redaction.md) | `seo-redaction`, `seo-eeat`, `seo-humanisation` | `/seo article` |
 | [Optimisation on-page](05-optimisation-on-page.md) | `seo-optimisation-onpage`, `seo-meta-serp`, `seo-quick-wins` | `/seo onpage <url> <mot-clé>` |
 | [Maillage interne](06-maillage-interne.md) | `seo-maillage-interne` | `/seo maillage` |
 | [Entités](07-entites.md) | `seo-entites-triplets`, `geo-llms-txt` | `/seo entités` |

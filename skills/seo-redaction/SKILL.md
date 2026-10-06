@@ -391,6 +391,17 @@ dont 1 600 sont du remplissage.
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/controle_contenu.py" contenus/<slug>.md
 ```
 
+## Passe finale : humanisation
+
+Dernière étape avant remise : skill `seo-humanisation`. Elle retire les
+tics d'écriture générée restants, dans le style de `memoire/style.md`, sans
+toucher au fond. Garder une copie du texte avant la passe (`brouillon.md`) ;
+score des tics sous 25, mêmes chiffres avant et après :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/humanisation.py" --avant brouillon.md --apres contenus/<slug>.md --seuil 25
+```
+
 ## Livrables
 
 - `article-<slug>.md` — le texte
