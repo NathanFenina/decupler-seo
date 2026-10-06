@@ -55,4 +55,8 @@ on attend : il apparaît dans « À décider ». Republie la page, puis
 
 ## 6. Livrer
 Journal de run `rapports/runs/<date>-hebdo.md`, commit sur `claude/hebdo-<date>`,
-push, PR. Fusionne si la session le permet, sinon règle « étape refusée ».
+push, PR vers la branche principale. **Ne jamais fusionner soi-même** (les
+routines n'ont pas le droit de fusionner sans relecture, et ne posent pas de
+question) : la PR devient une action `bloquee` dans « À décider »
+(`--attend "relire et fusionner"`, `--lien <PR>`), puis la page est republiée.
+Sur un site en mode `depot` (fusionner = publier), c'est la règle de toute façon.

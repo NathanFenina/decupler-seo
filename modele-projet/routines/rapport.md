@@ -20,5 +20,6 @@ python3 .claude/decupler-seo/scripts/pilotage.py injecter --html donnees/tableau
 Republie la page, puis résume les actions proposées dans le rapport.
 
 ## Livrer
-Commite, pousse, ouvre une PR (rapport, données, mémoire : rien du site). Fusionne-la
-si la session le permet ; sinon, règle « étape refusée » de `_commun.md`.
+Commite, pousse, ouvre une PR (rapport, données, mémoire : rien du site). Ne la
+fusionne pas : action `bloquee` « relire et fusionner » sur la page de suivi
+(règle de `_commun.md`).

@@ -124,11 +124,12 @@ refusée ne revient pas ; une décision prise n'est jamais écrasée.
 
 ## Une routine ne reste jamais bloquée
 
-Personne ne répond pendant une routine. Si une action est refusée par les
-permissions de la session (fusion d'une pull request, suppression de
-fichier, push sur main…), ne pas insister et ne pas attendre de réponse :
-laisser la PR ouverte, l'écrire dans le journal de run et dans la PR
-(« à fusionner par un humain »), ajouter sur la page de suivi
-`pilotage.py ajouter --titre "Fusionner la PR <n°>" --statut validee --lien <PR>`,
-publier, et terminer. Le tableau de bord est mis à jour **avant** la livraison
+Personne ne répond pendant une routine. **Une routine ne fusionne jamais sa
+propre PR** : la politique de sécurité des sessions refuse une fusion sans
+relecture, et une routine qui pose la question « fusionner ? » reste bloquée
+jusqu'à la réponse (constaté le 02/10/2026 : un vendredi entier perdu). Elle
+laisse la PR ouverte, l'écrit dans le journal de run, ajoute sur la page de suivi
+`pilotage.py ajouter --titre "Fusionner la PR <n°>" --type decision --chantier pilotage --statut bloquee --attend "relire et fusionner" --lien <PR>`,
+publie, et termine. Même conduite pour toute étape refusée (suppression,
+push sur main…) : ne pas insister, ne pas attendre de réponse. Le tableau de bord est mis à jour **avant** la livraison
 git : un refus de fusion ne doit jamais coûter la roadmap du mois.

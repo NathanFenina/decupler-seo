@@ -14,4 +14,4 @@ Lis `routines/_commun.md`, puis :
 2. Journalise chaque modification (`journal.py ajouter --auto`) avant de passer à la suivante.
 3. Publication selon `publication.mode` : `cms` → par `wp.py` (ou le CMS), en révision ou brouillon ;
    `depot` → contrôles bloquants (`controle.commandes`), puis PR qui liste page, requête visée, gain attendu.
-4. Fusion de la PR seulement si la config et `memoire/decisions.md` l'autorisent ; sinon PR ouverte.
+4. PR laissée ouverte, jamais fusionnée par la routine : action `bloquee` « relire et fusionner » sur la page de suivi.

@@ -425,12 +425,21 @@ def cmd_inspect(a) -> None:
     site = a.site or site_par_defaut()
     urls = a.url or [u.strip() for u in open(a.fichier, encoding="utf-8") if u.strip()]
     prefixe = site.rstrip("/") if site.startswith("http") else ""
-    print(f"\n{len(urls)} URL à inspecter · quota 2 000/jour\n")
+    if not a.json:
+        print(f"\n{len(urls)} URL à inspecter · quota 2 000/jour\n")
     compte: dict[str, int] = {}
+    resultats = []
     for u in urls:
         r = appel(INSPECT, {"inspectionUrl": u, "siteUrl": site, "languageCode": "fr"}) \
             .get("inspectionResult", {}).get("indexStatusResult", {})
         verdict, couverture = r.get("verdict", "?"), r.get("coverageState", "")
+        if a.json:                                   # une ligne par URL, pour les analyses (seo-indexation)
+            resultats.append({"url": u, "verdict": verdict, "couverture": couverture,
+                              "indexation": r.get("indexingState", ""), "recuperation": r.get("pageFetchState", ""),
+                              "robots": r.get("robotsTxtState", ""), "dernier_passage": (r.get("lastCrawlTime") or "")[:10],
+                              "canonique_google": r.get("googleCanonical", ""), "canonique_declaree": r.get("userCanonical", ""),
+                              "sitemaps": r.get("sitemap", []), "liens_vers": r.get("referringUrls", [])})
+            continue
         compte[couverture or verdict] = compte.get(couverture or verdict, 0) + 1
         court = u.replace(prefixe, "") if prefixe else u
         print(f"  {({'PASS': '✓', 'NEUTRAL': '•', 'FAIL': '✗'}).get(verdict, '?')} {court:<48} {couverture}")
@@ -438,6 +447,9 @@ def cmd_inspect(a) -> None:
             canon = (r.get("googleCanonical") or "—").replace(prefixe, "") if prefixe else r.get("googleCanonical")
             print(f"      dernier passage : {r['lastCrawlTime'][:10]} · robots : {r.get('robotsTxtState', '')}"
                   f" · canonique Google : {canon}")
+    if a.json:
+        print(json.dumps(resultats, ensure_ascii=False, indent=1))
+        return
     print("\n  Récapitulatif :")
     for k, v in sorted(compte.items(), key=lambda x: -x[1]):
         print(f"    {v:>3} · {k}")
@@ -480,6 +492,7 @@ def main() -> int:
 
     p = sub.add_parser("inspect", help="état d'indexation (API URL Inspection)")
     p.add_argument("--site"); p.add_argument("--url", nargs="*"); p.add_argument("--fichier")
+    p.add_argument("--json", action="store_true", help="une ligne par URL (couverture, dernier passage, canoniques, liens)")
     p.set_defaults(f=cmd_inspect)
 
     a = ap.parse_args()
