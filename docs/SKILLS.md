@@ -1,4 +1,4 @@
-# Les 52 skills
+# Les 53 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -40,6 +40,7 @@ aussi l'appeler par son nom.
 | `seo-brief` | Brief complet, réponse directe et FAQ déjà rédigées | « brief », « plan d'article » |
 | `seo-benchmark` | Les 3 meilleures pages concurrentes lues, grille « faire mieux » : 5 axes gagnés ou la page ne sort pas | « benchmark », « faire mieux que », avant toute page neuve |
 | `seo-redaction` | Rédaction SEO + GEO : anti-cannibalisation, thèse avant le plan, test anti-remplissage, sources vérifiées | « rédige », « écris un article » |
+| `seo-humanisation` | Dernière passe d'écriture : retire les tics d'écriture générée en français sans toucher au fond, dans le style mesuré du client ; score /100, comparatif avant/après qui bloque tout chiffre apparu | « humanise », « ça sonne IA », « enlève les tics IA », « détecteur IA » |
 | `seo-optimisation-onpage` | Note /100 par critère **puis réécrit** | « optimise cette page », « score SEO », « passe au vert » |
 | `seo-meta-serp` | 3 titles, 2 metas, aperçu SERP, comptage pixel | « title », « meta description », « CTR » |
 | `seo-faq-paa` | FAQ ciblant PAA, snippets et LLM, + schema | « FAQ », « People Also Ask » |
@@ -91,7 +92,7 @@ aussi l'appeler par son nom.
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
-| `seo-publication-cms` | WordPress, Webflow, générique. Sauvegarde et vérification | « publie », « mets en ligne » |
+| `seo-publication-cms` | WordPress, Webflow, générique. Sauvegarde et vérification. Extensions WordPress prêtes : `templates/wordpress/` (seo-meta-rest, seo-crawl-fix, seo-entite) | « publie », « mets en ligne » |
 | `seo-pilotage-notion` | 5 bases : leads, objectifs, roadmap, contenus, backlinks | « Notion », « pilotage », « roadmap » |
 | `seo-reporting` | Rapport avec les **causes**, pas seulement les courbes | « rapport », « bilan mensuel » |
 | `seo-dashboard` | Tableau de bord HTML autonome, partageable | « dashboard », « rapport visuel » |

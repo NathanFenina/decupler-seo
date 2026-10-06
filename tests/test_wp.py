@@ -5,7 +5,9 @@ réponses REST figées (fixtures/), le client sur un transport simulé, et la
 ligne de commande sur un faux WordPress local (127.0.0.1).
 """
 
+import contextlib
 import csv
+import io
 import json
 import sys
 import threading
@@ -96,6 +98,18 @@ class TestChampsSEO(unittest.TestCase):
         self.assertEqual(wp.meta_non_ecrits({"meta": {}}, attendu), ["_yoast_wpseo_metadesc"])
         self.assertEqual(wp.meta_non_ecrits({"meta": dict(attendu)}, attendu), [])
         self.assertEqual(wp.meta_non_ecrits({"meta": []}, attendu), ["_yoast_wpseo_metadesc"])
+
+    def test_le_mu_plugin_cite_existe(self):
+        # Le message d'échec renvoie vers un fichier réel, livré avec la méthode.
+        self.assertTrue(wp.MU_PLUGIN_SEO.is_file(), wp.MU_PLUGIN_SEO)
+        source = wp.MU_PLUGIN_SEO.read_text(encoding="utf-8")
+        for champs in wp.CHAMPS_SEO.values():
+            for champ in champs.values():
+                self.assertIn(f"'{champ}'", source, champ)
+        sortie = io.StringIO()
+        with contextlib.redirect_stdout(sortie):
+            wp.expliquer_meta_non_ecrite("rankmath", ["rank_math_title"])
+        self.assertIn(str(wp.MU_PLUGIN_SEO), sortie.getvalue())
 
     def test_valeur_affichee_et_brute(self):
         page = fixture("wp_pages.json")[0]

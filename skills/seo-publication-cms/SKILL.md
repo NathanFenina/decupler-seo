@@ -134,14 +134,17 @@ caractères : refusée (`--hors-format` pour forcer).
 
 | Extension | Champs | Écriture par l'API |
 |-----------|--------|-------------------|
-| Yoast | `_yoast_wpseo_title`, `_yoast_wpseo_metadesc` | Seulement si déclarés (mu-plugin) — sinon `--via-extrait` |
+| Yoast | `_yoast_wpseo_title`, `_yoast_wpseo_metadesc` | Articles seulement selon la version ; pages : si déclarés (mu-plugin) — sinon `--via-extrait` |
 | Rank Math | `rank_math_title`, `rank_math_description` | Champs déclarés, ou sa route `rankmath/v1/updateMeta`, tentée automatiquement |
 | SEOPress | `_seopress_titles_title`, `_seopress_titles_desc` | Seulement si déclarés |
 
 WordPress ignore **sans erreur** un champ non exposé : un 200 ne prouve
-rien, c'est pourquoi le script relit. Les deux solutions (mu-plugin de six
-lignes, ou modèle Yoast réglé sur `%%excerpt%%` + `--via-extrait`) sont dans
-`references/wordpress.md`.
+rien, c'est pourquoi le script relit. Les deux solutions (le mu-plugin
+`${CLAUDE_PLUGIN_ROOT}/templates/wordpress/mu-plugins/seo-meta-rest.php`, ou
+modèle Yoast réglé sur `%%excerpt%%` + `--via-extrait`) sont dans
+`references/wordpress.md`. Autres extensions prêtes (410 du spam, entité
+JSON-LD) : `templates/wordpress/README.md`, jamais installées sans
+validation humaine.
 
 ### Carte de contenu, maillage, cannibalisation
 

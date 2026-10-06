@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-52 skills · 15 agents · 32 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 349 tests
+53 skills · 15 agents · 34 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 17 SOP · 372 tests
 
 ---
 
@@ -119,8 +119,9 @@ Votre temps : **20 minutes le vendredi**, sur l'onglet du mois de la page de sui
 | Idées | `demande.py idees --lexique` (DataForSEO, sans connecteur) | la demande réelle : volume, difficulté, intention, tendance |
 | Priorités | `opportunites.py --calendrier` | actions classées par valeur pour **ce** client, funnel, calendrier éditorial |
 | Brief | `serp_concurrents.py` + `seo-benchmark` + `seo-brief` | top 5 lu et mesuré (longueur cible, sujets récurrents, questions non traitées, AI Overview), puis brief en 18 sections : gap face au top 5, plan chiffré, réponse directe, H1, intro et FAQ rédigés, prompts IA et fan-out, schémas, checklist GEO ; repli Firecrawl sans DataForSEO |
-| Rédaction | `style_maison.py` + `seo-redaction` + `controle_contenu.py` | texte écrit dans le style mesuré du client, relu, contrôlé, bloqué s'il contient une promesse ou un chiffre non sourcé |
-| Publication | `wp.py` (WordPress) | brouillon par défaut, révision à valider pour une page en ligne, meta relue puis journalisée, carte de contenu et maillage |
+| Rédaction | `style_maison.py` + `seo-redaction` + `humanisation.py` + `controle_contenu.py` | texte écrit dans le style mesuré du client, débarrassé des tics d'écriture IA, relu, contrôlé, bloqué s'il contient une promesse ou un chiffre non sourcé |
+| Publication | `wp.py` (WordPress) + `templates/wordpress/` | extensions prêtes (métas SEO par l'API pour Yoast, Rank Math, SEOPress ; nettoyage après piratage ; entité JSON-LD), brouillon par défaut, révision à valider pour une page en ligne, meta relue puis journalisée, carte de contenu et maillage |
+| Indexation | `indexation.py annoncer`, puis `suivre` | IndexNow + sitemaps resoumis après chaque mise en ligne, contrôle à J+3, liste des URL à demander ; jamais l'Indexing API hors de son usage |
 | Mesure | `journal.py` | chaque modification jugée à J+28 contre un témoin |
 | Rapport | `rapport.py` | les chiffres du mois calculés par script ; l'agent rédige seulement les causes |
 | Visibilité IA | `share_of_model.py` | part de voix dans ChatGPT et Gemini, prompts où vous manquez |
@@ -201,14 +202,14 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>52 skills</b>, en 8 familles</summary>
+<summary><b>53 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
 | **Diagnostic et technique** | `seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` · `seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` · `seo-audit-contenu` · `seo-migration` · `seo-veille` |
 | **Données Search Console** | `seo-gsc-analyses` — 21 analyses : content decay, gagnants et perdants, requêtes émergentes, saisonnalité, cannibalisation, pages à créer… |
 | **Recherche et stratégie** | `seo-opportunites` · `seo-cartographie` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
-| **Contenu** | `seo-brief` · `seo-redaction` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` · `seo-lead-magnet` |
+| **Contenu** | `seo-brief` · `seo-redaction` · `seo-humanisation` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` · `seo-lead-magnet` |
 | **Structure et échelle** | `seo-design-pages` · `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-entites-triplets` · `seo-hreflang-i18n` · `seo-images` |
 | **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |
 | **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |
@@ -256,12 +257,13 @@ Console. Seuls le crawler et l'analyse de pages utilisent `requests` et
 
 | | |
 |---|---|
+| **[Manuel](docs/MANUEL.md)** | **par où commencer : essayer, rejoindre un projet, piloter des projets** |
 | [Installation](docs/INSTALLATION.md) | les trois façons d'installer |
 | [Piloter des projets](docs/PROJETS.md) | mémoire, routines, boucle de mesure |
 | [Brancher les outils](docs/MCP.md) | Search Console, GA4, et les 11 autres |
 | [Les skills](docs/SKILLS.md) · [Les agents](docs/AGENTS.md) | ce que fait chacun |
 | [Les workflows](docs/WORKFLOWS.md) | les chaînes de bout en bout |
-| [Les 14 SOP](docs/sop/README.md) | une procédure par action, reliée à son skill |
+| [Les 17 SOP](docs/sop/README.md) | une procédure par action, la semaine type, les arbitrages, le travail avec un prestataire |
 | [Sécurité](docs/SECURITE.md) · [Dépannage](docs/DEPANNAGE.md) | |
 | [Contribuer](CONTRIBUTING.md) | |
 

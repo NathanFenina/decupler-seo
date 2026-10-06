@@ -24,6 +24,6 @@
 
 ## Pièges
 
-- Yoast n'ouvre pas title et meta à l'API par défaut : sans un petit plugin qui les expose, WordPress répond 200 et jette les valeurs.
+- Yoast n'ouvre pas title et meta à l'API par défaut : sans un petit plugin qui les expose, WordPress répond 200 et jette les valeurs. Le mu-plugin prêt à déposer, et deux extensions pour le spam en 410 et l'entité JSON-LD : `templates/wordpress/` (lire son README ; rien en production sans sauvegarde ni validation).
 - WordPress transforme les lignes vides en paragraphes, y compris dans un `<style>` : la page casse en ligne alors qu'elle était parfaite en local.
 - Mettre un `<h1>` dans le contenu quand le thème affiche déjà le titre.

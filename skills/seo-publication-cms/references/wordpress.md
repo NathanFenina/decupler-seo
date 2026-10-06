@@ -7,35 +7,25 @@ problème, ou quand une écriture échoue.
 
 WordPress **ignore sans erreur** un champ `meta` qui n'est pas déclaré dans
 l'API REST : la requête renvoie 200, rien n'est écrit. `wp.py` relit la
-réponse et le signale. C'est le cas par défaut de Yoast, qui n'expose aucune
-route d'écriture, et souvent de SEOPress.
+réponse et le signale. C'est le cas par défaut de Yoast (les versions
+récentes n'ouvrent title, meta et requête cible qu'aux articles, jamais aux
+pages, ni la canonique ni le noindex), et souvent de SEOPress.
 
 ### Solution 1 — déclarer les champs (recommandée)
 
-Un fichier dans `wp-content/mu-plugins/` (dossier à créer s'il n'existe
-pas), actif sans activation, invisible dans la liste des extensions :
+Un seul fichier, livré avec la méthode :
+`${CLAUDE_PLUGIN_ROOT}/templates/wordpress/mu-plugins/seo-meta-rest.php`
+(dans un projet : `.claude/decupler-seo/templates/wordpress/mu-plugins/`).
+Il détecte l'extension active (Yoast, Rank Math, SEOPress) et ouvre à
+l'écriture title, meta description, requête cible, canonique et noindex,
+pour tous les types de contenu publics, aux seuls comptes qui peuvent
+modifier le contenu concerné. À déposer dans `wp-content/mu-plugins/`
+(dossier à créer s'il n'existe pas) : actif sans activation, il n'apparaît
+que dans Extensions → « Indispensables ».
 
-```php
-<?php
-// wp-content/mu-plugins/seo-meta-rest.php
-// Rend le title et la meta description écrivables par l'API REST,
-// pour les comptes qui peuvent modifier le contenu.
-add_action('init', function () {
-    $champs = ['_yoast_wpseo_title', '_yoast_wpseo_metadesc'];
-    // Rank Math : ['rank_math_title', 'rank_math_description']
-    // SEOPress  : ['_seopress_titles_title', '_seopress_titles_desc']
-    foreach (['post', 'page'] as $type) {
-        foreach ($champs as $champ) {
-            register_post_meta($type, $champ, [
-                'show_in_rest'  => true,
-                'single'        => true,
-                'type'          => 'string',
-                'auth_callback' => fn() => current_user_can('edit_posts'),
-            ]);
-        }
-    }
-});
-```
+Installation, test (`/wp-json/seo-meta-rest/v1/etat`), désinstallation et
+niveau d'autonomie : `templates/wordpress/README.md`. Ne recopiez pas de
+version abrégée de ce code dans un projet : c'est ce fichier qui fait foi.
 
 Relancez `wp.py verifier` : la ligne « Champs SEO exposés » doit apparaître.
 
@@ -57,8 +47,9 @@ ailleurs dans le thème (listes d'articles) : vérifiez le rendu.
 
 Rank Math fournit sa propre route (`rankmath/v1/updateMeta`) : `wp.py` la
 tente automatiquement quand les champs ne sont pas exposés. Si elle est
-absente ou refusée selon la version installée, le mu-plugin ci-dessus règle
-la question.
+absente ou refusée selon la version installée, `seo-meta-rest.php` règle
+la question (testé avec Rank Math : `wp.py meta` écrit alors directement
+dans `rank_math_title` et `rank_math_description`).
 
 ## Erreurs d'accès
 
@@ -110,8 +101,9 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
   vient de la méta `_elementor_data`, pas de `content`. Modifier les deux, et
   sauvegarder les deux avant.
 - Une écriture de `_elementor_data` par l'API est enregistrée mais **pas
-  affichée** tant que le cache CSS/HTML d'Elementor n'est pas purgé (un petit
-  plugin maison peut purger à chaque modification).
+  affichée** tant que le cache CSS/HTML d'Elementor n'est pas purgé :
+  l'extension `templates/wordpress/plugins/seo-crawl-fix/` le purge à chaque
+  modification (réglage `purge_elementor`).
 - Gabarit `elementor_canvas` : pas d'en-tête ni de pied de page du site, donc
   aucun script posé dans l'en-tête ne s'y exécute.
 - Double H1 : beaucoup de thèmes (Astra, etc.) affichent le titre de la page
@@ -123,7 +115,8 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
 
 - Yoast n'expose pas le canonical à l'écriture par REST sans champ déclaré
   (voir plus haut) ; il ne publie l'Organisation dans son graphe que si le
-  logo est réglé.
+  logo est réglé — `templates/wordpress/plugins/seo-entite/` la crée alors,
+  avec ses `sameAs`, et donne un seul identifiant à la personne liée.
 - Une politique de mots de passe (Wordfence, etc.) refuse par l'API un mot de
   passe sans symbole : à prévoir pour toute création ou réinitialisation de compte.
 - **Un statut forcé déprogramme.** Un `POST` avec `"status": "draft"` sur un
@@ -144,7 +137,26 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
 - Site piraté : chercher les comptes administrateurs créés directement en base
   (sans email, date d'inscription incohérente) ; les rétrograder et changer
   leur mot de passe avant de supprimer, et **ne jamais** écrire leurs
-  identifiants dans un dépôt public.
+  identifiants dans un dépôt public. Les URL de spam restées dans l'index
+  se traitent par un 410 et un sitemap temporaire :
+  `templates/wordpress/plugins/seo-crawl-fix/` (niveau Interdit : proposé,
+  installé par une personne).
+
+## Extensions prêtes à installer
+
+`templates/wordpress/` regroupe les extensions écrites après ces incidents,
+génériques et réglables par un fichier de configuration :
+
+| Extension | Pour |
+|-----------|------|
+| `mu-plugins/seo-meta-rest.php` | Champs SEO écrivables par l'API (Yoast, Rank Math, SEOPress) |
+| `plugins/seo-crawl-fix/` | 410 du spam, page d'erreur légère, pagination hors limites, pages hors index, redirections, robots.txt, cache Elementor |
+| `plugins/seo-entite/` | Organisation, personne, `sameAs` et identifiants uniques dans le JSON-LD |
+
+Le `README.md` du dossier donne pour chacune l'incident d'origine,
+l'installation (FTP/SFTP, gestionnaire de fichiers ou zip), le test, la
+désinstallation et le niveau d'autonomie. Rien ne s'installe en production
+sans sauvegarde et validation humaine.
 
 ## Carte de contenu
 

@@ -70,6 +70,9 @@ CHAMPS_SEO = {
     "seopress": {"titre": "_seopress_titles_title", "description": "_seopress_titles_desc"},
 }
 NAMESPACES_SEO = (("yoast", "yoast/v1"), ("rankmath", "rankmath/v1"), ("seopress", "seopress/v1"))
+# Le mu-plugin qui ouvre ces champs à l'API (Yoast, Rank Math, SEOPress) :
+# à côté de scripts/, dans le plugin comme dans un projet (.claude/decupler-seo/).
+MU_PLUGIN_SEO = SCRIPTS.parent / "templates" / "wordpress" / "mu-plugins" / "seo-meta-rest.php"
 
 META_MIN, META_MAX = 120, 156      # la zone verte de la méthode, partout
 TITRE_MAX = 60
@@ -963,13 +966,11 @@ def ecrire_meta_rankmath(client: ClientWP, ident: int, meta: dict) -> bool:
 
 def expliquer_meta_non_ecrite(plugin: str | None, manquants: list[str]) -> None:
     print(f"  ! Champs SEO non écrits ({', '.join(manquants)}) : ils ne sont pas exposés dans l'API REST.")
+    print(f"    Solution : le mu-plugin {MU_PLUGIN_SEO}")
+    print("    à déposer dans wp-content/mu-plugins/ (installation et test : templates/wordpress/README.md).")
     if plugin == "yoast":
-        print("    Yoast n'expose aucune route d'écriture. Deux solutions : le mu-plugin qui déclare ces champs")
-        print("    (skills/seo-publication-cms/references/wordpress.md), ou régler le modèle de meta description")
-        print("    de Yoast sur %%excerpt%% puis relancer avec --via-extrait.")
-    else:
-        print("    Déclarez-les avec register_post_meta(show_in_rest) — voir le mu-plugin dans")
-        print("    skills/seo-publication-cms/references/wordpress.md.")
+        print("    Sans toucher au serveur : régler le modèle de meta description de Yoast sur %%excerpt%%")
+        print("    puis relancer avec --via-extrait (le title reste alors le modèle Yoast).")
 
 
 def controler(chemin: str) -> tuple[bool, str]:

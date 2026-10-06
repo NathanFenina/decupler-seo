@@ -1,5 +1,49 @@
 # Journal des versions
 
+## 3.9.0
+
+### Ajouté
+
+- **Passe d'humanisation** : skill `seo-humanisation` et `scripts/humanisation.py`.
+  Score des tics d'écriture générée en français (8 familles, signaux ligne par
+  ligne), comparatif `--avant/--apres` qui bloque tout chiffre apparu, `--seuil`
+  pour les contrôles. Marqueurs dans `config/marqueurs-ia-fr.json`, exceptions
+  du projet dans `memoire/marqueurs-ia.json`. Appelée en fin de `seo-redaction`
+  et dans la SOP 4. Elle rend un texte meilleur et reconnaissable comme celui du
+  client ; elle ne promet pas d'être « indétectable ».
+- **Indexation après publication** : `scripts/indexation.py` (`cle`, `annoncer`,
+  `suivre`) : IndexNow, sitemaps resoumis par l'API, registre
+  `donnees/indexation.csv`, inspection à J+3 et liste des URL à demander à la
+  main. Pas d'Indexing API Google hors offres d'emploi et vidéos en direct.
+- **`templates/wordpress/`** : trois extensions génériques, testées sur un
+  WordPress réel avec Yoast et Rank Math. `seo-meta-rest.php` (mu-plugin :
+  title, meta, requête, canonique, noindex écrivables par l'API pour Yoast,
+  Rank Math et SEOPress), `seo-crawl-fix` (410 du spam par liste et motifs,
+  sitemap des URL supprimées, page d'erreur légère, pagination hors limites,
+  pages hors index, redirections, robots.txt, cache Elementor), `seo-entite`
+  (Organisation, Personne, sameAs, identifiant unique dans le JSON-LD). README :
+  incident, installation, test, désinstallation, niveau d'autonomie. `wp.py`
+  renvoie vers le mu-plugin quand un champ SEO n'est pas écrit.
+- **Mise à jour depuis un projet** : commande `/seo-maj` ; `projet.py remonter`
+  (renvoie vers decupler-seo, sur une branche, les fichiers de méthode
+  améliorés dans un projet) ; `projet.py completer` (ajoute à un projet existant
+  les nouveautés du gabarit, sans rien remplacer).
+- **Obsidian** : chaque projet s'ouvre comme coffre (`.obsidian/` partagé,
+  `Accueil.md`, liens Markdown relatifs) ; `notes/` sert de boîte d'entrée
+  humaine (`#a-traiter`, `#fait-client`), lue par la routine du vendredi.
+- **SOP 15 à 17** : la semaine type, arbitrer les actions du mois (contenu,
+  technique, GEO sur une même échelle), travailler avec un prestataire.
+- **`docs/MANUEL.md`** : trois chemins de prise en main (essayer, rejoindre un
+  projet, piloter des projets) et la circulation du savoir entre decupler-seo
+  et les projets.
+
+### Modifié
+
+- `docs/PROJETS.md` : anatomie complète d'un projet, qui écrit quoi, skill de
+  méthode ou skill `projet-`, Obsidian.
+- SOP 11 : `indexation.py annoncer` puis `suivre` ; Claude in Chrome réservé à
+  quelques URL, jamais en routine.
+
 ## 3.8.0
 
 ### Ajouté
