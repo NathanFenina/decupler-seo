@@ -47,6 +47,28 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/demande.py" serp --mot "requête" --langu
 produit `donnees/demande-<langue>-<date>.csv`, que `seo-opportunites` lit
 directement. Une passe par langue du projet.
 
+**Avec le MCP Ubersuggest** (dans une session, pas dans une routine
+cloud sans connecteur) :
+- `auth_status` d'abord : un compte déconnecté se dit, il ne se remplace
+  pas par des chiffres supposés ;
+- à **chaque** appel, la langue (`language: "fr"`) et le pays (`locId`,
+  via `location_suggest`) : sans `locId`, les volumes sont mondiaux, et le
+  rapport doit le dire ;
+- `keyword_suggestions` pour la longue traîne (questions, comparaisons),
+  `keyword_overview` pour volume, difficulté, CPC et tendance,
+  `serp_analysis` pour le top 10 ;
+- Ubersuggest **n'expose pas la présence d'un AI Overview** : prenez les
+  questions remontées par `keyword_suggestions` comme indice de PAA, et
+  `brand_visibility_overview` / `brand_prompts` pour la visibilité dans les
+  moteurs IA ;
+- les réponses brutes se gardent dans un cache du projet (non versionné),
+  puis se réduisent au CSV `requete,volume,page` que lit `seo-opportunites`.
+
+**Une requête de Search Console sans volume connu** garde ses impressions
+comme borne basse, marquée « estimée » : ce n'est pas un volume de
+recherche. Une seconde passe (`demande.py volumes` ou `keyword_overview`)
+donne le vrai chiffre.
+
 Reddit mérite un mot : c'est la meilleure source de **vocabulaire réel**.
 Les gens y écrivent leurs problèmes avec leurs mots, pas avec les vôtres.
 Un mot-clé issu d'un thread Reddit convertit mieux qu'un mot-clé issu d'un
@@ -65,6 +87,11 @@ fausse qui a l'air juste. On écarte d'abord, on mesure ensuite :
   sert de champ sémantique, pas de cible.
 - **Bruit Search Console** : requêtes à 1 impression, fautes de frappe
   isolées, requêtes tronquées ou sans sens — ignorées.
+- **Termes ambigus** : un sigle ou un mot polysémique du métier (« IA »,
+  « GEO », un nom de produit qui est aussi un prénom) ramène des requêtes
+  d'un autre univers (géographie, jeux, homonymes). Un terme ambigu n'est
+  retenu qu'avec un **mot de contexte** du métier dans la requête, et une
+  liste négative (les univers voisins) écarte le reste avant toute mesure.
 
 Chaque exclusion se consigne avec sa raison : c'est ce qui évite de rouvrir
 le débat le mois suivant.

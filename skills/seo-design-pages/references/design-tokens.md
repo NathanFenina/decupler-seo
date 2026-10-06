@@ -83,10 +83,17 @@ variante foncée.
 | H2 | `clamp(1.5rem, 3.2vw, 2.1rem)` | 1,2 à 1,3 | |
 | H3 | `clamp(1.1rem, 2.2vw, 1.35rem)` | 1,3 | |
 | Chapô | 1,1 à 1,2 rem | 1,6 | 55 à 60 caractères de large |
-| Corps | 1 à 1,0625 rem (16-17 px) | 1,65 à 1,75 | **60 à 70 caractères par ligne** (`max-width: 68ch`) |
+| Corps | 1 à 1,0625 rem (16-17 px) | 1,65 à 1,75 | **60 à 70 caractères par ligne** (`max-width: 68ch`, ou en `em` : voir plus bas) |
 | Légende, note | 0,8 à 0,875 rem | 1,5 | jamais sous 12 px |
 | Chiffres | `font-variant-numeric: tabular-nums` | | tout chiffre comparable s'aligne |
 
+- **`ch` ment avec certaines polices.** L'unité vaut la largeur du « 0 » :
+  large dans les polices à chiffres larges (Inter : environ 0,75 em), elle
+  laisse passer 85 à 90 caractères de français sous un `max-width: 66ch`.
+  Mesurez la ligne réelle au rendu ; si elle dépasse, exprimez les mesures
+  de lecture en `em` (environ 36 em pour 72 caractères).
+- **Plancher de 12 px** (`.75rem`) pour tout texte qui porte une information
+  (pastille, étiquette, légende) ; en dessous, c'est de la décoration.
 - **Deux familles au plus**, trois ou quatre graisses en tout. Chaque graisse
   est un fichier à charger.
 - **Pile système par défaut** (zéro requête, zéro décalage). Police de marque :
@@ -132,9 +139,66 @@ ce contraste qui fait lire les sections comme des blocs.
   révéler a déjà laissé des pages entières invisibles (un script cassé par une
   ligne vide suffit). Si vous le faites malgré tout : filet `<noscript>` et
   forçage de l'affichage au bout de 2 à 3 secondes.
+- **Animer la translation, jamais l'opacité.** Un `from { opacity: 0 }`
+  rend le texte invisible partout où l'animation ne tourne pas : crawler
+  IA, JavaScript coupé, capture sans interface. `from { transform:
+  translateY(18px) }` donne le même effet sans rien cacher.
+- **Déclencher au défilement** (`IntersectionObserver`), pas au chargement :
+  jouée au chargement, l'animation d'un bloc situé 9 000 px plus bas est
+  finie avant que le lecteur n'y arrive, et on croit qu'elle manque.
+- **Une animation de fond (canvas, SVG animé)** : le texte reste dans le
+  HTML, jamais peint dans le canvas ; ordre de peinture explicite (canvas
+  en `z-index:0` et `pointer-events:none`, contenu en `position:relative;
+  z-index:1`) plutôt qu'un `z-index:-1` qui dépend du thème ; une seule
+  image fixe sous `prefers-reduced-motion` ; boucle arrêtée quand l'onglet
+  passe en arrière-plan ; aucune dépendance externe si quelques dizaines de
+  lignes suffisent.
 - **Focus clavier** : un anneau visible de 2 px, décalé de 2 à 3 px, sur tout
   élément interactif (`:focus-visible`). Ne le supprimez jamais sans le
   remplacer.
+
+## 5 bis. Les signatures d'une interface générée
+
+Une page se fait repérer comme produite en série sur des motifs visuels,
+avant qu'on lise une phrase. Ceux qui reviennent le plus :
+
+| Motif | Ce qu'on voit | À la place |
+|---|---|---|
+| Barre latérale colorée | 3-4 px de couleur ou de dégradé sur le bord gauche de chaque carte | Rien, ou un filet complet |
+| Halo coloré | Ombres teintées de la couleur de marque | Élévation neutre (ombre grise ou encre très diluée) |
+| Bord fin + ombre large | 1 px de bordure et 40 px de flou sur la même carte | Choisir : bord net **ou** élévation |
+| Numérotation décorative | « 01, 02, 03 » sur des éléments qui ne sont pas une séquence | Numéroter seulement une vraie suite ; l'étiquette porte une information utile |
+| Surtitre partout | Petite étiquette en capitales au-dessus de chaque H2 | Une ou deux dans la page |
+| Capitales longues | Une pastille de 35 caractères en capitales | Capitales sur 2-3 mots au plus |
+| Texte en dégradé | `background-clip:text` sur les titres | Couleur pleine (voir § 2) |
+| Grilles orphelines, bandes monotones | voir la checklist | voir la checklist |
+
+Un détecteur déterministe de ces motifs (par exemple Impeccable,
+impeccable.style) transforme l'impression « ça fait généré » en liste
+vérifiable. **Lancez-le en mode navigateur, sur la page servie en HTTP**,
+jamais sur le fichier : l'analyse statique ne résout pas `clamp()` ni les
+variables, et signale des défauts qui n'existent pas. Un signal qui relève
+de la charte assumée du client se garde et se note ; un faux positif se
+vérifie au DOM (une longueur de ligne se mesure, elle ne s'estime pas).
+
+Deux règles de correction :
+- **Corriger la règle à sa source.** Surcharger en fin de fichier laisse du
+  code mort que le détecteur (et le prochain qui lira la feuille) voit
+  encore.
+- **Ne jamais supposer les couleurs d'un composant.** Relire la règle avant
+  de changer un fond : une pastille qu'on croyait porter un chiffre blanc en
+  portait un violet foncé, et le passage en aplat foncé l'a rendue
+  illisible (1,5:1).
+
+## 5 ter. Le rythme vertical
+
+- Deux bandes **de même fond** qui se suivent additionnent leurs marges :
+  150 à 180 px de vide, le « bas de page vide ». Fusionnez-les ou changez
+  le fond de l'une.
+- Une bande de respiration (ruban sombre, fine) a peu de marge : elle doit
+  trancher, pas respirer.
+- Un titre posé sur une photo pleine largeur tient en une ou deux lignes
+  (22 caractères environ) : sur trois lignes, il mange la photo.
 
 ## 6. Mobile
 

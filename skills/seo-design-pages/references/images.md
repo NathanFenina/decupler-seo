@@ -113,7 +113,15 @@ Redimensionnez **avant** de compresser : une photo de 3 000 px affichée dans
 ```
 
 - `width` et `height` **toujours** (ou un `aspect-ratio` CSS) : sans eux, la
-  page saute au chargement — première cause de CLS ;
+  page saute au chargement, première cause de CLS. Piège : quand les deux
+  attributs sont posés, ils **l'emportent sur `aspect-ratio`** en CSS ; pour
+  qu'un cadre impose son ratio, déclarez aussi `height:auto` (ou
+  `object-fit` sur une hauteur fixée) ;
+- **Une image enveloppée change de sélecteur.** Sous WordPress, une `<img>`
+  voisine directe d'un bloc doit être mise dans un `<div>` (wpautop) : la
+  règle `.bloc > img` ne la trouve plus, l'image s'affiche à sa taille
+  d'origine et se fait rogner en silence par un `overflow:hidden`. Écrivez
+  `.bloc img` ;
 - `loading="lazy"` sous la ligne de flottaison ;
 - jamais une image en `data:` base64 dans le HTML : elle alourdit le document,
   n'est pas mise en cache, et gonfle chaque page qui la contient.
@@ -168,8 +176,34 @@ Par ordre de préférence :
    la palette crée un décalage.
 3. **Captures et maquettes** de l'outil ou du livrable.
 4. **Photos libres de droits** de lieux (pages locales), créditées.
+   Wikimedia Commons en donne de vraies, sous licence libre, avec l'auteur :
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/photos_libres.py" "Lyon vieux port" --n 6
+   ```
+   Le script écarte gravures, plans et blasons, ne garde que les licences
+   Creative Commons et domaine public, et sert une vignette à la largeur
+   utile (l'original fait vite répondre 429). **La légende affiche l'auteur
+   et la licence** : c'est la condition de la licence, pas une politesse.
+   Le recadrage d'une bande large (21:9) se choisit à l'œil, photo par
+   photo : sur une vue plongeante le sujet est au milieu, sur un panorama
+   de port il est en haut.
 5. **Images générées** : sujets abstraits, illustrations de section, visuels
-   de couverture. Jamais pour prouver.
+   de couverture, maquettes d'interface. Jamais pour prouver, **jamais un
+   lieu réel, jamais un visage présenté comme l'équipe ou un client.** Une
+   image générée de deux personnes légendée « nos experts » est un faux, et
+   il arrive par inadvertance, d'un brouillon à l'autre.
+
+**Un registre des visuels.** Sur un lot de pages (villes, services), toutes
+les photos passent par un registre du projet (clé → URL, dimensions, `alt`,
+crédit, origine réelle ou générée) et le gabarit n'accepte qu'une clé de ce
+registre. Une image qui n'y est pas ne peut pas atterrir sur une page par
+accident, et un crédit ne se perd pas.
+
+**Logos hétérogènes** (clients, outils) : ils arrivent en noir, en couleur,
+en carré, en bannière. Ramenez-les à une teinte unique (sur fond sombre :
+`filter:brightness(0) invert(1)` et une opacité réduite ; sur fond clair :
+`grayscale(1)`) et à une même `max-height`, sinon la grille part dans tous
+les sens.
 
 **Hébergement** : toujours dans la médiathèque du site ou le dépôt, jamais en
 lien vers un domaine externe (l'image disparaîtra). Sur WordPress, cherchez

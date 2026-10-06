@@ -1,4 +1,4 @@
-# Les 53 skills
+# Les 54 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -52,10 +52,10 @@ aussi l'appeler par son nom.
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
-| `seo-design-pages` | Design d'une page qui convertit : gabarit par type de page, placement des CTA, bannières, plan d'images et génération, tokens, checklist avant publication | « design de la page », « où mettre les CTA », « bannière », « plan d'images » |
+| `seo-design-pages` | Design d'une page qui convertit : gabarit par type de page, placement des CTA, bannières, plan d'images (photos libres créditées `photos_libres.py`, génération), tokens, signatures d'interface générée, rendu mesuré (`rendu.py`), checklist avant publication | « design de la page », « où mettre les CTA », « bannière », « plan d'images » |
 | `seo-page-builder-html` | Pages HTML autonomes, prêtes à coller, avec 15 composants (hero, sommaire, chiffres clés, tableau, témoignages, lead magnet, auteur…) | « page HTML », « Elementor », « landing page » |
-| `seo-programmatique` | Pages à l'échelle, garde-fous anti-contenu mince, part de contenu unique mesurée sur le lot (`similarite_lot.py`) | « pages à l'échelle », « pages ville », « pSEO » |
-| `seo-maillage-interne` | Orphelines, flux d'autorité, plan de liens exécutable | « maillage », « liens internes » |
+| `seo-programmatique` | Pages à l'échelle, garde-fous anti-contenu mince, part de contenu unique mesurée sur le lot (`similarite_lot.py`) ; pages ville d'un prestataire sans local (`areaServed`, preuve chiffrée, comparatif) | « pages à l'échelle », « pages ville », « pSEO » |
+| `seo-maillage-interne` | Orphelines, flux d'autorité, règles de pose des ancres (contexte négatif, lot programmé), plan de liens exécutable | « maillage », « liens internes » |
 | `seo-schema-jsonld` | Détection, validation, génération, dépréciations | « schema », « JSON-LD », « rich results » |
 | `seo-entites-triplets` | Faits en triplets sujet — prédicat — objet, entités reliées à Wikidata, JSON-LD `about`/`mentions`, cohérence des valeurs sur tout le site ; trio sémantique de l'organisation et de ses auteurs (fiche d'identité vérifiée au registre, un `@id` par entité, page d'entité) | « triplets », « entités », « knowledge graph », « cohérence des faits », « trio sémantique » |
 | `seo-hreflang-i18n` | Validation et génération hreflang, architecture i18n | « hreflang », « multilingue », « international » |
@@ -69,12 +69,13 @@ aussi l'appeler par son nom.
 | `geo-citation-tracker` | Pourquoi **cette page** n'est pas citée, réponse directe réécrite | « rendre citable », « extractibilité » |
 | `geo-llms-txt` | llms.txt, crawlers IA, entité, Wikidata, cohérence de marque | « llms.txt », « GPTBot », « entité » |
 | `geo-share-of-model` | Part de voix mesurée, suivi mensuel, benchmark | « share of model », « suivi des citations » |
+| `geo-linkedin` | Articles LinkedIn (page entreprise ou profil) qui servent la citation par les IA et l'entité sans dupliquer le site : format, angle, faits, anti-duplication, fiche de publication manuelle, mesure à J+30 | « article LinkedIn », « page entreprise », « newsletter LinkedIn » |
 
 ## Autorité et acquisition
 
 | Skill | Ce qu'il fait | Déclencheurs |
 |-------|---------------|--------------|
-| `seo-netlinking` | Profil, prospection, qualification /20, emails rédigés | « backlinks », « netlinking », « link building » |
+| `seo-netlinking` | Profil, prospection (dont ceux qui rankent déjà sur vos requêtes), qualification /20, classement des cibles /100 (`netlinking_score.py`), emails rédigés, séquence et suivi | « backlinks », « netlinking », « link building » |
 | `seo-reddit-communautes` | Threads à valeur LLM, réponses rédigées, vocabulaire audience | « Reddit », « forums », « communautés » |
 | `seo-local` | Google Business Profile, NAP, avis, pages zones sans doorway | « SEO local », « fiche Google », « pages ville » |
 | `seo-digital-pr` | Études, baromètres, outils : ce qui se cite tout seul | « étude », « linkbait », « données originales » |

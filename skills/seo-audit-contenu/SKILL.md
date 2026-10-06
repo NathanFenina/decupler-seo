@@ -46,6 +46,12 @@ Sortie : `donnees/audit-contenu.md` (lisible) et `donnees/audit-contenu.json`
 ait les colonnes `url` et `nb_mots` (`modifie`, `titre`, `h1`, `h2`,
 `meta_description` affinent le verdict) — un export de crawl fait l'affaire.
 
+**Pages construites avec un constructeur** (Elementor) : leur texte vit
+dans une méta (`_elementor_data`), pas dans `content`. `wp.py carte` la lit
+quand l'API l'expose et compte alors les mots de la page réelle ; sinon une
+page riche sort à quelques mots et passe « vide ». Avant tout verdict
+« vide » ou « mince » sur une page de ce type, ouvrez-la.
+
 **Sans Search Console**, l'audit tourne en dégradé sur la longueur et l'âge
 seulement, et le rapport le dit en tête : « morte » et « à pousser » ne
 peuvent pas être établis sans impressions. Ne présentez jamais un audit
@@ -88,19 +94,36 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_contenu.py" \
   --obsolete "gpt-?3\.5|gpt-4o\b::anciens modèles d'IA" --obsolete "windows 7::OS en fin de vie"
 ```
 
-ou une fois pour toutes dans `decupler-seo.config.yml` :
+Les motifs se cherchent dans le title, le H1, les H2, la meta et les
+25 termes principaux du corps (colonne `termes` de la carte), pas dans le
+corps entier : une mention isolée au fond d'un article ne sort pas. Pour un
+contrôle plein texte (une version retirée citée dans un paragraphe),
+`controle_contenu.py` ou une recherche dans l'export du site.
+
+Pour un site qui parle d'outils d'IA, les modèles retirés sont le motif le
+plus rentable : un guide qui recommande encore un modèle d'il y a deux
+générations se fait déclasser par les lecteurs avant de l'être par Google.
+Déclarez-les une fois pour toutes dans `decupler-seo.config.yml` :
 
 ```yaml
 audit_contenu:
   obsolete:
-    - "gpt-?3\\.5|gpt-4o\\b::anciens modèles d'IA"
-    - "prime de 2023::barème d'aide expiré"
+    - 'gpt-?3\.5|gpt-4o\b::anciens modèles IA'
+    - 'prime de 2023::barème expiré'
 ```
+
+Dans la config, **une seule barre oblique inverse** (`\.`, `\b`) et des
+guillemets simples : la valeur est lue telle quelle, sans échappement ; un
+`\\.` y chercherait une barre oblique littérale et ne trouverait jamais rien.
 
 ## 3. Avant d'agir sur une page
 
 1. **Reste technique déjà neutralisé ?** Une page technique hors index et
-   hors sitemap ne se touche pas.
+   hors sitemap ne se touche pas. C'est le cas typique des pages d'une
+   extension e-commerce installée puis abandonnée (boutique, panier,
+   commande, compte) : vides, mais sans effet si elles sont hors index.
+   Notez où elles sont neutralisées (extension, réglage) dans
+   `memoire/decisions.md`, pour que l'audit suivant ne les rouvre pas.
 2. **Cannibalisation** avant toute redirection (`seo-gsc-analyses`, analyse
    cannibalisation) : la cible doit couvrir la même intention, sinon la 301
    perd le trafic.
@@ -110,7 +133,13 @@ audit_contenu:
 4. **Backlinks** : une page qui en reçoit se redirige, ne se supprime pas.
 5. **Sauvegarde** du contenu avant toute écriture (`seo-publication-cms` le
    fait par script), redirections et 410 dans le gestionnaire du site, jamais
-   en masse sans diff validé (`seo-technique-autofix`).
+   en masse sans diff validé (`seo-technique-autofix`). **Un seul
+   gestionnaire de redirections** par site (une extension versionnée, ou le
+   serveur) : deux systèmes qui se recouvrent finissent en boucle. Chaque
+   redirection ou 410 se vérifie après mise en ligne (code et cible, au
+   `curl -I`), et entre dans les tests du gestionnaire s'il en a
+   (`templates/wordpress/plugins/seo-crawl-fix/` centralise 410 et
+   redirections sur WordPress).
 6. **Journaliser** chaque action (`seo-journal-mesure`) : une suppression ou
    une fusion se mesure à J+28 comme le reste.
 
@@ -123,6 +152,11 @@ audit_contenu:
   JSON-LD (`seo-schema-jsonld`).
 - Changer le title et l'URL ? Le title oui, si l'année y figurait ; l'URL
   non, sauf si elle contient l'année — et alors avec une 301.
+- Si la page est un lead magnet, la refonte suit `seo-lead-magnet` (même
+  URL, livrable, preuves à jour) plutôt qu'une simple correction de dates.
+- Une page construite avec un constructeur : sauvegarder `content` **et** la
+  méta du constructeur avant d'écrire (`seo-publication-cms`,
+  `references/wordpress.md`).
 - Mettre à jour la cartographie (`seo-cartographie`) : action et date.
 
 ## 5. Rendu

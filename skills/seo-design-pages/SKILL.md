@@ -177,7 +177,11 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --stric
 
 Vérifiez le rendu dans le vrai thème, avec les vraies polices, servi en HTTP
 (jamais en `file://`, où le chargement différé et les animations ne se
-déclenchent pas et simulent de fausses régressions).
+déclenchent pas et simulent de fausses régressions). La capture ne fait pas
+foi, le DOM si : `scripts/rendu.py` (ou le MCP Chrome DevTools) compte les
+éléments qui débordent ; et un fragment WordPress se relit **tel que servi**,
+après wpautop. Pour une photo de lieu réelle et créditée :
+`scripts/photos_libres.py` (`references/images.md`).
 
 ## Livrables
 

@@ -20,6 +20,10 @@ un site mentionné partout est un site que les modèles connaissent.
 Via Ahrefs : domaines référents, autorité, liens dofollow/nofollow, ancres,
 pages de destination, historique d'acquisition, liens perdus.
 
+**Sans Ahrefs** : `backlinks_overview` d'Ubersuggest sur le domaine du
+client (autorité, backlinks, domaines référents) donne la ligne de base.
+Sans ce point de départ mesuré et daté, aucun objectif n'est calibrable.
+
 Quatre indicateurs à regarder :
 
 **Domaines référents, pas backlinks.** 500 liens depuis 12 domaines valent
@@ -60,7 +64,15 @@ contrepartie choisie, emails écrits, ordre d'envoi, fichier de suivi.
 
 ## Étape 2 — Prospecter
 
-Cinq sources, par ordre de rendement :
+Six sources, par ordre de rendement :
+
+### 0. Ceux qui rankent déjà sur vos requêtes
+Annuaires spécialisés, classements, comparatifs (« les 10 meilleurs
+[prestataires] à [ville] »), pages « où trouver un [métier] » qui sortent
+en première page sur les requêtes que vous visez. Thématiquement parfaits,
+autorité souvent basse, presque toujours joignables : le meilleur ratio
+de toute la campagne. Un annuaire **mono-thématique** qui ranke sur vos
+requêtes est une cible de premier rang ; un annuaire généraliste, jamais.
 
 ### 1. Les liens des concurrents que vous n'avez pas
 Le meilleur point de départ : ces sites ont **déjà prouvé** qu'ils lient des
@@ -88,6 +100,19 @@ dit ce qui attire des liens dans votre marché.
 C'est le seul levier qui produit des liens **sans rien demander**, et il
 alimente aussi la citation par les LLM.
 
+**Les médias à forte autorité ne s'ouvrent qu'à la donnée propriétaire**
+(ou à une tribune tranchée). Ils ne relaient pas un prestataire qui offre
+un audit ; ils relaient des chiffres que personne d'autre n'a. Si l'objectif
+inclut des médias de ce niveau et qu'aucune étude n'existe, produire
+l'étude est le **préalable** de la campagne, pas une option : cadrez-la
+d'abord (`seo-digital-pr`).
+
+### 6. Les prescripteurs
+Experts-comptables, chambres de commerce, réseaux d'entrepreneurs,
+fédérations, partenaires. Liens à autorité faible, mais ils envoient des
+clients : ne les traitez jamais comme du netlinking pur : la relation
+compte plus que l'ancre.
+
 ## Étape 3 — Qualifier
 
 Ne démarchez pas au hasard. Notez chaque prospect sur 20 :
@@ -111,6 +136,24 @@ n'a aucune donnée** (domaine mort, ou hors index de l'outil). Écartez-le et
 dites pourquoi. L'autorité d'un outil (DA Ubersuggest, DR Ahrefs, DA Moz)
 ne se compare jamais à celle d'un autre, et le trafic affiché est une
 estimation : écrivez-le à chaque fois.
+
+**Classer en lot, avec les données mesurées.** La grille sur 20 décide
+qui entre dans la liste ; pour ordonner les envois, `netlinking_score.py`
+calcule un score sur 100 : pertinence 40 et accessibilité 20 (notées à la
+main, avec la donnée qui les justifie dans le champ `preuve`), autorité 25
+et trafic 15 (mesurés, en échelle logarithmique). Il écarte d'office les
+domaines sans donnée, et signale les cibles sans preuve.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/netlinking_score.py" recherche/netlinking/cibles.json [--offre <contrepartie>] [--json]
+```
+
+Le fichier de cibles, une entrée par domaine : `domaine`, `da`, `trafic`,
+`ref_domains`, `theme`, `pertinence` (0-40), `accessibilite` (0-20),
+`cout`, `page_visee`, `demande`, `offre`, `email` (le gabarit utilisé),
+`preuve` ; en tête, `mesure` (date) et `source_metriques` (outil, pays,
+langue). Les domaines écartés vont dans `ecartes`, avec leur raison : on
+ne rouvre pas le débat le mois suivant.
 
 **Ne réordonnez jamais par autorité seule.** Un site à DA 90 injoignable vaut
 moins qu'un DA 15 qui répond sous huit jours : l'autorité compte sur une
@@ -145,6 +188,8 @@ Et quatre règles qui font la différence :
   dites-le, je ne reviendrai pas ») : elle augmente le taux de réponse.
 - **Objet de 6 à 9 mots**, descriptif, sans fausse urgence ni majuscules
   d'emphase.
+- **La preuve de lecture est une remarque de fond** sur un vrai article
+  de la cible : un désaccord argumenté vaut mieux qu'un compliment.
 - **Les champs à personnaliser restent vides** dans les gabarits
   (`{article lu}`, `{remarque}`) : ils forcent la personnalisation à la
   main. Ne jamais les pré-remplir avec du plausible inventé.
@@ -153,9 +198,16 @@ Et quatre règles qui font la différence :
 clôture, puis on s'arrête. Jamais de troisième relance, toujours dans le
 même fil.
 
+**Interdits de campagne** : pas d'achat de lien caché dans une
+« collaboration », pas de réseau de sites (PBN), **pas d'échange
+réciproque** (il se signale et annule l'effet), pas d'annuaire généraliste,
+**pas d'envoi en masse** : une campagne se mène sur 15 à 20 cibles traitées
+à la main, pas 500 messages automatisés qui grillent le domaine
+expéditeur.
+
 **Ne promettez pas un livrable qui n'existe pas.** Si l'étude n'est pas
 produite, l'email qui la promet ne part pas : on ne grille un média qu'une
-fois. Le prospect passe en statut `bloqué`, avec ce qu'il faut produire
+fois. Le prospect passe en statut `bloque`, avec ce qu'il faut produire
 d'abord. Et annoncez un résultat en fourchette basse avec son délai
 (« 3 à 6 liens en 3 mois »), jamais un chiffre rond et flatteur.
 
@@ -193,6 +245,10 @@ Un tableau, tenu à jour :
 | exemple.fr | 16/20 | ✅ obtenu | 12/03 | url | notre guide du X | /guide-x |
 | autre.com | 14/20 | 📧 relancé | 08/03 | — | — | /page-y |
 
+Statuts : `a_envoyer`, `envoye`, `relance_1`, `relance_2`, `obtenu`,
+`refuse`, `bloque` (avec ce qui bloque : étude à produire, contact
+introuvable). Un prospect `bloque` n'est pas un échec : c'est une tâche.
+
 Et une surveillance mensuelle des **liens perdus**. Un lien qui disparaît
 d'une page à forte autorité fait bouger les positions, et personne ne s'en
 aperçoit. Ahrefs le signale ; un email au webmaster récupère le lien dans un
@@ -213,7 +269,7 @@ Dans tous les autres cas, ne touchez pas au fichier de désaveu.
 ## Livrables
 
 - `PROFIL-LIENS.md` — audit du profil existant
-- `prospects.csv` — la liste qualifiée, scorée, triée
+- `prospects.csv` ou `cibles.json` : la liste qualifiée, scorée, triée (`netlinking_score.py`)
 - `emails/` — les prises de contact rédigées, une par prospect
 - `suivi-liens.csv` — le tableau de suivi
 - `liens-perdus.csv` — la surveillance mensuelle

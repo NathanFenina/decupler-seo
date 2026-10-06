@@ -50,6 +50,7 @@ laissez jamais l'utilisateur devant un menu.
 | `llmstxt`, `entité` | `geo-llms-txt` |
 | `triplets`, `entités`, `knowledge graph`, `cohérence des faits` | `seo-entites-triplets` |
 | `share-of-model`, `part de voix` | `geo-share-of-model` |
+| `linkedin`, `article linkedin`, `newsletter linkedin` | `geo-linkedin` |
 | `backlink`, `netlinking` | `seo-netlinking` |
 | `reddit`, `communautés` | `seo-reddit-communautes` |
 | `local`, `gbp` | `seo-local` |

@@ -1,5 +1,99 @@
 # Journal des versions
 
+## 3.9.1
+
+Retours d'un projet en production : cinq skills propres au projet fusionnés
+dans la méthode, cinq autres allégés au profit des skills de méthode. Une
+seule version de chaque savoir-faire.
+
+### Ajouté
+
+- **`geo-linkedin`** : articles LinkedIn (page entreprise ou profil) qui
+  servent la citation par les moteurs IA et l'entité sans dupliquer le site :
+  trois formats (dérivé d'une page, réponse à un prompt, newsletter),
+  anti-duplication contre la page source, fiche de publication manuelle
+  (aucune API ne publie d'article long), mesure par les prompts à J+30.
+- **`templates/wordpress/plugins/seo-indexnow/`** : clé IndexNow servie à la
+  racine et envoi à chaque publication d'un contenu public (hors noindex,
+  brouillons, médias), uniquement en production ; route d'état. Testée sur un
+  WordPress local.
+- **Manuel** : « Comment ça marche, en deux minutes » et six tutos pas à pas
+  (mettre à jour, faire remonter une amélioration, plugin du poste, nouveau
+  projet, confier une tâche, état de tous les projets). Lien en tête du README.
+- **Gabarit** : `CLAUDE.md` dit à Claude comment mettre à jour la méthode et y
+  remonter une amélioration ; la routine `hebdo` suit l'indexation
+  (`indexation.py suivre`).
+- **`scripts/netlinking_score.py`** : classe les cibles d'une campagne de
+  netlinking sur 100 (pertinence 40, autorité 25 et trafic 15 en échelle
+  logarithmique, accessibilité 20), écarte d'office les domaines sans donnée
+  (autorité 1, aucun lien), signale les cibles sans preuve mesurée. JSON ou
+  CSV. Tests : `tests/test_netlinking_score.py`.
+- **`scripts/photos_libres.py`** : vraies photos de lieux sur Wikimedia
+  Commons, licence libre, auteur et crédit prêts à afficher ; écarte
+  gravures, plans, blasons et licences non libres ; vignette à la largeur
+  utile (l'original fait répondre 429). Tests : `tests/test_photos_libres.py`.
+- **`scripts/rendu.py`** : rendu Chromium sans interface et sonde de
+  débordement dans le DOM (la capture ne fait pas foi), cache local
+  d'images et de polices, page complète ou fragment. Pour les sessions et
+  routines sans MCP Chrome DevTools. Tests : `tests/test_rendu.py`.
+- **`seo-programmatique`** : section « Pages ville d'un prestataire de
+  service » : calibrage sur la SERP mesurée (la longueur ne décide pas, la
+  preuve si), jamais d'adresse ni de clientèle locale inventée,
+  `areaServed` et cadrage honnête, registres agence / consultant, page
+  comparatif pour l'intention mixte, maillage à cinq liens, données et
+  blocs rédigés séparés, carte de zone en SVG. Renvoi depuis `seo-local`.
+- **`seo-maillage-interne`** : « Poser un lien sans abîmer le texte » :
+  ancre déjà présente, jamais en contexte négatif ni dans un Hn,
+  dictionnaire d'ancres, dans un lot programmé un contenu ne lie que ses
+  prédécesseurs de parution, URL en 410 exclues.
+- **`seo-design-pages`** : signatures d'une interface générée et détecteur
+  en mode navigateur, correction à la source (`design-tokens.md`, § 5 bis) ;
+  rythme vertical (§ 5 ter) ; `ch` trompeur avec certaines polices,
+  plancher de 12 px ; animations en translation déclenchées au défilement,
+  animation de fond (canvas) ; registre des visuels, photos Commons
+  créditées, logos ramenés à une teinte, pièges `aspect-ratio` et
+  sélecteur après enveloppe wpautop (`images.md`) ; la matière qui
+  différencie une page service (`gabarits-par-type-de-page.md`) ; `100vw`
+  et barre de défilement, `sticky` natif (`integration-plateformes.md`).
+
+### Modifié
+
+- **`wp.py carte`** compte les mots d'une page Elementor depuis
+  `_elementor_data` quand l'API l'expose : une page riche n'y apparaît plus
+  « vide » (et `seo-audit-contenu` ne la condamne plus).
+- **`seo-audit-contenu`** : pages construites avec un constructeur ; portée
+  réelle des motifs d'obsolescence (zones affichées et termes principaux) ;
+  pages d'une extension e-commerce abandonnée ; un seul gestionnaire de
+  redirections ; refonte d'un lead magnet périmé. Correction de l'exemple
+  YAML : une seule barre oblique inverse, guillemets simples (l'exemple
+  doublé ne trouvait jamais rien).
+- **`seo-entites-triplets`** : correction du graphe côté serveur, une fois
+  pour tout le site ; vérification après correction (une `Organization`,
+  une `Person`, plus d'empreinte de l'extension SEO, test des résultats
+  enrichis).
+- **`seo-netlinking`** : ligne de base sans Ahrefs ; ceux qui rankent déjà
+  sur vos requêtes en première source ; données propriétaires préalables
+  aux médias à forte autorité ; prescripteurs ; format du fichier de
+  cibles ; interdits de campagne (échange réciproque, annuaire généraliste,
+  envoi en masse) ; statuts de suivi.
+- **`seo-redaction`** : butin minimum avant d'écrire et questions de la
+  SERP ; plan profond et trame d'un article expert ; longueur minimale
+  quand un plancher d'occurrences et un plafond de densité s'imposent
+  ensemble ; exception de la page d'accueil.
+- **`seo-keyword-research`** et **`seo-opportunites`** : recherche avec le
+  MCP Ubersuggest (langue et pays à chaque appel, volumes mondiaux sans
+  `locId`, pas d'AI Overview exposé) ; impressions comme borne basse d'un
+  volume inconnu ; filtre des termes ambigus par mot de contexte et liste
+  négative.
+- **`seo-publication-cms`** (`references/wordpress.md`) : contrôle après
+  chaque envoi (dont le `<br />` entre deux JSON-LD et les `<p>` vides
+  visibles seulement au DOM) ; capacité `unfiltered_html` exacte (éditeurs
+  compris sur un site simple, corrigé aussi dans `integration-plateformes.md`) ;
+  templates Elementor non relisibles, bascule `_elementor_edit_mode`,
+  refonte à la même URL ; création cherchée par slug.
+- **`seo-lead-magnet`** : légende des preuves chiffrées, `<p>` vides au DOM,
+  gabarit sans en-tête, entrée de menu.
+
 ## 3.9.0
 
 ### Ajouté

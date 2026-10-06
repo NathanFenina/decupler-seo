@@ -32,6 +32,14 @@ Avant la première phrase :
 4. Récupérer le vocabulaire de l'audience (Reddit, avis, forums)
 5. Lire `memoire/marque.md` (voix, vocabulaire validé, formules proscrites)
    et `memoire/style.md` (le style mesuré — voir « Écrire comme la maison »)
+6. Relever dans la SERP les questions « Autres questions posées » et ce que
+   dit l'AI Overview s'il y en a un (`demande.py serp`) : le contenu y
+   répond explicitement, chacune à un endroit précis
+
+**Le butin minimum avant la première phrase** : 3 à 5 données chiffrées
+sourcées, 2 à 3 exemples concrets (nommés, datés), 2 à 3 sources
+d'autorité à citer, et ce que le top 3 **rate** : c'est votre angle. Sans
+ce butin, la recherche n'est pas finie.
 
 **Aucun chiffre inventé. Jamais.** Un chiffre sans source ne s'écrit pas.
 Si la donnée manque : soit on la trouve, soit on écrit la phrase sans elle.
@@ -74,6 +82,17 @@ interchangeable avec les dix premiers résultats. Avant le plan, écrivez en
 une phrase **ce que ce contenu soutient** et que les concurrents ne disent
 pas — une position, une donnée, une méthode, un contre-pied argumenté.
 Si vous ne trouvez pas de thèse, vous n'avez pas encore assez cherché.
+
+Ensuite, **un plan profond** : chaque H2 porte une idée forte **et sa
+preuve** (donnée, exemple ou méthode). Répartis dans le contenu, il faut :
+un exemple réel (une requête et la réponse obtenue, un cas daté) ; des
+chiffres sourcés ; une méthode pas à pas ; les **erreurs courantes ou idées
+reçues** à démonter ; une opinion tranchée de la marque.
+
+Trame d'un article expert, à adapter, jamais à remplir mécaniquement :
+réponse autonome citable → définition précise → **le mécanisme** (comment
+ça marche vraiment) → méthode pas à pas → exemples et données → erreurs
+courantes → comparatif ou cas → FAQ (questions réelles) → CTA.
 
 ## La structure qui fonctionne
 
@@ -282,6 +301,24 @@ fixe sur-optimise un texte court et sous-optimise un long.
   `regles.mot_cle_occurrences_min` (`decupler-seo.config.yml`) et s'applique
   — sous le plafond. Si le texte est trop court pour l'atteindre sans le
   dépasser, allongez avec un angle utile (voir « Longueur ») ou signalez-le.
+
+**Plancher d'occurrences + plafond de densité = une longueur minimale.**
+Quand le client impose les deux, la longueur se calcule avant d'écrire,
+elle ne s'estime pas : `mots ≥ occurrences_min ÷ densité_max`, dans la
+définition de densité de l'outil qui contrôle. Si cet outil compte chaque
+mot d'un mot-clé de *n* mots (cas de beaucoup d'extensions SEO), multipliez
+par *n* : 20 occurrences d'un mot-clé de 3 mots sous 3,5 % demandent
+20 × 3 ÷ 0,035 ≈ 1 715 mots. Visez 5 à 10 % au-dessus : les corrections de
+fin raccourcissent le texte. Et si la densité dépasse en fin de course,
+**ajoutez du texte utile, ne retirez pas d'occurrences** sous le plancher.
+La FAQ est le gisement d'occurrences le plus naturel : trois questions qui
+contiennent le mot-clé exact, telles qu'un acheteur les pose.
+
+**La page d'accueil fait exception** : elle se classe sur la marque. Ni
+politique d'occurrences, ni densité, ni mot-clé dans le slug, ni H2 en
+questions ; les CTA y pointent volontairement plusieurs fois vers la même
+page. Restent : longueur suffisante pour dire ce que fait l'entreprise,
+FAQ, maillage, `alt`, et le reste de la relecture.
 
 Mesure : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onpage_score.py" page.html "<mot-clé>"`
 donne occurrences et densité.

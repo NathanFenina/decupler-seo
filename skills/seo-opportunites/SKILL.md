@@ -73,7 +73,9 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --ecrire
   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/opportunites.py" --demande donnees/demande-fr-<date>.csv --ecrire
   ```
   Les graines viennent des thèmes du lexique ; une passe par langue du
-  projet. Renseignez ensuite la colonne `page` pour les requêtes déjà
+  projet. Sans DataForSEO, le même CSV se produit en session avec le MCP
+  Ubersuggest (`seo-keyword-research`, étape 1 : langue et pays à chaque
+  appel, volumes mondiaux signalés). Renseignez ensuite la colonne `page` pour les requêtes déjà
   visées par une page publiée.
 - `--jours 90` par défaut : assez pour lisser les semaines, assez court
   pour rester actuel.

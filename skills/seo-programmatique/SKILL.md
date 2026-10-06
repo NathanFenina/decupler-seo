@@ -142,6 +142,87 @@ indexées. Prévoyez :
 Ne générez **jamais** 2 000 pages d'un coup. Si le gabarit est mauvais, vous
 l'apprendrez trois mois plus tard, sur un site abîmé.
 
+## Pages ville d'un prestataire de service
+
+Le cas le plus fréquent, et le plus risqué : « [service] [ville] » pour un
+prestataire qui n'a qu'une adresse. Les seuils de `guard.py` s'appliquent
+(pages locales : alerte à 30, blocage à 50), et le gabarit section par
+section est dans `seo-design-pages` (`references/gabarits-par-type-de-page.md`,
+page locale). Ce qui s'ajoute, appris en production :
+
+**Calibrer sur la SERP mesurée, pas sur une consigne a priori.** Avant
+chaque lot, relever le top 5 de deux ou trois villes du lot
+(`seo-serp-analysis`) : longueur, occurrences, FAQ, preuves, adresse. Sur
+ces requêtes, il arrive couramment que la page n°1 fasse 600 à 900 mots,
+sans FAQ ni adresse locale : **la longueur ne décide pas, la preuve si**
+(missions chiffrées et liées, zone servie claire, autorité du domaine).
+Une consigne maison pensée pour les articles (20 occurrences, 1 700 mots)
+rend la page deux fois plus longue que la gagnante sans rien gagner.
+Le relevé se date et se refait : une règle non sourcée finit par coûter.
+
+**Jamais d'adresse inventée.** Une adresse fictive en `LocalBusiness` est un
+faux signal local, sanctionné, et un mensonge envers le prospect. La seule
+adresse réelle vit dans le schéma `Organization` du site ; chaque page ville
+porte `areaServed` (ville, département). Le cadrage est honnête : « depuis
+[ville du siège], nous intervenons à [ville] », jamais « notre agence de
+[ville] ». Sur une ville voisine du siège, `areaServed` et ce cadrage
+suffisent ; loin du siège, l'ancrage local n'est pas crédible et la page
+d'agence seule ne gagnera pas : passez par un autre angle (comparatif,
+ci-dessous).
+
+**Jamais de clientèle locale inventée non plus.** « Nos clients [gentilé] »,
+« les entreprises que je vois ici » affirment une présence qu'on ne peut
+pas prouver. Écrire ce qui est vrai **du marché** (« une entreprise de
+[ville] part rarement d'un site vierge »), pas une expérience supposée.
+Relecture dédiée de tout le lot sur ce seul point.
+
+**Ce qui fait la profondeur locale** : codes postaux cités en toutes
+lettres, 8 à 12 communes limitrophes, le gentilé au moins une fois, les
+secteurs économiques réels de la ville, une vraie photo du lieu (crédit
+affiché). Et un bloc de **résultats chiffrés** (une ou deux missions, avec
+lien vers l'étude de cas complète) : c'est lui qui remplace l'adresse
+absente.
+
+**Deux registres, deux entités.** Une page « agence [ville] » parle au
+« nous » et se rattache à l'`Organization` ; une page « consultant [ville] »
+parle au « je » et se rattache à la `Person`. Ne pas mélanger les deux dans
+une même page, ni le schéma.
+
+**Intention mixte sur les grosses villes.** Quand une partie du top est
+faite de comparatifs (« les 15 meilleurs [prestataires] à [ville] »), la
+page d'agence ne couvre pas toute la SERP. Une page comparatif distincte
+cite les concurrents nommément, avec leurs vrais points forts, et place la
+marque à sa juste place (pas première par défaut), sans note ni classement
+chiffré inventé. C'est l'angle où l'absence d'adresse locale ne pénalise
+pas.
+
+**Maillage d'une page ville : cinq liens, pas plus.** Un lien montant vers
+le pilier local dans les 150 premiers mots ; deux ou trois latéraux vers
+les villes voisines du même département (au-delà, la grille de communes
+devient une ferme de liens) ; un lien croisé vers la page sœur de la même
+ville (autre service) si elle existe ; un lien de preuve vers une étude de
+cas du même secteur ; un lien descendant vers une ressource pratique.
+
+**Données et texte séparés.** Un fichier de **données** par ville (slug,
+gentilé, département, codes postaux, communes, secteurs, photo, registre)
+et un fichier de **blocs rédigés** ville par ville : accroche, contexte,
+points propres à la ville, piège local, introduction et note de la zone,
+second paragraphe du budget, CTA final, au moins deux questions de FAQ.
+Le gabarit assemble ; il ne rédige pas. Puis `similarite_lot.py --strict`
+sur le lot entier.
+
+**Une carte de zone en SVG plutôt qu'une capture** : quelques kilo-octets,
+du texte lisible par les moteurs, chaque point à sa vraie place
+(coordonnées réelles, distance au siège calculée, la même que dans le
+texte). Trois pièges : un cadrage par région (cadrer tout le réseau écrase
+les villes proches dans un coin) ; moins de repères au grand cadrage (les
+noms se chevauchent) ; la géométrie **découpée au cadre** du `viewBox`
+(un tracé qui déborde fait déborder la page en mobile).
+
+**Après la publication**, relire le rendu servi (`seo-publication-cms`,
+`references/wordpress.md`) : contenu identique au build, aucun `<p>` ni
+`<br>` parasite, JSON-LD valide, images en 200.
+
 ## Auditer un déploiement existant
 
 Si des pages programmatiques existent déjà :

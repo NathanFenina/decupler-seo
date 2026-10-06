@@ -84,6 +84,36 @@ Minimum : 2-3 liens sortants pertinents.
 | **Quantité raisonnable** | 5-15 liens internes contextuels par page. 80 liens diluent tout |
 | **Cohérence du silo** | Priorité aux liens intra-silo |
 
+### Poser un lien sans abîmer le texte
+
+- **L'ancre est une expression déjà présente.** On n'ajoute pas une phrase
+  pour caser un lien. Si aucune ancre naturelle ne se présente, soit le lien
+  n'est pas pertinent, soit il manque une idée au texte, et c'est souvent
+  la seconde : écrire la phrase utile, le lien s'y ancre tout seul.
+- **Jamais dans un titre (Hn)**, une légende, un lien existant, un bloc de
+  code. Un lien au plus par paragraphe.
+- **Jamais en contexte négatif.** Une ancre posée sur « méthode opaque » ou
+  « erreur à éviter » associe la page liée à une mauvaise pratique. Le
+  compte se vérifie par script, le sens non : relire chaque ancre avec ses
+  50 caractères avant et après.
+- **Jamais l'ancre du mot-clé principal de la page courante**, ni un lien
+  vers elle-même.
+- **Pas de bloc « À découvrir aussi » en pied de contenu** pour remplir un
+  quota : il est ignoré des lecteurs et pèse peu. Les liens vont dans le
+  fil du texte.
+- **Dictionnaire d'ancres** quand on pose des liens en lot : pour chaque
+  cible, ses expressions du plus spécifique au plus générique ; la générique
+  ne sert que si aucune spécifique n'est trouvée. Le remplacement ne touche
+  que les nœuds de texte, hors des zones interdites ci-dessus.
+- **Lot programmé sur plusieurs semaines : un contenu ne lie que ceux déjà
+  en ligne le jour de sa parution.** Triez le lot par date de publication
+  et n'autorisez que les prédécesseurs ; le premier du lot ne lie que des
+  pages permanentes. Sinon chaque article publie des liens vers des pages
+  qui n'existent pas encore.
+- **Jamais vers une URL supprimée** : un site qui renvoie 410 (et non 404)
+  sur ses pages retirées trompe un contrôle qui ne cherche que les 404.
+  Gardez la liste des URL vivantes à jour avant chaque lot.
+
 ## Étape 4 — Le plan, exécutable ligne par ligne
 
 Le livrable n'est pas une carte. C'est une liste d'actions :

@@ -145,6 +145,25 @@ une personne de plus. Signaux d'alerte, à relever sur 3-4 pages clés :
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" https://exemple.com/ --socle socle-global.json
 ```
 
+**La correction se fait côté serveur, une fois pour tout le site** : une
+extension qui complète le graphe de l'extension SEO (données officielles,
+`sameAs`, fondateur, fusion des personnes générées dans l'`@id` maison) :
+sur WordPress, `templates/wordpress/plugins/seo-entite/`. Les générateurs
+de pages du projet écrivent directement les `@id` stables. Jamais une
+correction page par page dans le contenu : la page suivante oublierait.
+
+**Vérifier après la correction**, sur le site en ligne et pas sur le
+fichier :
+1. sur 3-4 pages clés (accueil, une page de service, un article, la page
+   d'entité) : **une seule** `Organization` et **une seule** `Person` par
+   entité, plus aucune référence `#/schema/person/<empreinte>` restante,
+   `sameAs` présents ;
+2. le test des résultats enrichis de Google sur 2 ou 3 pages ; il demande
+   un navigateur : à faire faire par une personne, résultat noté ;
+3. l'état consigné dans la mémoire du projet (version de l'extension, date,
+   pages vérifiées), pour que la prochaine session ne recommence pas
+   l'audit.
+
 **Une page d'entité par entité** (« entity home ») : la page qui décrit la
 personne ou l'organisation — parcours vérifiable, profils, publications —
 vers laquelle pointent les `sameAs`, les bylines et le bloc auteur. Faits

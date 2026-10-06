@@ -14,6 +14,34 @@ commencer.
 
 ---
 
+## Comment ça marche, en deux minutes
+
+**Trois couches**, et chacune a un propriétaire :
+
+| Couche | Ce que c'est | Où | Qui la modifie |
+|---|---|---|---|
+| **La méthode** | les SOP (quoi faire, dans quel ordre), les skills (comment le faire), les agents (qui le fait), les scripts (ce qui mesure et publie) | ce dépôt, `decupler-seo` | une PR ici, jamais une copie |
+| **Le projet** | un site client : sa mémoire (marque, style, faits, décisions), son journal, ses données, ses skills `projet-…` | un dépôt privé par client | vous, vos prestataires, la routine |
+| **Les outils** | Search Console, GA4, le CMS, Notion, DataForSEO… branchés par MCP ou par clé | `.mcp.json` du projet + variables d'environnement | vous, une fois |
+
+**Comment une tâche se déroule.** Vous dites « suis la SOP brief pour "audit
+geo" ». Claude lit la SOP, qui cite un skill ; le skill dit quoi faire et
+appelle des scripts ; les scripts interrogent les outils et écrivent dans le
+projet ; la mémoire du projet (marque, style, faits) rend le résultat propre à
+ce client ; le journal garde la trace pour mesurer à J+28.
+
+**Comment un projet avance seul.** Une routine, le vendredi, lit
+`routines/hebdo.md` dans le dépôt : contrôle, chiffres, actions validées,
+notes, bilan sur la page de suivi. Vous validez en 20 minutes (SOP 15).
+
+**Pourquoi la méthode est copiée dans chaque projet.** Une routine tourne dans
+une session cloud qui ne charge pas les plugins : elle ne voit que ce qui est
+dans le dépôt qu'elle clone. La copie est tenue à jour par une PR chaque lundi,
+et protégée : une modification à la main bloque la synchro jusqu'à ce qu'on
+l'ait remontée ou déplacée.
+
+---
+
 ## A. Essayer le plugin sur votre site
 
 1. Installer Claude Code (https://code.claude.com), puis, dans une session :
@@ -64,6 +92,80 @@ n'installez pas le plugin.
 
 Optionnel : ouvrir le dépôt comme coffre Obsidian pour lire et annoter la
 mémoire ([docs/PROJETS.md](PROJETS.md#obsidian)).
+
+## Tutos pas à pas
+
+Chaque tuto donne la phrase à dire à Claude et, à côté, la commande qu'il
+lance. Les deux marchent.
+
+### 1. Mettre à jour la méthode dans un projet
+
+> « Mets à jour la méthode. » (ou `/seo-maj`)
+
+```bash
+python3 .claude/decupler-seo/scripts/projet.py statut .     # où on en est
+git checkout -b methode/decupler-seo-<version>
+python3 .claude/decupler-seo/scripts/projet.py sync .       # la méthode
+python3 .claude/decupler-seo/scripts/projet.py completer .  # nouveautés du gabarit
+git add -A && git commit -m "Méthode decupler-seo <version>" && git push -u origin HEAD
+```
+
+Puis ouvrir la PR et la fusionner. Si `sync` refuse parce qu'un fichier de
+méthode a été modifié ici : tuto 2 d'abord.
+
+### 2. Faire remonter une amélioration trouvée chez un client
+
+> « Ce que tu viens de corriger dans le skill, remonte-le dans la méthode. »
+
+```bash
+python3 .claude/decupler-seo/scripts/projet.py remonter . --simuler   # voir ce qui partirait
+python3 .claude/decupler-seo/scripts/projet.py remonter . .claude/skills/seo-brief/SKILL.md --pousser
+```
+
+Une branche `remontee/<projet>-<date>` arrive sur decupler-seo : ouvrir la PR,
+retirer tout ce qui est propre au client (nom, domaine, chiffres), fusionner.
+Le lundi suivant, tous les projets la reçoivent. Ce qui ne vaut que pour ce
+client va dans `memoire/` ou dans un skill `.claude/skills/projet-…`.
+
+### 3. Mettre à jour le plugin sur votre poste
+
+```bash
+claude plugin marketplace update decupler
+claude plugin update decupler-seo@decupler
+```
+
+Redémarrer Claude Code. Pour ne plus y penser : `/plugin` → Marketplaces →
+`decupler` → mise à jour automatique.
+
+### 4. Ajouter un projet
+
+> « Nouveau projet pour client.fr. »
+
+```bash
+python3 scripts/projet.py init ../client --nom "Client" --domaine https://client.fr   # nouveau dépôt
+python3 scripts/projet.py adopter ../site-existant --nom "Site" --domaine https://site.fr   # dépôt existant
+```
+
+Puis : dépôt **privé** sur GitHub, une ligne dans `projets.json`, la routine du
+vendredi (`ROUTINES.md`), et « Allow GitHub Actions to create and approve pull
+requests » dans les réglages du dépôt.
+
+### 5. Confier une tâche à un prestataire
+
+Créer l'action sur la page de suivi, la valider, et lui envoyer :
+> « Clone <dépôt>, lis Accueil.md, puis suis la SOP <nom> pour <sujet>. Une
+> branche presta/<prénom>-<tâche>, une PR. »
+
+Le reste est dans la [SOP 17](sop/17-travailler-avec-un-prestataire.md).
+
+### 6. Savoir où en sont tous les projets
+
+```bash
+python3 scripts/projet.py registre    # depuis decupler-seo
+```
+
+Version de la méthode dans chaque projet, synchro automatique présente ou non,
+ce qui est à synchroniser.
 
 ---
 

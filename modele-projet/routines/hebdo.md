@@ -13,6 +13,12 @@ robots.txt, sitemap. Retour du spam ou page clé cassée → une action
 `gsc.py instantane` puis `journal.py mesurer-tout --auto` : on mesure ce qui a
 été fait avant d'en faire plus.
 
+## 2 bis. L'indexation
+`python3 .claude/decupler-seo/scripts/indexation.py suivre` : les URL annoncées
+depuis au moins 3 jours, indexées ou non. Les URL à demander à la main vont dans
+le bilan (« À faire »), pour un humain. Après toute mise en ligne faite par la
+routine : `indexation.py annoncer <URL…>`.
+
 ## 3. Les actions validées
 Lis la page de suivi ; `pilotage.py etat --statut validee`. Exécute-les, la
 remarque du client faisant foi : `marquer --statut en-cours` et republie ;

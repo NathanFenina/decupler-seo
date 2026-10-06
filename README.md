@@ -8,7 +8,11 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-53 skills · 15 agents · 34 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 17 SOP · 372 tests
+54 skills · 15 agents · 37 scripts Python (le cœur sans aucune dépendance) · 13 MCP préconfigurés · 17 SOP · 403 tests
+
+> **Nouveau ici, prestataire sur un projet, ou plusieurs sites à piloter ?** Commencez par le
+> [Manuel](docs/MANUEL.md) : comment ça marche en deux minutes, votre chemin pas à pas, et les tutos
+> (mettre à jour, faire remonter une amélioration, confier une tâche).
 
 ---
 
@@ -202,7 +206,7 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>53 skills</b>, en 8 familles</summary>
+<summary><b>54 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
@@ -211,7 +215,7 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 | **Recherche et stratégie** | `seo-opportunites` · `seo-cartographie` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
 | **Contenu** | `seo-brief` · `seo-redaction` · `seo-humanisation` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` · `seo-lead-magnet` |
 | **Structure et échelle** | `seo-design-pages` · `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-entites-triplets` · `seo-hreflang-i18n` · `seo-images` |
-| **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` |
+| **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` · `geo-linkedin` |
 | **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |
 | **Pilotage** | `seo-nouveau-projet` · `seo-cycle` · `seo-pilotage` · `seo-journal-mesure` · `seo-publication-cms` · `seo-pilotage-notion` · `seo-reporting` · `seo-dashboard` · `seo-ecommerce` |
 

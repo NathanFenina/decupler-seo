@@ -46,6 +46,18 @@ L'encadré **limites** n'est pas de la prudence juridique seulement : les
 moteurs génératifs reprennent volontiers les pages qui bornent leurs
 promesses, et écartent celles qui promettent trop.
 
+**La matière qui différencie** : trois blocs portent tout le poids d'une
+page service ou locale, et aucun ne se recopie d'une page à l'autre :
+- **les livrables avec leur cadence** : ce qui arrive, et quand (six items,
+  chacun avec sa fréquence) ; vérifiable, donc crédible ;
+- **ce qu'on fait / ce qu'on ne fait pas**, en deux colonnes : au moins un
+  refus **qui coûte** (pas d'engagement de douze mois, un seul client par
+  métier et par zone). Un refus sans coût se lit comme une posture ;
+- **le parti pris signé** : deux ou trois paragraphes à la première
+  personne, une anecdote vraie, une position qui fait perdre des contrats.
+  C'est le seul endroit où quelqu'un parle ; une fois par page, dans une
+  bande à part.
+
 ---
 
 ## 2. Article / guide

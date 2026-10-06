@@ -95,6 +95,26 @@ homogènes. Filet de sécurité côté CSS de la page : `p:empty{display:none}`
 dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
 `content.rendered`, ou la page servie), jamais seulement le source envoyé.
 
+**Le contrôle après chaque envoi**, sur le `rendered` :
+- `raw` identique au fichier envoyé ;
+- zéro `<p></p>`, `<p><a`, `<p><img`, `<p><div`, et zéro `<br />` hors des
+  scripts de fin, y compris **entre deux blocs JSON-LD**, où wpautop en
+  glisse un sans casser l'affichage ;
+- le `<style>` du contenu ne contient aucun `</p>` ;
+- toutes les images répondent 200.
+
+Ce contrôle par motif ne voit pas tout : wpautop écrit parfois un `</p>`
+orphelin que le **navigateur** transforme en `<p>` vide, qui prend une case
+de grille ou la moitié d'un flex. Il ne se voit que dans le DOM rendu :
+compter les `p` vides sur la page servie (ou une copie locale), cible 0.
+
+**`<style>` et `<script>` dans le contenu** ne survivent que pour un compte
+qui a la capacité `unfiltered_html` : administrateurs et éditeurs sur un
+site simple, super-administrateurs seulement sur un multisite ; certaines
+extensions de sécurité la retirent à tous. Sans elle, WordPress les
+supprime à l'enregistrement, sans erreur. Vérifiez la capacité du compte du
+dispositif avant de publier une page qui porte son CSS.
+
 ## Elementor et thèmes à page builder
 
 - Page construite dans Elementor (`_elementor_edit_mode = builder`) : le rendu
@@ -110,6 +130,20 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
   en plus du H1 du contenu ; le masquer par les métas du thème, page par page.
 - En-tête et pied de page en templates Elementor : un correctif global (CSS,
   script) va dans ces templates, avec sauvegarde, plutôt que dans chaque page.
+- **La méta `_elementor_data` n'est pas lisible partout.** Sur les articles et
+  les pages, l'API la lit et l'écrit quand elle est exposée ; sur les
+  templates (`elementor_library` : en-tête, pied de page), elle s'écrit mais
+  ne se relit pas. On ne peut donc pas partir de l'existant : livrer le HTML
+  complet du widget, à coller à la main, avec la sauvegarde manuelle avant.
+- **Reprendre la main sur une page Elementor** : `_elementor_edit_mode` vide
+  (au lieu de `builder`) fait rendre la page depuis `content`. La bascule est
+  réversible. Pour une refonte à la même URL : sauvegarder `content` et
+  `_elementor_data`, vider `_elementor_edit_mode`, repasser le gabarit par
+  défaut (plus de `elementor_canvas`), archiver l'ancienne version dans le
+  dépôt.
+- **La carte de contenu** compte les mots depuis `_elementor_data` quand
+  l'API l'expose (`wp.py carte`) ; sinon une page Elementor riche y apparaît
+  presque vide.
 
 ## Petites surprises de l'API
 
@@ -130,6 +164,9 @@ dans le conteneur. Toujours contrôler le HTML **rendu** (`?context=edit` →
 - **Une URL supprimée répond souvent 410, pas 404.** Un contrôle de liens
   qui ne cherche que 404 la croit vivante : comptez 404 et 410 comme mortes,
   et ne les utilisez jamais en maillage.
+- **Une création cherche d'abord par slug.** Sinon WordPress crée un doublon
+  suffixé `-2` (et son média avec). `wp.py` le fait ; un script maison doit
+  le faire aussi.
 - **Pas de rafale.** Au-delà d'une dizaine de requêtes concurrentes,
   beaucoup d'hébergements renvoient des réponses incohérentes (des comptes
   qui changent d'un appel à l'autre) : un audit par l'API est séquentiel,

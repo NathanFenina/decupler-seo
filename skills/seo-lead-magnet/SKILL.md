@@ -53,6 +53,7 @@ dans l'ordre d'impact constaté :
 | **Exemple d'échange** ou de mise en œuvre | Montre comment on s'en sert, pas seulement quoi | Titré « Exemple » quand c'est une illustration ; « Échange réel » seulement si c'en est un, avec date et chiffres du jour |
 | **Commandes repliées** (`<details>`) | La valeur technique sans effrayer | Commandes vérifiées dans la documentation officielle de chaque outil, version relevée, jamais de mémoire |
 | **Exemples réels** | La preuve par le résultat | Captures fournies par le client, légendées honnêtement ; noms de sites masqués si le client le demande, avec la mention « nom masqué » |
+| **Preuves chiffrées** (courbes Search Console, rapports) | Crédibilité | Légende factuelle : les chiffres visibles, la période, à qui appartient le site (« site accompagné, nom masqué ») et **ce qui a produit la courbe** (un travail SEO complet, pas l'outil présenté seul). Une courbe antérieure à la création de l'entreprise s'attribue à la personne, pas à la marque. Captures recadrées sur la zone utile |
 | **Méthode pas à pas** | Donne la méthode, pas seulement l'outil | Liste numérotée tirée des exemples ; un parcours cliquable (ancres `#etape-N`) si les étapes sont longues |
 | **Parti pris signé** | Une voix, une position | 2-3 paragraphes à la première personne, signés d'une personne réelle. Aucune anecdote inventée |
 | **Ce que ça ne fait pas** | Le bloc le moins imitable | 4 limites concrètes |
@@ -111,7 +112,11 @@ départ à zéro.
    horloge simulée rate les `setTimeout` posés après coup.
 3. **Le HTML servi par le CMS**, pas le fichier local : sur WordPress, zéro
    `<p>` vide, `<br>` parasite ou `<p><a>` ajouté par wpautop
-   (`seo-publication-cms`).
+   (`seo-publication-cms`). Les `<p>` vides nés d'un `</p>` orphelin ne se
+   voient que dans le DOM du navigateur, pas dans le source : compter les
+   `p` vides sur la page servie. Une page en gabarit sans en-tête de site
+   (canvas) n'exécute pas les scripts posés dans l'en-tête : le script de
+   capture doit alors être dans la page elle-même.
 4. **Un seul H1** : le thème n'ajoute pas le sien.
 5. **Le livrable se télécharge** et s'ouvre.
 6. Contrôles automatiques :
@@ -124,7 +129,10 @@ départ à zéro.
 ## 5. Publier et tracer
 
 - Brouillon, relecture, publication (`seo-publication-cms`). Une refonte
-  se fait **à la même URL**, contenu d'origine sauvegardé.
+  se fait **à la même URL**, contenu d'origine sauvegardé (et la méta du
+  constructeur si la page en avait un : `references/wordpress.md`).
+- La page entre dans le menu ou la rubrique des ressources, sur ordinateur
+  **et** mobile quand les deux menus sont distincts.
 - Cartographie à jour (mot-clé et prompt principal), journal de la
   modification (`seo-journal-mesure`), sitemap resoumis.
 - Mesure à J+28 : positions sur le mot-clé, citation sur le prompt

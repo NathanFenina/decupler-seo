@@ -55,7 +55,11 @@ ainsi. Quatre conséquences :
   ```
 
   avec `overflow-x: hidden` sur le conteneur pour éviter la barre de
-  défilement horizontale que crée `100vw`. Aucun ancêtre ne doit avoir
+  défilement horizontale que crée `100vw` (qui **inclut** la barre de
+  défilement verticale : 15 px de trop sur ordinateur). Si le thème propose
+  un réglage de conteneur pleine largeur pour la page (Astra :
+  `full-width-container`), préférez-le : la largeur vient alors du
+  conteneur, sans `100vw` ni débordement à rogner. Aucun ancêtre ne doit avoir
   `overflow: hidden`, sinon la bande est rognée — vérifiez au pixel, pas à la
   géométrie : un élément rogné garde les bonnes dimensions.
 - **Colonne flex qui se réduit** : dans certains thèmes, le conteneur
@@ -69,6 +73,13 @@ ainsi. Quatre conséquences :
   valeur héritée, donc `color` sur le conteneur ne suffit pas et les titres
   restent sombres sur une bande sombre. Redéclarez-la dans le scope :
   `.dcp-page h1,.dcp-page h2,.dcp-page h3{color:var(--dcp-texte)}`.
+- **`position: sticky` natif** pour un CTA latéral collant : il fonctionne
+  dans la plupart des thèmes même avec un `overflow-x:hidden` sur `body`
+  (vérifiez au rendu). Une version en JavaScript relâche souvent le bloc
+  trop tôt (avant la FAQ).
+- **Pas de React sur un WordPress classique** : Framer Motion est une
+  bibliothèque React ; sur un thème PHP, l'équivalent est Motion (motion.dev)
+  en JavaScript simple, ou quelques lignes de CSS et d'`IntersectionObserver`.
 - **Une police déclarée n'est pas une police chargée.** `font-family` sans la
   police chargée par le thème (ou auto-hébergée) fait tomber toute la page en
   police système — invisible dans un aperçu local qui, lui, l'a chargée.
@@ -76,8 +87,9 @@ ainsi. Quatre conséquences :
 ### Droits et cache
 
 - `<style>` et `<script>` ne survivent que pour un compte qui a le droit
-  `unfiltered_html` (administrateur) : un éditeur les voit supprimés à
-  l'enregistrement.
+  `unfiltered_html` (administrateurs et éditeurs sur un site simple,
+  super-administrateurs seulement en multisite, et parfois retiré par une
+  extension de sécurité) : sinon ils sont supprimés à l'enregistrement.
 - **Cache Elementor** : une modification écrite en base (par l'API) n'apparaît
   pas tant que les fichiers CSS ne sont pas régénérés (Elementor → Outils →
   Régénérer les fichiers et les données).
@@ -185,4 +197,15 @@ composants**.
   dont le bord droit dépasse `document.documentElement.clientWidth` : c'est
   cette sonde qui tranche.
 - Le MCP Chrome DevTools fait tout cela : `resize_page`, `take_screenshot`,
-  `evaluate_script`, `lighthouse_audit`.
+  `evaluate_script`, `lighthouse_audit`. Sans lui (routine, session sans
+  connecteur), `scripts/rendu.py` rend la page dans Chromium sans interface
+  et pose la même sonde de débordement :
+  ```bash
+  python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rendu.py" page-<slug>.html 1440 --cache ./loc
+  python3 "${CLAUDE_PLUGIN_ROOT}/scripts/rendu.py" page-<slug>.html 390 --cache ./loc
+  ```
+  `--cache` sert images et polices rapatriées en local : un rendu hors
+  ligne sans elles juge une page qui n'est pas celle du site. En mode sans
+  interface, la fenêtre ne descend pas sous ~500 px : le script le signale.
+- **Le test des trois secondes** se fait sur la capture : réduite à 200 px
+  de large, elle doit montrer au moins quatre zones distinctes.

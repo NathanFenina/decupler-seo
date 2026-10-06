@@ -28,6 +28,25 @@ court : le détail vit dans `memoire/`.
    `python3 .claude/decupler-seo/scripts/guard.py --action <action> --cible <url>`
 5. **Ne jamais inventer un chiffre.** Donnée absente = « nécessite tel outil ».
 
+## La méthode : la mettre à jour, l'améliorer
+
+La méthode (skills, agents, commandes, scripts, SOP) vient de decupler-seo.
+Elle est la même pour tous les projets. Mode d'emploi complet :
+`.claude/decupler-seo/docs/MANUEL.md`.
+
+- **« Mets à jour la méthode »** → commande `/seo-maj` : statut, remontée des
+  améliorations faites ici, synchro sur une branche, nouveautés du gabarit, PR.
+- **Une tâche** → sa SOP d'abord (`.claude/decupler-seo/docs/sop/`), puis le
+  skill qu'elle cite.
+- **Tu trouves mieux que la méthode** (règle manquante, piège, seuil, bug de
+  script) : ne modifie pas `.claude/` en silence. Si c'est valable pour tous les
+  sites, modifie le fichier, puis `python3 .claude/decupler-seo/scripts/projet.py
+  remonter . <fichier> --pousser` et donne le lien de la branche : elle devient
+  une PR sur decupler-seo, sans aucune donnée du client. Si c'est propre à ce
+  client, écris-le dans `memoire/` ou dans un skill `.claude/skills/projet-…`.
+- **En fin de tâche**, si tu as appris quelque chose de réutilisable, propose
+  la remontée en une ligne.
+
 ## Règles d'or
 
 Chacune vient d'un incident réel sur ce projet. Quand un problème survient,

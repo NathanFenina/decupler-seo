@@ -141,6 +141,27 @@ class TestCarte(unittest.TestCase):
         self.assertEqual(ligne["nb_liens_externes"], 1)
         self.assertEqual(ligne["modifie"], "2026-08-02")
 
+    def test_page_elementor_comptee_depuis_la_meta(self):
+        # Régression : une page construite dans Elementor a un content presque vide ;
+        # la carte la comptait à 0 mot et l'audit de contenu la déclarait « vide ».
+        donnees = [{"elements": [{"widgetType": "heading", "settings": {"title": "Pourquoi un audit", "header_size": "h2"}},
+                                 {"widgetType": "text-editor", "settings": {"editor": "<p>" + "mot " * 120 + "</p>",
+                                                                            "_margin": {"top": "10"}}},
+                                 {"widgetType": "toggle", "settings": {"tabs": [{"tab_title": "Q",
+                                                                                  "tab_content": "Réponse courte ici."}]}}]}]
+        item = {"id": 7, "link": f"{SITE}/audit/", "title": {"rendered": "Audit"}, "content": {"rendered": "<p>Bonjour</p>"},
+                "meta": {"_elementor_data": json.dumps(donnees)}}
+        ligne = wp.ligne_carte(item, SITE, "pages")
+        self.assertGreater(ligne["nb_mots"], 120)
+        self.assertEqual(ligne["h2"], "Pourquoi un audit")
+
+    def test_page_sans_constructeur_inchangee(self):
+        item = {"id": 8, "link": f"{SITE}/a/", "title": {"rendered": "A"}, "content": {"rendered": "<p>Un deux</p>"},
+                "meta": {"_elementor_data": "[]"}}
+        self.assertEqual(wp.ligne_carte(item, SITE, "pages")["nb_mots"], 2)
+        self.assertEqual(wp.html_constructeur({"meta": {"_elementor_data": "{pas du json"}}), "")
+        self.assertEqual(wp.html_constructeur({"meta": []}), "")
+
     def test_mots_sans_script(self):
         analyse = wp.analyser_contenu("<p>Un deux trois.</p><script>var a = b;</script><style>p{x:y}</style>", SITE)
         self.assertEqual(analyse["nb_mots"], 3)

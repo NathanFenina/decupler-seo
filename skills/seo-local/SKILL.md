@@ -97,6 +97,12 @@ Alternative honnête pour un artisan qui intervient dans 40 communes : une
 page par **zone d'intervention** (5-8 pages avec un contenu réel), plus une
 page listant les communes couvertes. C'est moins ambitieux et ça fonctionne.
 
+Prestataire de service sans local dans la ville (agence, consultant,
+cabinet) : calibrage sur la SERP mesurée, `areaServed` au lieu d'une
+adresse, cadrage honnête, bloc de résultats chiffrés, page comparatif pour
+les grosses villes : `seo-programmatique`, « Pages ville d'un prestataire
+de service ».
+
 ## 5. Le site
 
 - **Schema `LocalBusiness`** avec `address`, `geo`, `openingHoursSpecification`,

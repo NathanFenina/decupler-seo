@@ -1,6 +1,6 @@
 # Extensions WordPress — modèles decupler-seo
 
-Trois petites extensions écrites pour un vrai site WordPress, après des
+Quatre petites extensions écrites pour un vrai site WordPress, après des
 incidents réels, puis rendues génériques : aucune donnée d'un client n'y
 figure, tout se règle dans un fichier de configuration.
 
@@ -9,6 +9,7 @@ figure, tout se règle dans un fichier de configuration.
 | `mu-plugins/seo-meta-rest.php` | `wp-content/mu-plugins/` | Title, meta description, requête cible, canonique et noindex écrivables par l'API REST (Yoast, Rank Math, SEOPress) | **Validation** |
 | `plugins/seo-crawl-fix/` | `wp-content/plugins/` | 410 sur les URL de spam ou supprimées, sitemap pour les faire repasser, page d'erreur légère, pagination hors limites en 404, pages hors index et hors sitemap, redirections, robots.txt | **Interdit** (proposition) |
 | `plugins/seo-entite/` | `wp-content/plugins/` | Organisation, personne et site dans le JSON-LD, avec `sameAs` et un seul identifiant par entité | **Validation** |
+| `plugins/seo-indexnow/` | `wp-content/plugins/` | Clé IndexNow servie à la racine, et envoi à IndexNow à chaque publication ou mise à jour d'un contenu public (l'équivalent de l'« indexation instantanée » de Rank Math, sans l'API Google) | **Validation** |
 
 ## La règle avant tout
 
@@ -221,6 +222,48 @@ Organisation, une seule Personne, aucune référence `@id` orpheline.
 **Désinstaller.** Désactiver puis supprimer, et
 `wp-content/seo-entite-config.php`. Le graphe redevient celui de
 l'extension SEO.
+
+## 4. `seo-indexnow/` — prévenir Bing et les moteurs IndexNow à chaque publication
+
+**Pourquoi.** Les extensions d'« indexation instantanée » font deux choses :
+IndexNow (propre, accepté par Bing, Yandex, Seznam, Naver, Yep ; Bing
+alimente Copilot), et parfois l'Indexing API de Google, réservée aux offres
+d'emploi et aux vidéos en direct. Celle-ci ne fait que la première. Pour
+Google : sitemap à jour, liens internes, `indexation.py suivre`.
+
+**Ce qu'elle fait.**
+- Sert la clé à `https://<site>/<clé>.txt` (texte brut, `noindex`). Clé : la
+  constante `INDEXNOW_KEY` de `wp-config.php` si elle existe, sinon une clé
+  générée à l'activation.
+- À chaque passage en « publié » d'un contenu public (article, page, type
+  public), sauf noindex (Yoast, Rank Math, SEOPress), protégé par mot de passe
+  ou média : un envoi groupé à `api.indexnow.org` en fin de requête.
+- N'envoie rien hors production (`wp_get_environment_type()`), sauf constante
+  `SEO_INDEXNOW_FORCER`.
+- Garde les 20 derniers envois, lisibles sur `GET /wp-json/seo-indexnow/v1/etat`
+  (comptes éditeurs), avec la clé : reportez-la dans la variable
+  `INDEXNOW_KEY` du projet pour que `indexation.py annoncer` utilise la même.
+
+**Installer.** Zipper le dossier `seo-indexnow/`, puis Extensions → Ajouter →
+Téléverser ; activer. Rank Math (module Instant Indexing) ou une autre
+extension IndexNow déjà active : ne pas installer celle-ci, une seule clé par
+site.
+
+**Tester.**
+```bash
+curl -s -u "$WP_USER:$WP_APP_PASSWORD" "$WP_SITE_URL/wp-json/seo-indexnow/v1/etat"   # clé + derniers envois
+curl -s "$WP_SITE_URL/<clé>.txt"                                                   # doit renvoyer la clé
+```
+Puis mettre à jour un article : un envoi apparaît dans `derniers_envois`
+(200 ou 202 = accepté ; 403 = clé non trouvée à l'adresse ; 422 = URL d'un
+autre domaine ; 429 = trop d'envois).
+
+**Désinstaller.** Désactiver, supprimer. Les options `seo_indexnow_cle` et
+`seo_indexnow_journal` restent en base (quelques octets) ; les supprimer par
+`wp option delete` si besoin.
+
+Testée sur un WordPress local : clé servie, envoi déclenché par une
+publication et pas par un brouillon, requête reçue par `api.indexnow.org`.
 
 ## Ce qui n'a pas été repris
 

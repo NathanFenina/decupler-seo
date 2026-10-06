@@ -1,7 +1,7 @@
 {
   "_role": "Registre des projets qui embarquent la méthode decupler-seo. `python3 scripts/projet.py registre` affiche la version de chacun. Ajouter une ligne à chaque `projet.py init` ou `adopter`.",
   "projets": [
-    {"nom": "decupler.com", "depot": "NathanFenina/decupler", "routine": "hebdo, vendredi 7h07"},
+    {"nom": "decupler.com", "depot": "NathanFenina/decupler-site", "routine": "hebdo, vendredi 7h07"},
     {"nom": "TechMedias", "depot": "NathanFenina/tech-medias", "routine": "voir ROUTINES.md du dépôt"},
     {"nom": "Tasis Partners", "depot": "NathanFenina/saudi-arabia", "routine": "hebdo, vendredi 7h03"}
   ]

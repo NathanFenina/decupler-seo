@@ -104,4 +104,10 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" page-<slug>.html --st
 - [ ] Webflow : chaque embed < 50 000 caractères
 - [ ] Next.js : `npm run build` passe, `priority` sur la seule image LCP
 - [ ] Rendu vérifié servi en HTTP, dans le vrai thème, aux deux largeurs,
-      captures jointes au livrable
+      captures jointes au livrable ; sonde DOM à zéro débordement
+      (`rendu.py`, ou `evaluate_script` du MCP Chrome DevTools)
+- [ ] Aucune signature d'interface générée (barre latérale colorée, halo,
+      numérotation décorative, surtitres partout) ; détecteur lancé en mode
+      navigateur s'il est installé (`references/design-tokens.md`, § 5 bis)
+- [ ] WordPress : le HTML **servi** relu après envoi (aucun `<p>` vide,
+      `<p><a>`, `<br>` parasite), pas seulement le fichier

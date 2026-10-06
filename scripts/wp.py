@@ -337,9 +337,68 @@ COLONNES_CARTE = ["id", "type", "statut", "url", "titre", "meta_titre", "meta_de
                   "modifie"]
 
 
+# Réglages de widget Elementor qui portent du texte affiché. Les autres
+# (couleurs, marges, identifiants) ne sont pas du contenu.
+_TEXTES_ELEMENTOR = ("title", "editor", "html", "text", "description", "content", "title_text",
+                     "description_text", "tab_content", "item_description", "testimonial_content",
+                     "alert_title", "alert_description", "inner_text", "prefix", "suffix")
+_TITRE_ELEMENTOR = re.compile(r"^h[1-6]$")
+
+
+def html_constructeur(item: dict) -> str:
+    """Le texte d'une page Elementor, recomposé en HTML depuis la méta `_elementor_data`.
+
+    Une page construite dans Elementor n'a souvent presque rien dans
+    `content` : la carte la compterait à 0 mot, et l'audit de contenu la
+    déclarerait « vide ». La méta n'est lisible que si l'API l'expose
+    (champ `meta`, souvent avec context=edit) ; sinon, chaîne vide.
+    """
+    brut = (item.get("meta") or {}).get("_elementor_data") if isinstance(item.get("meta"), dict) else None
+    if not brut or brut == "[]":
+        return ""
+    try:
+        donnees = json.loads(brut) if isinstance(brut, str) else brut
+    except json.JSONDecodeError:
+        return ""
+    morceaux: list[str] = []
+
+    def parcourir(elements):
+        for el in elements if isinstance(elements, list) else []:
+            if not isinstance(el, dict):
+                continue
+            reglages = el.get("settings") if isinstance(el.get("settings"), dict) else {}
+            if el.get("widgetType") == "heading" and isinstance(reglages.get("title"), str):
+                balise = reglages.get("header_size") or "h2"
+                balise = balise if _TITRE_ELEMENTOR.match(balise) else "p"
+                morceaux.append(f"<{balise}>{reglages['title']}</{balise}>")
+            else:
+                for cle in _TEXTES_ELEMENTOR:
+                    valeur = reglages.get(cle)
+                    if isinstance(valeur, str) and valeur.strip():
+                        morceaux.append(valeur if "<" in valeur else f"<p>{valeur}</p>")
+                for valeur in reglages.values():
+                    if isinstance(valeur, list):  # répéteurs : onglets, FAQ, listes d'icônes
+                        for sous in valeur:
+                            if isinstance(sous, dict):
+                                for cle in _TEXTES_ELEMENTOR:
+                                    if isinstance(sous.get(cle), str) and sous[cle].strip():
+                                        morceaux.append(f"<p>{sous[cle]}</p>" if "<" not in sous[cle] else sous[cle])
+            parcourir(el.get("elements"))
+
+    parcourir(donnees)
+    return "\n".join(morceaux)
+
+
 def ligne_carte(item: dict, site: str, type_rest: str, plugin: str | None = None) -> dict:
     """Une ligne de la carte de contenu depuis la réponse REST d'un article ou d'une page."""
     analyse = analyser_contenu(_champ_rendu(item.get("content")), site)
+    constructeur = html_constructeur(item)
+    if constructeur:
+        # Page Elementor : le texte vit dans la méta, pas (ou à peine) dans content.
+        analyse_c = analyser_contenu(constructeur, site)
+        if analyse_c["nb_mots"] > analyse["nb_mots"]:
+            analyse_c["liens_internes"] = list(dict.fromkeys(analyse["liens_internes"] + analyse_c["liens_internes"]))
+            analyse = analyse_c
     meta_titre, meta_desc = lire_seo_affiche(item)
     champs = lire_seo_champs(item, plugin)
     if plugin in CHAMPS_SEO:
