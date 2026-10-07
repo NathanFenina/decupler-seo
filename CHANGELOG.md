@@ -1,5 +1,18 @@
 # Journal des versions
 
+## 3.11.0
+
+### Ajouté
+
+- **Suivi mensuel des positions et des prompts** (`scripts/suivi.py`, skill
+  `seo-suivi-mensuel`) : position réelle de chaque mot-clé principal de la
+  cartographie dans Google (DataForSEO, sans attendre l'accès Search Console),
+  page qui ranke, concurrent devant, AI Overview ; batterie de prompts
+  proposée puis **validée par le client** (`recherche/prompts-suivi.csv`,
+  statut propose / valide / refuse, on ajoute sans jamais retirer), relevée
+  chaque mois sur les moteurs IA ; comparaison au mois précédent dans
+  `rapports/suivi-AAAA-MM.md`. Branché dans la routine de rapport.
+
 ## 3.10.1
 
 - **Indexation au déploiement**, comme l'indexation instantanée de Rank Math : le
