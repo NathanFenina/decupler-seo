@@ -105,7 +105,10 @@ def verifier_longueur(f: Path, nom: str, valeur: str, mini: int, maxi: int, r: R
 
 
 def verifier_html(f: Path, html: str, r: Rapport, interdits: list[re.Pattern]) -> None:
-    if m := re.search(r"<title[^>]*>(.*?)</title>", html, re.S | re.I):
+    # Le <title> d'un SVG inline (titre accessible d'un graphique, info-bulle
+    # d'une barre) n'est pas le title de la page : on l'écarte avant de chercher.
+    sans_svg = re.sub(r"<svg\b.*?</svg>", " ", html, flags=re.S | re.I)
+    if m := re.search(r"<title[^>]*>(.*?)</title>", sans_svg, re.S | re.I):
         verifier_longueur(f, "title", re.sub(r"\s+", " ", m.group(1)), TITLE_MIN, TITLE_MAX, r)
     if m := re.search(r'<meta[^>]+name=["\']description["\'][^>]*content=["\']([^"\']*)', html, re.I):
         verifier_longueur(f, "meta description", m.group(1), META_MIN, META_MAX, r)

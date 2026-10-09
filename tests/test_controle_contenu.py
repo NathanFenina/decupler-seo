@@ -18,6 +18,13 @@ class TestControle(DossierIsole):
         code, d = self.controler("page.html")
         self.assertEqual(code, 0, d)
 
+    def test_title_d_un_svg_ignore(self):
+        self.ecrire("page.html", '<html><head></head><body><svg role="img"><title>12</title><rect/></svg>'
+                    "<title>Plombier à Lyon : dépannage en 2 h, devis gratuit</title>"
+                    '<meta name="description" content="' + "x" * 150 + '"><h1>Titre</h1><p>Texte.</p></body></html>')
+        code, d = self.controler("page.html")
+        self.assertEqual(code, 0, d)                                    # le titre d'un graphique n'est pas le title
+
     def test_texte_provisoire_bloque(self):
         self.ecrire("a.md", "# Titre\n\nPrix : [à compléter].\n")
         code, d = self.controler("a.md")

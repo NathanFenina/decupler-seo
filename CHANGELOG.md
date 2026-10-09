@@ -34,6 +34,11 @@ backlinks), à la place de la page complète, qui porte de l'interne.
   dans le code de la page. Une page existante retrouve son lien au prochain
   `injecter --depot`.
 
+### Corrigé
+
+- `controle_contenu.py` ignore le `<title>` d'un SVG inline (titre accessible
+  d'un graphique) : seul le title de la page est mesuré. Remonté d'un projet.
+
 ## 3.12.1
 
 La vue **Backlinks se suffit à elle-même** : on peut partager la page de suivi
