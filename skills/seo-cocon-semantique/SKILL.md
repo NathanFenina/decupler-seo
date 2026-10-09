@@ -54,7 +54,13 @@ sujet et en ouvrir un second ensuite.
 ## Étape 2 — La page pilier
 
 Elle vise la requête principale du silo — la plus large, la plus
-concurrentielle. Caractéristiques :
+concurrentielle **qui reste sous le plafond de KD du site** (fixé par
+l'autorité du domaine, voir `seo-keyword-research` étape 4 : KD ≤ 20 pour
+un site neuf). Sur un site neuf, la requête « reine » du sujet est souvent
+au-dessus : le pilier prend alors une variante plus précise sous le plafond,
+et la requête large passe en mot-clé secondaire, « cible à DR X ». Même règle
+pour chaque satellite : un mot-clé principal par page, sous le plafond.
+Caractéristiques :
 
 - Couvre le sujet dans son ensemble, mais **sans épuiser** les satellites :
   chaque sous-partie donne l'essentiel puis renvoie vers l'article dédié

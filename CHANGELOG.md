@@ -1,5 +1,15 @@
 # Journal des versions
 
+## À venir
+
+- **Plafond de KD selon l'autorité du domaine** : `seo-keyword-research`
+  (étape 4) fixe le KD maximum d'un mot-clé principal d'après le DR / DA du
+  site (< 20 → KD ≤ 20, 20-39 → 30, 40-59 → 45, ≥ 60 → pas de plafond dur).
+  `seo-cocon-semantique` l'applique au pilier et aux satellites,
+  `seo-cartographie` aux pages à créer, l'agent `seo-strategiste` à la
+  création de contenu. Réglable par `seuils.autorite_domaine` et
+  `seuils.kd_max` dans la config.
+
 ## 3.11.0
 
 La page de suivi devient un **programme de pilotage sur plusieurs mois**, sur

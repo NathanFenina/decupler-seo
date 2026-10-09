@@ -35,7 +35,13 @@ client autant qu'à vous : on le valide ensemble, on le relit chaque mois.
    assistant, jamais en mots-clés, jamais avec le nom de la marque (sinon on
    mesure la notoriété de la question, pas la visibilité du site). Mêmes
    règles que la batterie de `geo-share-of-model`, contrôlées par le même code.
-3. **Le script propose, le client valide.** Ce que le script a deviné est
+3. **Le plafond de KD s'applique aux pages à créer.** Une ligne `a-creer`
+   (pilier comprise) ne prend pour mot-clé principal qu'une requête sous le
+   plafond fixé par l'autorité du domaine (`seo-keyword-research` étape 4 ;
+   KD ≤ 20 pour un site neuf). Une page existante qui vise plus haut est
+   signalée à la validation : changer de cible ou la garder en connaissance
+   de cause.
+4. **Le script propose, le client valide.** Ce que le script a deviné est
    listé dans la colonne `a_valider`. Une ligne n'est validée que lorsque
    cette colonne est vide.
 

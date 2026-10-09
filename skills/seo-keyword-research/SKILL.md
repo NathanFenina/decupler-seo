@@ -9,7 +9,8 @@ description: >
   "mots-clés", "keyword research", "recherche de mots-clés", "sur quoi me
   positionner", "volume de recherche", "intention de recherche", "quels
   sujets traiter", "champ sémantique", "requêtes", "mot-clé pivot", "je
-  cherche des idées de contenu".
+  cherche des idées de contenu", "mots-clés faciles", "KD max", "site neuf",
+  "DA faible", "difficulté sous 20".
 ---
 
 # Recherche de mots-clés — arbitrer, pas collectionner
@@ -83,8 +84,8 @@ fausse qui a l'air juste. On écarte d'abord, on mesure ensuite :
   le site n'intervient pas est exclue, quel que soit son volume.
 - **Appartient à une autre page du site** : c'est de la cannibalisation.
   On la laisse à la page qui la sert déjà (voir étape 8).
-- **Générique nationale à fort KD** : jamais le pivot d'un petit site. Elle
-  sert de champ sémantique, pas de cible.
+- **Au-dessus du plafond de KD** (étape 4) : jamais le pivot d'une page.
+  Elle sert de champ sémantique, pas de cible.
 - **Bruit Search Console** : requêtes à 1 impression, fautes de frappe
   isolées, requêtes tronquées ou sans sens — ignorées.
 - **Termes ambigus** : un sigle ou un mot polysémique du métier (« IA »,
@@ -122,8 +123,41 @@ et tendance, puis le pivot retenu et, pour chaque candidat écarté, la raison
 en une ligne (« KD 62 à DR 15 », « intention informationnelle sur une page
 service », « appartient à une autre page »).
 
-Sur la difficulté : comparez au Domain Rating de votre site, pas dans
-l'absolu. Un KD 40 est infranchissable à DR 8 et facile à DR 65.
+Sur la difficulté : comparez à l'autorité de votre site, pas dans l'absolu.
+Un KD 40 est infranchissable à DR 8 et facile à DR 65.
+
+### Le plafond de KD, fixé par l'autorité du domaine
+
+Avant de lister les candidats, lisez l'autorité du domaine
+(`seuils.autorite_domaine` de la config ; à défaut, mesurez-la : DR Ahrefs
+`site-explorer-domain-rating`, Authority Score Semrush, DA Moz) et déduisez
+le plafond :
+
+| Autorité du domaine (DR / DA / AS) | KD maximum d'un mot-clé principal |
+|---|---|
+| < 20 — site neuf ou peu lié | **20** |
+| 20 à 39 | 30 |
+| 40 à 59 | 45 |
+| ≥ 60 | pas de plafond dur : comparez aux DR du top 10 |
+
+`seuils.kd_max` force le plafond quand il est renseigné. Autorité inconnue
+et non mesurable : appliquez le palier « site neuf » et dites-le.
+
+Le plafond est une règle dure, pas une préférence :
+
+- **Aucun mot-clé principal** (page pilier comprise) au-dessus du plafond.
+  Une requête plus difficile reste dans le champ sémantique ou dans les
+  mots-clés secondaires, et peut être notée « cible à DR X » pour plus tard.
+- **Comparez des KD du même outil** que l'autorité : un KD Semrush, un KD
+  Ahrefs et une difficulté DataForSEO ne sont pas sur la même échelle.
+- KD absent pour une requête : vérifiez la SERP (`seo-serp-analysis`) avant
+  de la retenir ; si le top 10 n'est fait que de domaines à forte autorité,
+  écartez-la.
+- Annoncez le plafond en tête du livrable : « autorité 8 (DR Ahrefs) →
+  KD ≤ 20 ».
+
+Quand l'autorité franchit un palier, relevez le plafond et repassez les
+requêtes écartées pour cette seule raison : ce sont les prochains pivots.
 
 ## Étape 5 — Classer par intention et par étape du tunnel
 

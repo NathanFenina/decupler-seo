@@ -79,6 +79,16 @@ seuils:
   inp_bon_ms: 200
   cls_bon: 0.1
 
+  # Mots-clés — plafond de difficulté (KD) selon l'autorité du domaine.
+  # autorite_domaine : DR Ahrefs, DA Moz ou Authority Score Semrush (0-100),
+  # le même outil que celui qui donne le KD. Vide = site neuf ou inconnu,
+  # traité comme une autorité < 20.
+  # kd_max : vide = palier automatique (seo-keyword-research, étape 4) :
+  #   autorité < 20 → KD ≤ 20 · 20-39 → KD ≤ 30 · 40-59 → KD ≤ 45 · ≥ 60 → pas de plafond dur
+  # Un nombre ici force le plafond, quel que soit le palier.
+  autorite_domaine: ""
+  kd_max: ""
+
   # Netlinking — au-delà, le profil devient suspect
   ancres_exactes_max_pct: 15
   nouveaux_liens_par_mois_max: 30

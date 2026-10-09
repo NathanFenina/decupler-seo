@@ -26,6 +26,7 @@
 ## Pièges
 
 - Un silo n'est pas un répertoire d'URL : c'est une intention commerciale.
+- Un site neuf ne vise que des mots-clés à KD ≤ 20, pilier compris : le plafond de KD suit l'autorité du domaine (`seuils.autorite_domaine` et `seuils.kd_max` de la config).
 - Un prompt qui contient ta marque mesure ta notoriété, pas ta visibilité.
 - Le script propose, tu valides : la colonne `a_valider` doit être vide avant de produire.
 
