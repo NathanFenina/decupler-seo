@@ -17,7 +17,7 @@
 3. Une thèse avant un plan : ce que ta page affirme et que les autres ne disent pas.
 4. Rédaction par l'agent `seo-redacteur`, dans ton style mesuré (`memoire/style.md`), une donnée par paragraphe.
 5. Test anti-remplissage sur chaque paragraphe, puis note E-E-A-T sur 40 et correctifs localisés.
-6. Passe d'humanisation (`seo-humanisation`) : `humanisation.py` repère les tics d'écriture générée, Claude réécrit les paragraphes signalés dans ton style, sans changer le fond ; score sous 25 et mêmes chiffres avant et après.
+6. Passe d'humanisation (`seo-humanisation`) : `humanisation.py` repère les tics d'écriture générée, Claude réécrit les paragraphes signalés dans ton style, sans changer le fond ; score sous 25 et mêmes chiffres avant et après. Si le client l'exige, une mesure Pangram (`pangram.py --seuil 0.2`) en plus.
 7. `controle_contenu.py` bloque toute promesse ou tout chiffre sans source avant publication.
 
 **MCP nécessaires** : DataForSEO ou Firecrawl pour la recherche. WordPress pour le brouillon.

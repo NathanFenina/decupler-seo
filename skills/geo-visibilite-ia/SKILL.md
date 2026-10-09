@@ -114,6 +114,19 @@ Pour chaque question où vous n'êtes pas cité, identifiez la cause :
    connaît pas. Travail hors site nécessaire
 4. **Vous bloquez les crawlers** → vérifiez robots.txt immédiatement
 
+Pour le vérifier agent par agent (avec la règle de la RFC 9309 : un groupe
+nommé remplace « * »), plus llms.txt, la version Markdown des pages,
+ai-catalog.json, WebMCP et le contenu rendu côté serveur :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/agents_ia.py" https://<site>/<page>
+```
+
+Le script distingue ce qui coûte de la visibilité (un robot de recherche
+IA bloqué, une page vide sans JavaScript, un llms.txt en fausse 404) de ce
+qui reste facultatif parce que la norme n'est qu'une proposition
+(Content-Signal, Markdown, WebMCP, ai-catalog). Le dire tel quel au client.
+
 Le cas 4 arrive plus souvent qu'on ne croit : de nombreux sites ont bloqué
 `GPTBot` en 2023 par réflexe défensif et ont oublié qu'ils bloquaient aussi
 leur propre visibilité.
