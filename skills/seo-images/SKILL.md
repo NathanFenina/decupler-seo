@@ -106,7 +106,9 @@ Plan d'images par type de page, règles de génération et prompts :
 `seo-design-pages` (`references/images.md`). Génération :
 `scripts/images_generer.py` (Gemini, OpenAI en repli ; `--dry-run` pour
 voir le prompt sans payer). Contrôle avant publication :
-`scripts/audit_images.py --strict`.
+`scripts/audit_images.py --strict`, avec `--matiere 3` pour une page neuve
+(au moins trois éléments de matière réelle : `seo-design-pages`,
+`references/matiere-reelle.md`).
 
 - **Combien, où** : une image de couverture juste sous le H1, puis des
   images de section réparties régulièrement sur les H2 — pour 2 images sur

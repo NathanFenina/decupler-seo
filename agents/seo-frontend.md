@@ -57,8 +57,10 @@ limité à 50 000 caractères.
 
 ## Vérifier
 
-`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page.html --strict`
-bloque les images qui dégradent le LCP et le CLS. Puis la checklist de
+`python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page.html --matiere 3 --strict`
+bloque les images qui dégradent le LCP et le CLS, et la page plate (moins
+de trois éléments de matière réelle : `seo-design-pages`,
+`references/matiere-reelle.md`). Puis la checklist de
 `seo-design-pages`, et le rendu réel via Chrome DevTools à 390 et 1 440 px,
 servi en HTTP (jamais `file://`), avant de livrer. Une page qui casse en
 mobile ne se voit pas dans le code.

@@ -242,7 +242,11 @@ SERP comme repère de registre — jamais comme voix.
 6. **Des mots simples pour les émotions** : « inquiet », « soulagé », pas
    « en proie à une appréhension ».
 7. **Remplacer l'énumération didactique** par une image ou un exemple
-   quand trois puces abstraites disent moins qu'un cas concret.
+   quand trois puces abstraites disent moins qu'un cas concret. Le texte
+   prévoit sa **matière réelle** (au moins trois éléments : un avant /
+   après rédigé pour la page, une capture d'un résultat sourcé, les logos
+   des outils qu'il cite, un schéma tiré d'un chiffre de la source des
+   faits) : `seo-design-pages`, `references/matiere-reelle.md`.
 8. **Poser des questions ouvertes au lecteur** : « Combien de devis avez-vous
    comparés ? »
 9. **Accepter la phrase incomplète** : « Résultat : deux semaines perdues. »
@@ -445,7 +449,8 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/humanisation.py" --avant brouillon.md --a
 - `article-<slug>.html` — si destiné à un CMS (`/seo page`)
 - `sources.md` — chaque affirmation chiffrée et son lien
 - Les emplacements d'images et leur brief (`seo-images`, « Illustrer un
-  contenu neuf »)
+  contenu neuf »), dont les trois éléments de matière réelle au moins
+  (`seo-design-pages`, `references/matiere-reelle.md`)
 - Le schema JSON-LD correspondant (`/seo schema`)
 
 Enchaînez : `/seo publish` pour la mise en ligne en brouillon.

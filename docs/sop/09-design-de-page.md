@@ -14,7 +14,7 @@
 
 1. Typer la page : service, article, page locale, landing, comparatif, outil, lead magnet. En cas de doute, le format des trois premiers résultats tranche.
 2. Le gabarit section par section, le plan de CTA (une action, ses emplacements, ses libellés) et les bannières de preuve.
-3. Le plan d'images : un rôle par image, son poids, son texte `alt`.
+3. Le plan d'images : un rôle par image, son poids, son texte `alt`. Au moins trois éléments de matière réelle : logos des outils cités, captures de résultats, exemple avant / après, photos réelles, schémas tirés des chiffres sourcés (`audit_images.py --matiere 3`).
 4. Le HTML autonome, avec un CSS limité à la page, prêt pour WordPress, Elementor ou Webflow.
 5. Contrôle bloquant : rendu réel à 390 et à 1 440 px, image principale jamais en `lazy`, chaque bouton mène quelque part, chaque preuve a sa source.
 

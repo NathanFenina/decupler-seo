@@ -1,5 +1,41 @@
 # Journal des versions
 
+## 3.13.0
+
+Les pages neuves **ont de la vie dès le premier jet** : au moins trois éléments
+de matière réelle par page (logos des outils cités, captures, exemple avant /
+après, photo réelle, schéma tiré des données), et un contrôle qui bloque la
+page plate. Retour client à l'origine : « pas mal, mais ça manque de vie :
+screenshots, logos, exemples, photos ; c'est très flat ».
+
+### Ajouté
+
+- **`seo-design-pages` → `references/matiere-reelle.md`** : la règle (trois
+  éléments au moins, de deux types, chacun avec `alt` et légende), les six
+  types et leurs sources (logos officiels ou Wikimedia Commons, captures de
+  résultats déjà publiés, avant / après étiqueté comme exemple, photos
+  réelles créditées, schémas SVG tirés de la source des faits, logos clients
+  avec accord), les interdits (image générée d'une personne, d'un client ou
+  d'un lieu ; chiffre de visuel hors de la source des faits ; faux exemple
+  sous une vraie marque ; capture d'un tiers sans le dire), les pièges payés
+  en production (logo blanc invisible, schéma étiré, texte de SVG à 5 px sur
+  téléphone, `wptexturize` et `wpautop` dans un bloc de code, grille de logos
+  trop étroite, légende dupliquée dans un lot) et le registre des visuels.
+- **`audit_images.py --matiere N`** : compte les éléments de matière réelle
+  d'une page (`<figure>`, éléments `data-matiere="…"`, `<svg role="img">`
+  hors figure) ; moins de N = erreur de page (bloquante avec `--strict`) ;
+  une figure sans `<figcaption>` = avertissement. Sans l'option, rien ne
+  change.
+
+### Modifié
+
+- `seo-design-pages` : une septième règle pour tous les types, l'étape
+  « 5 bis. Matière » dans le déroulé, la checklist (deux cases), le plan
+  d'images (`images.md`) et le livrable `design-<slug>.md`.
+- `seo-redaction` : le texte prévoit sa matière réelle (règle 7 du style,
+  livrables) ; `seo-images`, SOP 09 et agent `seo-frontend` : contrôle
+  `audit_images.py --matiere 3 --strict`.
+
 ## 3.12.2
 
 Une **copie limitée de la page de suivi** pour un intervenant externe (consultant

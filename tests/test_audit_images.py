@@ -140,6 +140,53 @@ class TestAuditImagesLocal(DossierIsole):
         self.assertEqual(r.returncode, 2)
 
 
+PAGE_VIVANTE = """<section>
+<figure><img src="logos.webp" alt="Logos des outils cités" width="800" height="200" loading="lazy">
+<figcaption>Les outils de la mission.</figcaption></figure>
+<div class="aa" data-matiere="exemple"><div>Avant</div><div>Après</div></div>
+<svg viewBox="0 0 10 10" role="img" aria-label="Frise des quatre étapes"></svg>
+</section>"""
+
+
+class TestMatiereReelle(DossierIsole):
+    """--matiere N : une page sans matière réelle (logos, captures, exemples,
+    schémas) est « plate » et bloque, comme une image sans alt."""
+
+    def lancer_matiere(self, html, *args):
+        (self.dossier / "page.html").write_text(html, encoding="utf-8")
+        r = lancer("audit_images.py", "page.html", *args, "--json", cwd=self.dossier)
+        self.assertIn(r.returncode, (0, 1), r.stderr)
+        return r.returncode, json.loads(r.stdout)
+
+    def test_trois_elements_passent(self):
+        code, d = self.lancer_matiere(PAGE_VIVANTE, "--matiere", "3", "--strict")
+        self.assertEqual(code, 0, d)
+        self.assertEqual(d["pages"][0]["erreurs_page"], [])
+
+    def test_page_plate_bloque_en_strict(self):
+        code, d = self.lancer_matiere(PAGE_PROPRE, "--matiere", "3", "--strict")
+        self.assertEqual(code, 1)
+        self.assertTrue(any("matière réelle" in m for m in d["pages"][0]["erreurs_page"]))
+
+    def test_sans_option_aucun_controle(self):
+        code, d = self.lancer_matiere(PAGE_PROPRE, "--strict")
+        self.assertEqual(code, 0, d)
+
+    def test_figure_sans_legende_avertit(self):
+        html = PAGE_VIVANTE.replace("<figcaption>Les outils de la mission.</figcaption>", "")
+        code, d = self.lancer_matiere(html, "--matiere", "3", "--strict")
+        self.assertEqual(code, 0)
+        self.assertTrue(any("figcaption" in m for m in d["pages"][0]["avertissements_page"]))
+
+    def test_svg_dans_une_figure_compte_une_fois(self):
+        html = ("<figure><svg role=\"img\" aria-label=\"x\"></svg><figcaption>L</figcaption></figure>"
+                "<figure><img src=\"a.webp\" alt=\"Capture du tableau\" width=\"10\" height=\"10\" "
+                "loading=\"lazy\"><figcaption>L</figcaption></figure>")
+        elements = audit_images.relever_matiere(html)
+        self.assertEqual(len(elements), 2)
+        self.assertEqual(audit_images.controler_matiere(elements, 3)[0][0][:1], "2")
+
+
 class TestDimensions(unittest.TestCase):
     def test_formats(self):
         self.assertEqual(audit_images.dimensions(png(640, 480)), (640, 480))

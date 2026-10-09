@@ -23,6 +23,17 @@ sur l'image LCP, lazy absent plus bas, alt trop long ou répétitif, nom de
 fichier non descriptif, image beaucoup plus large que son affichage sans
 srcset, ratio déclaré différent du ratio réel, même image répétée, image
 hébergée hors du --domaine, plusieurs fetchpriority="high".
+
+Matière réelle (--matiere N, par défaut 0 = pas de contrôle) : une page doit
+porter au moins N éléments de matière réelle (logos des outils cités,
+captures, exemples avant / après, photos réelles, schémas tirés des données ;
+`seo-design-pages`, references/matiere-reelle.md). Est compté : chaque
+<figure>, chaque élément marqué data-matiere="…" (un exemple avant / après,
+par exemple), chaque <svg role="img"> hors d'une figure. Moins de N : erreur
+de page. Une <figure> sans <figcaption> : avertissement (la légende dit ce que
+le visuel prouve).
+
+    python3 audit_images.py build/page.html --matiere 3 --strict
 """
 
 from __future__ import annotations
@@ -129,11 +140,23 @@ class ExtracteurImages(HTMLParser):
         self._noscript = 0
         self._srcset_picture = False
         self.est_une_page = False   # <body> ou <h1> : la première image est candidate LCP
+        self.matiere: list[dict] = []   # figures, data-matiere, svg role=img (--matiere)
+        self._figures: list[dict] = []
 
     def handle_starttag(self, balise, attrs):
         a = {k: (v if v is not None else "") for k, v in attrs}
         if balise in ("body", "h1"):
             self.est_une_page = True
+        if "data-matiere" in a and balise != "figure":
+            self.matiere.append({"type": a["data-matiere"] or balise, "legende": True})
+        elif balise == "svg" and a.get("role") == "img" and not self._figures:
+            self.matiere.append({"type": "schéma", "legende": bool(a.get("aria-label"))})
+        elif balise == "figure":
+            fig = {"type": a.get("data-matiere") or "figure", "legende": False}
+            self.matiere.append(fig)
+            self._figures.append(fig)
+        elif balise == "figcaption" and self._figures:
+            self._figures[-1]["legende"] = True
         if balise == "picture":
             self._sources, self._srcset_picture = [], False
         elif balise == "source" and self._sources is not None:
@@ -158,6 +181,8 @@ class ExtracteurImages(HTMLParser):
             self._sources = None
         elif balise == "figure":
             self._figure = max(0, self._figure - 1)
+            if self._figures:
+                self._figures.pop()
         elif balise == "noscript":
             self._noscript = max(0, self._noscript - 1)
 
@@ -169,6 +194,29 @@ def extraire(html: str) -> tuple[list[dict], bool]:
     p.feed(html)
     p.close()
     return p.images, p.est_une_page
+
+
+def relever_matiere(html: str) -> list[dict]:
+    """Les éléments de matière réelle d'une page : [{type, legende}]."""
+    p = ExtracteurImages()
+    p.feed(html)
+    p.close()
+    return p.matiere
+
+
+def controler_matiere(elements: list[dict], minimum: int) -> tuple[list[str], list[str]]:
+    """(erreurs de page, avertissements de page) pour le contrôle --matiere."""
+    if minimum <= 0:
+        return [], []
+    erreurs, avert = [], []
+    if len(elements) < minimum:
+        erreurs.append(f"{len(elements)} élément(s) de matière réelle, {minimum} au minimum "
+                       "(logos des outils cités, captures, exemple avant / après, photo réelle, "
+                       "schéma tiré des données) — page plate")
+    sans = sum(1 for e in elements if not e["legende"])
+    if sans:
+        avert.append(f"{sans} figure(s) sans <figcaption> — la légende dit ce que le visuel prouve")
+    return erreurs, avert
 
 
 def _entier(valeur: str) -> int | None:
@@ -316,14 +364,17 @@ def pages_locales(cible: Path) -> list[Path]:
                   and not DOSSIERS_IGNORES.intersection(p.parts))
 
 
-def auditer_local(cible: Path, racine: Path | None, domaine: str) -> list[dict]:
+def auditer_local(cible: Path, racine: Path | None, domaine: str, matiere: int = 0) -> list[dict]:
     racine = racine or (cible if cible.is_dir() else cible.parent)
     resultats = []
     for page in pages_locales(cible):
-        images, est_une_page = extraire(page.read_text(encoding="utf-8", errors="replace"))
+        html = page.read_text(encoding="utf-8", errors="replace")
+        images, est_une_page = extraire(html)
         lignes, avert_page = analyser_images(images, page=est_une_page, base=page.parent, racine=racine,
                                              domaine=domaine)
-        resultats.append({"page": str(page), "images": lignes, "avertissements_page": avert_page})
+        err_m, avert_m = controler_matiere(relever_matiere(html), matiere)
+        resultats.append({"page": str(page), "images": lignes, "avertissements_page": avert_page + avert_m,
+                          "erreurs_page": err_m})
     return resultats
 
 
@@ -344,7 +395,7 @@ def poids_distant(url: str) -> int | None:
         return None
 
 
-def auditer_url(url: str, domaine: str, sans_poids: bool) -> list[dict]:
+def auditer_url(url: str, domaine: str, sans_poids: bool, matiere: int = 0) -> list[dict]:
     with urllib.request.urlopen(_requete(url), timeout=30) as rep:
         html = rep.read().decode(rep.headers.get_content_charset() or "utf-8", errors="replace")
     images, _ = extraire(html)
@@ -360,13 +411,16 @@ def auditer_url(url: str, domaine: str, sans_poids: bool) -> list[dict]:
                 poids[src] = poids_distant(src)
     domaine = domaine or urlparse(url).netloc
     lignes, avert_page = analyser_images(images, domaine=domaine, poids_distants=poids)
-    return [{"page": url, "images": lignes, "avertissements_page": avert_page}]
+    err_m, avert_m = controler_matiere(relever_matiere(html), matiere)
+    return [{"page": url, "images": lignes, "avertissements_page": avert_page + avert_m,
+             "erreurs_page": err_m}]
 
 
 # ─── Sorties ──────────────────────────────────────────────────────
 
 def totaux(resultats: list[dict]) -> tuple[int, int]:
-    e = sum(len(i["erreurs"]) for r in resultats for i in r["images"])
+    e = sum(len(i["erreurs"]) for r in resultats for i in r["images"]) \
+        + sum(len(r.get("erreurs_page", [])) for r in resultats)
     a = sum(len(i["avertissements"]) for r in resultats for i in r["images"]) \
         + sum(len(r["avertissements_page"]) for r in resultats)
     return e, a
@@ -394,9 +448,11 @@ def afficher(resultats: list[dict]) -> None:
     print(f"{'═' * 62}\n")
     for r in resultats:
         a_dire = [i for i in r["images"] if i["erreurs"] or i["avertissements"]]
-        if not a_dire and not r["avertissements_page"]:
+        if not a_dire and not r["avertissements_page"] and not r.get("erreurs_page"):
             continue
         print(f"── {r['page']}")
+        for message in r.get("erreurs_page", []):
+            print(f"   🔴 {message}")
         for message in r["avertissements_page"]:
             print(f"   🟠 {message}")
         for i in a_dire[:20]:
@@ -419,11 +475,14 @@ def main() -> int:
     p.add_argument("--domaine", default="", help="domaine du site : signale les images hébergées ailleurs")
     p.add_argument("--json", action="store_true", help="sortie JSON")
     p.add_argument("--strict", action="store_true", help="code de sortie 1 s'il y a au moins une erreur")
+    p.add_argument("--matiere", type=int, default=0,
+                   help="nombre minimum d'éléments de matière réelle par page (figures, data-matiere, "
+                        "svg role=img) ; 0 = pas de contrôle")
     args = p.parse_args()
 
     if args.cible.startswith(("http://", "https://")):
         try:
-            resultats = auditer_url(args.cible, args.domaine, args.sans_poids)
+            resultats = auditer_url(args.cible, args.domaine, args.sans_poids, args.matiere)
         except (urllib.error.URLError, OSError) as exc:
             print(f"Page inaccessible : {exc}", file=sys.stderr)
             return 2
@@ -433,7 +492,8 @@ def main() -> int:
         if not cible.exists():
             print(f"Introuvable : {cible}", file=sys.stderr)
             return 2
-        resultats = auditer_local(cible, Path(args.racine) if args.racine else None, args.domaine)
+        resultats = auditer_local(cible, Path(args.racine) if args.racine else None, args.domaine,
+                                  args.matiere)
         exporter = args.exporter
 
     if exporter:

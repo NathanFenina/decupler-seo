@@ -35,6 +35,8 @@ avec les composants de `${CLAUDE_PLUGIN_ROOT}/templates/`.
 3. Plan de CTA  → une action, ses emplacements, ses libellés   references/cta-et-bannieres.md
 4. Bannières    → lesquelles, dans quel ordre, avec quelles preuves réelles
 5. Plan d'images→ un rôle par image, formats, poids, alt      references/images.md
+5 bis. Matière  → au moins 3 éléments réels : logos, captures, avant / après,
+                  photos, schémas tirés des données          references/matiere-reelle.md
 6. Tokens       → palette, typo, espacements du site          references/design-tokens.md
 7. Construire   → composants + contraintes de la plateforme   references/integration-plateformes.md
 8. Contrôler    → checklist bloquante, rendu réel 390 et 1440 px   references/checklist-design.md
@@ -62,7 +64,7 @@ explique) choisit selon l'intention dominante de la SERP — voir
 `seo-serp-analysis`. En cas de doute, regardez le format des trois premiers
 résultats : c'est celui que Google a validé pour cette requête.
 
-## 2. Les six règles qui valent pour tous les types
+## 2. Les sept règles qui valent pour tous les types
 
 1. **La réponse avant l'argumentaire.** Le premier écran contient le H1, une
    réponse directe de 40 à 60 mots (ou la promesse chiffrée pour une page
@@ -86,6 +88,14 @@ résultats : c'est celui que Google a validé pour cette requête.
    méthode d'un outil sont dans le HTML initial. Une animation d'apparition
    qui masque le contenu jusqu'à l'exécution d'un script finit toujours par
    laisser une page blanche quelque part.
+7. **Au moins trois éléments de matière réelle**, de deux types au moins :
+   logos des outils et plateformes cités, captures réelles (résultats,
+   SERP, interface), exemple avant / après, photo réelle, schéma tiré des
+   données sourcées. Chacun avec `alt` et légende. Sans eux, une page juste
+   et bien construite reste plate : c'est le premier reproche d'un client
+   à la relecture. Types, sources, interdits et pièges :
+   `references/matiere-reelle.md` ; contrôle :
+   `audit_images.py --matiere 3 --strict`.
 
 ## 3. Le plan de CTA en une minute
 
@@ -148,10 +158,10 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/images_generer.py" \
 ```
 
 `--dry-run` affiche le prompt sans rien appeler ni facturer. Contrôle des
-images d'une page produite, hors ligne :
+images d'une page produite, hors ligne, avec le minimum de matière réelle :
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --strict
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --matiere 3 --strict
 ```
 
 ## 6. La plateforme
@@ -173,7 +183,9 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --stric
 - l'**image LCP** est en `loading="lazy"`, ou sans `width`/`height` ;
 - un **CTA pointe vers une URL qui n'existe pas**, ou un bouton
   « Télécharger » ne télécharge rien ;
-- une **preuve affichée n'a pas de source** (note, chiffre, logo, avis).
+- une **preuve affichée n'a pas de source** (note, chiffre, logo, avis) ;
+- la page n'a **aucune matière réelle** (ni logo, ni capture, ni exemple,
+  ni schéma) : juste, mais plate.
 
 Vérifiez le rendu dans le vrai thème, avec les vraies polices, servi en HTTP
 (jamais en `file://`, où le chargement différé et les animations ne se
@@ -186,7 +198,8 @@ après wpautop. Pour une photo de lieu réelle et créditée :
 ## Livrables
 
 - `design-<slug>.md` — type, gabarit retenu section par section, plan de
-  CTA, bannières, plan d'images (emplacement, source, ratio, `alt`)
+  CTA, bannières, plan d'images (emplacement, source, ratio, `alt`) et les
+  trois éléments de matière réelle au moins (type, source, légende)
 - les fragments HTML (via `seo-page-builder-html`) ou les composants du site
 - `images/` + un fichier `.json` par image générée (prompt, `alt` proposé à
   valider)

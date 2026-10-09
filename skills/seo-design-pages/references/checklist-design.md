@@ -6,7 +6,7 @@ regard ensuite.
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/controle_contenu.py" page-<slug>.html
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --strict
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/audit_images.py" page-<slug>.html --matiere 3 --strict
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" page-<slug>.html --strict
 ```
 
@@ -52,6 +52,11 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" page-<slug>.html --st
 ## Images
 
 - [ ] Chaque image a un rôle (prouver, expliquer, montrer, situer)
+- [ ] Au moins trois éléments de matière réelle, de deux types au moins
+      (logos des outils cités, captures, avant / après, photo réelle,
+      schéma tiré des données), chacun légendé — `matiere-reelle.md`
+- [ ] Un exemple inventé est dit inventé ; une capture d'un tiers est
+      légendée comme telle ; aucun chiffre de visuel hors de la source des faits
 - [ ] L'image LCP : pas de `loading="lazy"`, `fetchpriority="high"`,
       dimensions explicites, < 200 Ko
 - [ ] Toutes les images : `width` et `height`, `alt` pertinent (ou `alt=""`

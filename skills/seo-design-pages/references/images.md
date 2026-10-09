@@ -22,6 +22,10 @@ qu'elle illustre. Si elle ne dit rien que le texte ne dise mieux, elle ne doit
 pas exister. Sur un sujet technique ou B2B, un lecteur pressé ne lit pas
 1 500 mots : il cherche le schéma qui résume l'arbitrage.
 
+**Le minimum de matière réelle** : au-delà des quatre rôles, une page neuve
+porte au moins trois éléments réels (logos des outils cités, captures,
+avant / après, photos, schémas tirés des données) : `matiere-reelle.md`.
+
 **Ce qu'on ne met pas** : photo de banque d'images générique (poignée de
 main, skyline, personne souriante devant un ordinateur), illustration
 décorative sans lien avec la section, visage généré qui passerait pour un
