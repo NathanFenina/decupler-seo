@@ -381,11 +381,39 @@ class TestBacklinksEtProgramme(DossierIsole):
                    cwd=self.dossier)
         self.assertNotEqual(r.returncode, 0)
 
+    def test_guide_autonome_et_retrait(self):
+        p = {"id": "atlas"}
+        P.fusionner_backlinks(p, self.PLAN)
+        P.fusionner_backlinks(p, {"documents": [{"titre": "Doc", "url": "https://exemple.test/doc"}],
+                                  "guide": [{"titre": "Bloc NAP", "blocs": [{"copie": "Nom : Atlas"}]},
+                                            {"titre": "Checklist", "intro": "Note sur 20",
+                                             "blocs": [{"cases": ["Pertinence"]}, {"table": {"colonnes": ["A"], "lignes": [["1"]]}},
+                                                       {"titre": "Ordre", "liste": ["un", "deux"], "ordonnee": True},
+                                                       {"note": "Attention"}, {"texte": "Voir **https://exemple.test**"}]}]})
+        P.fusionner_backlinks(p, {"guide": [{"titre": "bloc nap", "blocs": [{"copie": "Nom : Atlas SAS"}]}],
+                                  "retirer": ["brief", {"documents": "https://EXEMPLE.test/doc"}],
+                                  "mois": {"2026-10": {"retirer": [{"taches": "fiche annuaire a"}]},
+                                           "2027-05": {"retirer": [{"taches": "rien"}]}}})
+        b = p["backlinks"]
+        self.assertEqual([s["titre"].lower() for s in b["guide"]], ["bloc nap", "checklist"])     # pas de doublon
+        self.assertEqual(b["guide"][0]["blocs"], [{"copie": "Nom : Atlas SAS"}])                  # section remplacée
+        self.assertNotIn("brief", b)
+        self.assertEqual(b["documents"], [])
+        self.assertEqual([t["texte"] for t in b["mois"]["2026-10"]["taches"]], ["Valider la commande"])
+        self.assertNotIn("2027-05", b["mois"])                                                    # rien de créé pour rien
+        for faux in ({"guide": [{"titre": "", "blocs": []}]}, {"guide": [{"titre": "X", "blocs": [{"texte": "a", "liste": []}]}]},
+                     {"guide": [{"titre": "X", "blocs": [{"titre": "seul"}]}]}, {"retirer": [{"inconnue": "x"}]}):
+            with self.assertRaises(SystemExit):
+                P.fusionner_backlinks(p, faux)
+
     def test_gabarit_backlinks_par_mois_theme_clair_et_hote_isole(self):
         for marque in ("detailBacklinks", "moisBacklinks", "statutTache", "frise(", "p.programme", "rendreHote",
                        "attachShadow", "pl-theme", "theme.clair", 'prefers-color-scheme:dark', ':root[data-theme="dark"]'):
             self.assertIn(marque, GABARIT)
         self.assertIn("valeurSure", GABARIT)                                        # pas d'injection CSS par la charte
+        for marque in ("guideBacklinks", "sommaireGuide", "blocGuide", "copier(", "execCommand", "pl-cases", "pl-copie"):
+            self.assertIn(marque, GABARIT)                                         # guide autonome, bouton Copier avec repli
+        self.assertNotIn("innerHTML", GABARIT[GABARIT.index("function riche"):GABARIT.index("function vueLiens")])
 
 
 class TestMois(unittest.TestCase):

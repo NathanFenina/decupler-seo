@@ -3,7 +3,7 @@
 <style id="css">
 /* Programme de pilotage sur plusieurs mois, mis en page comme un conducteur : en-tête de programme (surtitre, titre, ardoise),
    onglets collants, synthèse, décisions, roadmap chantier × mois avec frise des phases, plan d'actions filtrable,
-   backlinks mois par mois, reporting. Titres en police d'affiche (--titre), étiquettes et texte en police de lecture (--texte). */
+   backlinks mois par mois (et leur guide), reporting. Titres en police d'affiche (--titre), étiquettes et texte en police de lecture (--texte). */
 #app{
   --fond:#f3f4f6;--carte:#ffffff;--creux:#e9ebef;--encre:#14161c;--encre2:#454b59;--doux:#646a7a;--trait:#d9dce3;--trait-fort:#c3c8d2;
   --accent:#2a45b0;--accent-doux:#e4e8f8;--attente:#985a00;--attente-doux:#fbefd9;--ok:#12704a;--ok-doux:#dff2e8;
@@ -212,6 +212,35 @@ button.pl-cel:hover{background:var(--fond);border-radius:4px}
 .pl-docs{display:flex;flex-wrap:wrap;gap:8px}
 .pl-doc{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;border:1px solid var(--trait-fort);border-radius:20px;padding:4px 12px;background:var(--carte);text-decoration:none}
 .pl-doc.pl-principal{background:var(--accent);border-color:var(--accent);color:var(--cta-texte)!important;font-weight:600}
+button.pl-doc{font:inherit;font-size:.84rem;color:var(--lien);cursor:pointer}
+button.pl-doc:hover,a.pl-doc:hover{border-color:var(--accent)}
+/* guide du netlinking : la vue se suffit à elle-même (textes, listes, cases, tableaux, blocs à copier) */
+.pl-guide{scroll-margin-top:64px;display:block}
+.pl-guide>:not(summary)+*{margin-top:14px}
+@media (max-width:560px){
+  #app .pl-gtable thead{display:none}
+  #app .pl-gtable tr{display:block;border-bottom:1px solid var(--trait);padding:6px 0}
+  #app .pl-gtable tbody tr:last-child{border-bottom:0}
+  #app .pl-gtable td{display:block;border:0;padding:3px 12px;min-width:0}
+  #app .pl-gtable td[data-col]::before{content:attr(data-col);display:block;font:600 .6rem/1.5 var(--texte);letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}
+  #app .pl-gtable td.pl-fort[data-col]::before{display:none}
+}
+#app .pl-guide>summary{display:flex;gap:12px;align-items:baseline}
+.pl-gnum{font:500 .78rem var(--chiffre);color:var(--accent);flex:none}
+.pl-gintro{font:400 1.05rem/1.45 var(--titre);color:var(--encre);max-width:70ch}
+.pl-gbloc{display:grid;gap:8px;min-width:0}
+.pl-gbloc>p{color:var(--encre2);max-width:78ch;overflow-wrap:anywhere}
+.pl-gliste{margin:0;padding-left:1.35em;display:grid;gap:6px;color:var(--encre2);max-width:82ch}
+.pl-gliste li{overflow-wrap:anywhere;padding-left:2px}
+.pl-gliste strong,.pl-gbloc strong,.pl-cases strong{color:var(--encre)}
+.pl-gnote{background:var(--attente-doux);color:var(--encre);border-left:3px solid var(--attente);border-radius:0 4px 4px 0;padding:10px 14px;max-width:82ch;overflow-wrap:anywhere}
+.pl-cases{list-style:none;margin:0;padding:0;display:grid;gap:7px;max-width:82ch}
+.pl-cases li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;color:var(--encre2)}
+.pl-cases input{margin:3px 0 0;width:16px;height:16px;accent-color:var(--accent)}
+.pl-copie{border:1px solid var(--trait);border-radius:var(--rayon);background:var(--creux);min-width:0}
+.pl-copie-tete{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px 7px 14px;border-bottom:1px solid var(--trait)}
+.pl-copie-tete h4{margin:0}
+.pl-copie-texte{margin:0;padding:12px 14px;font:.8rem/1.6 var(--chiffre);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--encre);max-height:32rem;overflow:auto}
 /* filtres */
 .pl-filtres{display:grid;grid-template-columns:minmax(0,2fr) repeat(4,minmax(0,1fr)) auto;gap:8px;align-items:end}
 .pl-filtres label{display:grid;gap:4px;font:600 .66rem var(--texte);letter-spacing:.08em;text-transform:uppercase;color:var(--doux);min-width:0}
@@ -592,6 +621,68 @@ function detailBacklinks(p,m){
       (Object.keys(d).length?null:el("p",{class:"pl-vide",texte:"Pas de plan de netlinking pour ce mois. L'ajouter : pilotage.py backlinks --fichier plan.json."})),
     d.note?el("p",{class:"pl-meta"},bidi(d.note)):null,tCibles,bLiens,bOff);
 }
+/* Guide du plan de netlinking (p.backlinks.guide) : des sections autonomes, pour qu'un consultant n'ait besoin d'aucun
+   autre document. Texte brut seulement : **gras** et adresses http(s) cliquables, jamais de HTML. */
+const guideOuvert=new Set(),casesCochees=new Set();
+const slug=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"section";
+const URL_TEXTE=/(https?:\/\/[^\s<>"«»]*[^\s<>"«».,;:!?)\]])/;
+function riche(t){
+  const f=document.createDocumentFragment();
+  String(t==null?"":t).split(/(\*\*[^*]+\*\*)/).forEach(part=>{
+    if(!part)return;
+    const gras=/^\*\*[^*]+\*\*$/.test(part),cible=gras?el("strong"):f,txt=gras?part.slice(2,-2):part;
+    txt.split(URL_TEXTE).forEach((m,i)=>{if(m)cible.append(i%2&&lienSur(m)?el("a",{href:m,target:"_blank",rel:"noopener",texte:m}):bidi(m))});
+    if(gras)f.append(cible);
+  });
+  return f;
+}
+function copier(texte,bouton,zone){
+  const dire=(t,attente)=>{bouton.textContent=t;setTimeout(()=>{bouton.textContent="Copier"},attente||1800)};
+  const selection=()=>{try{const r=document.createRange();r.selectNodeContents(zone);const s=window.getSelection();s.removeAllRanges();s.addRange(r);
+    let ok=false;try{ok=document.execCommand("copy")}catch(e){}dire(ok?"Copié":"Sélectionné : Ctrl+C",ok?1800:4000)}catch(e){dire("Sélectionnez le texte",4000)}};
+  try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(texte).then(()=>dire("Copié"),selection);else selection()}catch(e){selection()}
+}
+function blocGuide(x,cle){
+  const titre=x.titre?el("h4",{},riche(x.titre)):null;
+  if(x.copie!=null){
+    const zone=el("pre",{class:"pl-copie-texte",tabindex:"0"},String(x.copie)),b=el("button",{class:"pl-btn",type:"button",texte:"Copier"});
+    b.addEventListener("click",()=>copier(String(x.copie),b,zone));
+    return el("div",{class:"pl-copie"},el("div",{class:"pl-copie-tete"},titre||el("span"),b),zone);
+  }
+  if(x.table){
+    const c=x.table.colonnes||[],L=x.table.lignes||[];
+    return el("div",{class:"pl-gbloc"},titre,el("div",{class:"pl-table"},el("table",{class:"pl-gtable"},c.length?el("thead",{},el("tr",{},...c.map(t=>el("th",{scope:"col",texte:t})))):null,
+      el("tbody",{},...L.map(l=>el("tr",{},...(Array.isArray(l)?l:[l]).map((v,j)=>el("td",{class:j===0&&c.length>1?"pl-fort":"pl-texte","data-col":c[j]||null},riche(v)))))))));
+  }
+  if(x.cases)return el("div",{class:"pl-gbloc"},titre,el("ul",{class:"pl-cases"},...x.cases.map((t,j)=>{const k=cle+"-"+j;
+    return el("li",{},el("input",{type:"checkbox",id:"c-"+k,checked:casesCochees.has(k)?"":false,onchange:e=>{e.target.checked?casesCochees.add(k):casesCochees.delete(k)}}),
+      el("label",{for:"c-"+k},riche(t)))})));
+  if(x.liste)return el("div",{class:"pl-gbloc"},titre,el(x.ordonnee?"ol":"ul",{class:"pl-gliste"},...x.liste.map(t=>el("li",{},riche(t)))));
+  if(x.note!=null)return el("div",{class:"pl-gbloc"},titre,el("p",{class:"pl-gnote"},riche(x.note)));
+  if(x.texte!=null)return el("div",{class:"pl-gbloc"},titre,el("p",{},riche(x.texte)));
+  return titre;
+}
+const sectionsGuide=b=>(b.guide||[]).filter(s=>s&&s.titre);
+function ouvrirSection(id){guideOuvert.add(id);const d=document.getElementById(id);if(d){d.open=true;d.scrollIntoView({block:"start",behavior:"smooth"})}}
+function sommaireGuide(b){
+  const g=sectionsGuide(b);
+  if(!g.length)return null;
+  return el("nav",{class:"pl-docs","aria-label":"Sommaire du guide"},...g.map((s,i)=>el("button",{class:"pl-doc",type:"button",onclick:()=>ouvrirSection("guide-"+slug(s.titre)),texte:String(i+1).padStart(2,"0")+" · "+s.titre})));
+}
+function guideBacklinks(b){
+  const g=sectionsGuide(b);
+  if(!g.length)return null;
+  return el("div",{class:"pl-section",id:"guide-backlinks",role:"region","aria-labelledby":"t-guide"},
+    el("div",{class:"pl-entete"},el("h2",{id:"t-guide",texte:"Le guide · "+g.length+" section"+(g.length>1?"s":"")}),
+      el("span",{class:"pl-meta"},el("button",{class:"pl-lien-btn",type:"button",onclick:()=>{g.forEach(s=>guideOuvert.add("guide-"+slug(s.titre)));rendre()},texte:"tout ouvrir"}),
+        el("button",{class:"pl-lien-btn",type:"button",onclick:()=>{guideOuvert.clear();rendre()},texte:"tout fermer"}))),
+    ...g.map((s,i)=>{const id="guide-"+slug(s.titre);
+      const d=el("details",{class:"pl-bloc pl-guide",id,open:guideOuvert.has(id)?"":false},
+        el("summary",{},el("span",{class:"pl-gnum",texte:String(i+1).padStart(2,"0")}),el("span",{},bidi(s.titre))),
+        s.intro?el("p",{class:"pl-gintro"},riche(s.intro)):null,...(s.blocs||[]).map((x,j)=>blocGuide(x,id+"-"+j)));
+      d.addEventListener("toggle",()=>{d.open?guideOuvert.add(id):guideOuvert.delete(id)});
+      return d}));
+}
 function vueLiens(p){
   const b=p.backlinks||{},L=(p.liens||[]).slice().sort((a,c)=>String(c.date||"").localeCompare(String(a.date||"")));
   const off=(p.actions||[]).filter(a=>a.chantier==="off-page");
@@ -603,7 +694,8 @@ function vueLiens(p){
   const docs=[b.brief&&lienSur(b.brief.url)?el("a",{class:"pl-doc pl-principal",href:b.brief.url,target:"_blank",rel:"noopener",texte:(b.brief.titre||"Brief")+" ↗"}):null,
     ...(b.documents||[]).filter(x=>lienSur(x.url)).map(x=>el("a",{class:"pl-doc",href:x.url,target:"_blank",rel:"noopener",title:x.note||"",texte:x.titre||x.url}))].filter(Boolean);
   const tete=el("div",{class:"pl-section"},el("div",{class:"pl-entete"},el("h2",{texte:"Backlinks et autorité"}),b.responsable?el("span",{class:"pl-meta"},"Responsable : ",el("b",{},bidi(b.responsable))):null),
-    b.synthese?el("p",{class:"pl-chapeau"},bidi(b.synthese)):null,docs.length?el("div",{class:"pl-docs"},...docs):null);
+    b.synthese?el("p",{class:"pl-chapeau"},bidi(b.synthese)):null,docs.length?el("div",{class:"pl-docs"},...docs):null,
+    sectionsGuide(b).length?el("h3",{texte:"Le guide, section par section"}):null,sommaireGuide(b));
   const tuiles=el("div",{class:"pl-tuiles"},tuile("faite","Liens obtenus",String(L.length),domaines.size+" domaine"+(domaines.size>1?"s":"")+" distinct"+(domaines.size>1?"s":"")),
     tuile("chiffre","Dofollow",String(dofollow),L.length?Math.round(dofollow/L.length*100)+" % des liens":"aucun lien consigné"),
     tuile("chiffre","Budget engagé",prix?euros(prix):"—",prix?"coût moyen "+euros(prix/Math.max(1,L.filter(x=>Number(x.prix)>0).length)):"aucun lien payé consigné"),
@@ -634,7 +726,7 @@ function vueLiens(p){
   const actionsOff=el("details",{class:"pl-bloc",open:b.mois?false:""},el("summary",{texte:"Toutes les actions off-page · "+off.length}),
     off.length?ORDRE_GROUPES.filter(g=>off.some(a=>groupe(a)===g)).map(g=>{const l=off.filter(a=>groupe(a)===g).sort((x,y)=>moisRoadmap(x).localeCompare(moisRoadmap(y)));
       return el("div",{class:"pl-groupe"},el("h3",{texte:GROUPES[g]+" · "+l.length}),el("ul",{class:"pl-actions"},...l.map(a=>carteAction(a,p))))}):el("p",{class:"pl-vide",texte:"Aucune action off-page."}));
-  return el("div",{class:"pl-panneau",role:"tabpanel",id:"vue-liens","aria-labelledby":"onglet-liens"},tete,tuiles,ind,parMois,pages,regles,blocLiens,actionsOff);
+  return el("div",{class:"pl-panneau",role:"tabpanel",id:"vue-liens","aria-labelledby":"onglet-liens"},tete,tuiles,ind,parMois,pages,regles,guideBacklinks(b),blocLiens,actionsOff);
 }
 
 /* ── Reporting mois par mois ── */

@@ -60,7 +60,20 @@ taches: [{qui, texte, statut | action}], cibles: [{nom, priorite, type, etat, co
 lien, url}]}}}`. Une tâche qui porte `action` (id d'une action) affiche le statut
 de cette action ; sinon `statut` : `a-faire`, `en-cours`, `fait`, `bloque`.
 Relancé, il met à jour sans rien doubler (tâche repérée par son texte, cible
-par son nom). Jamais d'identifiant, de mot de passe ni de détail de sécurité
+par son nom).
+
+**Une vue qui se suffit à elle-même** : quand la page se partage à un consultant
+externe à la place d'un brief, tout le brief passe dans `guide` :
+`[{titre, intro, blocs: [{titre?, texte | liste (+ ordonnee) | cases | table:
+{colonnes, lignes} | copie | note}]}]`, une section repérée par son titre. `copie`
+affiche un bloc préformaté avec un bouton « Copier » (bloc NAP, modèles d'e-mails),
+`cases` une checklist, `note` un encadré. Texte brut seulement : `**gras**` et les
+adresses http(s) deviennent cliquables, aucun HTML. Les sections s'ouvrent depuis
+le sommaire en tête de la vue. Retirer ce qui ne sert plus (un brief privé, des
+liens vers un dépôt que le consultant ne peut pas ouvrir, une tâche renommée) :
+`"retirer": ["brief", {"documents": "<url>"}]`, et dans un mois
+`"retirer": [{"taches": "<texte>"}]` ; la fusion seule ne supprime jamais rien.
+Jamais d'identifiant, de mot de passe ni de détail de sécurité
 dans ce plan : la page se partage et sa copie part dans git.
 
 Le mois d'une action est son `mois_cible` s'il existe, sinon son `mois`. Une

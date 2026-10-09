@@ -682,8 +682,46 @@ def _fusionner_liste(liste: list[dict], nouveaux: list[dict], ident: str) -> lis
 
 
 # Clé d'identification des listes du plan de netlinking (vue Backlinks).
-IDENT_BACKLINKS = {"indicateurs": "nom", "pages": "page", "regles": "titre", "documents": "url"}
+IDENT_BACKLINKS = {"indicateurs": "nom", "pages": "page", "regles": "titre", "documents": "url", "guide": "titre"}
 IDENT_MOIS_BACKLINKS = {"taches": "texte", "cibles": "nom"}
+# Blocs d'une section du guide : un seul type par bloc, rendu tel quel (texte brut, **gras** et adresses http(s) seulement).
+TYPES_BLOCS_GUIDE = ("texte", "liste", "cases", "table", "copie", "note")
+
+
+def _cle(v) -> str:
+    return str(v or "").strip().lower()
+
+
+def _retirer(conteneur: dict, consignes: list, idents: dict) -> list[str]:
+    """Retire ce que le plan désigne : une clé entière ("brief") ou un élément d'une liste ({"documents": "<url>"}).
+
+    Seul moyen de faire disparaître un élément : la fusion, elle, ne supprime jamais rien."""
+    faits = []
+    for c in consignes or []:
+        if isinstance(c, str):
+            if conteneur.pop(c, None) is not None:
+                faits.append(c)
+            continue
+        for liste, valeur in (c or {}).items():
+            if liste not in idents:
+                raise SystemExit(f"✗ retirer : liste inconnue « {liste} » (attendu : {', '.join(idents)})")
+            avant = conteneur.get(liste) or []
+            conteneur[liste] = [x for x in avant if _cle(x.get(idents[liste])) != _cle(valeur)]
+            if len(conteneur[liste]) < len(avant):
+                faits.append(f"{liste} : {valeur}")
+    return faits
+
+
+def _verifier_guide(sections: list) -> None:
+    for s in sections or []:
+        if not str(s.get("titre") or "").strip():
+            raise SystemExit("✗ guide : chaque section a un titre")
+        for bloc in s.get("blocs") or []:
+            types = [t for t in TYPES_BLOCS_GUIDE if t in bloc]
+            if len(types) != 1:
+                raise SystemExit(f"✗ guide « {s['titre']} » : un bloc porte un seul type parmi {', '.join(TYPES_BLOCS_GUIDE)}")
+            if "table" in bloc and not isinstance(bloc["table"], dict):
+                raise SystemExit(f"✗ guide « {s['titre']} » : table = {{colonnes, lignes}}")
 
 
 def fusionner_backlinks(p: dict, plan: dict) -> dict:
@@ -691,24 +729,35 @@ def fusionner_backlinks(p: dict, plan: dict) -> dict:
 
     `plan` : {"synthese", "responsable", "brief": {titre, url}, "documents": [{titre, url, note}],
     "indicateurs": [{nom, depart, cible_3m, cible_6m, mesure}], "pages": [{page, requete, depart, liens, note}],
-    "regles": [{titre, texte}], "mois": {"AAAA-MM": {titre, objectif, cible, budget, temps, note,
+    "regles": [{titre, texte}], "guide": [{titre, intro, blocs: [{titre?, texte | liste (+ordonnee) | cases |
+    table: {colonnes, lignes} | copie | note}]}], "retirer": ["brief", {"documents": "<url>"}],
+    "mois": {"AAAA-MM": {titre, objectif, cible, budget, temps, note, "retirer": [{"taches": "<texte>"}],
     "taches": [{qui, texte, statut, action, lien}], "cibles": [{nom, priorite, type, etat, cout, lien, url}]}}}.
-    Un élément déjà présent (même nom, même texte, même page) est mis à jour ; relancer ne double rien.
+    Un élément déjà présent (même nom, même texte, même page, même titre de section) est mis à jour ; relancer
+    ne double rien. `retirer` passe avant la fusion. Le guide rend la vue autonome (le consultant n'a besoin
+    d'aucun autre document) : textes, listes, cases à cocher, tableaux, blocs à copier (bouton « Copier »).
     Une tâche reliée à une action (`action` = id) prend dans la page le statut de cette action."""
     for m in plan.get("mois") or {}:
         mois_valide(m)
+    _verifier_guide(plan.get("guide"))
     b = p.setdefault("backlinks", {})
+    _retirer(b, plan.get("retirer"), IDENT_BACKLINKS)
+    for m, contenu in (plan.get("mois") or {}).items():
+        if contenu.get("retirer") and m in (b.get("mois") or {}):
+            _retirer(b["mois"][m], contenu["retirer"], IDENT_MOIS_BACKLINKS)
     for cle, v in plan.items():
-        if cle == "mois" or v in (None, "", [], {}):
+        if cle in ("mois", "retirer") or v in (None, "", [], {}):
             continue
         if cle in IDENT_BACKLINKS:
             b[cle] = _fusionner_liste(b.setdefault(cle, []), v, IDENT_BACKLINKS[cle])
         else:
             b[cle] = v
     for m, contenu in (plan.get("mois") or {}).items():
+        if not set(contenu) - {"retirer"}:
+            continue
         cible = b.setdefault("mois", {}).setdefault(m, {})
         for cle, v in contenu.items():
-            if v in (None, "", [], {}):
+            if cle == "retirer" or v in (None, "", [], {}):
                 continue
             if cle in IDENT_MOIS_BACKLINKS:
                 cible[cle] = _fusionner_liste(cible.setdefault(cle, []), v, IDENT_MOIS_BACKLINKS[cle])
@@ -900,7 +949,8 @@ def main() -> int:
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)
     p.add_argument("--fichier", required=True,
-                   help="JSON {synthese, responsable, brief, documents, indicateurs, pages, regles, mois: {AAAA-MM: {…}}}")
+                   help="JSON {synthese, responsable, brief, documents, indicateurs, pages, regles, guide, retirer, "
+                        "mois: {AAAA-MM: {…}}}")
     p.set_defaults(f=cmd_backlinks)
     p = sp.add_parser("programme", help="en-tête du programme et phases de la roadmap (frise)")
     p.add_argument("--html", required=True)

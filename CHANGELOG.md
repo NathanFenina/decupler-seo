@@ -1,5 +1,25 @@
 # Journal des versions
 
+## 3.12.1
+
+La vue **Backlinks se suffit à elle-même** : on peut partager la page de suivi
+à un consultant à la place d'un brief, sans aucun autre document à ouvrir.
+
+### Ajouté
+
+- **Guide du plan de netlinking** (`backlinks.guide`, via `pilotage.py backlinks
+  --fichier`) : des sections repérées par leur titre, chacune faite de blocs
+  `texte`, `liste` (ordonnée ou non), `cases` (checklist à cocher), `table`
+  (`{colonnes, lignes}`), `copie` (bloc préformaté avec un bouton « Copier »,
+  repli par sélection du texte quand le presse-papiers est refusé) et `note`
+  (encadré). Texte brut seulement : `**gras**` et adresses http(s) cliquables.
+  Sommaire en tête de la vue, sections repliables, « tout ouvrir / tout fermer ».
+- **`retirer`** dans le plan : une clé entière (`"brief"`) ou un élément d'une
+  liste (`{"documents": "<url>"}`, et dans un mois `{"taches": "<texte>"}`).
+  C'est le seul moyen d'enlever un élément : la fusion n'en supprime jamais.
+- Contrôle du guide à l'écriture : une section sans titre ou un bloc à zéro ou
+  plusieurs types est refusé.
+
 ## 3.12.0
 
 La page de suivi prend la mise en page d'un **programme client** (en-tête de
