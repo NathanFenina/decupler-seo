@@ -6,7 +6,8 @@ description: >
   concurrents. Détecte les anomalies et alerte avec un diagnostic, pas juste
   un chiffre. Déclencher sur "veille", "surveillance", "monitoring", "alerte",
   "surveiller mon site", "prévenir si", "détecter les problèmes", "suivi
-  automatique", "check quotidien".
+  automatique", "check quotidien", "veille vidéo", "dernières vidéos de",
+  "transcription YouTube", "lire cette vidéo".
 ---
 
 # Veille — détecter avant que ça coûte
@@ -84,6 +85,33 @@ Surveillez les annonces officielles. Quand une mise à jour est confirmée :
 
 Le pire réflexe est de modifier le site pendant un déploiement : vous ne
 saurez jamais ce qui a causé quoi.
+
+## La veille vidéo : chaînes YouTube et méthodes du métier
+
+Une partie de la veille métier passe par des vidéos (mises à jour d'outils,
+retours d'expérience). `youtube.py` les rend lisibles par Claude, sans clé :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" videos @chaine --shorts      # 15 dernières publications
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" transcription <url> --sortie veille/<date>-<slug>.md
+```
+
+`transcription` demande `pip install youtube-transcript-api`. YouTube refuse
+souvent les sous-titres aux serveurs (routines cloud) : lancez-la depuis
+votre poste, ou réglez `YOUTUBE_PROXY_URL`. Le titre et la liste des vidéos,
+eux, passent partout.
+
+Ce qu'on fait d'une transcription :
+
+1. En tirer les **pratiques précises** (commande, seuil, ordre des étapes),
+   pas un résumé.
+2. Les comparer à ce que fait déjà le dispositif (skill, SOP, script) :
+   déjà couvert, meilleur chez nous, ou vraiment nouveau.
+3. **Vérifier avant d'adopter** : une affirmation sur Google se vérifie dans
+   sa documentation, un résultat chiffré (« 11 000 clics en 3 mois ») n'est
+   qu'un cas, pas une règle. Ce qui n'est pas vérifiable reste une piste.
+4. Ce qui est retenu entre dans le skill concerné avec sa source, en
+   remontée (`projet.py remonter`) si ça vient d'un projet client.
 
 ## Automatiser
 

@@ -2,6 +2,15 @@
 
 ## À venir
 
+- **`pangram.py`** : mesure Pangram (détecteur d'IA) en fin de passe
+  `seo-humanisation` : part IA / assistée / humaine, passages à reprendre
+  avec leur ligne, passages « humanisés » repérés, `--seuil`, `--cout`.
+  Clé `PANGRAM_API_KEY`, ligne dans `/seo doctor`.
+- **`youtube.py`** : veille vidéo dans `seo-veille`. `videos` liste les
+  dernières publications d'une chaîne (flux RSS, sans clé), `transcription`
+  rend les sous-titres en Markdown horodaté (`youtube-transcript-api`,
+  `YOUTUBE_PROXY_URL` quand YouTube bloque un serveur).
+
 - **Plafond de KD selon l'autorité du domaine** : `seo-keyword-research`
   (étape 4) fixe le KD maximum d'un mot-clé principal d'après le DR / DA du
   site (< 20 → KD ≤ 20, 20-39 → 30, 40-59 → 45, ≥ 60 → pas de plafond dur).

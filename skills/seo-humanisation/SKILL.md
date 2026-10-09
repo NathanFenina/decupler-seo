@@ -12,7 +12,8 @@ description: >
   "humanise", "humaniser", "ça sonne IA", "ça fait IA", "enlève les tics IA",
   "retire les tics d'écriture", "relis le style", "rends ce texte plus
   naturel", "détecteur IA", "détecteur d'IA", "texte trop robotique",
-  "dé-IA-ise", "passe d'humanisation".
+  "dé-IA-ise", "passe d'humanisation", "Pangram", "score Pangram",
+  "passer les détecteurs".
 ---
 
 # Humanisation : la dernière passe avant de rendre un texte
@@ -121,11 +122,41 @@ routine ou dans les commandes de contrôle. **25** est le seuil conseillé
 pour un contenu à publier. Ne pas courir après 0 : un texte correct qui
 garde deux « essentiel » et une énumération en trois est un texte normal.
 
+### 3 bis. Contrôle par un détecteur externe : Pangram (facultatif)
+
+`humanisation.py` mesure des tics ; il ne dit pas comment un détecteur d'IA
+lira le texte. Quand le client le demande (éditeur, école, plateforme qui
+filtre), on ajoute une mesure Pangram après la réécriture :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pangram.py" contenus/<slug>.md --cout        # mots et coût, sans appel
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pangram.py" contenus/<slug>.md --seuil 0.2
+```
+
+Le script rend la part du texte jugée IA, assistée par IA et humaine, puis
+les **passages à reprendre avec leur ligne**, dont ceux que Pangram
+reconnaît comme passés dans un outil de reformulation (« humanisés »).
+`--seuil 0.2` renvoie le code 1 si IA + assisté dépasse 20 %.
+
+- Un passage signalé se reprend comme à l'étape 2 : l'idée, puis la phrase
+  réécrite en entier dans la voix de la maison. Jamais un « humaniseur »
+  automatique : Pangram les détecte, et ils abîment le sens.
+- Pangram ne fait que mesurer. Pas plus de deux allers-retours : si un
+  passage reste signalé, c'est souvent qu'il manque de matière propre au
+  client (exemple, chiffre de `memoire/faits.md`) ; on pose un marqueur
+  `[À COMPLÉTER : …]` plutôt que de tourner la phrase dans tous les sens.
+- Le texte part chez un tiers : pas sur un contenu confidentiel sans
+  l'accord du client. Clé `PANGRAM_API_KEY`, environ 0,05 $ les 100 mots
+  (tarif public, à vérifier).
+- Un score Pangram bas n'est ni une garantie de qualité ni un critère
+  Google : c'est une contrainte du client, pas un objectif SEO.
+
 ### 4. Rapport
 
 À rendre avec le texte :
 
 - score avant → après, et les familles qui ont le plus baissé ;
+- si mesuré, la part IA + assisté selon Pangram, avant → après ;
 - ce qui a été coupé (et pourquoi : redite, phrase creuse) ;
 - les marqueurs `[À COMPLÉTER : …]` posés, avec la question à poser au
   client ;
