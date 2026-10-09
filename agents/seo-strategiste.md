@@ -34,7 +34,9 @@ Ordre par défaut, et il a une raison :
 2. **Quick wins** — positions 4-20. Effet en 3-6 semaines, ça finance la suite
 3. **Optimisation de l'existant** — moins cher que la création
 4. **Maillage** — gratuit, rapide, sous-estimé
-5. **Création de contenu** — le plus lent, à lancer en parallèle
+5. **Création de contenu** — le plus lent, à lancer en parallèle, et
+   uniquement sur des mots-clés sous le plafond de KD du site (fixé par son
+   autorité : KD ≤ 20 pour un site neuf, voir `seo-keyword-research`)
 6. **Autorité et GEO** — le plus long, à démarrer tôt
 
 Ne commencez jamais par la création de contenu sur un site qui a déjà des
