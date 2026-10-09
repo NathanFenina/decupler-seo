@@ -89,6 +89,12 @@ seuils:
   autorite_domaine: ""
   kd_max: ""
 
+  # Budget des API payantes (budget.py, hooks/budget.sh). Vide = pas de
+  # plafond : les dépenses sont seulement consignées dans .seo-decupler/depenses.csv.
+  budget_mensuel_usd: ""
+  # Un appel estimé au-dessus de ce montant demande une confirmation.
+  budget_demander_usd: 0.5
+
   # Netlinking — au-delà, le profil devient suspect
   ancres_exactes_max_pct: 15
   nouveaux_liens_par_mois_max: 30

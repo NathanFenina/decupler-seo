@@ -34,8 +34,19 @@ Dans Search Console, comparez jour par jour sur 16 mois. Vous cherchez la
 signalées en août ou fin décembre sont des variations normales. Comparez à
 la même période de l'année précédente, pas au mois précédent.
 
-Puis confrontez la date à l'historique des mises à jour Google. Si elle
-coïncide à 48 h près avec un core update, vous tenez probablement la cause.
+Puis confrontez la date aux mises à jour Google, avec leurs dates
+officielles de début et de fin (tableau de bord Google Search Status), pas
+avec la mémoire d'un modèle ni un tracker tiers :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maj_google.py" periode <début de la chute> <fin>
+```
+
+Si la chute commence pendant un déploiement (ou dans les 7 jours qui
+suivent sa fin), vous tenez probablement la cause. **Déploiement encore en
+cours : on ne conclut rien et on ne modifie rien** tant qu'il n'est pas fini
+depuis 7 jours. Une « mise à jour » qui n'est pas sur le tableau de bord
+(`maj_google.py rumeurs`) n'explique rien.
 
 ## Étape 2 — Isoler ce qui a baissé
 

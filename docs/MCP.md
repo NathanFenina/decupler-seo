@@ -1,4 +1,4 @@
-# Brancher les 13 MCP
+# Brancher les 15 MCP
 
 Aucun n'est obligatoire. Les skills s'adaptent à ce qui est branché et vous
 disent ce qui manque. Commencez par le niveau 1 : c'est gratuit et ça couvre
@@ -50,6 +50,22 @@ propriété Search Console. Pour qui ne veut pas voir un terminal.
 `scripts/gsc.py` interroge l'API sans aucune dépendance (la signature de la
 clé est faite en Python pur) : `perf`, `page`, `instantane`, `temoin`,
 `sitemap`, `inspect`. C'est lui que la boucle de mesure utilise.
+
+#### Méthode C — Votre propre compte Google, par gcloud (5 min)
+
+Quand le compte de service n'a pas été ajouté à toutes vos propriétés,
+`gsc.py` peut utiliser votre propre connexion Google :
+
+```bash
+gcloud auth application-default login \
+  --scopes=https://www.googleapis.com/auth/webmasters.readonly,https://www.googleapis.com/auth/cloud-platform
+gcloud auth application-default set-quota-project <votre-projet-google-cloud>
+```
+
+La Search Console API doit être activée sur ce projet. Sans compte de
+service configuré, `gsc.py` prend ces identifiants tout seul ; `GSC_AUTH=adc`
+les force même si un compte de service existe. Sur votre poste seulement :
+une routine cloud n'a pas votre connexion gcloud.
 
 > ⚠️ Ne donnez **jamais** le rôle propriétaire à un compte de service.
 > Lecture seule suffit pour tout, sauf `gsc.py sitemap --resoumettre` qui
@@ -135,6 +151,35 @@ contenu.
 
 Le plus simple : le **connecteur claude.ai** (Réglages → Connecteurs), un
 clic, sans clé. Sinon `UBERSUGGEST_API_KEY`.
+
+### Treg et Monid — les routeurs d'outils payés à l'appel
+
+Deux places de marché d'API pour agents : un seul compte, un solde, et
+l'accès à des centaines de fournisseurs, payés à l'appel au lieu d'un
+abonnement par outil. Utiles pour une donnée ponctuelle (un volume, une
+SERP, des backlinks, des avis Google, des fils Reddit) sur un fournisseur
+auquel l'agence n'est pas abonnée. Pour un usage quotidien, l'abonnement
+direct (DataForSEO, Ahrefs) reste moins cher et plus stable.
+
+| | Treg | Monid |
+|---|---|---|
+| Catalogue | 110 fournisseurs, 3 800+ points d'accès : mots-clés, SERP, rang, backlinks, visibilité IA | 55+ fournisseurs, 1 700+ outils : recherche web, extraction, Ahrefs, réseaux sociaux, avis |
+| Connexion | jeton `TREG_TOKEN` (en-tête Bearer) | OAuth : `/mcp` → monid → Authenticate |
+| Prix | au prix du fournisseur, sans marge ; vos propres clés passent sans frais | à l'appel, sur un solde |
+| Offert | 1 $ | 1 $ |
+
+**Treg** : créez un compte sur [treg.to](https://treg.to), copiez le jeton
+dans `.env` (`TREG_TOKEN=…`). Le serveur `treg` du `.mcp.json` le lit.
+
+**Monid** : rien à mettre dans `.env`. Au premier lancement, `/mcp` →
+`monid` → **Authenticate**, puis connexion à votre compte
+[monid.ai](https://monid.ai). En routine cloud, préférez Treg : une
+connexion OAuth ne s'y fait pas sans vous.
+
+Ces deux routeurs dépensent votre solde à chaque appel : le hook
+`budget.sh` (voir `hooks/README.md`) les compte avec les autres outils
+payants. Une donnée venue d'un routeur se note avec sa source réelle (le
+fournisseur appelé), pas « Treg » ou « Monid ».
 
 ---
 

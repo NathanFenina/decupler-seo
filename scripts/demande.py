@@ -247,6 +247,11 @@ def main() -> int:
             extra += f"  {l['intention']}" if l.get("intention") else ""
             print(f"  {l['volume'] or 0:>8}  {l['requete']}{extra}")
     print(f"\n  coût DataForSEO : {res['cout_usd']:.4f} $\n", file=sys.stderr)
+    try:
+        import budget  # journal des dépenses du projet (budget.py etat)
+        budget.consigner("dataforseo", f"demande.py {a.cmd}", res["cout_usd"], False)
+    except Exception:  # le journal ne doit jamais faire échouer une mesure
+        pass
     return 0
 
 

@@ -6,7 +6,8 @@ description: >
   concurrents. Détecte les anomalies et alerte avec un diagnostic, pas juste
   un chiffre. Déclencher sur "veille", "surveillance", "monitoring", "alerte",
   "surveiller mon site", "prévenir si", "détecter les problèmes", "suivi
-  automatique", "check quotidien".
+  automatique", "check quotidien", "veille vidéo", "dernières vidéos de",
+  "transcription YouTube", "lire cette vidéo".
 ---
 
 # Veille — détecter avant que ça coûte
@@ -74,7 +75,16 @@ Le principal défaut d'une surveillance est le bruit. Filtres à appliquer :
 
 ## Les mises à jour Google
 
-Surveillez les annonces officielles. Quand une mise à jour est confirmée :
+Surveillez les annonces officielles : `maj_google.py` lit le tableau de bord
+Google Search Status, avec les dates de début et de fin.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maj_google.py"              # les 10 dernières
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maj_google.py" en-cours     # code 1 si un déploiement est en cours
+```
+
+Dans une routine, `en-cours` en tête : code 1 → la routine consigne les
+mesures mais ne modifie pas le site. Quand une mise à jour est confirmée :
 
 1. Notez la date de début et de fin de déploiement
 2. **N'analysez rien pendant le déploiement** — les positions bougent dans
@@ -84,6 +94,40 @@ Surveillez les annonces officielles. Quand une mise à jour est confirmée :
 
 Le pire réflexe est de modifier le site pendant un déploiement : vous ne
 saurez jamais ce qui a causé quoi.
+
+## La veille vidéo : chaînes YouTube et méthodes du métier
+
+Une partie de la veille métier passe par des vidéos (mises à jour d'outils,
+retours d'expérience). `youtube.py` les rend lisibles par Claude :
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" videos @chaine --shorts      # 15 dernières publications
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" analyser <url> --sortie veille/<date>-<slug>.md
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" analyser <url> --question "Quelles commandes tape-t-il ?"
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" transcription <url>           # sous-titres bruts
+```
+
+**`analyser` est la voie par défaut** : Gemini regarde la vidéo (image et
+son) et rend un résumé, les pratiques montrées horodatées, les chiffres
+annoncés avec leur contexte, les affirmations à vérifier et les outils
+cités. Il marche aussi depuis une routine cloud. Clé `GEMINI_API_KEY`
+(celle de `share_of_model.py`), environ 300 jetons par seconde de vidéo.
+
+`transcription` (sous-titres, `pip install youtube-transcript-api`) est
+souvent refusée aux serveurs par YouTube : depuis votre poste, ou avec
+`YOUTUBE_PROXY_URL`.
+
+Ce qu'on fait d'une transcription :
+
+1. En tirer les **pratiques précises** (commande, seuil, ordre des étapes),
+   pas un résumé.
+2. Les comparer à ce que fait déjà le dispositif (skill, SOP, script) :
+   déjà couvert, meilleur chez nous, ou vraiment nouveau.
+3. **Vérifier avant d'adopter** : une affirmation sur Google se vérifie dans
+   sa documentation, un résultat chiffré (« 11 000 clics en 3 mois ») n'est
+   qu'un cas, pas une règle. Ce qui n'est pas vérifiable reste une piste.
+4. Ce qui est retenu entre dans le skill concerné avec sa source, en
+   remontée (`projet.py remonter`) si ça vient d'un projet client.
 
 ## Automatiser
 
