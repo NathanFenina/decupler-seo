@@ -5,6 +5,9 @@
     python3 wp.py publier --html contenus/guide.html --titre "…" --slug guide \\
         --extrait "…" --categories "Guides" --image-une hero.webp --alt-image "…" \\
         --meta-titre "…" --meta-description "…"
+    python3 wp.py publier --id 120 --html contenus/guide.html --programmer 2026-10-14T09:00
+    python3 wp.py calendrier --fichier plan.json --debut 2026-10-13 --intervalle-jours 3 --heure 09:00
+    python3 wp.py calendrier --suivre          # journalise les pages programmées passées en ligne
     python3 wp.py media --fichier hero.webp --alt "…"
     python3 wp.py meta --url https://exemple.com/page/ --titre-seo "…" --description "…" --requete "…"
     python3 wp.py carte                        # → donnees/carte-contenu.csv
@@ -22,6 +25,9 @@ d'application, jamais celui de connexion. Aucune valeur n'est jamais affichée.
 
 Les règles, qui ne dépendent pas de la bonne volonté de l'appelant :
 - Un contenu neuf part en brouillon (publication.statut_par_defaut).
+- Une publication programmée (--programmer, calendrier) passe le même
+  garde-fou qu'une publication ; une date passée est refusée (WordPress
+  publierait tout de suite).
 - Une page déjà en ligne n'est jamais modifiée en direct sans --statut
   publish (ou --en-ligne) ET le feu vert de guard.py : sinon la modification
   part en révision (autosave), à valider dans l'éditeur WordPress.
@@ -717,6 +723,123 @@ def mode_ecriture(statut_actuel: str | None, statut_demande: str | None) -> str:
     return "brouillon"
 
 
+# ─── Publication programmée ─────────────────────────────────────────
+# Une page neuve ne part pas le jour où elle est prête, mais à sa date :
+# quelques jours d'écart entre deux pages, jamais un lot le même jour, jamais
+# le week-end. WordPress la met en ligne seul (statut `future`), à l'heure
+# locale du site (`date`, pas `date_gmt`).
+
+FORMAT_PROGRAMME = "%Y-%m-%dT%H:%M"
+JOURS_SEMAINE = ("lun.", "mar.", "mer.", "jeu.", "ven.", "sam.", "dim.")
+STATUTS_PROGRAMMABLES = {"draft", "pending", "future"}
+REGISTRE_PROGRAMMES = Path("donnees") / "publications-programmees.csv"
+COLONNES_PROGRAMMES = ["id", "type", "url", "titre", "programmee_pour", "programmee_le", "journalisee_le"]
+
+
+def lire_date_programmee(texte: str) -> dt.datetime:
+    try:
+        return dt.datetime.strptime(texte.strip(), FORMAT_PROGRAMME)
+    except (ValueError, AttributeError):
+        raise ErreurWP(f"Date « {texte} » illisible : AAAA-MM-JJTHH:MM, à l'heure locale du site "
+                       "(ex. 2026-10-14T09:00).") from None
+
+
+def lire_heure(texte: str) -> dt.time:
+    try:
+        return dt.datetime.strptime(texte.strip(), "%H:%M").time()
+    except (ValueError, AttributeError):
+        raise ErreurWP(f"Heure « {texte} » illisible : HH:MM (ex. 09:00).") from None
+
+
+def date_wp(quand: dt.datetime) -> str:
+    """Le champ `date` de l'API : heure locale du site, sans fuseau."""
+    return quand.strftime("%Y-%m-%dT%H:%M:00")
+
+
+def heure_du_site(racine: dict | None, maintenant_utc: dt.datetime | None = None) -> dt.datetime | None:
+    """Heure locale du site, d'après `gmt_offset` de /wp-json/. None si l'index ne la donne pas."""
+    if not isinstance(racine, dict) or racine.get("gmt_offset") in (None, ""):
+        return None
+    try:
+        decalage = float(racine["gmt_offset"])
+    except (TypeError, ValueError):
+        return None
+    maintenant_utc = maintenant_utc or dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+    return maintenant_utc + dt.timedelta(hours=decalage)
+
+
+def controler_date_future(quand: dt.datetime, maintenant_site: dt.datetime | None) -> None:
+    """Une date passée publierait tout de suite (WordPress passe un `future`
+    daté du passé en `publish`) : on refuse plutôt que de publier par erreur."""
+    if maintenant_site is not None and quand <= maintenant_site + dt.timedelta(minutes=5):
+        raise ErreurWP(f"{quand:%d/%m/%Y %H:%M} est déjà passé à l'heure du site "
+                       f"({maintenant_site:%d/%m/%Y %H:%M}) : WordPress publierait tout de suite. "
+                       "Choisissez une date à venir.")
+
+
+def jour_ouvre(jour: dt.date, pris: set | frozenset = frozenset()) -> dt.date:
+    """Premier jour à partir de `jour` qui n'est ni un samedi, ni un dimanche, ni déjà pris."""
+    while jour.weekday() >= 5 or jour in pris:
+        jour += dt.timedelta(days=1)
+    return jour
+
+
+def jours_calendrier(debut: dt.date, nombre: int, intervalle: int = 3,
+                     pris: set | frozenset = frozenset()) -> list[dt.date]:
+    """`nombre` jours ouvrés, au moins `intervalle` jours entre deux, en sautant
+    les jours où une autre page est déjà programmée."""
+    if intervalle < 1:
+        raise ErreurWP("--intervalle-jours doit valoir au moins 1 : jamais deux pages le même jour.")
+    jours, jour = [], debut
+    for _ in range(nombre):
+        jour = jour_ouvre(jour, pris)
+        jours.append(jour)
+        jour += dt.timedelta(days=intervalle)
+    return jours
+
+
+def semaines_chargees(jours: list[dt.date], plafond: int | None) -> list[tuple[str, int]]:
+    """Semaines (AAAA-SWW) qui dépassent le plafond de pages neuves."""
+    if not plafond:
+        return []
+    compte: dict[str, int] = {}
+    for jour in jours:
+        annee, semaine, _ = jour.isocalendar()
+        cle = f"{annee}-S{semaine:02d}"
+        compte[cle] = compte.get(cle, 0) + 1
+    return [(s, n) for s, n in sorted(compte.items()) if n > plafond]
+
+
+def lire_plan(chemin: str) -> list[dict]:
+    """Le plan du calendrier : [12, 15], [{"id": 12, "type": "page"}, …] ou {"contenus": […]}."""
+    try:
+        donnees = json.loads(Path(chemin).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        raise ErreurWP(f"Plan introuvable : {chemin}") from None
+    except ValueError as exc:
+        raise ErreurWP(f"Plan illisible ({chemin}) : JSON invalide ({exc}).") from None
+    if isinstance(donnees, dict):
+        donnees = donnees.get("contenus") or donnees.get("ids") or []
+    plan, vus = [], set()
+    for element in donnees if isinstance(donnees, list) else []:
+        ident, type_contenu = (element.get("id"), element.get("type")) if isinstance(element, dict) else (element, None)
+        if isinstance(ident, bool):
+            ident = None
+        try:
+            ident = int(ident)
+        except (TypeError, ValueError):
+            raise ErreurWP(f"Plan : « {element} » n'est pas un id de contenu.") from None
+        if type_contenu not in (None, "post", "page"):
+            raise ErreurWP(f"Plan : type « {type_contenu} » inconnu pour l'id {ident} (post ou page).")
+        if ident in vus:
+            raise ErreurWP(f"Plan : l'id {ident} apparaît deux fois.")
+        vus.add(ident)
+        plan.append({"id": ident, "type": type_contenu})
+    if not plan:
+        raise ErreurWP(f"Plan vide : {chemin} doit lister les id des brouillons à programmer.")
+    return plan
+
+
 def message_erreur(statut: int, corps: bytes | str | None, chemin: str = "") -> str:
     """Message d'erreur qui dit quoi faire. Ne contient jamais d'identifiant."""
     texte = corps.decode("utf-8", "replace") if isinstance(corps, bytes) else (corps or "")
@@ -995,17 +1118,60 @@ def sauvegarder(item: dict, type_rest: str, plugin: str | None) -> Path:
     return chemin
 
 
-def journaliser(cmd: list[str], simuler: bool) -> None:
+def maintenant_du_site(client: ClientWP | None) -> dt.datetime:
+    """Heure locale du site (gmt_offset de /wp-json/), à défaut celle de la machine."""
+    racine = None
+    if client is not None:
+        try:
+            racine = client.get("/")
+        except ErreurWP:
+            racine = None
+    heure = heure_du_site(racine)
+    if heure is None:
+        print("  ! Fuseau du site inconnu (gmt_offset absent de /wp-json/) : dates comparées à l'heure de cette machine.")
+        return dt.datetime.now()
+    return heure
+
+
+def lire_programmations() -> list[dict]:
+    chemin = racine_projet() / REGISTRE_PROGRAMMES
+    if not chemin.is_file():
+        return []
+    with open(chemin, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def ecrire_programmations(lignes: list[dict]) -> None:
+    chemin = racine_projet() / REGISTRE_PROGRAMMES
+    chemin.parent.mkdir(parents=True, exist_ok=True)
+    with open(chemin, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=COLONNES_PROGRAMMES)
+        w.writeheader()
+        for ligne in lignes:
+            w.writerow({k: ligne.get(k, "") for k in COLONNES_PROGRAMMES})
+
+
+def inscrire_programmation(item: dict, type_contenu: str, titre: str, quand: dt.datetime) -> None:
+    """Registre des pages programmées : la routine les journalise le jour où elles passent en ligne."""
+    lignes = [l for l in lire_programmations() if str(l.get("id")) != str(item.get("id"))]
+    lignes.append({"id": item.get("id"), "type": type_contenu, "url": item.get("link", ""), "titre": titre,
+                   "programmee_pour": quand.strftime(FORMAT_PROGRAMME),
+                   "programmee_le": dt.date.today().isoformat(), "journalisee_le": ""})
+    ecrire_programmations(sorted(lignes, key=lambda l: l["programmee_pour"]))
+
+
+def journaliser(cmd: list[str], simuler: bool) -> bool:
     lisible = " ".join(f'"{c}"' if " " in c else c for c in ["journal.py", *cmd[2:]])
     if simuler:
         print(f"  (simulation) journal : {lisible}")
-        return
+        return True
     r = subprocess.run(cmd, capture_output=True, text=True)
     sortie = (r.stdout + r.stderr).strip()
     if sortie:
         print("  " + sortie.replace("\n", "\n  "))
     if r.returncode:
         print(f"  ! Journalisation échouée : relancez à la main → {lisible}")
+    return r.returncode == 0
 
 
 def lien_edition(client: ClientWP, ident) -> str:
@@ -1155,6 +1321,9 @@ def cmd_publier(a) -> int:
     problemes = problemes_meta(a.meta_titre, a.meta_description)
     if problemes and not a.hors_format:
         raise ErreurWP("; ".join(problemes) + ". Corrigez, ou forcez avec --hors-format.")
+    quand = lire_date_programmee(a.programmer) if a.programmer else None
+    if quand and a.statut:
+        raise ErreurWP("--programmer et --statut s'excluent : une publication programmée part en « future ».")
 
     client = ouvrir_client(a.simuler)
     base = base_rest(a.type)
@@ -1163,6 +1332,12 @@ def cmd_publier(a) -> int:
         if client is None:
             raise ErreurWP("Mise à jour d'un contenu existant : les identifiants WordPress sont nécessaires, même en simulation.")
         existant, base = trouver(client, ident=a.id, type_contenu=a.type)
+    if quand:
+        if existant and existant.get("status") not in STATUTS_PROGRAMMABLES:
+            raise ErreurWP(f"Le contenu {existant.get('id')} est « {existant.get('status')} » : seul un brouillon "
+                           "(ou un contenu déjà programmé) se programme. Une page en ligne se met à jour, "
+                           "elle ne se reprogramme pas.")
+        controler_date_future(quand, maintenant_du_site(client))
     slug = slugifier(a.slug or a.titre) if (a.slug or not existant) else None
     if client and not existant and slug:
         doublons = client.get(f"/wp/v2/{base}", slug=slug, context="edit",
@@ -1172,7 +1347,7 @@ def cmd_publier(a) -> int:
             raise ErreurWP(f"Un contenu existe déjà avec le slug « {slug} » (ID {d['id']}, {d.get('status')}). "
                            f"Pour le mettre à jour : --id {d['id']}. Pour un autre contenu : un autre --slug.")
 
-    statut_demande = a.statut or (None if existant else statut_par_defaut())
+    statut_demande = "future" if quand else (a.statut or (None if existant else statut_par_defaut()))
     mode = mode_ecriture(existant.get("status") if existant else None, statut_demande)
     plugin = plugin_seo(client, a.plugin_seo)
     extrait = a.extrait
@@ -1194,7 +1369,8 @@ def cmd_publier(a) -> int:
                            "ne sert ni l'accessibilité ni la recherche d'images.")
 
     cible = (existant or {}).get("link") or f"{client.site if client else ''}/{slug or ''}/"
-    action = "mettre-a-jour-page" if existant else "publier"
+    # Programmer, c'est publier à une date : même garde-fou, même validation.
+    action = "publier" if (quand or not existant) else "mettre-a-jour-page"
     libelles = {"creation": f"création en « {statut_demande} »", "brouillon": "mise à jour du brouillon",
                 "revision": "révision proposée (autosave) — la page en ligne ne change pas",
                 "en-ligne": "mise à jour EN LIGNE"}
@@ -1202,6 +1378,8 @@ def cmd_publier(a) -> int:
     print(f"  Titre   : {a.titre or texte_brut(_champ_rendu(existant.get('title')))}")
     if slug:
         print(f"  Slug    : {slug}")
+    if quand:
+        print(f"  Programmé : en ligne le {quand:%d/%m/%Y à %H:%M} (heure du site), statut « future »")
     print(f"  Contenu : {len(html)} caractères, {analyser_contenu(html, cible)['nb_mots']} mots")
     if meta:
         print(f"  SEO ({plugin}) : " + " · ".join(f"{k} = {v}" for k, v in meta.items()))
@@ -1235,6 +1413,8 @@ def cmd_publier(a) -> int:
 
     charge = construire_charge(titre=a.titre, html=html, statut=statut_demande, slug=slug, extrait=extrait,
                                categories=categories, etiquettes=etiquettes, image_une=image_id, meta=meta)
+    if quand:
+        charge["date"] = date_wp(quand)
     if existant:
         reponse = client.post(f"/wp/v2/{base}/{existant['id']}", charge)
     else:
@@ -1260,6 +1440,15 @@ def cmd_publier(a) -> int:
     print(f"    Éditer  : {lien_edition(client, reponse.get('id'))}")
     if statut_final != "publish":
         print(f"    Aperçu  : {client.site}/?p={reponse.get('id')}&preview=true")
+    if quand and statut_final == "future":
+        titre = a.titre or texte_brut(_champ_rendu(reponse.get("title")))
+        inscrire_programmation(reponse, a.type, titre, quand)
+        print(f"    En ligne le {quand:%d/%m/%Y à %H:%M} (heure du site), par WordPress lui-même.")
+        print(f"    Journal : `wp.py calendrier --suivre` l'inscrira (page-neuve) une fois en ligne "
+              f"({REGISTRE_PROGRAMMES}).\n")
+        return 0
+    if quand and statut_final != "publish":
+        print(f"  ! Statut renvoyé : « {statut_final} », pas « future » : vérifiez la date dans l'éditeur.")
     if statut_final == "publish":
         titre = a.titre or texte_brut(_champ_rendu(reponse.get("title")))
         if existant and existant.get("status") == "publish":
@@ -1271,6 +1460,142 @@ def cmd_publier(a) -> int:
         print("    Journal : la page sera journalisée (type page-neuve) le jour de sa mise en ligne.")
     print()
     return 0
+
+
+def jours_deja_programmes(client: ClientWP, exclus: set[int]) -> dict[dt.date, str]:
+    """Jours où un autre contenu est déjà programmé sur le site (statut future)."""
+    pris: dict[dt.date, str] = {}
+    for base in ("posts", "pages"):
+        for item in client.lister(f"/wp/v2/{base}", {"status": "future", "_fields": "id,status,date,link"}):
+            if item.get("status") != "future" or item.get("id") in exclus or not item.get("date"):
+                continue
+            try:
+                jour = dt.datetime.fromisoformat(str(item["date"])[:19]).date()
+            except ValueError:
+                continue
+            pris[jour] = item.get("link", "")
+    return pris
+
+
+def cmd_calendrier(a) -> int:
+    if a.suivre:
+        return suivre_programmations(a)
+    if not a.fichier:
+        raise ErreurWP("--fichier plan.json est obligatoire (ou --suivre).")
+    plan = lire_plan(a.fichier)
+    heure = lire_heure(a.heure)
+    client = ouvrir_client(a.simuler)
+    if client is None:
+        raise ErreurWP("Le calendrier lit les brouillons sur le site : identifiants WordPress nécessaires, "
+                       "même en simulation.")
+    maintenant = maintenant_du_site(client)
+    if a.debut:
+        try:
+            debut = dt.date.fromisoformat(a.debut)
+        except ValueError:
+            raise ErreurWP(f"--debut « {a.debut} » illisible : AAAA-MM-JJ.") from None
+    else:
+        debut = maintenant.date() + dt.timedelta(days=1)
+
+    contenus = []
+    for ligne in plan:
+        item, base = trouver(client, ident=ligne["id"], type_contenu=ligne["type"])
+        if item.get("status") not in STATUTS_PROGRAMMABLES:
+            raise ErreurWP(f"Le contenu {ligne['id']} est « {item.get('status')} » : le calendrier ne programme que "
+                           "des brouillons (draft, pending) ou des contenus déjà programmés. Retirez-le du plan.")
+        contenus.append((item, base))
+
+    pris = jours_deja_programmes(client, {item["id"] for item, _ in contenus})
+    jours = jours_calendrier(debut, len(contenus), a.intervalle_jours, set(pris))
+    dates = [dt.datetime.combine(j, heure) for j in jours]
+    for quand in dates:
+        controler_date_future(quand, maintenant)
+
+    print(f"\n  Calendrier : {len(contenus)} contenu(s), un tous les {a.intervalle_jours} jour(s) au moins, "
+          f"à {heure:%H:%M} (heure du site), jamais le week-end")
+    if pris:
+        print(f"  Jours déjà pris par une autre programmation : "
+              + ", ".join(f"{j:%d/%m}" for j in sorted(pris)))
+    for (item, base), quand in zip(contenus, dates):
+        titre = texte_brut(_champ_rendu(item.get("title"))) or f"(sans titre, id {item['id']})"
+        print(f"    {JOURS_SEMAINE[quand.weekday()]} {quand:%d/%m/%Y %H:%M}  ·  {base[:-1]} {item['id']}  ·  {titre}")
+    plafond = lire_valeur("cycle.pages_neuves_par_semaine_max")
+    try:
+        plafond = int(plafond) if plafond else None
+    except (TypeError, ValueError):
+        plafond = None
+    for semaine, nombre in semaines_chargees(jours + list(pris), plafond):
+        print(f"  ! {semaine} : {nombre} pages programmées, plafond {plafond} "
+              "(cycle.pages_neuves_par_semaine_max) : allongez --intervalle-jours.")
+
+    # Programmer, c'est publier à une date : chaque contenu passe le garde-fou
+    # comme une publication, et rien ne part si l'un d'eux est refusé.
+    refus = [item for item, _ in contenus
+             if not autoriser("publier", item.get("link") or f"{client.site}/?p={item['id']}", a.valide, a.simuler)]
+    if a.simuler:
+        print("\n  Simulation : rien n'a été écrit.\n")
+        return 0
+    if refus:
+        print(f"\n  ✗ Rien n'a été programmé ({len(refus)} contenu(s) refusé(s) par le garde-fou).\n")
+        return 2
+
+    plugin = detecter_plugin_seo((client.get("/") or {}).get("namespaces", []))
+    erreurs = 0
+    for (item, base), quand in zip(contenus, dates):
+        sauvegarder(item, base, plugin)
+        reponse = client.post(f"/wp/v2/{base}/{item['id']}", {"status": "future", "date": date_wp(quand)})
+        if reponse.get("status") != "future":
+            erreurs += 1
+            print(f"  ✗ {base[:-1]} {item['id']} : statut renvoyé « {reponse.get('status')} », pas « future ». "
+                  f"Vérifiez dans l'éditeur : {lien_edition(client, item['id'])}")
+            continue
+        titre = texte_brut(_champ_rendu(item.get("title")))
+        inscrire_programmation(reponse, base[:-1], titre, quand)
+        print(f"  ✓ {base[:-1]} {item['id']} programmé le {quand:%d/%m/%Y à %H:%M}")
+    print(f"\n  Registre : {REGISTRE_PROGRAMMES}. Chaque page sera journalisée (page-neuve) une fois en ligne : "
+          "`wp.py calendrier --suivre`, à chaque routine.\n")
+    return 1 if erreurs else 0
+
+
+def suivre_programmations(a) -> int:
+    """Journalise les pages programmées passées en ligne ; signale celles que WP-Cron a manquées."""
+    lignes = lire_programmations()
+    attente = [l for l in lignes if not l.get("journalisee_le")]
+    if not attente:
+        print("\n  Aucune publication programmée en attente de journal.\n")
+        return 0
+    client = ouvrir_client(False)
+    maintenant = maintenant_du_site(client)
+    journalisees, manquees = 0, []
+    for ligne in attente:
+        try:
+            quand = lire_date_programmee(ligne["programmee_pour"])
+        except ErreurWP:
+            continue
+        if quand > maintenant:
+            print(f"  · {ligne['url'] or ligne['id']} : en ligne le {quand:%d/%m/%Y à %H:%M}")
+            continue
+        item, _ = trouver(client, ident=int(ligne["id"]), type_contenu=ligne.get("type") or None)
+        if item.get("status") == "publish":
+            ok = journaliser(commande_journal(item.get("link") or ligne["url"], "page-neuve", "",
+                                              ligne.get("titre") or texte_brut(_champ_rendu(item.get("title"))),
+                                              None, a.auto, note=f"publication programmée du {quand:%d/%m/%Y %H:%M}"),
+                             a.simuler)
+            if ok and not a.simuler:
+                ligne["journalisee_le"] = dt.date.today().isoformat()
+                ligne["url"] = item.get("link") or ligne["url"]
+                journalisees += 1
+        elif item.get("status") == "future":
+            manquees.append(ligne)
+            print(f"  ! {ligne['url'] or ligne['id']} : date passée ({quand:%d/%m/%Y %H:%M}) mais toujours « future » : "
+                  "WP-Cron n'a pas tourné (« Programmation manquée »). Publiez-la dans l'éditeur, ou réglez un "
+                  "vrai cron chez l'hébergeur.")
+        else:
+            print(f"  ! {ligne['url'] or ligne['id']} : statut « {item.get('status')} » — déprogrammée à la main ?")
+    if not a.simuler:
+        ecrire_programmations(lignes)
+    print(f"\n  {journalisees} page(s) journalisée(s) · {len(manquees)} programmation(s) manquée(s)\n")
+    return 1 if manquees else 0
 
 
 def cmd_media(a) -> int:
@@ -1626,6 +1951,8 @@ def main() -> int:
     pb.add_argument("--type", choices=["post", "page"], default="post")
     pb.add_argument("--id", type=int, help="contenu existant à mettre à jour")
     pb.add_argument("--statut", choices=STATUTS, help="défaut : publication.statut_par_defaut (draft)")
+    pb.add_argument("--programmer", metavar="AAAA-MM-JJTHH:MM",
+                    help="publication programmée (statut future), heure locale du site ; même garde-fou qu'une publication")
     pb.add_argument("--categories", help="noms ou IDs, séparés par des virgules")
     pb.add_argument("--etiquettes", help="noms ou IDs, séparés par des virgules")
     pb.add_argument("--image-une", help="ID de média ou fichier image à téléverser")
@@ -1639,6 +1966,16 @@ def main() -> int:
     pb.add_argument("--auto", action="store_true", help="journal : situation de départ relevée dans Search Console")
     ecriture(pb)
     seo(pb)
+
+    cl = sp.add_parser("calendrier", help="programmer des brouillons, espacés, jamais le week-end")
+    cl.add_argument("--fichier", help="plan JSON : liste d'id ([12, 15] ou [{\"id\": 12, \"type\": \"page\"}])")
+    cl.add_argument("--debut", help="premier jour possible, AAAA-MM-JJ (défaut : demain)")
+    cl.add_argument("--intervalle-jours", type=int, default=3, help="jours au moins entre deux pages (défaut 3)")
+    cl.add_argument("--heure", default="09:00", help="heure de mise en ligne, heure du site (défaut 09:00)")
+    cl.add_argument("--suivre", action="store_true",
+                    help="journaliser les pages programmées passées en ligne, signaler les programmations manquées")
+    cl.add_argument("--auto", action="store_true", help="avec --suivre : situation de départ relevée dans Search Console")
+    ecriture(cl)
 
     md = sp.add_parser("media", help="téléverser une image avec son texte alternatif")
     md.add_argument("--fichier", required=True)
@@ -1696,7 +2033,8 @@ def main() -> int:
     ecriture(rp)
 
     a = p.parse_args()
-    commandes = {"verifier": cmd_verifier, "publier": cmd_publier, "media": cmd_media, "meta": cmd_meta,
+    commandes = {"verifier": cmd_verifier, "publier": cmd_publier, "calendrier": cmd_calendrier,
+                 "media": cmd_media, "meta": cmd_meta,
                  "carte": cmd_carte, "maillage": cmd_maillage, "remplacer": cmd_remplacer}
     try:
         return commandes[a.commande](a)

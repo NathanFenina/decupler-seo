@@ -51,7 +51,9 @@ cet ordre, et le consigne dans la page de suivi (skill `seo-pilotage`) :
 
 1. **Contrôle** : le mode veille ci-dessous (lecture seule).
 2. **Mesure** : instantané Search Console, puis les mesures dues
-   (`seo-journal-mesure`) avant toute nouvelle modification.
+   (`seo-journal-mesure`) avant toute nouvelle modification ; sur WordPress,
+   `wp.py calendrier --suivre --auto` journalise les pages programmées
+   passées en ligne depuis le dernier passage.
 3. **Actions validées** sur la page de suivi, tous chantiers confondus, selon
    les règles des modes optimisation et contenu (plafonds, niveaux
    d'autonomie, journal). Une action qui attend quelqu'un passe en `bloquee`
@@ -201,6 +203,19 @@ contenu vit dans le dépôt, et **publier, c'est fusionner**.
    qu'elle vise : `journal.py ajouter --auto --type page-neuve --url <url>
    --requete "<requête 1> | <requête 2>"`, et sa ligne de
    `memoire/cartographie.csv` passe en « publiee ».
+6. **La routine programme, elle ne publie pas tout d'un coup.** Les pages
+   neuves validées (et les brouillons de la semaine, une fois validés) sont
+   programmées, espacées de quelques jours, jamais le week-end, jamais un
+   lot le même jour : `wp.py calendrier --fichier <plan.json>` (3 jours
+   d'écart par défaut, 9 h), ou `wp.py publier --programmer` pour une seule
+   page. Même garde-fou qu'une publication : en mode assisted, le
+   calendrier attend le oui (`--simuler` présenté dans
+   `rapports/a-valider.md`, puis `--valide`). À chaque passage,
+   `wp.py calendrier --suivre --auto` journalise les pages programmées
+   passées en ligne et signale une programmation manquée. Pourquoi : un
+   rythme régulier pour Google, le temps de vérifier chaque page en ligne,
+   une mesure à J+28 page par page. En mode `depot`, même principe : une
+   PR par page, fusionnées à quelques jours d'écart.
 
 ### La boucle de fraîcheur — une page par semaine
 

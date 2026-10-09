@@ -1,7 +1,36 @@
 # Journal des versions
 
-## À venir
+## 3.11.1
 
+Les pages neuves ne partent plus en lot : elles se **programment**, espacées
+de quelques jours. Et la clé IndexNow n'a plus besoin d'être recopiée.
+
+### Ajouté
+
+- **`wp.py publier --programmer AAAA-MM-JJTHH:MM`** : statut `future`, champ
+  `date` à l'heure locale du site. Même garde-fou qu'une publication
+  (`guard.py --action publier`, `--valide` en mode assisted), y compris pour
+  un brouillon existant. Refusé : une date passée (WordPress publierait tout
+  de suite, contrôlée avec le `gmt_offset` du site), une page déjà en ligne,
+  `--statut` en même temps.
+- **`wp.py calendrier --fichier plan.json`** (`--debut`, `--intervalle-jours`
+  3 par défaut, `--heure` 09:00 par défaut) : programme des brouillons déjà
+  dans WordPress, un tous les N jours au moins, jamais le week-end, en
+  sautant les jours déjà pris par une autre programmation ; prévient si une
+  semaine dépasse `cycle.pages_neuves_par_semaine_max`. Chaque brouillon est
+  sauvegardé avant ; rien ne part si le garde-fou refuse un seul contenu.
+- **`wp.py calendrier --suivre [--auto]`** : journalise (`page-neuve`) les
+  pages programmées passées en ligne, une seule fois, et signale une
+  programmation manquée (date passée, toujours « future » : WP-Cron).
+  Registre : `donnees/publications-programmees.csv`.
+- Règle documentée dans `seo-publication-cms` et `seo-cycle` (mode contenu,
+  mode hebdo) : espacer les pages neuves, jamais un lot le même jour, pour un
+  rythme régulier, le temps de vérifier chaque page et une mesure page par page.
+- **`indexation.py`** : sans `INDEXNOW_KEY`, la clé est lue sur le site par
+  l'extension `seo-indexnow` (`GET /wp-json/seo-indexnow/v1/etat`, champ
+  `cle`, identifiants de `wp.py`), seulement si `WP_SITE_URL` vise le site
+  annoncé. La clé n'est jamais affichée en entier (4 premiers caractères),
+  y compris dans le message de refus du fichier de clé, qui l'affichait.
 - **Plafond de KD selon l'autorité du domaine** : `seo-keyword-research`
   (étape 4) fixe le KD maximum d'un mot-clé principal d'après le DR / DA du
   site (< 20 → KD ≤ 20, 20-39 → 30, 40-59 → 45, ≥ 60 → pas de plafond dur).
@@ -9,6 +38,12 @@
   `seo-cartographie` aux pages à créer, l'agent `seo-strategiste` à la
   création de contenu. Réglable par `seuils.autorite_domaine` et
   `seuils.kd_max` dans la config.
+
+### Corrigé
+
+- `indexation.py` : `http()` retente 3 fois une erreur réseau (connexion
+  coupée par un proxy, délai dépassé), pause de 2 puis 4 s ; une réponse
+  HTTP, même en erreur, n'est jamais retentée.
 
 ## 3.11.0
 
