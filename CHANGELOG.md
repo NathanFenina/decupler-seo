@@ -1,5 +1,40 @@
 # Journal des versions
 
+## 3.11.0
+
+La page de suivi devient un **programme de pilotage sur plusieurs mois**, sur
+le modèle d'une page de programme client. Même JSON, mêmes commandes, même
+URL : une page de l'ancien format se lit et se réinjecte sans perte
+(`integrer --hote <page> --etat-depuis <page>`).
+
+### Ajouté
+
+- **Six vues** dans `templates/pilotage.html` : Synthèse (chiffres du dernier
+  bilan, compteurs, 5 décisions les plus urgentes, avancement par chantier),
+  À décider (bloqué par personne attendue, puis à valider par chantier, boutons
+  et remarque conservés), Roadmap (matrice chantier × mois avec comptes par
+  statut, détail du mois en couloirs), Plan d'actions (recherche, filtres
+  chantier / statut / mois / qui, compteur), Backlinks (`projet.liens` et
+  actions off-page), Reporting (un onglet par mois, contenu hôte compris).
+- **`pilotage.py mois-cible --id --mois AAAA-MM`** (ou `--retirer`) et
+  `ajouter --mois-cible` : programmer une action dans un mois à venir. Une
+  action validée programmée plus tard n'est pas listée par `etat --statut`
+  avant son mois (`--toutes` pour la voir) : une routine ne la lance pas en avance.
+- **`pilotage.py lien`** (`--url --domaine --cible --ancre --prix --attribut
+  --statut --date --note`) : consigne un lien obtenu dans `projet.liens`, pour
+  le reporting mensuel du netlinking ; une URL déjà consignée est mise à jour.
+- `ajouter --qui` : qui porte l'action (sinon déduit d'`attend` et du statut).
+- Champs facultatifs : `action.mois_cible`, `action.qui`, `projet.liens`,
+  `projet.decideur`, `mois[AAAA-MM].objectif`.
+
+### Corrigé
+
+- `integrer` ne prend plus le code de la page pour un contenu hôte quand la
+  page n'en a pas.
+- À l'enregistrement depuis la page, la police de la charte du projet ne
+  remplace plus celle du gabarit.
+- Le texte de la page parle de la routine hebdomadaire, plus du vendredi.
+
 ## 3.10.1
 
 - **Indexation au déploiement**, comme l'indexation instantanée de Rank Math : le

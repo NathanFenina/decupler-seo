@@ -27,9 +27,17 @@ bloc : jamais au reste de la page.
     python3 pilotage.py mois --html tableau.html --projet-id atlas --fichier donnees/semaine.json
     python3 pilotage.py sauvegarder --html tableau.html --projet-id atlas
 
-La page a un onglet par mois : ce qui attend une décision (à valider, bloqué),
-ce qui a été fait, ce qui reste à faire par chantier, les wins, les contenus
-publiés et le reporting. Chaque mercredi, la routine hebdo y écrit la semaine.
+    # 6. Programmer une action dans un mois à venir, consigner un lien obtenu
+    python3 pilotage.py mois-cible --html tableau.html --projet-id atlas --id a1b2c3d4 --mois 2026-12
+    python3 pilotage.py lien --html tableau.html --projet-id atlas --url https://media.example/article \
+        --cible /audit-geo/ --ancre "audit GEO" --prix 180 --attribut dofollow --statut en-ligne
+
+La page est un programme sur plusieurs mois : synthèse (chiffres du dernier
+bilan, décisions urgentes, avancement par chantier), à décider (bloqué, puis à
+valider par chantier), roadmap chantier × mois, plan d'actions filtrable,
+backlinks (`liens`) et reporting mois par mois. Le mois d'une action est son
+`mois_cible` s'il existe, sinon son `mois`. Chaque mercredi, la routine hebdo y
+écrit la semaine.
 
 Une action validée n'est jamais reproposée ni écrasée : l'injection ajoute les
 nouvelles propositions et garde les décisions déjà prises.
@@ -46,6 +54,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _projet import charger_env, lire_valeur, racine_projet  # noqa: E402
@@ -56,6 +65,7 @@ MAX_ACTIONS = 8
 CHANTIERS = ("contenus", "optimisation", "technique", "off-page", "geo", "international",
              "securite", "indexation", "design", "pilotage")
 SAUVEGARDE = "journal/pilotage.json"
+MOIS = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 BALISE = re.compile(r'(<script type="application/json" id="etat">)(.*?)(</script>)', re.S)
 
 
@@ -108,7 +118,7 @@ def fusionner_actions(existantes: list[dict], nouvelles: list[dict], date: str) 
             existantes.append(par_id[n["id"]])
             ajoutees += 1
         elif a.get("statut") == "proposee":
-            a.update({k: v for k, v in n.items() if k not in ("statut", "note", "lien")}, maj=date)
+            a.update({k: v for k, v in n.items() if k not in ("statut", "note", "lien", "mois_cible")}, maj=date)
     return existantes, ajoutees
 
 
@@ -133,6 +143,74 @@ def marquer_action(p: dict, aid: str, statut: str, lien: str = "", note: str = "
                 a.pop("attend", None)
             return a
     raise SystemExit(f"✗ action {aid} introuvable dans le projet {p.get('id')}")
+
+
+def mois_valide(mois: str) -> str:
+    if not MOIS.match(mois or ""):
+        raise SystemExit(f"✗ mois « {mois} » : attendu AAAA-MM")
+    return mois
+
+
+def programmer_action(p: dict, aid: str, mois: str | None) -> dict:
+    """Range une action dans un mois de la roadmap (`mois_cible`, AAAA-MM) ; None la rend à son mois d'origine.
+
+    Une action validée programmée plus tard n'est pas exécutée avant son mois (`etat --statut`)."""
+    for a in p.get("actions", []):
+        if a["id"] == aid:
+            if mois is None:
+                a.pop("mois_cible", None)
+            else:
+                a["mois_cible"] = mois_valide(mois)
+            return a
+    raise SystemExit(f"✗ action {aid} introuvable dans le projet {p.get('id')}")
+
+
+def mois_prevu(a: dict) -> str:
+    """Le mois d'une action dans la roadmap : `mois_cible`, sinon `mois`."""
+    return a.get("mois_cible") or a.get("mois") or (a.get("maj") or "")[:7]
+
+
+def plus_tard(a: dict, mois: str | None = None) -> bool:
+    """Action encore ouverte, programmée après le mois en cours."""
+    mois = mois or dt.date.today().strftime("%Y-%m")
+    return a.get("statut") not in ("faite", "refusee") and mois_prevu(a) > mois
+
+
+def prix_de(texte: str | float | None) -> float | int | None:
+    """« 180 », « 180,50 € », « 1 200 » → nombre ; vide → None."""
+    if texte in (None, ""):
+        return None
+    brut = re.sub(r"[\s\u00a0\u202f€]|EUR", "", str(texte), flags=re.I).replace(",", ".")
+    try:
+        n = float(brut)
+    except ValueError:
+        raise SystemExit(f"✗ prix « {texte} » : attendu un nombre (ex. 180 ou 180,50)")
+    return int(n) if n.is_integer() else round(n, 2)
+
+
+def ajouter_lien(p: dict, lien: dict) -> tuple[dict, bool]:
+    """Consigne un lien obtenu dans `projet.liens`. Une URL déjà consignée est mise à jour, jamais dupliquée."""
+    url = (lien.get("url") or "").strip()
+    if not re.match(r"^https?://", url, re.I):
+        raise SystemExit(f"✗ URL « {url} » : attendu http(s)://…")
+    if not lien.get("domaine"):
+        lien["domaine"] = re.sub(r"^www\.", "", urlparse(url).netloc.lower())
+    date = lien.get("date") or dt.date.today().isoformat()
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise SystemExit(f"✗ date « {date} » : attendu AAAA-MM-JJ")
+    lien = {**lien, "url": url, "date": date}
+    liens = p.setdefault("liens", [])
+    cle = url.rstrip("/").lower()
+    for l in liens:
+        if (l.get("url") or "").rstrip("/").lower() == cle:
+            l.update({k: v for k, v in lien.items() if v not in (None, "")})
+            return l, False
+    lien = {k: v for k, v in lien.items() if v not in (None, "")}
+    liens.append(lien)
+    liens.sort(key=lambda l: l.get("date", ""))
+    return lien, True
 
 
 # ─── Les propositions du mois ─────────────────────────────────────
@@ -429,8 +507,12 @@ def integrer(gabarit: str, hote_html: str, etat: dict) -> str:
     validation. Le fond de page reste celui de l'hôte."""
     titre, contenu = corps_de(hote_html)
     if 'id="hote"' in hote_html:                     # déjà intégrée : on repart de son contenu d'origine
-        m = re.search(r'<template id="hote">(.*?)</template>', hote_html, re.S)
-        contenu = m.group(1) if m else contenu
+        avant = hote_html.split('<script type="application/json" id="etat">', 1)[0]   # jamais le code de la page
+        m = re.search(r'<template id="hote">(.*?)</template>', avant, re.S)
+        if m:
+            contenu = m.group(1)
+        elif BALISE.search(hote_html):                # page de suivi sans contenu hôte : rien à conserver
+            contenu = ""
     if "</template>" in contenu:
         raise SystemExit("✗ la page hôte contient déjà une balise <template> : intégration manuelle requise")
     html = re.sub(r'<style id="css-page">.*?</style>\n?', "", gabarit, count=1, flags=re.S)
@@ -462,9 +544,11 @@ def cmd_ajouter(a) -> int:
               "page": a.page or "", "pourquoi": a.pourquoi or "", "gain": a.gain or "", "effort": a.effort,
               "source": "conversation", "mois": date[:7], "statut": a.statut, "maj": date,
               "chantier": a.chantier or chantier_de({"type": a.type})}
-    for cle in ("lien", "note", "attend"):
+    for cle in ("lien", "note", "attend", "qui"):
         if getattr(a, cle):
             action[cle] = getattr(a, cle)
+    if a.mois_cible:
+        action["mois_cible"] = mois_valide(a.mois_cible)
     existante = next((x for x in p.setdefault("actions", []) if x["id"] == action["id"]), None)
     if existante:
         existante.update({k: v for k, v in action.items() if v})
@@ -481,12 +565,19 @@ def cmd_etat(a) -> int:
     if p is None:
         raise SystemExit(f"✗ projet {a.projet_id} absent du tableau de bord")
     actions = [x for x in p.get("actions", []) if not a.statut or x.get("statut") == a.statut]
+    if a.statut and not a.toutes:                    # une action programmée plus tard attend son mois
+        tard = [x for x in actions if plus_tard(x)]
+        actions = [x for x in actions if not plus_tard(x)]
+        if tard:
+            print(f"  ({len(tard)} action(s) « {a.statut} » programmée(s) plus tard, non listée(s) : --toutes pour les voir)",
+                  file=sys.stderr)
     if a.json:
         print(json.dumps(actions, ensure_ascii=False, indent=1))
         return 0
     for x in actions:
         print(f"  [{x['statut']:<9}] {x['id']}  {x.get('type', ''):<12} {x['titre']}"
-              + (f"  ({x['page']})" if x.get("page") else "") + (f"  → {x['note']}" if x.get("note") else ""))
+              + (f"  ({x['page']})" if x.get("page") else "") + (f"  · prévue {x['mois_cible']}" if x.get("mois_cible") else "")
+              + (f"  → {x['note']}" if x.get("note") else ""))
     if not actions:
         print("  aucune action" + (f" « {a.statut} »" if a.statut else ""))
     return 0
@@ -503,6 +594,45 @@ def cmd_marquer(a) -> int:
     etat["maj"] = dt.date.today().isoformat()
     page.write_text(ecrire_etat(html, etat), encoding="utf-8")
     print(f"  ✓ {x['id']} → {x['statut']} : {x['titre']}")
+    return 0
+
+
+def _projet_existant(etat: dict, pid: str) -> dict:
+    p = projet_de(etat, pid)
+    if p is None:
+        raise SystemExit(f"✗ projet {pid} absent du tableau de bord")
+    return p
+
+
+def cmd_mois_cible(a) -> int:
+    """Programme une action dans un mois de la roadmap (ou la rend à son mois d'origine avec --retirer)."""
+    if not a.mois and not a.retirer:
+        raise SystemExit("✗ --mois AAAA-MM ou --retirer")
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    x = programmer_action(_projet_existant(etat, a.projet_id), a.id, None if a.retirer else a.mois)
+    etat["maj"] = dt.date.today().isoformat()
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    ou = x.get("mois_cible") or f"mois d'origine ({x.get('mois', '?')})"
+    print(f"  ✓ {x['id']} → {ou} : {x['titre']}")
+    return 0
+
+
+def cmd_lien(a) -> int:
+    """Consigne un lien obtenu (reporting mensuel du netlinking) dans la vue Backlinks."""
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = projet_de(etat, a.projet_id, creer=True)
+    lien = {"date": a.date or "", "domaine": (a.domaine or "").strip().lower(), "url": a.url, "cible": a.cible or "",
+            "ancre": a.ancre or "", "prix": prix_de(a.prix), "attribut": (a.attribut or "").strip().lower(),
+            "statut": a.statut or "", "note": a.note or ""}
+    x, neuf = ajouter_lien(p, lien)
+    etat["maj"] = dt.date.today().isoformat()
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ lien {'ajouté' if neuf else 'mis à jour'} : {x['domaine']} → {x.get('cible', '')} "
+          f"({len(p['liens'])} lien(s) consigné(s))")
     return 0
 
 
@@ -559,7 +689,8 @@ def cmd_sauvegarder(a) -> int:
     sortie = Path(a.sortie)
     sortie.parent.mkdir(parents=True, exist_ok=True)
     sortie.write_text(json.dumps(p, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"  ✓ {sortie} · {len(p.get('actions', []))} action(s), {len(p.get('mois', {}))} mois")
+    print(f"  ✓ {sortie} · {len(p.get('actions', []))} action(s), {len(p.get('mois', {}))} mois, "
+          f"{len(p.get('liens', []))} lien(s)")
     return 0
 
 
@@ -625,12 +756,16 @@ def main() -> int:
     p.add_argument("--lien")
     p.add_argument("--note")
     p.add_argument("--attend", help="action bloquée : qui ou quoi on attend")
+    p.add_argument("--qui", help="qui porte l'action (Claude, Nathan, consultant…) ; défaut : déduit du statut et d'--attend")
+    p.add_argument("--mois-cible", help="AAAA-MM : mois de la roadmap où l'action est programmée")
     p.add_argument("--date", help="AAAA-MM-JJ : date de l'action (défaut : aujourd'hui), pour reprendre un historique")
     p.set_defaults(f=cmd_ajouter)
     p = sp.add_parser("etat", help="actions d'un projet")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)
     p.add_argument("--statut", choices=STATUTS)
+    p.add_argument("--toutes", action="store_true",
+                   help="avec --statut : lister aussi les actions programmées après le mois en cours (mois_cible)")
     p.add_argument("--json", action="store_true")
     p.set_defaults(f=cmd_etat)
     p = sp.add_parser("marquer", help="changer le statut d'une action")
@@ -642,6 +777,26 @@ def main() -> int:
     p.add_argument("--note")
     p.add_argument("--attend", help="avec --statut bloquee : qui ou quoi on attend")
     p.set_defaults(f=cmd_marquer)
+    p = sp.add_parser("mois-cible", help="programmer une action dans un mois de la roadmap")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--id", required=True)
+    p.add_argument("--mois", help="AAAA-MM")
+    p.add_argument("--retirer", action="store_true", help="rendre l'action à son mois d'origine")
+    p.set_defaults(f=cmd_mois_cible)
+    p = sp.add_parser("lien", help="consigner un lien obtenu (vue Backlinks, reporting du netlinking)")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--url", required=True, help="URL de la page qui fait le lien")
+    p.add_argument("--domaine", help="défaut : le domaine de --url")
+    p.add_argument("--cible", help="page du site qui reçoit le lien (ex. /audit-geo/)")
+    p.add_argument("--ancre")
+    p.add_argument("--prix", help="en euros (ex. 180 ou 180,50) ; vide pour un lien gratuit")
+    p.add_argument("--attribut", help="dofollow, nofollow, sponsored, ugc")
+    p.add_argument("--statut", default="en-ligne", help="en-ligne, commandé, à relancer, perdu… (défaut : en-ligne)")
+    p.add_argument("--date", help="AAAA-MM-JJ : date de mise en ligne (défaut : aujourd'hui)")
+    p.add_argument("--note")
+    p.set_defaults(f=cmd_lien)
     p = sp.add_parser("mois", help="reporter le bilan de la semaine (ou du mois) dans l'onglet du mois")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)

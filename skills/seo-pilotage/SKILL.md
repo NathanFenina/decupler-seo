@@ -21,15 +21,47 @@ Chaque action a un **chantier**, qui la range dans la page : `contenus`,
 `optimisation`, `technique`, `off-page`, `geo`, `international`, `securite`,
 `indexation`, `design`, `pilotage`.
 
-## Un onglet par mois
+## Un programme sur plusieurs mois
 
-La page montre un onglet par mois. Le mois en cours : **À décider** (à valider
-et bloquées, avec boutons et remarque pour Claude), reporting, **Fait**, **À
-faire** par chantier, **Wins**, **Contenus** (lien vers la page et vers
-Notion), semaine par semaine, puis cartographie, livrables et routines. Les
-mois passés gardent leur fait, leurs wins, leurs contenus et leur reporting.
-Une action faite se range dans le mois de sa date (`maj`) ; pour reprendre un
-historique : `ajouter --date AAAA-MM-JJ`.
+La page est organisée en six vues :
+
+- **Synthèse** : clics et impressions du dernier bilan, actions à valider,
+  bloquées, en cours et faites ce mois, les 5 décisions les plus urgentes
+  (boutons compris), avancement par chantier, courbe des clics.
+- **À décider** : d'abord ce qui est bloqué, regroupé par personne attendue
+  (`attend`), puis ce qui est à valider, par chantier, avec Valider / Refuser
+  et une remarque pour Claude. Les décisions programmées plus tard sont
+  repliées à part.
+- **Roadmap** : matrice chantier × mois, du premier mois des actions à six
+  mois après le mois en cours ; chaque case compte les actions par statut, un
+  clic ouvre le mois en couloirs par chantier.
+- **Plan d'actions** : toutes les actions, recherche et filtres (chantier,
+  statut, mois, qui), avec un compteur.
+- **Backlinks** : les liens obtenus (`projet.liens`) et les actions off-page.
+- **Reporting** : un onglet par mois (reporting, fait, à faire, wins,
+  contenus, liens du mois, semaine par semaine, cartographie). Le contenu
+  hôte d'une page intégrée reste dans l'onglet de son mois.
+
+Le mois d'une action est son `mois_cible` s'il existe, sinon son `mois`. Une
+action faite se range dans le mois de sa date (`maj`) ; une action ouverte d'un
+mois passé glisse dans le mois en cours. Pour reprendre un historique :
+`ajouter --date AAAA-MM-JJ`.
+
+Programmer une action dans un mois à venir :
+`pilotage.py mois-cible --id <id> --mois AAAA-MM` (`--retirer` pour la rendre à
+son mois), ou `ajouter … --mois-cible AAAA-MM`. **Une action validée programmée
+plus tard n'est pas lancée avant son mois** : `etat --statut validee` ne la liste
+pas (`--toutes` pour la voir).
+
+Consigner un lien obtenu (reporting mensuel du consultant ou de la routine) :
+`pilotage.py lien --url <page qui fait le lien> --cible /page/ --ancre "…" --prix 180
+--attribut dofollow --statut en-ligne --date AAAA-MM-JJ` (`--domaine` est déduit
+de l'URL). Une URL déjà consignée est mise à jour, jamais dupliquée.
+
+Qui porte une action : `qui` s'il est renseigné (`ajouter --qui`), sinon la
+personne nommée avant « : » dans `attend`, sinon le décideur (`decideur` du
+projet, Nathan par défaut) pour ce qui est à valider ou bloqué, et Claude pour
+le reste.
 
 Le bilan d'une semaine ou d'un mois s'écrit avec `pilotage.py mois --fichier
 <json>` (format dans `routines/hebdo.md`) : relancé, il ne double rien. Le
@@ -58,7 +90,8 @@ la marque quel que soit le thème du lecteur. Vérifier les contrastes (texte
 1. `Artifact` action `read` avec l'adresse du tableau de bord ; enregistrer le
    HTML reçu tel quel dans `donnees/tableau-de-bord.html` (jamais commité : il
    contient les données de tous les projets).
-2. `scripts/pilotage.py` travaille sur ce fichier (`etat`, `injecter`, `marquer`).
+2. `scripts/pilotage.py` travaille sur ce fichier (`etat`, `injecter`, `marquer`,
+   `ajouter`, `mois-cible`, `lien`, `mois`).
 3. `Artifact` publish avec `url` = l'adresse du tableau de bord et `file_path` =
    ce fichier. Sans `capabilities` (la page garde les siennes). En cas de conflit
    (quelqu'un a validé entre-temps), repartir de la version renvoyée, refaire

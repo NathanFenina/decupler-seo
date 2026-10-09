@@ -201,6 +201,133 @@ class TestCommandes(DossierIsole):
         self.assertIn("appliquerTheme", GABARIT)                      # la page applique la charte du projet
 
 
+class TestProgramme(DossierIsole):
+    """Programme sur plusieurs mois : liens obtenus, actions programmées, pages de l'ancien format."""
+
+    def page(self, contenu=GABARIT):
+        (self.dossier / "tableau.html").write_text(contenu, encoding="utf-8")
+        return self.dossier / "tableau.html"
+
+    def test_lien_ajoute_puis_mis_a_jour_sans_doublon(self):
+        page = self.page()
+        args = ("pilotage.py", "lien", "--html", "tableau.html", "--projet-id", "atlas",
+                "--url", "https://www.media.example/article-geo/", "--cible", "/audit-geo/", "--ancre", "audit GEO",
+                "--prix", "180,50 €", "--attribut", "Dofollow", "--date", "2026-11-04")
+        r = lancer(*args, cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        r = lancer(*args[:-2], "--statut", "à relancer", "--date", "2026-11-04", cwd=self.dossier)   # même URL : mise à jour
+        self.assertEqual(r.returncode, 0, r.stderr)
+        r = lancer("pilotage.py", "lien", "--html", "tableau.html", "--projet-id", "atlas", "--url",
+                   "https://annuaire.example/decupler", "--date", "2026-10-20", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        liens = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["liens"]
+        self.assertEqual([l["domaine"] for l in liens], ["annuaire.example", "media.example"])      # rangés par date
+        l = liens[1]
+        self.assertEqual((l["prix"], l["attribut"], l["statut"], l["cible"], l["ancre"]),
+                         (180.5, "dofollow", "à relancer", "/audit-geo/", "audit GEO"))
+        self.assertEqual(liens[0]["statut"], "en-ligne")                                          # défaut
+        self.assertNotIn("prix", liens[0])                                                        # lien gratuit
+        for mauvais in (("--url", "media.example/x"), ("--url", "https://m.example/x", "--prix", "cher"),
+                        ("--url", "https://m.example/x", "--date", "04/11/2026")):
+            r = lancer("pilotage.py", "lien", "--html", "tableau.html", "--projet-id", "atlas", *mauvais, cwd=self.dossier)
+            self.assertNotEqual(r.returncode, 0, mauvais)
+        self.assertEqual(len(P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["liens"]), 2)
+
+    def test_mois_cible_programme_et_masque_aux_routines(self):
+        page = self.page()
+        for titre in ("Page « audit SEO »", "Page « consultant SEO Lille »"):
+            r = lancer("pilotage.py", "ajouter", "--html", "tableau.html", "--projet-id", "atlas", "--titre", titre,
+                       "--type", "contenu", "--statut", "validee", cwd=self.dossier)
+            self.assertEqual(r.returncode, 0, r.stderr)
+        actions = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["actions"]
+        lille = next(a["id"] for a in actions if "Lille" in a["titre"])
+        r = lancer("pilotage.py", "mois-cible", "--html", "tableau.html", "--projet-id", "atlas", "--id", lille,
+                   "--mois", "2099-11", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        a = next(x for x in P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["actions"] if x["id"] == lille)
+        self.assertEqual(a["mois_cible"], "2099-11")
+        # la routine ne lance pas une action validée programmée plus tard…
+        r = lancer("pilotage.py", "etat", "--html", "tableau.html", "--projet-id", "atlas", "--statut", "validee", "--json",
+                   cwd=self.dossier)
+        self.assertEqual([x["titre"] for x in json.loads(r.stdout)], ["Page « audit SEO »"])
+        self.assertIn("programmée", r.stderr)
+        # … mais elle reste visible
+        r = lancer("pilotage.py", "etat", "--html", "tableau.html", "--projet-id", "atlas", "--statut", "validee", "--toutes",
+                   "--json", cwd=self.dossier)
+        self.assertEqual(len(json.loads(r.stdout)), 2)
+        r = lancer("pilotage.py", "etat", "--html", "tableau.html", "--projet-id", "atlas", cwd=self.dossier)
+        self.assertEqual(r.stdout.count("[validee"), 2)
+        self.assertIn("prévue 2099-11", r.stdout)
+        for mauvais in (("--id", lille, "--mois", "2026-13"), ("--id", lille, "--mois", "novembre"),
+                        ("--id", "inconnu", "--mois", "2026-11"), ("--id", lille)):
+            r = lancer("pilotage.py", "mois-cible", "--html", "tableau.html", "--projet-id", "atlas", *mauvais, cwd=self.dossier)
+            self.assertNotEqual(r.returncode, 0, mauvais)
+        r = lancer("pilotage.py", "mois-cible", "--html", "tableau.html", "--projet-id", "atlas", "--id", lille, "--retirer",
+                   cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        a = next(x for x in P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]["actions"] if x["id"] == lille)
+        self.assertNotIn("mois_cible", a)
+        # programmée dès sa création, et jamais effacée quand la proposition se rafraîchit
+        r = lancer("pilotage.py", "ajouter", "--html", "tableau.html", "--projet-id", "atlas", "--titre", "Sortir de WordPress",
+                   "--type", "decision", "--statut", "proposee", "--mois-cible", "2027-03", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        p = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]
+        x = next(a for a in p["actions"] if a["titre"] == "Sortir de WordPress")
+        self.assertEqual(x["mois_cible"], "2027-03")
+        P.fusionner_actions(p["actions"], [{"id": x["id"], "titre": "Sortir de WordPress", "mois_cible": "2026-10"}], "2026-10-09")
+        self.assertEqual(x["mois_cible"], "2027-03")
+
+    def test_page_de_l_ancien_format_lue_et_reinjectee_sans_perte(self):
+        ancien = (Path(__file__).parent / "fixtures" / "pilotage-3.10.html").read_text(encoding="utf-8")
+        avant = P.lire_etat(ancien)
+        self.assertNotIn("vueRoadmap", ancien)                                   # c'est bien l'ancien gabarit
+        # les commandes lisent et écrivent l'ancienne page sans toucher à son code
+        page = self.page(ancien)
+        r = lancer("pilotage.py", "etat", "--html", "tableau.html", "--projet-id", "atlas", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout.count("\n"), len(avant["projets"][0]["actions"]))
+        # réinjection dans le nouveau gabarit : même état, même contenu hôte, même titre
+        r = lancer("pilotage.py", "integrer", "--hote", "tableau.html", "--etat-depuis", "tableau.html",
+                   "--sortie", "nouveau.html", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        nouveau = (self.dossier / "nouveau.html").read_text(encoding="utf-8")
+        self.assertEqual(P.lire_etat(nouveau), avant)
+        self.assertIn("vueRoadmap", nouveau)
+        hote = ancien[ancien.index('<template id="hote">'):ancien.index("</template>") + len("</template>")]
+        self.assertEqual(nouveau.count(hote), 1)
+        self.assertIn("<title>Pilotage Atlas Conseil</title>", nouveau)
+        # puis les commandes habituelles sur la nouvelle page ne perdent rien
+        (self.dossier / "tableau.html").write_text(nouveau, encoding="utf-8")
+        (self.dossier / "theme.json").write_text(json.dumps(avant["projets"][0]["theme"]), encoding="utf-8")
+        for args in (("injecter", "--theme", "theme.json"), ("marquer", "--id", "a2", "--statut", "validee"),
+                     ("mois-cible", "--id", "a4", "--mois", "2026-12"),
+                     ("lien", "--url", "https://media.example/a", "--date", "2026-10-02")):
+            r = lancer("pilotage.py", args[0], "--html", "tableau.html", "--projet-id", "atlas", *args[1:], cwd=self.dossier)
+            self.assertEqual(r.returncode, 0, r.stderr)
+        apres = P.lire_etat(page.read_text(encoding="utf-8"))
+        pa, pb = avant["projets"][0], apres["projets"][0]
+        for cle in pa:
+            if cle != "actions":
+                self.assertEqual(pb[cle], pa[cle], cle)
+        self.assertEqual([a["id"] for a in pb["actions"]], [a["id"] for a in pa["actions"]])
+        self.assertEqual(next(a for a in pb["actions"] if a["id"] == "a4")["mois_cible"], "2026-12")
+        self.assertEqual(len(pb["liens"]), 1)
+        self.assertEqual(apres["hote_mois"], avant["hote_mois"])
+        # réintégrer une seconde fois n'emboîte pas le contenu hôte
+        r = lancer("pilotage.py", "integrer", "--hote", "tableau.html", "--etat-depuis", "tableau.html",
+                   "--sortie", "encore.html", cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual((self.dossier / "encore.html").read_text(encoding="utf-8").count(hote), 1)
+
+    def test_gabarit_programme(self):
+        for vue in ("vueSynthese", "vueDecider", "vueRoadmap", "vuePlan", "vueLiens", "vueReporting", "appliquerTheme",
+                    "mois_cible", "p.liens"):
+            self.assertIn(vue, GABARIT)
+        self.assertNotRegex(GABARIT, r"opacity:\s*0[;}]")                     # rien d'invisible au chargement
+        sans = P.integrer(GABARIT, P.ecrire_etat(GABARIT, {"projets": []}), {"projets": []})
+        self.assertIn('<template id="hote"></template>', sans)                 # jamais le code de la page comme contenu
+
+
 class TestMois(unittest.TestCase):
     def test_semaine_remplacee_et_wins_mis_a_jour(self):
         p = {"id": "atlas"}
