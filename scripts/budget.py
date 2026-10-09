@@ -66,7 +66,7 @@ TARIFS_DATAFORSEO = [
 ]
 DEFAUT_DATAFORSEO = 0.05
 # Outils payants comptés sans montant (crédits ou unités propres à chaque fournisseur).
-NON_CHIFFRES = ("ahrefs", "semrush", "firecrawl", "perplexity", "ubersuggest")
+NON_CHIFFRES = ("ahrefs", "semrush", "firecrawl", "perplexity", "ubersuggest", "treg", "monid")
 GRATUITS = re.compile(r"(docs_|_docs|list_|locations|languages|status|balance|credit|user_limits|auth_status)", re.I)
 
 

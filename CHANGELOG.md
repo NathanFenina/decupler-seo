@@ -37,7 +37,12 @@
   n'est configuré, `GSC_AUTH=adc` pour les forcer ; projet de quota envoyé
   dans `x-goog-user-project`. Méthode C dans `docs/MCP.md`.
 
-Les quatre derniers points reprennent des idées de claude-seo v2.4.x (MIT,
+- **MCP Treg et Monid** : deux routeurs d'outils payés à l'appel ajoutés au
+  `.mcp.json` (15 MCP). Treg par jeton (`TREG_TOKEN`), Monid par OAuth
+  (`/mcp` → Authenticate). Comptés par `budget.sh`, ligne Treg dans
+  `/seo doctor`, section dans `docs/MCP.md`.
+
+Les points sur maj_google, agents_ia, budget et gsc reprennent des idées de claude-seo v2.4.x (MIT,
 Daniel Agrici), réécrites pour ce dispositif.
 
 - **Plafond de KD selon l'autorité du domaine** : `seo-keyword-research`

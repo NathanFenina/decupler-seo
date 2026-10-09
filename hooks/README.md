@@ -33,7 +33,7 @@ Code de sortie 2 = commande bloquée, avec l'explication renvoyée à Claude.
 ## `budget.sh` — plafonner les dépenses d'API
 
 Avant chaque appel à un MCP payant (DataForSEO, Ahrefs, Semrush, Firecrawl,
-Perplexity, Ubersuggest), estime son coût ; demande une confirmation au-delà
+Perplexity, Ubersuggest, Treg, Monid), estime son coût ; demande une confirmation au-delà
 de `seuils.budget_demander_usd` (0,50 $ par défaut) et bloque l'appel si le
 plafond du mois `seuils.budget_mensuel_usd` est atteint. Après l'appel,
 consigne le coût réel (DataForSEO le renvoie) dans `.seo-decupler/depenses.csv`.
@@ -44,13 +44,13 @@ consigne le coût réel (DataForSEO le renvoie) dans `.seo-decupler/depenses.csv
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__.*(dataforseo|ahrefs|semrush|firecrawl|perplexity|ubersuggest).*",
+        "matcher": "mcp__.*(dataforseo|ahrefs|semrush|firecrawl|perplexity|ubersuggest|treg|monid).*",
         "hooks": [{ "type": "command", "command": "~/.claude/seo-decupler/hooks/budget.sh avant" }]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "mcp__.*(dataforseo|ahrefs|semrush|firecrawl|perplexity|ubersuggest).*",
+        "matcher": "mcp__.*(dataforseo|ahrefs|semrush|firecrawl|perplexity|ubersuggest|treg|monid).*",
         "hooks": [{ "type": "command", "command": "~/.claude/seo-decupler/hooks/budget.sh apres" }]
       }
     ]
