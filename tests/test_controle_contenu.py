@@ -49,6 +49,12 @@ class TestControle(DossierIsole):
         self.assertEqual(code, 1)
         self.assertTrue(any("interdit du projet" in e for e in d["erreurs"]))
 
+    def test_title_de_svg_ignore(self):
+        # Le <title> d'un graphique SVG inline n'est pas le title de la page.
+        self.ecrire("page.html", '<h1>Titre</h1><svg viewBox="0 0 10 10"><title>' + "x" * 90 + '</title></svg><p>Texte.</p>')
+        code, d = self.controler("page.html")
+        self.assertEqual(code, 0, d)
+
     def test_image_sans_alt(self):
         self.ecrire("p.html", '<h1>T</h1><img src="a.webp">')
         code, _ = self.controler("p.html")
