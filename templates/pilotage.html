@@ -296,7 +296,8 @@ let etat;try{etat=JSON.parse(brut)}catch(e){etat={maj:"",projets:[]}}
 if(!Array.isArray(etat.projets))etat.projets=[];
 /* Vue exportée (pilotage.py exporter) : seulement ses onglets, en lecture seule, sans boutons de décision. */
 const EXPORT=etat.vue&&Array.isArray(etat.vue.onglets)?etat.vue:null;
-const VUES_PAGE=(EXPORT&&VUES.filter(v=>EXPORT.onglets.includes(v[0])).length)?VUES.filter(v=>EXPORT.onglets.includes(v[0])):VUES;
+const VUES_VUE=EXPORT?EXPORT.onglets.map(k=>VUES.find(v=>v[0]===k)).filter(Boolean):[];   /* dans l'ordre de la vue */
+const VUES_PAGE=VUES_VUE.length?VUES_VUE:VUES;
 const FIGEE=!!(EXPORT&&EXPORT.lecture_seule);
 const aujourdhui=new Date().toISOString().slice(0,10),ceMois=aujourdhui.slice(0,7);
 let courant=null,vue=VUES_PAGE[0][0],moisChoisi=null,moisRoad=null,moisLiens=null,lectureSeule=FIGEE,minuteur=null,enAttente=false,defiler=false;

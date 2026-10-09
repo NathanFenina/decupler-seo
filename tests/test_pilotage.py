@@ -542,7 +542,7 @@ class TestExport(DossierIsole):
             P.vue_exportee(etat, "atlas", "backlinks", ["secret"])
 
     def test_gabarit_vue_exportee(self):
-        for marque in ("VUES_PAGE", "EXPORT.message", "if(FIGEE){li.append(corps);return li}", "lien(p.depot_url,\"Dépôt\")"):
+        for marque in ("VUES_PAGE", "EXPORT.onglets.map(", "EXPORT.message", "if(FIGEE){li.append(corps);return li}", "lien(p.depot_url,\"Dépôt\")"):
             self.assertIn(marque, GABARIT)
         self.assertNotIn("github.com", GABARIT)                                  # aucun hébergeur de code dans le code de la page
 
