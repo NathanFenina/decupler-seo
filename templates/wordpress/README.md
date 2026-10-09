@@ -241,8 +241,10 @@ Google : sitemap à jour, liens internes, `indexation.py suivre`.
 - N'envoie rien hors production (`wp_get_environment_type()`), sauf constante
   `SEO_INDEXNOW_FORCER`.
 - Garde les 20 derniers envois, lisibles sur `GET /wp-json/seo-indexnow/v1/etat`
-  (comptes éditeurs), avec la clé : reportez-la dans la variable
-  `INDEXNOW_KEY` du projet pour que `indexation.py annoncer` utilise la même.
+  (comptes éditeurs), avec la clé : `indexation.py annoncer` la lit là tout
+  seul quand `INDEXNOW_KEY` est absente (identifiants de `wp.py`). Reportez-la
+  dans `INDEXNOW_KEY` seulement pour l'action GitHub quotidienne, qui n'a pas
+  les identifiants WordPress.
 
 **Installer.** Zipper le dossier `seo-indexnow/`, puis Extensions → Ajouter →
 Téléverser ; activer. Rank Math (module Instant Indexing) ou une autre

@@ -10,6 +10,7 @@ import csv
 import io
 import json
 import sys
+import tempfile
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -363,7 +364,7 @@ class FauxWordPress(BaseHTTPRequestHandler):
         e = self.etat
         e["requetes"].append(("GET", self.path, self.headers.get("Authorization", "")))
         if u.path == "/wp-json/":
-            return self.repondre(200, {"namespaces": ["wp/v2", "yoast/v1"]})
+            return self.repondre(200, {"namespaces": ["wp/v2", "yoast/v1"], "gmt_offset": 2})
         base = u.path.removeprefix("/wp-json/wp/v2/").strip("/")
         if base in ("pages", "posts"):
             items = [i for i in e[base] if not q.get("slug") or i["slug"] == q["slug"]]
@@ -387,18 +388,21 @@ class FauxWordPress(BaseHTTPRequestHandler):
         parties = chemin.split("/")
         if len(parties) == 1:
             cree = {"id": 99, "status": corps.get("status"), "link": f"{e['site']}/{corps.get('slug')}/",
-                    "title": {"rendered": corps.get("title")}, "meta": {}}
+                    "title": {"rendered": corps.get("title")}, "meta": {}, "date": corps.get("date")}
             return self.repondre(201, cree)
         if len(parties) == 3 and parties[2] == "autosaves":
             return self.repondre(200, {"id": 500, "parent": int(parties[1])})
         for i in e.get(parties[0], []):
             if str(i["id"]) == parties[1]:
                 i.setdefault("meta", {}).update(corps.get("meta", {}))
+                i.update({k: corps[k] for k in ("status", "date") if k in corps})
                 return self.repondre(200, i)
         return self.repondre(404, {"code": "rest_post_invalid_id"})
 
 
-class TestLigneDeCommande(DossierIsole):
+class AvecFauxWordPress(DossierIsole):
+    """Un faux WordPress local par test ; aucun test ici."""
+
     def setUp(self):
         super().setUp()
         self.serveur = ThreadingHTTPServer(("127.0.0.1", 0), FauxWordPress)
@@ -434,6 +438,8 @@ class TestLigneDeCommande(DossierIsole):
     def ecritures(self):
         return [r for r in FauxWordPress.etat["requetes"] if r[0] == "POST"]
 
+
+class TestLigneDeCommande(AvecFauxWordPress):
     def test_brouillon_par_defaut(self):
         r = self.wp("publier", "--html", "contenus/guide.html", "--titre", "Guide de l'audit")
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
@@ -539,6 +545,170 @@ class TestLigneDeCommande(DossierIsole):
         self.assertTrue(all(c.endswith("/autosaves") for c in chemins), chemins)
         corps = self.ecritures()[0][2]["content"]
         self.assertIn(f'href="{self.site}/audit-seo-local/"', corps)
+
+
+class TestProgrammationPure(unittest.TestCase):
+    def test_week_end_saute_et_intervalle_respecte(self):
+        vendredi = wp.dt.date(2026, 10, 16)
+        jours = wp.jours_calendrier(vendredi, 4, 3)
+        self.assertEqual(jours, [wp.dt.date(2026, 10, 16), wp.dt.date(2026, 10, 19),
+                                 wp.dt.date(2026, 10, 22), wp.dt.date(2026, 10, 26)])
+        self.assertTrue(all(j.weekday() < 5 for j in jours))
+        self.assertTrue(all((b - a).days >= 3 for a, b in zip(jours, jours[1:])))
+
+    def test_debut_un_samedi(self):
+        self.assertEqual(wp.jours_calendrier(wp.dt.date(2026, 10, 17), 1), [wp.dt.date(2026, 10, 19)])
+
+    def test_jours_deja_pris_evites(self):
+        lundi = wp.dt.date(2026, 10, 12)
+        jours = wp.jours_calendrier(lundi, 2, 1, pris={lundi, wp.dt.date(2026, 10, 14)})
+        self.assertEqual(jours, [wp.dt.date(2026, 10, 13), wp.dt.date(2026, 10, 15)])
+
+    def test_jamais_deux_pages_le_meme_jour(self):
+        with self.assertRaises(wp.ErreurWP):
+            wp.jours_calendrier(wp.dt.date(2026, 10, 12), 3, 0)
+
+    def test_plafond_hebdomadaire(self):
+        jours = wp.jours_calendrier(wp.dt.date(2026, 10, 12), 5, 1)
+        self.assertEqual(wp.semaines_chargees(jours, 3), [("2026-S42", 5)])
+        self.assertEqual(wp.semaines_chargees(wp.jours_calendrier(wp.dt.date(2026, 10, 12), 5, 3), 3), [])
+        self.assertEqual(wp.semaines_chargees(jours, None), [])
+
+    def test_formats_du_plan(self):
+        with tempfile.TemporaryDirectory() as d:
+            for contenu in ("[12, 15]", '[{"id": 12}, {"id": "15", "type": "page"}]', '{"contenus": [12, 15]}'):
+                chemin = Path(d) / "plan.json"
+                chemin.write_text(contenu)
+                self.assertEqual([l["id"] for l in wp.lire_plan(str(chemin))], [12, 15], contenu)
+            for mauvais in ("[]", "[12, 12]", '["x"]', '[{"id": 3, "type": "produit"}]', "{"):
+                chemin.write_text(mauvais)
+                with self.assertRaises(wp.ErreurWP, msg=mauvais):
+                    wp.lire_plan(str(chemin))
+
+    def test_date_et_fuseau(self):
+        quand = wp.lire_date_programmee("2026-10-14T09:00")
+        self.assertEqual(wp.date_wp(quand), "2026-10-14T09:00:00")
+        with self.assertRaises(wp.ErreurWP):
+            wp.lire_date_programmee("14/10/2026 9h")
+        site = wp.heure_du_site({"gmt_offset": 2}, wp.dt.datetime(2026, 10, 14, 6, 0))
+        self.assertEqual(site, wp.dt.datetime(2026, 10, 14, 8, 0))
+        self.assertIsNone(wp.heure_du_site({"namespaces": []}))
+        # 09:00 heure du site, il est 08:00 sur le site : accepté ; 07:00 : refusé.
+        wp.controler_date_future(quand, site)
+        with self.assertRaises(wp.ErreurWP):
+            wp.controler_date_future(wp.lire_date_programmee("2026-10-14T07:00"), site)
+
+
+class TestProgrammation(AvecFauxWordPress):
+    def setUp(self):
+        super().setUp()
+        for ident in (40, 41, 42):
+            FauxWordPress.etat["posts"].append({
+                "id": ident, "status": "draft", "slug": f"brouillon-{ident}", "link": f"{self.site}/?p={ident}",
+                "title": {"rendered": f"Brouillon {ident}", "raw": f"Brouillon {ident}"},
+                "content": {"rendered": "<p>x</p>", "raw": "<p>x</p>"}, "excerpt": {"raw": ""}, "meta": {}})
+        self.ecrire("plan.json", "[40, 41, 42]")
+
+    @staticmethod
+    def vendredi_a_venir(semaines=3):
+        jour = wp.dt.date.today() + wp.dt.timedelta(weeks=semaines)
+        return jour + wp.dt.timedelta(days=(4 - jour.weekday()) % 7)
+
+    def registre(self):
+        with open(self.dossier / "donnees/publications-programmees.csv", encoding="utf-8") as f:
+            return list(csv.DictReader(f))
+
+    def test_publier_programme_un_contenu_neuf(self):
+        jour = self.vendredi_a_venir()
+        r = self.wp("publier", "--html", "contenus/guide.html", "--titre", "Guide", "--programmer", f"{jour}T09:30")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        (_, chemin, corps), = self.ecritures()
+        self.assertEqual((corps["status"], corps["date"]), ("future", f"{jour}T09:30:00"))
+        self.assertEqual(self.registre()[0]["programmee_pour"], f"{jour}T09:30")
+        self.assertFalse((self.dossier / "journal/modifications.csv").exists(), "journalisée le jour de sa mise en ligne")
+
+    def test_programmer_un_brouillon_existant_est_une_publication(self):
+        jour = self.vendredi_a_venir()
+        r = self.wp("publier", "--html", "contenus/guide.html", "--id", "40", "--programmer", f"{jour}T09:00")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("Garde-fou (publier)", r.stdout)
+        (_, chemin, corps), = self.ecritures()
+        self.assertEqual((chemin, corps["status"]), ("/wp-json/wp/v2/posts/40", "future"))
+        self.assertEqual(len(list(self.dossier.glob(".*/backups/*.json"))), 1)
+
+    def test_programmation_refusee_comme_une_publication_en_assisted(self):
+        jour = self.vendredi_a_venir()
+        r = self.wp("publier", "--html", "contenus/guide.html", "--titre", "Guide", "--programmer",
+                    f"{jour}T09:00", mode="assisted")
+        self.assertEqual(r.returncode, 2)
+        self.assertEqual(self.ecritures(), [])
+        r = self.wp("publier", "--html", "contenus/guide.html", "--titre", "Guide", "--programmer",
+                    f"{jour}T09:00", "--valide", mode="assisted")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        r = self.wp("publier", "--html", "contenus/guide.html", "--titre", "Guide", "--programmer",
+                    f"{jour}T09:00", mode="safe")
+        self.assertEqual(r.returncode, 2)
+
+    def test_date_passee_page_en_ligne_et_statut_refuses(self):
+        for args in (("--titre", "Guide", "--programmer", "2020-01-06T09:00"),
+                     ("--id", "12", "--type", "page", "--programmer", f"{self.vendredi_a_venir()}T09:00"),
+                     ("--titre", "Guide", "--statut", "publish", "--programmer", f"{self.vendredi_a_venir()}T09:00")):
+            r = self.wp("publier", "--html", "contenus/guide.html", *args)
+            self.assertEqual(r.returncode, 1, args)
+        self.assertEqual(self.ecritures(), [])
+
+    def test_calendrier_espace_et_evite_le_week_end(self):
+        vendredi = self.vendredi_a_venir()
+        r = self.wp("calendrier", "--fichier", "plan.json", "--debut", str(vendredi))
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        envois = self.ecritures()
+        self.assertEqual([c for _, c, _ in envois], [f"/wp-json/wp/v2/posts/{i}" for i in (40, 41, 42)])
+        attendus = [vendredi, vendredi + wp.dt.timedelta(days=3), vendredi + wp.dt.timedelta(days=6)]
+        self.assertEqual([corps for _, _, corps in envois],
+                         [{"status": "future", "date": f"{j}T09:00:00"} for j in attendus])
+        self.assertEqual(len(list(self.dossier.glob(".*/backups/*.json"))), 3)
+        self.assertEqual([l["id"] for l in self.registre()], ["40", "41", "42"])
+
+    def test_calendrier_saute_un_jour_deja_programme(self):
+        vendredi = self.vendredi_a_venir()
+        FauxWordPress.etat["pages"].append({"id": 77, "status": "future", "date": f"{vendredi}T10:00:00",
+                                            "link": f"{self.site}/?page_id=77", "slug": "autre",
+                                            "title": {"rendered": "Autre"}, "content": {"rendered": "", "raw": ""}})
+        r = self.wp("calendrier", "--fichier", "plan.json", "--debut", str(vendredi), "--intervalle-jours", "4",
+                    "--heure", "08:15")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        premier = self.ecritures()[0][2]["date"]
+        self.assertEqual(premier, f"{vendredi + wp.dt.timedelta(days=3)}T08:15:00")
+
+    def test_calendrier_refuse_une_page_en_ligne_et_attend_la_validation(self):
+        self.ecrire("plan2.json", "[40, 31]")
+        r = self.wp("calendrier", "--fichier", "plan2.json", "--debut", str(self.vendredi_a_venir()))
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("publish", r.stderr)
+        r = self.wp("calendrier", "--fichier", "plan.json", "--debut", str(self.vendredi_a_venir()), mode="assisted")
+        self.assertEqual(r.returncode, 2)
+        r = self.wp("calendrier", "--fichier", "plan.json", "--simuler")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertEqual(self.ecritures(), [])
+
+    def test_suivre_journalise_les_pages_en_ligne(self):
+        self.ecrire("donnees/publications-programmees.csv",
+                    "id,type,url,titre,programmee_pour,programmee_le,journalisee_le\n"
+                    f"31,post,{self.site}/avis-clients-google/,Avis,2020-01-06T09:00,2020-01-01,\n"
+                    f"40,post,{self.site}/?p=40,Brouillon,2020-01-07T09:00,2020-01-01,\n")
+        FauxWordPress.etat["posts"][-3]["status"] = "future"
+        r = self.wp("calendrier", "--suivre")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("WP-Cron", r.stdout)
+        with open(self.dossier / "journal/modifications.csv", encoding="utf-8") as f:
+            (ligne,) = list(csv.DictReader(f))
+        self.assertEqual((ligne["type"], ligne["url"]), ("page-neuve", f"{self.site}/blog/avis-clients-google/"))
+        registre = {l["id"]: l["journalisee_le"] for l in self.registre()}
+        self.assertTrue(registre["31"])
+        self.assertFalse(registre["40"])
+        r = self.wp("calendrier", "--suivre")
+        with open(self.dossier / "journal/modifications.csv", encoding="utf-8") as f:
+            self.assertEqual(len(list(csv.DictReader(f))), 1, "jamais journalisée deux fois")
 
 
 class TestSansIdentifiants(DossierIsole):

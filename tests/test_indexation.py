@@ -1,9 +1,21 @@
 """Indexation : annoncer sans casser quand une brique manque, suivre sans Search Console."""
 
 import csv
+import json
+import os
+import sys
+import threading
 import unittest
+import urllib.error
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest import mock
 
-from _outils import DossierIsole, lancer
+from _outils import SCRIPTS, DossierIsole, environnement_propre, lancer
+
+sys.path.insert(0, str(SCRIPTS))
+import indexation  # noqa: E402
+
+CLE = "0123456789abcdef0123456789abcdef"
 
 
 class TestIndexation(DossierIsole):
@@ -86,6 +98,132 @@ class TestConstatEtAuto(DossierIsole):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertIn("2 URL dans le sitemap · 1 modifiée(s)", r.stdout)
         self.assertFalse((self.dossier / "donnees/indexation.csv").exists())
+
+
+class _Reponse:
+    status = 200
+
+    def __init__(self, texte):
+        self.texte = texte
+
+    def read(self):
+        return self.texte.encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+class TestReessais(unittest.TestCase):
+    def test_coupure_reseau_retentee(self):
+        effets = [urllib.error.URLError("connexion coupée"), ConnectionResetError("reset"), _Reponse("ok")]
+        with mock.patch("urllib.request.urlopen", side_effect=effets) as appel, \
+                mock.patch.object(indexation.time, "sleep") as pause:
+            self.assertEqual(indexation.http("https://ex.fr/"), (200, "ok"))
+        self.assertEqual(appel.call_count, 3)
+        self.assertEqual(pause.call_count, 2)
+
+    def test_trois_essais_au_plus(self):
+        with mock.patch("urllib.request.urlopen", side_effect=TimeoutError("délai")) as appel, \
+                mock.patch.object(indexation.time, "sleep"):
+            code, texte = indexation.http("https://ex.fr/")
+        self.assertEqual((code, appel.call_count), (0, 3))
+        self.assertIn("3 essais", texte)
+
+    def test_erreur_http_jamais_retentee(self):
+        erreur = urllib.error.HTTPError("https://ex.fr/", 404, "Not Found", {}, None)
+        with mock.patch("urllib.request.urlopen", side_effect=erreur) as appel, \
+                mock.patch.object(indexation.time, "sleep") as pause:
+            self.assertEqual(indexation.http("https://ex.fr/")[0], 404)
+        self.assertEqual((appel.call_count, pause.call_count), (1, 0))
+
+
+class FauxSite(BaseHTTPRequestHandler):
+    etat: dict = {}
+
+    def log_message(self, *args):
+        pass
+
+    def do_GET(self):
+        self.etat["requetes"].append((self.path, self.headers.get("Authorization", "")))
+        if self.path.startswith("/wp-json/seo-indexnow/v1/etat") and self.etat.get("extension"):
+            corps, code = json.dumps({"cle": CLE, "fichier": f"/{CLE}.txt"}).encode(), 200
+        else:
+            corps, code = json.dumps({"code": "rest_no_route"}).encode(), 404
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(corps)))
+        self.end_headers()
+        self.wfile.write(corps)
+
+
+class TestCleLueSurLeSite(DossierIsole):
+    def setUp(self):
+        super().setUp()
+        self.serveur = ThreadingHTTPServer(("127.0.0.1", 0), FauxSite)
+        self.hote = f"127.0.0.1:{self.serveur.server_port}"
+        FauxSite.etat = {"requetes": [], "extension": True}
+        threading.Thread(target=self.serveur.serve_forever, daemon=True).start()
+        env = environnement_propre(WP_SITE_URL=f"http://{self.hote}", WP_USER="robot",
+                                   WP_APP_PASSWORD="abcd efgh ijkl mnop", SEO_DECUPLER_PROJET=str(self.dossier),
+                                   NO_PROXY="127.0.0.1", no_proxy="127.0.0.1", HTTP_PROXY="", http_proxy="")
+        self.env = mock.patch.dict(os.environ, env, clear=True)
+        self.env.start()
+
+    def tearDown(self):
+        self.env.stop()
+        self.serveur.shutdown()
+        self.serveur.server_close()
+        super().tearDown()
+
+    def test_cle_lue_par_l_api_de_l_extension(self):
+        cle, origine = indexation.cle_indexnow(self.hote)
+        self.assertEqual(cle, CLE)
+        self.assertNotIn(CLE, origine)
+        self.assertIn("seo-indexnow", origine)
+        chemin, auth = FauxSite.etat["requetes"][0]
+        self.assertTrue(chemin.startswith("/wp-json/seo-indexnow/v1/etat"))
+        self.assertTrue(auth.startswith("Basic "))
+
+    def test_la_variable_passe_avant_le_site(self):
+        os.environ["INDEXNOW_KEY"] = "cle-de-la-variable"
+        self.assertEqual(indexation.cle_indexnow(self.hote), ("cle-de-la-variable", "INDEXNOW_KEY"))
+        self.assertEqual(FauxSite.etat["requetes"], [])
+
+    def test_extension_absente_ou_autre_site(self):
+        FauxSite.etat["extension"] = False
+        cle, origine = indexation.cle_indexnow(self.hote)
+        self.assertEqual(cle, "")
+        self.assertIn("seo-indexnow", origine)
+        self.assertEqual(indexation.cle_indexnow("www.autre-site.fr")[0], "")
+
+    def test_la_cle_n_apparait_jamais_en_entier(self):
+        envois = []
+
+        def faux_http(url, donnees=None):
+            envois.append((url, donnees))
+            return (404, "") if url.endswith(".txt") else (200, "")
+
+        url = f"http://{self.hote}/page/"
+        with mock.patch.object(indexation, "http", side_effect=faux_http):
+            refus = indexation.indexnow([url])
+            self.assertNotIn(CLE, refus)
+            self.assertIn("refusé", refus)
+            envois.clear()
+            with mock.patch.object(indexation, "http", side_effect=lambda u, d=None: envois.append((u, d)) or
+                                   ((200, CLE) if u.endswith(".txt") else (202, ""))):
+                statut = indexation.indexnow([url])
+        self.assertTrue(statut.startswith("ok"), statut)
+        self.assertNotIn(CLE, statut)
+        self.assertEqual(json.loads(envois[-1][1])["key"], CLE)
+
+    def test_sans_identifiants_wordpress(self):
+        for nom in ("WP_SITE_URL", "WP_USER", "WP_APP_PASSWORD"):
+            os.environ.pop(nom)
+        self.assertEqual(indexation.indexnow([f"http://{self.hote}/a/"]),
+                         "sans clé (INDEXNOW_KEY absente, identifiants WordPress absents)")
 
 
 if __name__ == "__main__":

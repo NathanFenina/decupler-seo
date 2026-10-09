@@ -29,8 +29,11 @@ direct (BroadcastEvent) ; Google a écrit en 2024 que les abus peuvent couper
 l'accès. Il n'automatise pas non plus l'interface de Search Console.
 
 Variables : INDEXNOW_KEY (clé publiée à la racine du site), GSC_SA_JSON et
-GSC_SITE_URL (voir gsc.py). Chaque brique manquante est signalée, jamais
-bloquante pour les autres.
+GSC_SITE_URL (voir gsc.py). Sans INDEXNOW_KEY, la clé est lue sur le site
+WordPress quand l'extension seo-indexnow y est active
+(GET /wp-json/seo-indexnow/v1/etat, avec WP_SITE_URL, WP_USER et
+WP_APP_PASSWORD, comme wp.py) ; elle n'est jamais affichée en entier.
+Chaque brique manquante est signalée, jamais bloquante pour les autres.
 """
 
 from __future__ import annotations
@@ -43,6 +46,7 @@ import json
 import os
 import secrets
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -57,6 +61,8 @@ CHAMPS = ["url", "annoncee_le", "indexnow", "statut", "verifiee_le", "detail"]
 DELAI_JOURS = 3
 LISTE_DU_JOUR = 10
 AGENT = "decupler-seo-indexation/1.0"
+ESSAIS_HTTP = 3          # le proxy des sessions cloud coupe parfois une connexion
+PAUSE_ESSAIS = 2.0       # secondes, doublées à chaque essai
 A_VALIDER_REL = Path("rapports") / "a-valider.md"
 DEBUT_SECTION = "<!-- indexation:debut -->"
 FIN_SECTION = "<!-- indexation:fin -->"
@@ -100,36 +106,82 @@ def ecrire_registre(lignes: list[dict]) -> None:
 
 
 def http(url: str, donnees: bytes | None = None) -> tuple[int, str]:
+    """(code, texte). Une erreur réseau (connexion coupée, délai dépassé) est
+    retentée ESSAIS_HTTP fois ; une réponse HTTP, même 4xx ou 5xx, ne l'est pas."""
     entetes = {"User-Agent": AGENT}
     if donnees is not None:
         entetes["Content-Type"] = "application/json; charset=utf-8"
-    requete = urllib.request.Request(url, data=donnees, headers=entetes, method="POST" if donnees else "GET")
+    erreur = ""
+    for essai in range(ESSAIS_HTTP):
+        requete = urllib.request.Request(url, data=donnees, headers=entetes, method="POST" if donnees else "GET")
+        try:
+            with urllib.request.urlopen(requete, timeout=60) as rep:
+                return rep.status, rep.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as exc:
+            return exc.code, ""
+        except (urllib.error.URLError, OSError) as exc:
+            erreur = str(getattr(exc, "reason", exc))
+            if essai < ESSAIS_HTTP - 1:
+                time.sleep(PAUSE_ESSAIS * 2 ** essai)
+    return 0, f"{erreur} (après {ESSAIS_HTTP} essais)"
+
+
+def masquer(cle: str) -> str:
+    """Une clé ne s'affiche jamais en entier : ses 4 premiers caractères suffisent à la reconnaître."""
+    return f"{cle[:4]}…" if len(cle) > 8 else "…"
+
+
+def _hote_nu(hote: str) -> str:
+    return hote.lower().removeprefix("www.")
+
+
+def cle_depuis_wordpress(hote: str | None = None) -> tuple[str, str]:
+    """(clé, détail) lue par l'API de l'extension seo-indexnow, avec les
+    identifiants de wp.py. Clé vide si le site, l'extension ou les droits manquent."""
     try:
-        with urllib.request.urlopen(requete, timeout=60) as rep:
-            return rep.status, rep.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as exc:
-        return exc.code, ""
-    except (urllib.error.URLError, OSError) as exc:
-        return 0, str(exc)
+        import wp
+        site, utilisateur, mot_de_passe = wp.identifiants()
+    except Exception:   # noqa: BLE001 — identifiants absents : simplement pas de clé
+        return "", "INDEXNOW_KEY absente, identifiants WordPress absents"
+    if hote and _hote_nu(urllib.parse.urlparse(site).netloc) != _hote_nu(hote):
+        return "", f"INDEXNOW_KEY absente, et WP_SITE_URL vise un autre site que {hote}"
+    try:
+        etat = wp.ClientWP(site, utilisateur, mot_de_passe).get("/seo-indexnow/v1/etat")
+    except wp.ErreurWP as exc:
+        premiere = str(exc).split(". ")[0]
+        return "", f"INDEXNOW_KEY absente, clé illisible sur le site (extension seo-indexnow ? {premiere})"
+    cle = str((etat or {}).get("cle") or "").strip() if isinstance(etat, dict) else ""
+    if not re.fullmatch(r"[A-Za-z0-9-]{8,128}", cle):
+        return "", "INDEXNOW_KEY absente, l'extension seo-indexnow n'a pas renvoyé de clé valide"
+    return cle, f"clé {masquer(cle)} lue sur le site (seo-indexnow)"
+
+
+def cle_indexnow(hote: str | None = None) -> tuple[str, str]:
+    """(clé, origine) : INDEXNOW_KEY d'abord, sinon l'extension seo-indexnow du site."""
+    cle = os.environ.get("INDEXNOW_KEY", "").strip()
+    if cle:
+        return cle, "INDEXNOW_KEY"
+    return cle_depuis_wordpress(hote)
 
 
 def indexnow(urls: list[str]) -> str:
-    """Soumet les URL d'un même site à IndexNow. Renvoie un statut lisible."""
-    cle = os.environ.get("INDEXNOW_KEY", "").strip()
-    if not cle:
-        return "sans clé (INDEXNOW_KEY absente)"
+    """Soumet les URL d'un même site à IndexNow. Renvoie un statut lisible, sans la clé."""
     hotes = {urllib.parse.urlparse(u).netloc for u in urls}
     if len(hotes) != 1:
         return "refusé : une annonce = un seul site"
     hote = hotes.pop()
+    cle, origine = cle_indexnow(hote)
+    if not cle:
+        return f"sans clé ({origine})"
     racine = f"https://{hote}"
     code, contenu = http(f"{racine}/{cle}.txt")
     if code != 200 or contenu.strip() != cle:
-        return f"refusé : {racine}/{cle}.txt absent ou différent de la clé"
+        return f"refusé : {racine}/{masquer(cle)}.txt absent ou différent de la clé ({origine})"
     corps = json.dumps({"host": hote, "key": cle, "keyLocation": f"{racine}/{cle}.txt",
                         "urlList": urls[:10000]}).encode()
     code, _ = http("https://api.indexnow.org/indexnow", corps)
-    return {200: "ok", 202: "ok (en attente de validation de la clé)"}.get(code, f"erreur HTTP {code}")
+    resultat = {200: "ok", 202: "ok (en attente de validation de la clé)"}.get(code, f"erreur HTTP {code}")
+    return resultat if origine == "INDEXNOW_KEY" else f"{resultat} · {origine}"
 
 
 def resoumettre_sitemaps() -> str:
@@ -150,7 +202,8 @@ def cmd_cle(_a) -> int:
     print(f"  1. Publiez un fichier texte {cle}.txt à la racine du site, qui contient seulement la clé.")
     print("     WordPress : Rank Math (module Instant Indexing) ou Yoast le font pour vous ;")
     print("     site en code : ajoutez le fichier au dossier public.")
-    print("  2. Ajoutez INDEXNOW_KEY à l'environnement (jamais dans le dépôt).\n")
+    print("  2. Ajoutez INDEXNOW_KEY à l'environnement (jamais dans le dépôt).")
+    print("  WordPress avec l'extension seo-indexnow : rien à faire, `annoncer` lit la clé sur le site.\n")
     return 0
 
 

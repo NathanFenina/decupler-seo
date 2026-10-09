@@ -32,7 +32,10 @@ Google n'y participe pas), resoumet les sitemaps par l'API Search Console et
 les inscrit dans `donnees/indexation.csv`. `suivre` inspecte les URL
 annoncées (API URL Inspection, lecture seule) et sort au plus 10 URL non
 indexées à demander à la main dans Search Console. Clé IndexNow, une fois
-par site : `indexation.py cle`.
+par site : `indexation.py cle`. Sur WordPress avec l'extension `seo-indexnow`,
+rien à faire : sans `INDEXNOW_KEY`, le script lit la clé sur le site
+(`/wp-json/seo-indexnow/v1/etat`, identifiants de `wp.py`) et ne l'affiche
+jamais en entier. Une coupure réseau est retentée trois fois.
 
 Jamais l'Indexing API de Google pour des articles ou des pages : elle est
 réservée aux offres d'emploi et aux vidéos en direct, et Google a prévenu

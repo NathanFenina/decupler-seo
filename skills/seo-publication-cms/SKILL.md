@@ -70,7 +70,7 @@ l'extension SEO accepte l'écriture par l'API, ce qui décide de la suite.
 
 | Règle | Comment |
 |-------|---------|
-| Brouillon par défaut | Un contenu neuf part en `publication.statut_par_defaut` (`draft`) |
+| Brouillon par défaut | Un contenu neuf part en `publication.statut_par_defaut` (`draft`) ; une page neuve validée se **programme** (`--programmer`, `calendrier`), espacée des autres |
 | Rien en direct sans feu vert | Une page **déjà en ligne** n'est modifiée en direct qu'avec `--statut publish` (ou `--en-ligne`) **et** `AUTORISE` de `guard.py`. Sinon la modification part en **révision** (autosave) : la page publique ne bouge pas, la révision attend dans l'éditeur |
 | Sauvegarde avant écriture | Restaurable par `cms_restore.py` |
 | Journal | Toute modification mise en ligne passe par `journal.py ajouter`, avec sa valeur d'avant |
@@ -107,6 +107,54 @@ python3 "$WP" publier --html contenus/guide-audit-local.html \
   n'est jamais envoyé par défaut (il dépublierait la page).
 - Catégories et étiquettes : noms ou IDs. Rien n'est créé : l'arborescence
   est une décision humaine.
+
+### Programmer les pages neuves — jamais un lot le même jour
+
+**Règle : les pages neuves s'espacent.** Quelques jours d'écart entre deux
+pages (3 par défaut), jamais le week-end, jamais un lot entier le même jour,
+et jamais au-delà de `cycle.pages_neuves_par_semaine_max`. Trois raisons :
+
+- **un rythme régulier pour Google** : un site qui publie à intervalles
+  réguliers est exploré régulièrement ; un lot de pages du même jour
+  ressemble à de la production en masse, ce que visent les mises à jour
+  anti-spam ;
+- **le temps de vérifier chaque page** en ligne (rendu, title, schema,
+  liens entrants) avant que la suivante ne parte ;
+- **une mesure page par page** : à J+28, chaque page a sa propre date de
+  départ ; dix pages du même jour se mesurent en bloc, sans savoir laquelle
+  a porté le résultat.
+
+```bash
+# un contenu (neuf, ou brouillon existant avec --id) : statut future, heure locale du site
+python3 "$WP" publier --id 120 --html contenus/guide.html --programmer 2026-10-14T09:00 --simuler
+
+# un lot de brouillons déjà dans WordPress, espacés automatiquement
+python3 "$WP" calendrier --fichier plan.json --debut 2026-10-13 \
+  --intervalle-jours 3 --heure 09:00 --simuler     # plan.json : [120, 121, 125]
+
+# à chaque routine : journaliser les pages programmées passées en ligne
+python3 "$WP" calendrier --suivre [--auto]
+```
+
+- **Même garde-fou qu'une publication** : programmer, c'est publier à une
+  date. `guard.py --action publier` pour chaque contenu ; en mode assisted,
+  `--simuler`, le oui explicite, puis `--valide`. Le calendrier ne programme
+  rien si un seul contenu est refusé.
+- `--programmer AAAA-MM-JJTHH:MM` envoie `status: future` et `date` à
+  l'heure locale du site (pas `date_gmt`). Une date passée est refusée :
+  WordPress publierait tout de suite. Une page déjà en ligne ne se
+  programme pas.
+- `calendrier` part de `--debut` (demain par défaut), saute samedi et
+  dimanche, et saute les jours où un autre contenu est déjà programmé sur le
+  site ; il prévient si une semaine dépasse le plafond de pages neuves.
+  Chaque brouillon est sauvegardé avant d'être programmé.
+- Les pages programmées sont inscrites dans
+  `donnees/publications-programmees.csv`. Elles entrent au journal
+  (`page-neuve`) **le jour où elles passent en ligne**, pas avant :
+  `calendrier --suivre` s'en charge, et signale une page dont la date est
+  passée mais qui est toujours « future » (WP-Cron n'a pas tourné :
+  « Programmation manquée » ; la publier dans l'éditeur ou régler un vrai
+  cron chez l'hébergeur). Annoncer ensuite l'URL (`seo-indexation`).
 
 ### Images
 
