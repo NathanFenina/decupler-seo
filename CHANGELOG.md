@@ -1,5 +1,39 @@
 # Journal des versions
 
+## 3.12.2
+
+Une **copie limitée de la page de suivi** pour un intervenant externe (consultant
+backlinks), à la place de la page complète, qui porte de l'interne.
+
+### Ajouté
+
+- **`pilotage.py exporter --html <page> --projet-id <id> --vue backlinks --sortie <fichier>`** :
+  une page autonome tirée de la même page et du même état, avec le même gabarit
+  et la même charte, réduite aux onglets de la vue. Vue `backlinks` : en-tête
+  réduit (surtitre, introduction, période), onglet Backlinks complet (guide
+  compris), roadmap et plan d'actions limités au chantier `off-page`. Rien
+  d'interne n'est écrit dans la page : ni session, ni dépôt, ni Notion, ni
+  livrables, ni synthèse, ni « À décider », ni reporting, ni chiffres, ni
+  contenu hôte, ni remarques internes des actions, ni actions refusées.
+- **Motifs interdits** : liens de session, dépôts de code, mots de passe et noms
+  de variables secrètes toujours retirés ; ceux du projet en plus
+  (`--interdits <fichier>`, `--interdit <motif>`). Un élément fautif est retiré
+  proprement (entrée de liste, ligne de tableau entière, tâche, section, action
+  ou seulement son champ) et listé ; s'il reste un motif, l'export est refusé.
+- **Lecture seule** : la page exportée ne se republie jamais elle-même et
+  n'affiche ni boutons Valider / Refuser ni champ de remarque ; elle se publie
+  sans `capabilities`. Options `--titre`, `--surtitre`, `--intro`.
+
+### Modifié
+
+- Le gabarit lit une vue exportée (`etat.vue`) : seulement ses onglets, son
+  message de lecture seule, pas de ligne « À décider » ni d'aide `pilotage.py`
+  quand l'onglet n'y est pas.
+- Le lien « Dépôt » de l'en-tête vient de `depot_url`, écrit par
+  `injecter --depot` (owner/repo ou adresse) : plus d'hébergeur de code écrit
+  dans le code de la page. Une page existante retrouve son lien au prochain
+  `injecter --depot`.
+
 ## 3.12.1
 
 La vue **Backlinks se suffit à elle-même** : on peut partager la page de suivi

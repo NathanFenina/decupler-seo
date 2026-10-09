@@ -36,6 +36,9 @@ bloc : jamais au reste de la page.
     python3 pilotage.py backlinks --html tableau.html --projet-id atlas --fichier donnees/backlinks.json
     python3 pilotage.py programme --html tableau.html --projet-id atlas --fichier donnees/programme.json
 
+    # 8. Une copie pour un intervenant externe (consultant backlinks) : onglets limités, lecture seule
+    python3 pilotage.py exporter --html tableau.html --projet-id atlas --vue backlinks --sortie donnees/suivi-consultant.html
+
 La page est un programme sur plusieurs mois : synthèse (chiffres du dernier
 bilan, décisions urgentes, avancement par chantier), à décider (bloqué, puis à
 valider par chantier), roadmap chantier × mois, plan d'actions filtrable,
@@ -478,6 +481,8 @@ def cmd_injecter(a) -> int:
     for cle in ("session", "depot"):
         if getattr(a, cle):
             p[cle] = getattr(a, cle)
+    if a.depot:                                      # la page affiche l'adresse telle quelle (aucun hébergeur codé en dur)
+        p["depot_url"] = a.depot if re.match(r"^https?://", a.depot) else f"https://github.com/{a.depot.strip('/')}"
     if a.titre:
         etat["titre"] = a.titre
     if a.livrables:
@@ -822,6 +827,147 @@ def cmd_mois(a) -> int:
     return 0
 
 
+# ─── Vues exportées : une copie de la page pour un intervenant externe ─────
+
+# Une vue = les onglets gardés, les chantiers d'actions gardés, ce qui reste du projet et de l'en-tête.
+# Tout le reste n'est pas masqué : il n'est pas écrit dans la page exportée.
+VUES_EXPORT = {
+    "backlinks": {
+        "libelle": "Programme backlinks",
+        "onglets": ["liens", "roadmap", "actions"],
+        "chantiers": ["off-page"],
+        "projet": ("id", "nom", "site", "theme", "backlinks", "liens", "decideur"),
+        "programme": ("surtitre", "intro", "debut", "fin"),
+        "message": "Copie en lecture seule de la page de suivi, limitée au netlinking. "
+                   "Les statuts sont mis à jour à chaque bilan hebdomadaire.",
+    },
+}
+# Champs d'une action recopiés dans une vue exportée (ni remarque interne, ni source).
+CHAMPS_ACTION_EXPORT = ("id", "titre", "type", "chantier", "statut", "mois", "mois_cible", "maj", "page", "pourquoi",
+                        "gain", "effort", "qui", "attend", "lien")
+# Toujours retirés d'une vue exportée, quel que soit le projet : liens de session, dépôts de code, secrets.
+INTERDITS_EXPORT = (r"claude\.ai/code", r"github\.com", r"\bmots? de passe\b", r"\bpassword\b", r"\bapp_password\b",
+                    r"(?-i:\b[A-Z][A-Z0-9_]*_(?:API_KEY|SECRET|TOKEN|PASSWORD)\b)")
+# Clé qui identifie un élément : si elle tombe, l'élément entier tombe (une tâche sans texte, une section sans titre…).
+CLES_IDENTITE = ("titre", "texte", "nom", "page", "url", "id")
+TACHE_DEPUIS_ACTION = {"faite": "fait", "en-cours": "en-cours", "bloquee": "bloque"}
+
+
+def _compiler_interdits(motifs) -> re.Pattern | None:
+    motifs = [m for m in (x.strip() for x in motifs or []) if m and not m.startswith("#")]
+    for m in motifs:
+        try:
+            re.compile(m)
+        except re.error as exc:
+            raise SystemExit(f"✗ motif interdit invalide « {m} » : {exc}")
+    return re.compile("|".join(f"(?:{m})" for m in motifs), re.I) if motifs else None
+
+
+def purger(obj, motif: re.Pattern, chemin: str = "", retraits: list | None = None):
+    """Retire d'un objet JSON tout ce qui contient un motif interdit, en gardant la structure lisible.
+
+    Une chaîne fautive disparaît ; une ligne de tableau fautive disparaît entière (pas de colonnes décalées) ;
+    un objet dont la clé d'identité tombe (titre, texte, nom…) disparaît entier ; un bloc vidé disparaît.
+    Renvoie None quand l'objet entier tombe ; `retraits` reçoit le chemin de chaque retrait."""
+    retraits = [] if retraits is None else retraits
+    if isinstance(obj, str):
+        if motif.search(obj):
+            retraits.append(chemin)
+            return None
+        return obj
+    if isinstance(obj, list):
+        garde = []
+        for i, x in enumerate(obj):
+            if isinstance(x, list) and any(isinstance(c, str) and motif.search(c) for c in x):
+                retraits.append(f"{chemin}[{i}]")                    # ligne de tableau : entière ou rien
+                continue
+            v = purger(x, motif, f"{chemin}[{i}]", retraits)
+            if v is not None:
+                garde.append(v)
+        return garde
+    if isinstance(obj, dict):
+        ident = next((k for k in CLES_IDENTITE if isinstance(obj.get(k), str) and obj.get(k)), None)
+        sortie = {}
+        for k, v in obj.items():
+            if motif.search(str(k)):
+                retraits.append(f"{chemin}.{k}")
+                continue
+            w = purger(v, motif, f"{chemin}.{k}", retraits)
+            if w is None:
+                if k == ident or k == "url":
+                    return None                                       # l'élément perd ce qui le désigne (ou son adresse) : il tombe
+                continue
+            sortie[k] = w
+        types = [t for t in TYPES_BLOCS_GUIDE if t in obj]
+        if types and not any(sortie.get(t) not in (None, "", [], {}) for t in types):
+            return None                                               # bloc du guide vidé de son contenu
+        return sortie
+    return obj
+
+
+def vue_exportee(etat: dict, pid: str, vue: str, interdits=(), titre: str = "", surtitre: str = "",
+                 intro: str = "") -> tuple[dict, list[str]]:
+    """L'état d'une vue exportée : un seul projet, les onglets et les chantiers de la vue, sans rien d'interne.
+
+    Écrit seulement ce que la vue garde (jamais de session, de dépôt, de livrables, de chiffres, de reporting ni de
+    décisions), puis purge les motifs interdits. Renvoie (état, retraits)."""
+    if vue not in VUES_EXPORT:
+        raise SystemExit(f"✗ vue « {vue} » inconnue (attendu : {', '.join(VUES_EXPORT)})")
+    v = VUES_EXPORT[vue]
+    p = _projet_existant(etat, pid)
+    motif = _compiler_interdits(list(INTERDITS_EXPORT) + list(interdits or []))
+    q = {k: json.loads(json.dumps(p[k])) for k in v["projet"] if p.get(k) not in (None, "", [], {})}
+    actions = [{k: a[k] for k in CHAMPS_ACTION_EXPORT if a.get(k) not in (None, "")}
+               for a in p.get("actions", []) if a.get("chantier") in v["chantiers"] and a.get("statut") != "refusee"]
+    gardees = {a["id"] for a in actions}
+    par_id = {a["id"]: a for a in p.get("actions", [])}
+    for m in ((q.get("backlinks") or {}).get("mois") or {}).values():
+        for t in m.get("taches") or []:                               # une tâche reliée à une action absente garde son statut
+            if t.get("action") and t["action"] not in gardees:
+                a = par_id.get(t.pop("action"))
+                if a and not t.get("statut"):
+                    t["statut"] = TACHE_DEPUIS_ACTION.get(a.get("statut"), "a-faire")
+    q["actions"] = actions
+    prog = {k: p.get("programme", {})[k] for k in v["programme"] if (p.get("programme") or {}).get(k)}
+    for cle, val in (("surtitre", surtitre), ("intro", intro)):
+        if val:
+            prog[cle] = val
+    if prog:
+        q["programme"] = prog
+    sortie = {"titre": titre or f"{v['libelle']} · {p.get('nom') or pid}", "maj": etat.get("maj", ""),
+              "vue": {"nom": vue, "onglets": v["onglets"], "lecture_seule": True, "message": v["message"]},
+              "projets": [q]}
+    if etat.get("decideur"):
+        sortie["decideur"] = etat["decideur"]
+    retraits: list[str] = []
+    if motif:
+        sortie["projets"] = [purger(q, motif, pid, retraits) or {"id": pid, "actions": []}]
+        reste = motif.search(json.dumps(sortie, ensure_ascii=False))
+        if reste:                                                     # dernier filet : rien ne sort s'il reste un motif
+            raise SystemExit(f"✗ « {reste.group(0)} » reste dans la vue exportée : export refusé")
+    return sortie, retraits
+
+
+def cmd_exporter(a) -> int:
+    """Page autonome pour un intervenant externe : même gabarit, même charte, seulement les onglets de la vue.
+
+    Lecture seule : la page n'a pas besoin de la capability de republication (publier sans `capabilities`)."""
+    etat = lire_etat(Path(a.html).read_text(encoding="utf-8"))
+    interdits = list(a.interdit or [])
+    if a.interdits:
+        interdits += Path(a.interdits).read_text(encoding="utf-8").splitlines()
+    sortie, retraits = vue_exportee(etat, a.projet_id, a.vue, interdits, a.titre or "", a.surtitre or "", a.intro or "")
+    gabarit = (Path(__file__).resolve().parent.parent / "templates" / "pilotage.html").read_text(encoding="utf-8")
+    Path(a.sortie).write_text(ecrire_etat(gabarit, sortie), encoding="utf-8")
+    q = sortie["projets"][0]
+    print(f"  ✓ {a.sortie} · vue {a.vue} : onglets {', '.join(sortie['vue']['onglets'])} · "
+          f"{len(q.get('actions', []))} action(s) · {len((q.get('backlinks') or {}).get('guide') or [])} section(s) de guide"
+          f" · {len(retraits)} élément(s) retiré(s) par les motifs interdits")
+    for r in retraits:
+        print(f"    − {r}", file=sys.stderr)
+    return 0
+
+
 def cmd_sauvegarder(a) -> int:
     """Copie de sûreté du projet dans git : la page publiée n'est pas la seule à garder la roadmap.
 
@@ -957,6 +1103,19 @@ def main() -> int:
     p.add_argument("--projet-id", required=True)
     p.add_argument("--fichier", required=True, help="JSON {surtitre, intro, debut, fin, phases: [{titre, debut, fin, texte}]}")
     p.set_defaults(f=cmd_programme)
+    p = sp.add_parser("exporter", help="copie autonome de la page pour un intervenant externe (vue limitée, lecture seule)")
+    p.add_argument("--html", required=True, help="la page de suivi (lue avec l'outil Artifact)")
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--vue", required=True, choices=sorted(VUES_EXPORT),
+                   help="backlinks : en-tête réduit, onglet Backlinks, roadmap et plan des actions off-page")
+    p.add_argument("--sortie", required=True)
+    p.add_argument("--titre", help="nom de la page exportée (défaut : « <vue> · <projet> »)")
+    p.add_argument("--surtitre", help="surtitre de l'en-tête (défaut : celui du programme)")
+    p.add_argument("--intro", help="introduction de l'en-tête (défaut : celle du programme)")
+    p.add_argument("--interdits", help="fichier de motifs (une expression régulière par ligne, # pour commenter) : "
+                                       "tout élément qui en contient un est retiré de la vue")
+    p.add_argument("--interdit", action="append", help="motif interdit en plus (répétable)")
+    p.set_defaults(f=cmd_exporter)
     p = sp.add_parser("sauvegarder", help="copie de sûreté du projet dans git")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)

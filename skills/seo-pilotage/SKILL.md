@@ -155,6 +155,36 @@ Ne jamais réécrire la page à la main : seul le bloc `etat` change.
   client) : la roadmap interne et ses boutons n'y ont pas leur place. On la
   garde dans une page interne et on relie les livrables client depuis elle.
 
+## Une copie pour un intervenant externe
+
+La page de suivi complète porte de l'interne (sécurité, clients, brouillons,
+conversation, dépôt). Pour un consultant, on publie une **copie limitée**, un
+artifact à part, régénéré à chaque republication de la page principale :
+
+`pilotage.py exporter --html donnees/tableau-de-bord.html --projet-id <id> --vue backlinks
+--sortie donnees/suivi-<consultant>.html --interdits <fichier de motifs> [--titre …] [--intro …]`
+
+- **Vue `backlinks`** : en-tête réduit (surtitre, introduction, période ; ni
+  phases, ni ardoise des décisions, ni liens Notion / conversation / dépôt),
+  onglet Backlinks complet (guide compris), roadmap et plan d'actions limités au
+  chantier `off-page` (sans les actions refusées).
+- **Rien d'interne n'est écrit dans la page** (pas masqué : absent) : ni
+  synthèse, ni « À décider », ni reporting, ni livrables, ni chiffres Search
+  Console, ni cartographie, ni contenu hôte ; des actions, seuls les champs
+  affichés (pas de remarque interne). Une tâche reliée à une action non exportée
+  garde son statut.
+- **Motifs interdits** : toujours les liens de session, les dépôts de code, les
+  mots de passe et les noms de variables secrètes ; en plus, ceux du projet
+  (`--interdits`, une expression régulière par ligne : clients sans accord,
+  numéros de brouillons, sécurité). Tout élément qui en contient un est retiré
+  (une entrée de liste, une ligne de tableau entière, une tâche, une action ou
+  seulement son champ fautif) ; s'il en reste un, l'export est refusé.
+- **Lecture seule** : la copie ne se republie jamais elle-même et n'affiche aucun
+  bouton de décision. Publier **sans `capabilities`**, comme nouvel artifact la
+  première fois, puis à la même `url` à chaque republication de la page principale.
+- Vérifier avant de partager : `grep -i -E "<motifs>" donnees/suivi-<consultant>.html`
+  ne renvoie rien, et le rendu tient à 400 et 1 440 px, en clair et en sombre.
+
 ## À l'ouverture de la conversation du projet
 
 Montrer la roadmap du projet, sans rien lancer :

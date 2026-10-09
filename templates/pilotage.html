@@ -294,12 +294,16 @@ const VUES=[["synthese","Synthèse"],["decider","À décider"],["roadmap","Roadm
 const brut=document.getElementById("etat").textContent;
 let etat;try{etat=JSON.parse(brut)}catch(e){etat={maj:"",projets:[]}}
 if(!Array.isArray(etat.projets))etat.projets=[];
+/* Vue exportée (pilotage.py exporter) : seulement ses onglets, en lecture seule, sans boutons de décision. */
+const EXPORT=etat.vue&&Array.isArray(etat.vue.onglets)?etat.vue:null;
+const VUES_PAGE=(EXPORT&&VUES.filter(v=>EXPORT.onglets.includes(v[0])).length)?VUES.filter(v=>EXPORT.onglets.includes(v[0])):VUES;
+const FIGEE=!!(EXPORT&&EXPORT.lecture_seule);
 const aujourdhui=new Date().toISOString().slice(0,10),ceMois=aujourdhui.slice(0,7);
-let courant=null,vue="synthese",moisChoisi=null,moisRoad=null,moisLiens=null,lectureSeule=false,minuteur=null,enAttente=false,defiler=false;
+let courant=null,vue=VUES_PAGE[0][0],moisChoisi=null,moisRoad=null,moisLiens=null,lectureSeule=FIGEE,minuteur=null,enAttente=false,defiler=false;
 const filtres={q:"",chantier:"",statut:"",mois:"",qui:""};
-try{const v=localStorage.getItem("pilotage-vue");if(VUES.some(x=>x[0]===v))vue=v;courant=localStorage.getItem("pilotage-onglet")}catch(e){}
+try{const v=localStorage.getItem("pilotage-vue");if(VUES_PAGE.some(x=>x[0]===v))vue=v;courant=localStorage.getItem("pilotage-onglet")}catch(e){}
 try{for(const h of decodeURIComponent((location.hash||"").slice(1)).split("/").filter(Boolean)){
-  if(/^\d{4}-\d\d$/.test(h)){moisChoisi=h;vue="reporting"}else if(VUES.some(x=>x[0]===h))vue=h;else courant=h}}catch(e){}
+  if(/^\d{4}-\d\d$/.test(h)){moisChoisi=h;if(VUES_PAGE.some(x=>x[0]==="reporting"))vue="reporting"}else if(VUES_PAGE.some(x=>x[0]===h))vue=h;else courant=h}}catch(e){}
 if(!etat.projets.some(p=>p.id===courant))courant=etat.projets[0]&&etat.projets[0].id;
 const app=document.getElementById("app");
 const el=(t,a,...enfants)=>{const n=document.createElement(t);for(const k in a||{}){if(k==="texte")n.textContent=a[k];else if(k.startsWith("on"))n.addEventListener(k.slice(2),a[k]);else if(a[k]!==undefined&&a[k]!==null&&a[k]!==false)n.setAttribute(k,a[k])}for(const c of enfants.flat())if(c!=null&&c!=="")n.append(c.nodeType?c:document.createTextNode(String(c)));return n};
@@ -353,6 +357,7 @@ function carteAction(a,p){
     a.statut==="bloquee"&&a.attend?el("div",{class:"pl-attend",texte:"En attente : "+a.attend}):null,meta,
     a.note?el("div",{class:"pl-meta",texte:"Remarque : "+a.note}):null,lien(a.lien,"Voir le résultat"));
   const b=el("div",{class:"pl-boutons"});
+  if(FIGEE){li.append(corps);return li}
   const changer=s=>()=>{const n=document.getElementById("note-"+a.id);if(n&&n.value.trim())a.note=n.value.trim();a.statut=s;if(s!=="bloquee")delete a.attend;a.maj=aujourdhui;programmer();rendre()};
   if(a.statut==="proposee")b.append(el("button",{class:"pl-btn pl-oui",type:"button",disabled:lectureSeule,onclick:changer("validee"),texte:"Valider"}),
     el("button",{class:"pl-btn pl-non",type:"button",disabled:lectureSeule,onclick:changer("refusee"),texte:"Refuser"}));
@@ -542,7 +547,7 @@ function detailMois(p,m){
     el("div",{class:"pl-tete-mois"},el("div",{},el("div",{class:"pl-surtitre",texte:etiquette+" · "+l.length+" action"+(l.length>1?"s":"")}),
       el("h2",{id:"t-detail",texte:nomMois(m)}),bilan.objectif||bilan.synthese?el("p",{class:"pl-objectif"},bidi(bilan.objectif||bilan.synthese)):null),
       el("div",{class:"pl-cel"},...compteurs(l))),
-    couloirs.length?el("div",{class:"pl-couloirs"},...couloirs):el("p",{class:"pl-vide",texte:m>ceMois?"Rien de programmé pour ce mois. Programmer une action : pilotage.py mois-cible --id <id> --mois "+m+".":"Aucune action rangée dans ce mois."}));
+    couloirs.length?el("div",{class:"pl-couloirs"},...couloirs):el("p",{class:"pl-vide",texte:m>ceMois?"Rien de programmé pour ce mois."+(FIGEE?"":" Programmer une action : pilotage.py mois-cible --id <id> --mois "+m+"."):"Aucune action rangée dans ce mois."}));
 }
 
 /* ── Plan d'actions : recherche et filtres ── */
@@ -611,14 +616,14 @@ function detailBacklinks(p,m){
         el("td",{texte:c.cout||""}),el("td",{texte:c.lien||""}))))))):null;
   const bLiens=el("div",{class:"pl-section"},el("h3",{texte:"Liens obtenus ce mois · "+liens.length}),
     liens.length?el("ul",{class:"pl-liste pl-fait"},...liens.map(x=>el("li",{},el("div",{},x.domaine||x.url||"",el("small",{},[x.cible,x.ancre&&"« "+x.ancre+" »",x.prix!=null&&x.prix!==""?euros(x.prix):"",x.attribut,x.statut].filter(Boolean).join(" · ")))))):
-    el("p",{class:"pl-vide",texte:m>ceMois?"Le mois n'a pas commencé.":"Aucun lien consigné pour ce mois (pilotage.py lien)."}));
+    el("p",{class:"pl-vide",texte:m>ceMois?"Le mois n'a pas commencé.":"Aucun lien consigné pour ce mois"+(FIGEE?".":" (pilotage.py lien).")}));
   const bOff=off.length?el("div",{class:"pl-section"},el("h3",{texte:"Actions off-page du mois · "+off.length}),el("ul",{class:"pl-liste"},...off.sort((x,y)=>ORDRE_GROUPES.indexOf(groupe(x))-ORDRE_GROUPES.indexOf(groupe(y))).map(itemAction))):null;
   return el("div",{class:"pl-bloc",id:"detail-backlinks",role:"region","aria-labelledby":"t-bl-mois"},
     el("div",{class:"pl-tete-mois"},el("div",{},el("div",{class:"pl-surtitre",texte:etiquette+(taches.length?" · "+taches.filter(fait).length+"/"+taches.length+" tâches faites":"")}),
       el("h2",{id:"t-bl-mois"},nomMois(m)+(d.titre?" · ":""),d.titre?bidi(d.titre):""),d.objectif?el("p",{class:"pl-objectif"},bidi(d.objectif)):null)),
     faits.length?el("div",{class:"pl-faits"},...faits.map(([k,v])=>el("div",{class:"pl-fait-k"},el("span",{texte:k}),el("b",{},bidi(v))))):null,
     couloirs.length?el("div",{class:"pl-section"},el("h3",{texte:"Qui fait quoi"}),el("div",{class:"pl-couloirs"},...couloirs)):
-      (Object.keys(d).length?null:el("p",{class:"pl-vide",texte:"Pas de plan de netlinking pour ce mois. L'ajouter : pilotage.py backlinks --fichier plan.json."})),
+      (Object.keys(d).length?null:el("p",{class:"pl-vide",texte:"Pas de plan de netlinking pour ce mois."+(FIGEE?"":" L'ajouter : pilotage.py backlinks --fichier plan.json.")})),
     d.note?el("p",{class:"pl-meta"},bidi(d.note)):null,tCibles,bLiens,bOff);
 }
 /* Guide du plan de netlinking (p.backlinks.guide) : des sections autonomes, pour qu'un consultant n'ait besoin d'aucun
@@ -837,16 +842,16 @@ function ardoise(p){
   const nb=aDecider(p).length;
   return el("div",{class:"pl-ardoise"},ligne("Période",moisCourt(debut)+" → "+moisCourt(fin)),
     ligne("Actions",A.length+" · "+A.filter(a=>a.statut==="faite").length+" faites"),
-    ligne("À décider",String(nb)),
+    VUES_PAGE.some(x=>x[0]==="decider")?ligne("À décider",String(nb)):null,
     (p.liens||[]).length?ligne("Liens",String(p.liens.length)):null,
     etat.maj?ligne("Mise à jour",dateLongue(etat.maj)):null,
     el("div",{class:"pl-liens"},site?el("a",{href:site,target:"_blank",rel:"noopener",texte:p.site.replace(/^https?:\/\//,"")}):null,
-      lien(p.notion,"Notion"),lien(p.session,"Conversation"),p.depot?el("a",{href:"https://github.com/"+p.depot,target:"_blank",rel:"noopener",texte:"Dépôt"}):null));
+      lien(p.notion,"Notion"),lien(p.session,"Conversation"),lien(p.depot_url,"Dépôt")));
 }
 function projet(p){
   const nb=aDecider(p).length,nA=(p.actions||[]).length,nL=(p.liens||[]).length;
   const badge={decider:nb?el("span",{class:"pl-pastille",title:nb+" à décider",texte:nb}):null,actions:el("span",{class:"pl-pastille pl-neutre",texte:nA}),liens:nL?el("span",{class:"pl-pastille pl-neutre",texte:nL}):null};
-  const vues=el("div",{class:"pl-vues",role:"tablist","aria-label":"Vues"},...VUES.map(([k,t])=>el("button",{type:"button",role:"tab",class:"pl-vue",id:"onglet-"+k,"aria-selected":String(k===vue),"aria-controls":"vue-"+k,
+  const vues=el("div",{class:"pl-vues",role:"tablist","aria-label":"Vues"},...VUES_PAGE.map(([k,t])=>el("button",{type:"button",role:"tab",class:"pl-vue",id:"onglet-"+k,"aria-selected":String(k===vue),"aria-controls":"vue-"+k,
     onclick:()=>{vue=k;defiler=true;try{localStorage.setItem("pilotage-vue",k)}catch(e){}rendre()}},t,badge[k]||null)));
   const rendu={synthese:vueSynthese,decider:vueDecider,roadmap:vueRoadmap,actions:vuePlan,liens:vueLiens,reporting:vueReporting}[vue]||vueSynthese;
   return el("div",{class:"pl-projet",id:"panneau-"+p.id},el("div",{id:"pl-ancre"}),vues,rendu(p));
@@ -896,7 +901,7 @@ function rendreHote(){
   return d;
 }
 function rendre(){
-  if(!VUES.some(x=>x[0]===vue))vue="synthese";
+  if(!VUES_PAGE.some(x=>x[0]===vue))vue=VUES_PAGE[0][0];
   const p=etat.projets.find(x=>x.id===courant),prog=(p&&p.programme)||{};
   const total=etat.projets.reduce((s,x)=>s+aDecider(x).length,0);
   const sous=(etat.projets.length?(etat.projets.length>1?etat.projets.length+" sites · ":"")+total+" à décider":"Aucun site pour l'instant")+(etat.maj?" · mis à jour le "+dateLongue(etat.maj):"");
@@ -905,7 +910,7 @@ function rendre(){
   const onglets=el("div",{class:"pl-onglets",role:"tablist","aria-label":"Sites"},...etat.projets.map(x=>el("button",{class:"pl-onglet",role:"tab",type:"button","aria-selected":String(x.id===courant),
     onclick:()=>{courant=x.id;moisChoisi=null;moisRoad=null;moisLiens=null;try{localStorage.setItem("pilotage-onglet",x.id)}catch(e){}rendre()}},x.nom||x.id,aDecider(x).length?el("span",{class:"pl-pastille",texte:aDecider(x).length}):null)));
   appliquerTheme(p);
-  app.replaceChildren(tete,lectureSeule?el("p",{class:"pl-lecture-seule",texte:"Lecture seule : vous pouvez consulter la page, pas la modifier."}):"",etat.projets.length>1?onglets:"",p?projet(p):el("p",{class:"pl-vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
+  app.replaceChildren(tete,lectureSeule?el("p",{class:"pl-lecture-seule",texte:(EXPORT&&EXPORT.message)||"Lecture seule : vous pouvez consulter la page, pas la modifier."}):"",etat.projets.length>1?onglets:"",p?projet(p):el("p",{class:"pl-vide",texte:"Les sites apparaîtront ici dès que leur première routine aura écrit ses chiffres."}));
   if(enAttente)dire("Modifications en attente d'enregistrement…");
   if(defiler){defiler=false;const a=document.getElementById("pl-ancre");if(a&&a.getBoundingClientRect().top<0)a.scrollIntoView({block:"start"})}
   const barre=app.querySelector(".pl-vues"),choisi=barre&&barre.querySelector('[aria-selected="true"]');      /* l'onglet choisi reste visible sur mobile */
@@ -937,7 +942,8 @@ async function enregistrer(){
 const hote=document.getElementById("hote");
 if(hote&&!etat.hote_mois)app.after(rendreHote());
 rendre();
-if(window.claude&&window.claude.use){window.claude.use("artifact").then(a=>{artifact=a;if(!a){lectureSeule=true;rendre()}}).catch(()=>{lectureSeule=true;rendre()})}
+if(FIGEE){/* copie exportée : jamais de republication depuis la page */}
+else if(window.claude&&window.claude.use){window.claude.use("artifact").then(a=>{artifact=a;if(!a){lectureSeule=true;rendre()}}).catch(()=>{lectureSeule=true;rendre()})}
 else{lectureSeule=true;rendre()}
 })();
 </script>

@@ -443,3 +443,113 @@ class TestMois(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestExport(DossierIsole):
+    """Vue exportée pour un intervenant externe : rien d'interne n'est écrit dans la page, et elle reste en lecture seule."""
+
+    ETAT = {"maj": "2026-10-09", "titre": "Pilotage Atlas", "hote_mois": "2026-09", "projets": [{
+        "id": "atlas", "nom": "Atlas", "site": "atlas.example", "session": "https://claude.ai/code/session_x",
+        "depot": "atlas/site", "notion": "https://notion.example/base", "kpis": {"clics_4s": 12},
+        "livrables": [{"titre": "Kit interne", "url": "https://interne.example/kit"}],
+        "mois": {"2026-10": {"synthese": "Bilan interne"}}, "theme": {"mode": "sombre", "fond": "#07080f"},
+        "programme": {"surtitre": "Atlas · SEO", "intro": "Programme complet", "debut": "2026-09", "fin": "2027-03",
+                      "phases": [{"titre": "Nettoyage du piratage", "debut": "2026-09", "fin": "2026-09"}]},
+        "actions": [
+            {"id": "o1", "titre": "Annuaire sectoriel", "chantier": "off-page", "statut": "validee", "note": "remarque interne",
+             "lien": "https://github.com/atlas/site/pull/3", "pourquoi": "Aucun lien depuis le piratage", "source": "conversation"},
+            {"id": "o2", "titre": "Commander deux articles", "chantier": "off-page", "statut": "faite", "maj": "2026-10-08",
+             "lien": "https://media.example/article"},
+            {"id": "o3", "titre": "Fiche rejetée", "chantier": "off-page", "statut": "refusee"},
+            {"id": "o4", "titre": "Changer le mot de passe admin", "chantier": "off-page", "statut": "proposee"},
+            {"id": "s1", "titre": "Mettre à jour Wordfence", "chantier": "securite", "statut": "faite"},
+            {"id": "c1", "titre": "Brouillon 21200 à relire", "chantier": "contenus", "statut": "validee"}],
+        "liens": [{"url": "https://media.example/article", "domaine": "media.example", "date": "2026-10-08"}],
+        "backlinks": {
+            "synthese": "Dix domaines propres.", "responsable": "Le consultant",
+            "documents": [{"titre": "Brief", "url": "https://github.com/atlas/site/blob/main/brief.md"}],
+            "mois": {"2026-10": {"taches": [{"qui": "Consultant", "texte": "Commander", "action": "o2"},
+                                            {"qui": "Claude", "texte": "Sécuriser", "action": "s1"},
+                                            {"qui": "Claude", "texte": "Voir https://claude.ai/code/session_x"}]}},
+            "guide": [{"titre": "Contexte", "blocs": [
+                {"liste": ["Site nettoyé chez l'hébergeur OVH", "Dix domaines propres"]},
+                {"table": {"colonnes": ["Cible", "Note"], "lignes": [["Média A", "ok"], ["Dépôt", "https://github.com/atlas"]]}},
+                {"note": "Accès : jamais par e-mail, WP_APP_PASSWORD dans le .env"}]},
+                {"titre": "Accès OVH", "blocs": [{"texte": "interne"}]}]}}]}
+
+    def exporter(self, *extra):
+        (self.dossier / "tableau.html").write_text(P.ecrire_etat(GABARIT, self.ETAT), encoding="utf-8")
+        return lancer("pilotage.py", "exporter", "--html", "tableau.html", "--projet-id", "atlas", "--vue", "backlinks",
+                      "--sortie", "vue.html", *extra, cwd=self.dossier)
+
+    def test_vue_backlinks_sans_rien_d_interne(self):
+        r = self.exporter("--interdit", r"\bOVH\b", "--interdit", "piratage|wordfence")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        html = (self.dossier / "vue.html").read_text(encoding="utf-8")
+        etat = P.lire_etat(html)
+        q = etat["projets"][0]
+        self.assertEqual(etat["vue"], {"nom": "backlinks", "onglets": ["liens", "roadmap", "actions"], "lecture_seule": True,
+                                       "message": P.VUES_EXPORT["backlinks"]["message"]})
+        self.assertEqual(set(q), {"id", "nom", "site", "theme", "backlinks", "liens", "actions", "programme"})
+        self.assertEqual(q["programme"], {"surtitre": "Atlas · SEO", "intro": "Programme complet", "debut": "2026-09",
+                                          "fin": "2027-03"})                     # en-tête réduit : pas de phases
+        self.assertEqual([a["id"] for a in q["actions"]], ["o1", "o2"])          # off-page seulement, ni refusée ni secret
+        o1 = q["actions"][0]
+        self.assertEqual(set(o1), {"id", "titre", "chantier", "statut"})        # ni note, ni source, ni lien de dépôt
+        taches = q["backlinks"]["mois"]["2026-10"]["taches"]
+        self.assertEqual(taches[0]["action"], "o2")                              # action exportée : lien gardé
+        self.assertEqual((taches[1].get("action"), taches[1]["statut"]), (None, "fait"))   # absente : son statut reste
+        self.assertEqual(len(taches), 2)                                          # la tâche au lien de session tombe
+        g = q["backlinks"]["guide"]
+        self.assertEqual([s["titre"] for s in g], ["Contexte"])                  # section au titre interdit retirée
+        self.assertEqual(g[0]["blocs"][0]["liste"], ["Dix domaines propres"])
+        self.assertEqual(g[0]["blocs"][1]["table"]["lignes"], [["Média A", "ok"]])   # ligne entière, colonnes intactes
+        self.assertEqual(len(g[0]["blocs"]), 2)                                   # bloc vidé retiré
+        self.assertFalse(q["backlinks"].get("documents"))                      # document au lien de dépôt retiré
+        self.assertEqual(etat["titre"], "Programme backlinks · Atlas")
+        donnees = json.dumps(etat, ensure_ascii=False)
+        for interdit in ("claude.ai/code", "github", "atlas/site", "Wordfence", "OVH", "piratage", "21200", "mot de passe",
+                         "Kit interne", "Bilan interne", "notion.example", "remarque interne", "hote_mois", "PASSWORD"):
+            self.assertNotIn(interdit, donnees, interdit)
+        self.assertNotIn('<template id="hote">', html.split('<script type="application/json" id="etat">')[0])  # ni contenu hôte
+        self.assertIn("FIGEE", html)                                              # lecture seule, sans republication
+        self.assertIn("élément(s) retiré(s)", r.stdout)
+
+    def test_interdits_par_fichier_et_vue_inconnue(self):
+        (self.dossier / "interdits.txt").write_text("# motifs du projet\nAnnuaire\n", encoding="utf-8")
+        r = self.exporter("--interdits", "interdits.txt", "--titre", "Programme backlinks Atlas", "--intro", "Pour le consultant")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        etat = P.lire_etat((self.dossier / "vue.html").read_text(encoding="utf-8"))
+        self.assertEqual([a["id"] for a in etat["projets"][0]["actions"]], ["o2"])
+        self.assertEqual((etat["titre"], etat["projets"][0]["programme"]["intro"]), ("Programme backlinks Atlas", "Pour le consultant"))
+        self.assertIn("<title>Programme backlinks Atlas</title>", (self.dossier / "vue.html").read_text(encoding="utf-8"))
+        for mauvais in (("--vue", "tout"), ("--interdit", "(")):
+            r = lancer("pilotage.py", "exporter", "--html", "tableau.html", "--projet-id", "atlas", "--vue", "backlinks",
+                       "--sortie", "x.html", *mauvais, cwd=self.dossier)
+            self.assertNotEqual(r.returncode, 0, mauvais)
+        r = lancer("pilotage.py", "exporter", "--html", "tableau.html", "--projet-id", "autre", "--vue", "backlinks",
+                   "--sortie", "x.html", cwd=self.dossier)
+        self.assertNotEqual(r.returncode, 0)
+
+    def test_purge_et_dernier_filet(self):
+        motif = P._compiler_interdits(["secret"])
+        retraits = []
+        self.assertIsNone(P.purger({"titre": "un secret", "texte": "x"}, motif, "a", retraits))
+        self.assertEqual(P.purger({"titre": "ok", "lien": "secret"}, motif, "b", retraits), {"titre": "ok"})
+        self.assertEqual(len(retraits), 2)
+        etat = {"maj": "", "projets": [{"id": "atlas", "actions": []}], "decideur": "secret"}
+        with self.assertRaises(SystemExit):                                       # rien ne sort s'il reste un motif
+            P.vue_exportee(etat, "atlas", "backlinks", ["secret"])
+
+    def test_gabarit_vue_exportee(self):
+        for marque in ("VUES_PAGE", "EXPORT.message", "if(FIGEE){li.append(corps);return li}", "lien(p.depot_url,\"Dépôt\")"):
+            self.assertIn(marque, GABARIT)
+        self.assertNotIn("github.com", GABARIT)                                  # aucun hébergeur de code dans le code de la page
+
+    def test_injecter_depot_en_adresse(self):
+        (self.dossier / "tableau.html").write_text(GABARIT, encoding="utf-8")
+        r = lancer("pilotage.py", "injecter", "--html", "tableau.html", "--projet-id", "atlas", "--depot", "atlas/site",
+                   cwd=self.dossier)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        p = P.lire_etat((self.dossier / "tableau.html").read_text(encoding="utf-8"))["projets"][0]
+        self.assertEqual((p["depot"], p["depot_url"]), ("atlas/site", "https://github.com/atlas/site"))
