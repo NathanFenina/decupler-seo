@@ -1,5 +1,42 @@
 # Journal des versions
 
+## 3.12.0
+
+La page de suivi prend la mise en page d'un **programme client** (en-tête de
+programme, frise des phases, titres en police d'affiche) et la vue
+**Backlinks s'organise par mois**. Même JSON, mêmes commandes, même URL :
+une page en 3.11 se réinjecte sans perte (`integrer --hote <page> --etat-depuis <page>`).
+
+### Ajouté
+
+- **`pilotage.py backlinks --fichier plan.json`** : le plan de netlinking dans
+  l'état (`projet.backlinks`) : synthèse, responsable, brief, documents,
+  indicateurs, pages à pousser, règles, et mois par mois l'objectif, le
+  budget, les tâches par personne (reliées aux actions par leur id) et les
+  cibles. Relancé, il met à jour sans doubler.
+- **Vue Backlinks par mois** : frise des mois, puis pour le mois choisi
+  « qui fait quoi », les cibles, les liens obtenus et les actions off-page du
+  mois ; pages à pousser, règles du jeu, tous les liens, toutes les actions
+  off-page (repliées).
+- **`pilotage.py programme --fichier programme.json`** : surtitre,
+  introduction, période et phases du programme ; la frise des phases s'affiche
+  dans la synthèse et au-dessus des mois de la roadmap, alignée sur eux.
+- **Charte claire et sombre** : `theme.clair` (et `theme.sombre`) font suivre
+  au tableau de bord le thème du lecteur, chaque mode avec ses jetons ; jetons
+  `creux`, `encre2`, couleurs d'état et `chiffre` en plus. Les valeurs sont
+  filtrées (pas d'injection CSS par la charte).
+
+### Modifié
+
+- Mise en page : en-tête de programme (surtitre, titre, introduction, ardoise
+  période / actions / décisions / mise à jour), titres et chiffres en police
+  d'affiche, étiquettes en petites capitales, cartes et tableaux plus sobres,
+  palette par défaut neutre en clair et en sombre, onglet choisi toujours
+  visible sur mobile.
+- Le contenu hôte d'une page intégrée est rendu dans une ombre (shadow DOM) :
+  ses styles (`:root`, `body`) ne débordent plus sur le tableau de bord ni sur
+  le thème clair.
+
 ## 3.11.1
 
 Les pages neuves ne partent plus en lot : elles se **programment**, espacées

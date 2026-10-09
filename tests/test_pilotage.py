@@ -328,6 +328,66 @@ class TestProgramme(DossierIsole):
         self.assertIn('<template id="hote"></template>', sans)                 # jamais le code de la page comme contenu
 
 
+class TestBacklinksEtProgramme(DossierIsole):
+    """Vue Backlinks organisée par mois, en-tête et phases du programme : relancer ne double rien."""
+
+    PLAN = {"synthese": "Profil de liens propre en six mois", "responsable": "Consultant",
+            "brief": {"titre": "Brief", "url": "https://exemple.test/brief"},
+            "indicateurs": [{"nom": "Domaines propres", "depart": "10"}],
+            "regles": [{"titre": "Ancres", "texte": "Marque d'abord"}],
+            "mois": {"2026-10": {"titre": "Fondations", "cible": "+8 à 11",
+                                 "taches": [{"qui": "Consultant", "texte": "Fiche annuaire A", "statut": "a-faire"},
+                                            {"qui": "Client", "texte": "Valider la commande", "action": "a1"}],
+                                 "cibles": [{"nom": "Annuaire A", "priorite": "0"}]},
+                     "2026-11": {"titre": "Premiers achats"}}}
+
+    def test_plan_fusionne_sans_doublon(self):
+        p = {"id": "atlas"}
+        P.fusionner_backlinks(p, self.PLAN)
+        P.fusionner_backlinks(p, {"mois": {"2026-10": {"taches": [{"texte": "fiche annuaire a", "statut": "fait"}],
+                                                          "cibles": [{"nom": "Annuaire B"}]}},
+                                  "indicateurs": [{"nom": "Domaines propres", "cible_3m": "+20"}]})
+        b = p["backlinks"]
+        octobre = b["mois"]["2026-10"]
+        self.assertEqual(len(octobre["taches"]), 2)
+        self.assertEqual(octobre["taches"][0]["statut"], "fait")                 # mise à jour, pas de doublon
+        self.assertEqual(octobre["taches"][0]["qui"], "Consultant")              # le reste est conservé
+        self.assertEqual([c["nom"] for c in octobre["cibles"]], ["Annuaire A", "Annuaire B"])
+        self.assertEqual(b["indicateurs"], [{"nom": "Domaines propres", "depart": "10", "cible_3m": "+20"}])
+        self.assertEqual(list(b["mois"]), ["2026-10", "2026-11"])
+        self.assertEqual(octobre["titre"], "Fondations")
+        with self.assertRaises(SystemExit):
+            P.fusionner_backlinks(p, {"mois": {"octobre": {}}})
+
+    def test_commandes_backlinks_et_programme(self):
+        page = self.dossier / "tableau.html"
+        page.write_text(GABARIT, encoding="utf-8")
+        (self.dossier / "plan.json").write_text(json.dumps(self.PLAN), encoding="utf-8")
+        prog = {"surtitre": "Atlas · SEO", "intro": "Le programme", "debut": "2026-09", "fin": "2027-03",
+                "phases": [{"titre": "Presse", "debut": "2027-01", "fin": "2027-03"},
+                           {"titre": "Fondations", "debut": "2026-10", "fin": "2026-12"}]}
+        (self.dossier / "prog.json").write_text(json.dumps(prog), encoding="utf-8")
+        for _ in range(2):
+            for cmd, f in (("backlinks", "plan.json"), ("programme", "prog.json")):
+                r = lancer("pilotage.py", cmd, "--html", "tableau.html", "--projet-id", "atlas", "--fichier", f,
+                           cwd=self.dossier)
+                self.assertEqual(r.returncode, 0, r.stderr)
+        p = P.lire_etat(page.read_text(encoding="utf-8"))["projets"][0]
+        self.assertEqual(len(p["backlinks"]["mois"]["2026-10"]["taches"]), 2)
+        self.assertEqual([x["titre"] for x in p["programme"]["phases"]], ["Fondations", "Presse"])   # rangées par date
+        self.assertEqual(p["programme"]["surtitre"], "Atlas · SEO")
+        (self.dossier / "faux.json").write_text(json.dumps({"phases": [{"titre": "X", "debut": "oct."}]}), encoding="utf-8")
+        r = lancer("pilotage.py", "programme", "--html", "tableau.html", "--projet-id", "atlas", "--fichier", "faux.json",
+                   cwd=self.dossier)
+        self.assertNotEqual(r.returncode, 0)
+
+    def test_gabarit_backlinks_par_mois_theme_clair_et_hote_isole(self):
+        for marque in ("detailBacklinks", "moisBacklinks", "statutTache", "frise(", "p.programme", "rendreHote",
+                       "attachShadow", "pl-theme", "theme.clair", 'prefers-color-scheme:dark', ':root[data-theme="dark"]'):
+            self.assertIn(marque, GABARIT)
+        self.assertIn("valeurSure", GABARIT)                                        # pas d'injection CSS par la charte
+
+
 class TestMois(unittest.TestCase):
     def test_semaine_remplacee_et_wins_mis_a_jour(self):
         p = {"id": "atlas"}

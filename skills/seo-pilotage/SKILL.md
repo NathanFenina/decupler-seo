@@ -37,10 +37,31 @@ La page est organisée en six vues :
   clic ouvre le mois en couloirs par chantier.
 - **Plan d'actions** : toutes les actions, recherche et filtres (chantier,
   statut, mois, qui), avec un compteur.
-- **Backlinks** : les liens obtenus (`projet.liens`) et les actions off-page.
+- **Backlinks** : le plan de netlinking **mois par mois** (`projet.backlinks`) :
+  synthèse, brief et documents, indicateurs, frise des mois, puis pour le mois
+  choisi l'objectif, le budget, « qui fait quoi » (tâches par personne, reliées
+  aux actions par leur id), les cibles du mois, les liens obtenus et les actions
+  off-page ; ensuite les pages à pousser, les règles du jeu et tous les liens.
 - **Reporting** : un onglet par mois (reporting, fait, à faire, wins,
   contenus, liens du mois, semaine par semaine, cartographie). Le contenu
   hôte d'une page intégrée reste dans l'onglet de son mois.
+
+L'en-tête est celui d'un programme : surtitre, titre, introduction et ardoise
+(période, actions, décisions, mise à jour) ; la roadmap porte une frise des
+phases alignée sur les mois. Les deux s'écrivent avec
+`pilotage.py programme --fichier programme.json`
+(`{surtitre, intro, debut, fin, phases: [{titre, debut, fin, texte}]}`).
+
+Le plan de netlinking s'écrit avec `pilotage.py backlinks --fichier plan.json` :
+`{synthese, responsable, brief: {titre, url}, documents, indicateurs: [{nom, depart,
+cible_3m, cible_6m, mesure}], pages: [{page, requete, depart, liens, note}],
+regles: [{titre, texte}], mois: {"AAAA-MM": {titre, objectif, cible, budget, temps,
+taches: [{qui, texte, statut | action}], cibles: [{nom, priorite, type, etat, cout,
+lien, url}]}}}`. Une tâche qui porte `action` (id d'une action) affiche le statut
+de cette action ; sinon `statut` : `a-faire`, `en-cours`, `fait`, `bloque`.
+Relancé, il met à jour sans rien doubler (tâche repérée par son texte, cible
+par son nom). Jamais d'identifiant, de mot de passe ni de détail de sécurité
+dans ce plan : la page se partage et sa copie part dans git.
 
 Le mois d'une action est son `mois_cible` s'il existe, sinon son `mois`. Une
 action faite se range dans le mois de sa date (`maj`) ; une action ouverte d'un
@@ -74,7 +95,12 @@ Chaque projet garde sa charte : `pilotage.py injecter --theme theme.json`, avec
 les jetons du design system du client (`mode` sombre ou clair, `fond`, `carte`,
 `encre`, `doux`, `trait`, `accent`, `accent_doux`, `cta`, `cta_texte`, `lien`,
 `titre`, `texte`, `polices` = URL Google Fonts). En mode sombre, la page suit
-la marque quel que soit le thème du lecteur. Vérifier les contrastes (texte
+la marque quel que soit le thème du lecteur. Pour suivre le thème du lecteur
+(clair ou sombre), ajouter `clair` (et au besoin `sombre`) : des jetons qui
+remplacent ceux du thème dans ce mode, par exemple
+`{"mode": "auto", "fond": "#07080f", …, "clair": {"fond": "#f6f5fb", "encre": "#12131f", …}}`.
+Jetons possibles en plus : `creux` (fonds de tableaux et frise), `encre2` (texte
+secondaire), `attente`, `ok`, `non`, `info` et leurs `_doux`, `chiffre`. Vérifier les contrastes (texte
 4,5:1, bouton `cta` / `cta_texte` compris) avant de publier.
 
 ## Rien ne se perd

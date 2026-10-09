@@ -32,6 +32,10 @@ bloc : jamais au reste de la page.
     python3 pilotage.py lien --html tableau.html --projet-id atlas --url https://media.example/article \
         --cible /audit-geo/ --ancre "audit GEO" --prix 180 --attribut dofollow --statut en-ligne
 
+    # 7. Le plan de netlinking mois par mois (vue Backlinks), l'en-tête et les phases du programme
+    python3 pilotage.py backlinks --html tableau.html --projet-id atlas --fichier donnees/backlinks.json
+    python3 pilotage.py programme --html tableau.html --projet-id atlas --fichier donnees/programme.json
+
 La page est un programme sur plusieurs mois : synthèse (chiffres du dernier
 bilan, décisions urgentes, avancement par chantier), à décider (bloqué, puis à
 valider par chantier), roadmap chantier × mois, plan d'actions filtrable,
@@ -665,6 +669,96 @@ def fusionner_mois(p: dict, bilan: dict) -> dict:
     return m
 
 
+def _fusionner_liste(liste: list[dict], nouveaux: list[dict], ident: str) -> list[dict]:
+    """Ajoute ou met à jour des éléments repérés par `ident` (casse et espaces ignorés) : jamais de doublon."""
+    for el in nouveaux or []:
+        k = str(el.get(ident) or "").strip().lower()
+        existant = next((x for x in liste if k and str(x.get(ident) or "").strip().lower() == k), None)
+        if existant:
+            existant.update({c: v for c, v in el.items() if v not in (None, "")})
+        else:
+            liste.append(el)
+    return liste
+
+
+# Clé d'identification des listes du plan de netlinking (vue Backlinks).
+IDENT_BACKLINKS = {"indicateurs": "nom", "pages": "page", "regles": "titre", "documents": "url"}
+IDENT_MOIS_BACKLINKS = {"taches": "texte", "cibles": "nom"}
+
+
+def fusionner_backlinks(p: dict, plan: dict) -> dict:
+    """Reporte un plan de netlinking dans la vue Backlinks, mois par mois, sans rien perdre.
+
+    `plan` : {"synthese", "responsable", "brief": {titre, url}, "documents": [{titre, url, note}],
+    "indicateurs": [{nom, depart, cible_3m, cible_6m, mesure}], "pages": [{page, requete, depart, liens, note}],
+    "regles": [{titre, texte}], "mois": {"AAAA-MM": {titre, objectif, cible, budget, temps, note,
+    "taches": [{qui, texte, statut, action, lien}], "cibles": [{nom, priorite, type, etat, cout, lien, url}]}}}.
+    Un élément déjà présent (même nom, même texte, même page) est mis à jour ; relancer ne double rien.
+    Une tâche reliée à une action (`action` = id) prend dans la page le statut de cette action."""
+    for m in plan.get("mois") or {}:
+        mois_valide(m)
+    b = p.setdefault("backlinks", {})
+    for cle, v in plan.items():
+        if cle == "mois" or v in (None, "", [], {}):
+            continue
+        if cle in IDENT_BACKLINKS:
+            b[cle] = _fusionner_liste(b.setdefault(cle, []), v, IDENT_BACKLINKS[cle])
+        else:
+            b[cle] = v
+    for m, contenu in (plan.get("mois") or {}).items():
+        cible = b.setdefault("mois", {}).setdefault(m, {})
+        for cle, v in contenu.items():
+            if v in (None, "", [], {}):
+                continue
+            if cle in IDENT_MOIS_BACKLINKS:
+                cible[cle] = _fusionner_liste(cible.setdefault(cle, []), v, IDENT_MOIS_BACKLINKS[cle])
+            else:
+                cible[cle] = v
+    if b.get("mois"):
+        b["mois"] = dict(sorted(b["mois"].items()))
+    return b
+
+
+def fusionner_programme(p: dict, prog: dict) -> dict:
+    """En-tête et phases du programme (frise de la roadmap) : {surtitre, intro, debut, fin, phases: [{titre, debut, fin, texte}]}.
+
+    Les phases sont repérées par leur titre ; une phase reprise est mise à jour, jamais doublée."""
+    for cle in ("debut", "fin"):
+        if prog.get(cle):
+            mois_valide(prog[cle])
+    for ph in prog.get("phases") or []:
+        for cle in ("debut", "fin"):
+            mois_valide(ph.get(cle) or "")
+    g = p.setdefault("programme", {})
+    for cle, v in prog.items():
+        if v in (None, "", []):
+            continue
+        g[cle] = _fusionner_liste(g.setdefault("phases", []), v, "titre") if cle == "phases" else v
+    if g.get("phases"):
+        g["phases"].sort(key=lambda x: (x.get("debut", ""), x.get("fin", "")))
+    return g
+
+
+def _commande_fichier(a, fusion, libelle: str) -> int:
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = projet_de(etat, a.projet_id, creer=True)
+    r = fusion(p, json.loads(Path(a.fichier).read_text(encoding="utf-8")))
+    etat["maj"] = dt.date.today().isoformat()
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ {libelle} · " + ", ".join(f"{k} : {len(v)}" for k, v in r.items() if isinstance(v, (list, dict))))
+    return 0
+
+
+def cmd_backlinks(a) -> int:
+    return _commande_fichier(a, fusionner_backlinks, "plan de netlinking (vue Backlinks)")
+
+
+def cmd_programme(a) -> int:
+    return _commande_fichier(a, fusionner_programme, "programme (en-tête et phases)")
+
+
 def cmd_mois(a) -> int:
     page = Path(a.html)
     html = page.read_text(encoding="utf-8")
@@ -802,6 +896,17 @@ def main() -> int:
     p.add_argument("--projet-id", required=True)
     p.add_argument("--fichier", required=True, help="JSON {mois, synthese, reporting, wins, contenus, semaine}")
     p.set_defaults(f=cmd_mois)
+    p = sp.add_parser("backlinks", help="plan de netlinking mois par mois (vue Backlinks) : objectifs, tâches, cibles")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--fichier", required=True,
+                   help="JSON {synthese, responsable, brief, documents, indicateurs, pages, regles, mois: {AAAA-MM: {…}}}")
+    p.set_defaults(f=cmd_backlinks)
+    p = sp.add_parser("programme", help="en-tête du programme et phases de la roadmap (frise)")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--fichier", required=True, help="JSON {surtitre, intro, debut, fin, phases: [{titre, debut, fin, texte}]}")
+    p.set_defaults(f=cmd_programme)
     p = sp.add_parser("sauvegarder", help="copie de sûreté du projet dans git")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)
