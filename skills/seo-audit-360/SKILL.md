@@ -60,7 +60,7 @@ Lancez ces agents **en parallèle** (un seul message, plusieurs appels) :
 | `seo-eeat` | Experience, Expertise, Autorité, Confiance |
 | `seo-schema` | détection, validation, opportunités |
 | `seo-crawler` | architecture, profondeur, orphelines |
-| `seo-geo` | citabilité par les moteurs IA |
+| `seo-geo` | citabilité par les moteurs IA, accès des robots et agents IA (`agents_ia.py`) |
 | `seo-data` | GSC + GA4 : ce qui performe réellement |
 
 Chaque agent renvoie : un score /100, ses constats, et pour chaque constat

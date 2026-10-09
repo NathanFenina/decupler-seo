@@ -51,6 +51,22 @@ propriété Search Console. Pour qui ne veut pas voir un terminal.
 clé est faite en Python pur) : `perf`, `page`, `instantane`, `temoin`,
 `sitemap`, `inspect`. C'est lui que la boucle de mesure utilise.
 
+#### Méthode C — Votre propre compte Google, par gcloud (5 min)
+
+Quand le compte de service n'a pas été ajouté à toutes vos propriétés,
+`gsc.py` peut utiliser votre propre connexion Google :
+
+```bash
+gcloud auth application-default login \
+  --scopes=https://www.googleapis.com/auth/webmasters.readonly,https://www.googleapis.com/auth/cloud-platform
+gcloud auth application-default set-quota-project <votre-projet-google-cloud>
+```
+
+La Search Console API doit être activée sur ce projet. Sans compte de
+service configuré, `gsc.py` prend ces identifiants tout seul ; `GSC_AUTH=adc`
+les force même si un compte de service existe. Sur votre poste seulement :
+une routine cloud n'a pas votre connexion gcloud.
+
 > ⚠️ Ne donnez **jamais** le rôle propriétaire à un compte de service.
 > Lecture seule suffit pour tout, sauf `gsc.py sitemap --resoumettre` qui
 > demande l'autorisation « complète ».

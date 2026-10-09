@@ -25,7 +25,8 @@ from _projet import charger_env, config_est_le_modele, fichier_config, racine_pr
 OUTILS = [
     ("search-console", "Google Search Console", ["GSC_SA_JSON|GSC_CREDENTIALS_JSON"], 1,
      "Quick wins, rapports, diagnostic de chute de trafic, priorisation réelle",
-     "Google Cloud → Search Console API → compte de service", "gratuit"),
+     "Google Cloud → Search Console API → compte de service, ou votre compte : "
+     "gcloud auth application-default login (voir gsc.py)", "gratuit"),
     ("google-analytics", "Google Analytics 4", ["GA4_PROPERTY_ID", "GA4_CREDENTIALS_JSON"], 1,
      "Conversions organiques, valeur business par page, rapport mensuel complet",
      "Google Cloud → Analytics Data API → compte de service", "gratuit"),

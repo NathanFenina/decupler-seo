@@ -20,6 +20,16 @@ Authentification, la première trouvée gagne :
      client_email doit être ajoutée comme utilisateur dans Search Console,
      propriété par propriété, en lecture seule.
   2. OAuth utilisateur — GSC_CLIENT_ID, GSC_CLIENT_SECRET, GSC_REFRESH_TOKEN.
+  3. Votre propre compte Google par gcloud (identifiants par défaut, ADC),
+     utile quand le compte de service n'a pas accès à toutes vos propriétés :
+
+       gcloud auth application-default login \
+         --scopes=https://www.googleapis.com/auth/webmasters.readonly,https://www.googleapis.com/auth/cloud-platform
+       gcloud auth application-default set-quota-project <projet-google-cloud>
+
+     Lu dans GOOGLE_APPLICATION_CREDENTIALS s'il pointe vers un fichier
+     « authorized_user », sinon dans le fichier par défaut de gcloud.
+     GSC_AUTH=adc le choisit même si un compte de service est configuré.
 
 Aucune dépendance : la signature RS256 du compte de service est faite en
 Python pur (voir _signer_rs256_pur).
@@ -34,6 +44,7 @@ import argparse
 import base64
 import datetime as dt
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -171,6 +182,44 @@ def _jeton_compte_de_service(sa: dict, scope: str) -> dict:
         return json.load(rep)
 
 
+def fichier_adc() -> Path | None:
+    """Le fichier d'identifiants par défaut de gcloud, s'il est de type « authorized_user »."""
+    candidats = []
+    if _env("GOOGLE_APPLICATION_CREDENTIALS"):
+        candidats.append(resoudre(_env("GOOGLE_APPLICATION_CREDENTIALS")))
+    if os.environ.get("CLOUDSDK_CONFIG"):
+        candidats.append(Path(os.environ["CLOUDSDK_CONFIG"]) / "application_default_credentials.json")
+    if os.environ.get("APPDATA"):
+        candidats.append(Path(os.environ["APPDATA"]) / "gcloud" / "application_default_credentials.json")
+    candidats.append(Path.home() / ".config" / "gcloud" / "application_default_credentials.json")
+    for c in candidats:
+        try:
+            if c.is_file() and json.loads(c.read_text(encoding="utf-8")).get("type") == "authorized_user":
+                return c
+        except (OSError, ValueError):
+            continue
+    return None
+
+
+def _jeton_adc(fichier: Path) -> dict:
+    """Rafraîchit le jeton gcloud : les droits sont ceux accordés au moment du login."""
+    adc = json.loads(fichier.read_text(encoding="utf-8"))
+    data = urllib.parse.urlencode({
+        "client_id": adc["client_id"], "client_secret": adc["client_secret"],
+        "refresh_token": adc["refresh_token"], "grant_type": "refresh_token"}).encode()
+    try:
+        with urllib.request.urlopen(urllib.request.Request("https://oauth2.googleapis.com/token", data=data),
+                                    timeout=60) as rep:
+            d = json.load(rep)
+    except urllib.error.HTTPError as exc:
+        raise ErreurGSC("Le jeton gcloud ne se rafraîchit pas : relancez « gcloud auth application-default login "
+                        "--scopes=…webmasters.readonly,…cloud-platform ».\n"
+                        + exc.read().decode("utf-8", "replace")[:300]) from exc
+    _projet_quota["valeur"] = _env("GSC_QUOTA_PROJECT") or adc.get("quota_project_id", "")
+    return d
+
+
+_projet_quota = {"valeur": ""}
 _cache: dict = {}
 
 
@@ -184,7 +233,12 @@ def jeton(ecriture: bool = False) -> str:
 
     scope = ("https://www.googleapis.com/auth/webmasters" if ecriture
              else "https://www.googleapis.com/auth/webmasters.readonly")
-    sa = _cle_compte_de_service()
+    force_adc = _env("GSC_AUTH").lower() == "adc"
+    sa = None if force_adc else _cle_compte_de_service()
+    adc = fichier_adc()
+    if force_adc and not adc:
+        raise ErreurGSC("GSC_AUTH=adc mais aucun identifiant gcloud « authorized_user » : lancez "
+                        "« gcloud auth application-default login --scopes=…webmasters.readonly,…cloud-platform ».")
     if sa:
         d = _jeton_compte_de_service(sa, scope)
     elif all(_env(k) for k in ("GSC_CLIENT_ID", "GSC_CLIENT_SECRET", "GSC_REFRESH_TOKEN")):
@@ -194,10 +248,13 @@ def jeton(ecriture: bool = False) -> str:
         with urllib.request.urlopen(urllib.request.Request("https://oauth2.googleapis.com/token",
                                                            data=data), timeout=60) as rep:
             d = json.load(rep)
+    elif adc:
+        d = _jeton_adc(adc)
     else:
         raise ErreurGSC("Aucun identifiant Search Console. Définissez GSC_SA_JSON ou "
-                        "GSC_CREDENTIALS_JSON (compte de service, recommandé), ou le trio "
-                        "GSC_CLIENT_ID / GSC_CLIENT_SECRET / GSC_REFRESH_TOKEN.")
+                        "GSC_CREDENTIALS_JSON (compte de service, recommandé), le trio "
+                        "GSC_CLIENT_ID / GSC_CLIENT_SECRET / GSC_REFRESH_TOKEN, ou connectez votre "
+                        "compte Google avec « gcloud auth application-default login ».")
 
     _cache[cle_cache] = (d["access_token"], time.time() + d.get("expires_in", 3600))
     return d["access_token"]
@@ -205,14 +262,18 @@ def jeton(ecriture: bool = False) -> str:
 
 def identifiants_presents() -> bool:
     return bool(_env("GSC_SA_JSON") or _env("GSC_CREDENTIALS_JSON")
-                or all(_env(k) for k in ("GSC_CLIENT_ID", "GSC_CLIENT_SECRET", "GSC_REFRESH_TOKEN")))
+                or all(_env(k) for k in ("GSC_CLIENT_ID", "GSC_CLIENT_SECRET", "GSC_REFRESH_TOKEN"))
+                or fichier_adc())
 
 
 def appel(url: str, corps: dict | None = None, methode: str | None = None, ecriture: bool = False):
+    entetes = {"Authorization": "Bearer " + jeton(ecriture), "Content-Type": "application/json"}
+    if _projet_quota["valeur"]:
+        # Identifiants gcloud : l'appel est facturé (quota) au projet Google Cloud indiqué.
+        entetes["x-goog-user-project"] = _projet_quota["valeur"]
     requete = urllib.request.Request(
         url, data=json.dumps(corps).encode() if corps is not None else None,
-        method=methode or ("POST" if corps is not None else "GET"),
-        headers={"Authorization": "Bearer " + jeton(ecriture), "Content-Type": "application/json"})
+        method=methode or ("POST" if corps is not None else "GET"), headers=entetes)
     for essai in range(5):
         try:
             with urllib.request.urlopen(requete, timeout=120) as rep:
@@ -225,10 +286,14 @@ def appel(url: str, corps: dict | None = None, methode: str | None = None, ecrit
                 time.sleep(2 ** essai)
                 continue
             if exc.code == 403:
-                raise ErreurGSC("HTTP 403. Le compte n'a probablement pas accès à cette propriété : "
-                                "Search Console → Paramètres → Utilisateurs et autorisations → "
-                                "ajouter l'adresse client_email de la clé, en lecture seule.\n"
-                                + detail[:300]) from exc
+                conseil = ("Avec gcloud : vérifiez que votre compte Google voit la propriété, que la Search "
+                           "Console API est activée sur le projet de quota (gcloud auth application-default "
+                           "set-quota-project) et que le login a demandé le scope webmasters.readonly."
+                           if _projet_quota["valeur"] or (fichier_adc() and not _cle_compte_de_service()) else
+                           "Le compte n'a probablement pas accès à cette propriété : Search Console → "
+                           "Paramètres → Utilisateurs et autorisations → ajouter l'adresse client_email "
+                           "de la clé, en lecture seule.")
+                raise ErreurGSC("HTTP 403. " + conseil + "\n" + detail[:300]) from exc
             raise ErreurGSC(f"HTTP {exc.code} : {detail[:400]}") from exc
         except urllib.error.URLError as exc:
             if essai == 4:

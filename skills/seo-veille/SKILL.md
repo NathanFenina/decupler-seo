@@ -75,7 +75,16 @@ Le principal défaut d'une surveillance est le bruit. Filtres à appliquer :
 
 ## Les mises à jour Google
 
-Surveillez les annonces officielles. Quand une mise à jour est confirmée :
+Surveillez les annonces officielles : `maj_google.py` lit le tableau de bord
+Google Search Status, avec les dates de début et de fin.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maj_google.py"              # les 10 dernières
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maj_google.py" en-cours     # code 1 si un déploiement est en cours
+```
+
+Dans une routine, `en-cours` en tête : code 1 → la routine consigne les
+mesures mais ne modifie pas le site. Quand une mise à jour est confirmée :
 
 1. Notez la date de début et de fin de déploiement
 2. **N'analysez rien pendant le déploiement** — les positions bougent dans
@@ -89,17 +98,24 @@ saurez jamais ce qui a causé quoi.
 ## La veille vidéo : chaînes YouTube et méthodes du métier
 
 Une partie de la veille métier passe par des vidéos (mises à jour d'outils,
-retours d'expérience). `youtube.py` les rend lisibles par Claude, sans clé :
+retours d'expérience). `youtube.py` les rend lisibles par Claude :
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" videos @chaine --shorts      # 15 dernières publications
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" transcription <url> --sortie veille/<date>-<slug>.md
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" analyser <url> --sortie veille/<date>-<slug>.md
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" analyser <url> --question "Quelles commandes tape-t-il ?"
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/youtube.py" transcription <url>           # sous-titres bruts
 ```
 
-`transcription` demande `pip install youtube-transcript-api`. YouTube refuse
-souvent les sous-titres aux serveurs (routines cloud) : lancez-la depuis
-votre poste, ou réglez `YOUTUBE_PROXY_URL`. Le titre et la liste des vidéos,
-eux, passent partout.
+**`analyser` est la voie par défaut** : Gemini regarde la vidéo (image et
+son) et rend un résumé, les pratiques montrées horodatées, les chiffres
+annoncés avec leur contexte, les affirmations à vérifier et les outils
+cités. Il marche aussi depuis une routine cloud. Clé `GEMINI_API_KEY`
+(celle de `share_of_model.py`), environ 300 jetons par seconde de vidéo.
+
+`transcription` (sous-titres, `pip install youtube-transcript-api`) est
+souvent refusée aux serveurs par YouTube : depuis votre poste, ou avec
+`YOUTUBE_PROXY_URL`.
 
 Ce qu'on fait d'une transcription :
 

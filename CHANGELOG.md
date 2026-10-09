@@ -7,9 +7,38 @@
   avec leur ligne, passages « humanisés » repérés, `--seuil`, `--cout`.
   Clé `PANGRAM_API_KEY`, ligne dans `/seo doctor`.
 - **`youtube.py`** : veille vidéo dans `seo-veille`. `videos` liste les
-  dernières publications d'une chaîne (flux RSS, sans clé), `transcription`
+  dernières publications d'une chaîne (flux RSS, sans clé) ; `analyser` fait
+  regarder la vidéo par Gemini (pratiques horodatées, chiffres, affirmations
+  à vérifier, outils), y compris depuis une routine cloud ; `transcription`
   rend les sous-titres en Markdown horodaté (`youtube-transcript-api`,
   `YOUTUBE_PROXY_URL` quand YouTube bloque un serveur).
+- **`maj_google.py`** : les mises à jour du classement Google avec leurs
+  dates officielles de début et de fin, lues sur le tableau de bord Google
+  Search Status (`incidents.json`, cache d'un jour) et complétées par un
+  historique sourcé (`config/mises-a-jour-google.json`). `periode` dit quelle
+  mise à jour recouvre une chute (marge de 7 jours), `en-cours` sort en code 1
+  pendant un déploiement, `rumeurs` liste les affirmations non vérifiées à ne
+  pas utiliser. Branché dans `seo-traffic-drop` et `seo-veille`.
+- **`agents_ia.py`** : préparation du site aux robots et agents IA. robots.txt
+  agent par agent avec la sélection de groupe de la RFC 9309, Content-Signal,
+  llms.txt selon les règles Lighthouse (fausse 404 comprise), version
+  Markdown de la page, ai-catalog.json, WebMCP, contenu rendu côté serveur.
+  Sépare ce qui coûte de la visibilité de ce qui reste facultatif. Branché
+  dans `geo-visibilite-ia` et l'audit 360.
+- **`budget.py` et `hooks/budget.sh`** : plafond de dépenses des API payantes.
+  Le hook estime chaque appel MCP DataForSEO (coût réel consigné après coup),
+  compte les appels Ahrefs, Semrush, Firecrawl, Perplexity, Ubersuggest,
+  demande une confirmation au-delà de `seuils.budget_demander_usd` et bloque
+  au-delà de `seuils.budget_mensuel_usd`. Journal par projet
+  (`.seo-decupler/depenses.csv`), `budget.py etat` pour le mois ; `demande.py`
+  y consigne aussi ses appels.
+- **`gsc.py` avec votre compte Google** : repli sur les identifiants gcloud
+  (`gcloud auth application-default login`) quand aucun compte de service
+  n'est configuré, `GSC_AUTH=adc` pour les forcer ; projet de quota envoyé
+  dans `x-goog-user-project`. Méthode C dans `docs/MCP.md`.
+
+Les quatre derniers points reprennent des idées de claude-seo v2.4.x (MIT,
+Daniel Agrici), réécrites pour ce dispositif.
 
 - **Plafond de KD selon l'autorité du domaine** : `seo-keyword-research`
   (étape 4) fixe le KD maximum d'un mot-clé principal d'après le DR / DA du

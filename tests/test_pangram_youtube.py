@@ -111,6 +111,22 @@ class TestYouTube(unittest.TestCase):
         self.assertEqual(youtube.paragraphes(segs), [(0, "Bonjour suite"), (70, "fin")])
         self.assertEqual(youtube._horodatage(3725), "1:02:05")
 
+    def test_analyser_sans_cle(self):
+        import os
+        ancien = os.environ.pop("GEMINI_API_KEY", None)
+        try:
+            with self.assertRaises(youtube.ErreurYouTube):
+                youtube.analyser_gemini("NoGGXMrDPYM")
+        finally:
+            if ancien is not None:
+                os.environ["GEMINI_API_KEY"] = ancien
+
+    def test_markdown_analyse(self):
+        md = youtube.markdown_analyse({"id": "NoGGXMrDPYM", "titre": "Titre", "modele": "gemini", "jetons": 10,
+                                       "question": "", "texte": "## Résumé\nx"})
+        self.assertTrue(md.startswith("# Titre\n"))
+        self.assertIn("https://www.youtube.com/watch?v=NoGGXMrDPYM", md)
+
 
 if __name__ == "__main__":
     unittest.main()

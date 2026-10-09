@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
-"""Veille vidéo : dernières vidéos d'une chaîne YouTube et transcription d'une vidéo.
+"""Veille vidéo : dernières vidéos d'une chaîne YouTube, transcription, analyse par Gemini.
 
     python3 youtube.py videos @agricidaniel                     # dernières vidéos (flux RSS public, 15 publications)
     python3 youtube.py videos https://youtube.com/@agricidaniel --n 5 --json
     python3 youtube.py transcription https://www.youtube.com/watch?v=NoGGXMrDPYM
     python3 youtube.py transcription NoGGXMrDPYM --langues fr,en --sortie veille/video.md
+    python3 youtube.py analyser https://www.youtube.com/watch?v=NoGGXMrDPYM --sortie veille/video.md
+    python3 youtube.py analyser NoGGXMrDPYM --question "Quelles commandes montre-t-il ?"
 
 `videos` n'a besoin d'aucune dépendance ni d'aucune clé : il lit le flux RSS
 public de la chaîne. `transcription` lit les sous-titres (manuels, sinon
 automatiques) avec le paquet youtube-transcript-api :
 
     pip install youtube-transcript-api
+
+`analyser` fait regarder la vidéo par Gemini (image et son, sans
+sous-titres) et rend les pratiques précises qu'elle montre : c'est la voie
+qui marche aussi depuis un serveur, YouTube ne bloquant pas Google. Clé
+GEMINI_API_KEY, modèle YOUTUBE_MODELE_GEMINI (défaut gemini-flash-latest).
+Une vidéo publique seulement ; environ 300 jetons par seconde de vidéo.
 
 YouTube refuse souvent les sous-titres aux adresses de centres de données
 (routines cloud, serveurs) : « Sign in to confirm you're not a bot ». Lancez
@@ -179,6 +187,64 @@ def transcrire(vid: str, langues: list[str]) -> dict:
             "segments": segments}
 
 
+CONSIGNE_ANALYSE = """Tu analyses une vidéo pour une agence SEO qui outille Claude Code (skills, scripts, SOP).
+Réponds en français, en Markdown, sans introduction, avec ces sections :
+
+## Résumé
+Cinq lignes au plus : de quoi parle la vidéo, ce qu'elle démontre.
+
+## Pratiques montrées
+Une puce par pratique précise et reproductible : commande, réglage, seuil, ordre des étapes,
+outil, structure de fichier. Horodatage [mm:ss] au début de chaque puce. Pas de généralités.
+
+## Chiffres annoncés
+Chaque chiffre avec son contexte (période, site, source citée ou non), horodaté.
+
+## Affirmations à vérifier
+Ce qui est présenté comme un fait sur Google, les IA ou un outil et qui demande une source.
+
+## Outils et liens cités
+Nom, rôle, et adresse si elle est montrée ou dite.
+
+N'invente rien : ce qui n'est ni dit ni montré dans la vidéo n'apparaît pas."""
+
+
+def analyser_gemini(vid: str, question: str = "", modele: str = "") -> dict:
+    """Fait regarder la vidéo par Gemini (l'API accepte une URL YouTube publique comme fichier)."""
+    cle = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not cle:
+        raise ErreurYouTube("GEMINI_API_KEY absente : https://aistudio.google.com/apikey, à mettre dans .env")
+    modele = modele or os.environ.get("YOUTUBE_MODELE_GEMINI", "gemini-flash-latest")
+    consigne = question.strip() or CONSIGNE_ANALYSE
+    corps = {"contents": [{"parts": [{"file_data": {"file_uri": f"https://www.youtube.com/watch?v={vid}"}},
+                                     {"text": consigne}]}]}
+    req = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{modele}:generateContent",
+        data=json.dumps(corps).encode(), method="POST",
+        headers={"x-goog-api-key": cle, "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=600) as r:
+            d = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        raise ErreurYouTube(f"Gemini HTTP {e.code} : {e.read().decode(errors='replace')[:300]}") from e
+    except urllib.error.URLError as e:
+        raise ErreurYouTube(f"Gemini injoignable : {e.reason}") from e
+    candidat = (d.get("candidates") or [{}])[0]
+    texte = "".join(p.get("text", "") for p in candidat.get("content", {}).get("parts", []))
+    if not texte.strip():
+        raise ErreurYouTube(f"réponse vide de Gemini ({candidat.get('finishReason') or d.get('promptFeedback')})")
+    usage = d.get("usageMetadata", {})
+    return {"id": vid, "modele": d.get("modelVersion", modele), "texte": texte.strip(),
+            "jetons": usage.get("totalTokenCount"), "question": question.strip()}
+
+
+def markdown_analyse(res: dict) -> str:
+    url = f"https://www.youtube.com/watch?v={res['id']}"
+    return (f"# {res.get('titre') or res['id']}\n\nSource : {url} · analyse {res['modele']}"
+            f" ({res.get('jetons') or '?'} jetons)\n\n" + (f"Question : {res['question']}\n\n" if res["question"] else "")
+            + res["texte"] + "\n")
+
+
 def markdown_transcription(res: dict) -> str:
     url = f"https://www.youtube.com/watch?v={res['id']}"
     sortie = [f"# {res.get('titre') or res['id']}", "",
@@ -202,6 +268,12 @@ def main() -> int:
     t.add_argument("--langues", default="fr,en", help="ordre de préférence (défaut fr,en)")
     t.add_argument("--sortie", help="fichier Markdown à écrire (sinon sortie standard)")
     t.add_argument("--json", action="store_true")
+    g = sous.add_parser("analyser", help="la vidéo regardée par Gemini : pratiques, chiffres, affirmations")
+    g.add_argument("video", help="URL ou identifiant de la vidéo")
+    g.add_argument("--question", default="", help="une question précise au lieu de l'analyse complète")
+    g.add_argument("--modele", default="", help="modèle Gemini (défaut YOUTUBE_MODELE_GEMINI ou gemini-flash-latest)")
+    g.add_argument("--sortie", help="fichier Markdown à écrire (sinon sortie standard)")
+    g.add_argument("--json", action="store_true")
     a = ap.parse_args()
     charger_env()
 
@@ -219,17 +291,26 @@ def main() -> int:
                           "ne donne que les 15 dernières publications)")
             return 0
         vid = id_video(a.video)
+        if a.cmd == "analyser":
+            res = analyser_gemini(vid, a.question, a.modele)
+            res["titre"] = titre_video(vid)
+            texte = json.dumps(res, ensure_ascii=False, indent=2) if a.json else markdown_analyse(res)
+            return ecrire(texte, a.sortie, f"analyse {res['jetons'] or '?'} jetons")
         res = transcrire(vid, [l.strip() for l in a.langues.split(",") if l.strip()])
         res["titre"] = titre_video(vid)
     except ErreurYouTube as e:
         print(f"✗ {e}", file=sys.stderr)
         return 2
     texte = json.dumps(res, ensure_ascii=False, indent=2) if a.json else markdown_transcription(res)
-    if a.sortie:
-        cible = Path(a.sortie)
+    return ecrire(texte, a.sortie, f"{len(res['segments'])} segments")
+
+
+def ecrire(texte: str, sortie: str | None, bilan: str) -> int:
+    if sortie:
+        cible = Path(sortie)
         cible.parent.mkdir(parents=True, exist_ok=True)
         cible.write_text(texte, encoding="utf-8")
-        print(f"✓ {cible} ({len(res['segments'])} segments)", file=sys.stderr)
+        print(f"✓ {cible} ({bilan})", file=sys.stderr)
     else:
         print(texte)
     return 0

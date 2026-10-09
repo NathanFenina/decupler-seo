@@ -1,0 +1,94 @@
+{
+ "_source": "Tableau de bord Google Search Status (https://status.search.google.com/incidents.json), service Ranking. Ce fichier garde l'historique antérieur au flux officiel, qui ne remonte qu'à un an ; maj_google.py le fusionne avec le flux à chaque lecture. Historique repris de claude-seo (MIT, Daniel Agrici), data/google-updates.json, vérifié le 2026-09-28. Une fin vide = date de fin non sourcée.",
+ "verifie_le": "2026-10-09",
+ "mises_a_jour": [
+  {
+   "debut": "2024-03-05",
+   "fin": "2024-04-19",
+   "type": "core",
+   "nom": "March 2024 core update",
+   "source": "https://developers.google.com/search/blog/2024/03/core-update-spam-policies",
+   "notes": "Système « contenu utile » fondu dans le classement principal ; nouvelles règles spam (contenu à grande échelle, réputation de site, domaines expirés). Spam update lancée le même jour."
+  },
+  {
+   "debut": "2024-06-20",
+   "fin": "2024-06-27",
+   "type": "spam",
+   "nom": "June 2024 spam update",
+   "source": "https://status.search.google.com/products/rGHU1u87FJnkP6W2GwMi/history",
+   "notes": ""
+  },
+  {
+   "debut": "2024-08-15",
+   "fin": "2024-09-03",
+   "type": "core",
+   "nom": "August 2024 core update",
+   "source": "https://developers.google.com/search/blog/2024/08/august-2024-core-update",
+   "notes": "Annoncée pour mieux faire remonter les petits éditeurs indépendants."
+  },
+  {
+   "debut": "2024-11-11",
+   "fin": "2024-12-05",
+   "type": "core",
+   "nom": "November 2024 core update",
+   "source": "https://status.search.google.com/products/rGHU1u87FJnkP6W2GwMi/history",
+   "notes": "23 jours de déploiement."
+  },
+  {
+   "debut": "2024-12-12",
+   "fin": "2024-12-18",
+   "type": "core",
+   "nom": "December 2024 core update",
+   "source": "https://status.search.google.com/products/rGHU1u87FJnkP6W2GwMi/history",
+   "notes": "Environ 7 jours."
+  },
+  {
+   "debut": "2024-12-19",
+   "fin": "2024-12-26",
+   "type": "spam",
+   "nom": "December 2024 spam update",
+   "source": "https://status.search.google.com/incidents/UUq2WSouY7PhSm8zvtD1",
+   "notes": ""
+  },
+  {
+   "debut": "2025-03-13",
+   "fin": "2025-03-27",
+   "type": "core",
+   "nom": "March 2025 core update",
+   "source": "https://status.search.google.com/products/rGHU1u87FJnkP6W2GwMi/history",
+   "notes": "14 jours."
+  },
+  {
+   "debut": "2025-06-30",
+   "fin": "2025-07-17",
+   "type": "core",
+   "nom": "June 2025 core update",
+   "source": "https://status.search.google.com/products/rGHU1u87FJnkP6W2GwMi/history",
+   "notes": "17 jours."
+  },
+  {
+   "debut": "2025-08-26",
+   "fin": "2025-09-22",
+   "type": "spam",
+   "nom": "August 2025 spam update",
+   "source": "https://status.search.google.com/incidents/a7Aainy6E9rZsmfq82xt",
+   "notes": "26 jours."
+  }
+ ],
+ "non_verifie": [
+  {
+   "date": "2026-09-25",
+   "affirmation": "SAFE (Scaled Abuse Forensics Examiner) serait déployé dans Google Search avec la spam update de septembre 2026.",
+   "statut": "Invérifiable : l'article de Google décrit la détection de réseaux de chaînes YouTube et ne parle pas de Search. Ne pas l'utiliser dans un diagnostic.",
+   "sources_tierces": [
+    "https://www.searchenginejournal.com/google-has-deployed-a-new-ai-spam-detector-called-safe/590918/"
+   ]
+  },
+  {
+   "date": "2026-09",
+   "affirmation": "Une « September 2026 Authority Signals Update ».",
+   "statut": "Réfuté : aucun incident de ce nom sur le tableau de bord Google.",
+   "sources_tierces": []
+  }
+ ]
+}
