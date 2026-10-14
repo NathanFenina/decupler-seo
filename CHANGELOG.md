@@ -1,5 +1,18 @@
 # Journal des versions
 
+## 3.13.1 — le garde-fou devient automatique
+
+- **Hook garde-fou actif d'office** : `hooks/hooks.json` (plugin) et
+  `.claude/settings.json` du gabarit. Toute écriture improvisée vers l'API
+  WordPress ou Webflow, tout envoi de `robots.txt` / `.htaccess`, toute
+  publication Reddit ou envoi d'email passe par `guard.py` avant de partir.
+- **Corrigé** : `curl -X POST https://…/wp-json/…` passait sans contrôle
+  (le motif attendait la méthode après l'URL) ; une simple lecture de
+  `robots.txt` avec `2>&1` pouvait être prise pour une écriture.
+- Le hook trouve `guard.py` à côté de lui (plugin ou méthode embarquée),
+  lit la commande en JSON proprement et évalue depuis le dossier du projet.
+- Tests : `tests/test_garde_fou_hook.py`.
+
 ## 3.13.0
 
 Les pages neuves **ont de la vie dès le premier jet** : au moins trois éléments

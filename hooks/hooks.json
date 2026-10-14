@@ -1,0 +1,13 @@
+{
+  "description": "Garde-fou decupler-seo : toute écriture hors de la machine (API WordPress ou Webflow, robots.txt, .htaccess, Reddit, email) passe par scripts/guard.py avant de partir.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/garde-fou.sh\"", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}
