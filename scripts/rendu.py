@@ -18,7 +18,8 @@ droit dépasse la largeur de la fenêtre. C'est elle qui fait foi.
 Code de sortie 0 si scrollWidth == clientWidth et zéro débordement, 1 sinon,
 2 si le navigateur est introuvable. La sonde relève aussi les textes sous
 12 px (plancher de lisibilité) et la suite des bandes pleine largeur, claires
-ou non (règle d'alternance : deux claires de suite au plus) ; `--strict` fait
+ou non (règle d'alternance : deux claires de suite au plus ; un ruban sombre
+de plus de 30 px compte comme rupture, une bande claire doit dépasser 60 px) ; `--strict` fait
 échouer sur ces deux mesures.
 
 Un fragment (sans <html>) est enveloppé dans un document minimal. --cache
@@ -31,6 +32,15 @@ Limite connue : Chromium sans interface ne descend pas sous une fenêtre
 d'environ 500 px. Une demande à 390 px est rendue à ~500 : le script le
 signale. Pour une vraie largeur mobile, émulation d'appareil (MCP Chrome
 DevTools, Playwright) ; la sonde à 500 px attrape déjà l'essentiel.
+Autre limite : sur certaines pages (Elementor, animations), le budget de
+temps virtuel de Chromium ne rend jamais la main (délai de 180 s dépassé)
+alors que la page se charge en quelques secondes en temps réel. Dans ce cas,
+injecter la même SONDE avec Playwright en temps réel.
+
+La sonde ne compte pas un élément qui dépasse dans un parent qui le coupe
+(overflow hidden, auto, scroll ou clip, lui-même dans la fenêtre) : un
+carrousel ou un bandeau de logos qui défile dans son cadre n'est pas un
+débordement de page.
 
 Navigateur : --chrome, sinon la variable CHROME, sinon chromium/chrome du
 PATH, sinon un Chromium installé par Playwright. Bibliothèque standard.
@@ -50,9 +60,11 @@ from pathlib import Path
 
 SONDE = """<script>window.addEventListener('load',function(){setTimeout(function(){
 var r=document.documentElement,n=0,pires=[],W=r.clientWidth;
+function coupe(e){for(var a=e.parentElement;a&&a!==document.body;a=a.parentElement){
+  if(/hidden|auto|scroll|clip/.test(getComputedStyle(a).overflowX)&&a.getBoundingClientRect().right<=W+1)return true;}return false;}
 document.querySelectorAll('body *').forEach(function(e){
   var b=e.getBoundingClientRect();
-  if(b.right>W+1){n++;
+  if(b.right>W+1&&!coupe(e)){n++;
     if(pires.length<5)pires.push(e.tagName+'.'+(String(e.className)||'(sans classe)')
       +' right='+Math.round(b.right)+' w='+Math.round(b.width));}});
 var p=0,pp=[];
@@ -72,7 +84,8 @@ document.querySelectorAll('body *').forEach(function(e){var k=0;
   for(var i=0;i<e.children.length;i++){var c=e.children[i].getBoundingClientRect();if(c.width>=0.9*W&&c.height>60)k++;}
   if(k>bn){bn=k;best=e;}});
 var seq='';if(best){for(var i=0;i<best.children.length;i++){var c=best.children[i],q=c.getBoundingClientRect();
-  if(q.width>=0.9*W&&q.height>60)seq+=aImage(c)?'R':fond(c);}}
+  if(q.width<0.9*W||q.height<=30)continue;var t=aImage(c)?'R':fond(c);
+  if(q.height>60||t==='R')seq+=t;}}
 var d=document.createElement('div');d.id='SONDE';
 d.setAttribute('data-v',W);d.setAttribute('data-s',r.scrollWidth);
 d.setAttribute('data-n',n);d.setAttribute('data-h',document.body.scrollHeight);
