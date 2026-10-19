@@ -267,6 +267,25 @@ class TestRegistre(DossierIsole):
         self.assertIn("invisible", msg[("attention", "Comptabilité analytique")])
         self.assertNotIn(("attention", "Atlas Conseil"), msg)  # le nœud Organization du socle compte
 
+    def test_reference_id_vers_le_socle_vaut_balisage(self):
+        # Le graphe de la page ne définit pas l'Organisation (l'extension SEO
+        # la sert ailleurs) : une mention { "@id": … } suffit.
+        graphe = {"@context": "https://schema.org", "@graph": [
+            {"@type": "WebPage", "@id": f"{SITE}/offres/bilan-annuel/#webpage", "name": "Bilan annuel",
+             "mentions": [{"@id": f"{SITE}/#organization"}]}]}
+        r = self.verifier(graphe=graphe)
+        msg = {(c["gravite"], c["entite"]) for c in r["constats"]}
+        self.assertNotIn(("attention", "Atlas Conseil"), msg)
+        self.assertFalse(any(c["entite"] == "" for c in r["constats"]))
+
+    def test_ligne_avec_virgule_non_protegee(self):
+        self.ecrire("memoire/entites.csv", ENTITES_CSV
+                    + "Signaux web,Thing,Q333333,https://www.wikidata.org/wiki/Q333333,Mesures : vitesse, stabilité,\n")
+        entites = t.charger_entites(self.dossier / "memoire/entites.csv")
+        e = next(x for x in entites if x["entite"] == "Signaux web")
+        self.assertEqual(e["qid"], "Q333333")
+        self.assertIn("stabilité", e["definition"] + " ".join(e.get("alias", [])))
+
     def test_saillance(self):
         r = self.verifier()
         self.assertEqual(r["saillance"][0]["entite"], "Lyon")  # H1 + title + introduction

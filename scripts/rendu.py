@@ -16,7 +16,10 @@ page, elle compte, après chargement des images, les éléments dont le bord
 droit dépasse la largeur de la fenêtre. C'est elle qui fait foi.
 
 Code de sortie 0 si scrollWidth == clientWidth et zéro débordement, 1 sinon,
-2 si le navigateur est introuvable.
+2 si le navigateur est introuvable. La sonde relève aussi les textes sous
+12 px (plancher de lisibilité) et la suite des bandes pleine largeur, claires
+ou non (règle d'alternance : deux claires de suite au plus) ; `--strict` fait
+échouer sur ces deux mesures.
 
 Un fragment (sans <html>) est enveloppé dans un document minimal. --cache
 pointe vers un dossier d'images et de polices rapatriées en local : sans
@@ -45,20 +48,48 @@ import sys
 import urllib.parse
 from pathlib import Path
 
-SONDE = """<script>window.addEventListener('load',function(){
-var r=document.documentElement,n=0,pires=[];
+SONDE = """<script>window.addEventListener('load',function(){setTimeout(function(){
+var r=document.documentElement,n=0,pires=[],W=r.clientWidth;
 document.querySelectorAll('body *').forEach(function(e){
   var b=e.getBoundingClientRect();
-  if(b.right>r.clientWidth+1){n++;
+  if(b.right>W+1){n++;
     if(pires.length<5)pires.push(e.tagName+'.'+(String(e.className)||'(sans classe)')
       +' right='+Math.round(b.right)+' w='+Math.round(b.width));}});
+var p=0,pp=[];
+document.querySelectorAll('body *').forEach(function(e){
+  if(e.closest('svg,script,style,noscript')||!e.offsetParent)return;
+  var t=Array.prototype.some.call(e.childNodes,function(c){return c.nodeType===3&&c.textContent.trim();});
+  if(!t)return;var f=parseFloat(getComputedStyle(e).fontSize);
+  if(f<12){p++;if(pp.length<5)pp.push(e.tagName+'.'+(String(e.className)||'-')+' '+f.toFixed(1)+'px');}});
+function fond(e){for(;e&&e!==document.documentElement;e=e.parentElement){var s=getComputedStyle(e);
+  if(s.backgroundImage&&s.backgroundImage!=='none')return 'R';
+  var m=s.backgroundColor.match(/[\\d.]+/g);if(m&&(m.length<4||+m[3]>0.5)){
+    var l=(0.2126*m[0]+0.7152*m[1]+0.0722*m[2])/255;return l>0.75?'C':'R';}}return 'C';}
+function aImage(e){var i=e.querySelector('img');if(!i)return false;var b=i.getBoundingClientRect(),c=e.getBoundingClientRect();
+  return b.width>=0.9*c.width&&b.height>=0.5*c.height;}
+var best=null,bn=0;
+document.querySelectorAll('body *').forEach(function(e){var k=0;
+  for(var i=0;i<e.children.length;i++){var c=e.children[i].getBoundingClientRect();if(c.width>=0.9*W&&c.height>60)k++;}
+  if(k>bn){bn=k;best=e;}});
+var seq='';if(best){for(var i=0;i<best.children.length;i++){var c=best.children[i],q=c.getBoundingClientRect();
+  if(q.width>=0.9*W&&q.height>60)seq+=aImage(c)?'R':fond(c);}}
 var d=document.createElement('div');d.id='SONDE';
-d.setAttribute('data-v',r.clientWidth);d.setAttribute('data-s',r.scrollWidth);
+d.setAttribute('data-v',W);d.setAttribute('data-s',r.scrollWidth);
 d.setAttribute('data-n',n);d.setAttribute('data-h',document.body.scrollHeight);
 d.setAttribute('data-q',pires.join(' || '));
-d.style.display='none';document.body.appendChild(d);});</script>"""
+d.setAttribute('data-p',p);d.setAttribute('data-pq',pp.join(' || '));d.setAttribute('data-b',seq);
+d.style.display='none';document.body.appendChild(d);},1500);});</script>"""
 
-MOTIF_SONDE = re.compile(r'<div id="SONDE" data-v="(\d+)" data-s="(\d+)" data-n="(\d+)" data-h="(\d+)" data-q="([^"]*)"')
+MOTIF_SONDE = re.compile(r'<div id="SONDE" data-v="(\d+)" data-s="(\d+)" data-n="(\d+)" data-h="(\d+)" data-q="([^"]*)"'
+                         r'(?: data-p="(\d+)" data-pq="([^"]*)" data-b="([CR]*)")?')
+
+
+def plus_longue_suite_claire(sequence: str) -> int:
+    """Nombre maximal de bandes claires consécutives (C) dans une suite « CCRCC… ».
+
+    Règle d'alternance (seo-design-pages, design-tokens § rythme) : jamais plus
+    de deux bandes claires de suite sans une bande photo, sombre ou un ruban."""
+    return max((len(m) for m in re.findall(r"C+", sequence or "")), default=0)
 
 
 def trouver_chrome(explicite: str | None = None) -> str | None:
@@ -108,9 +139,11 @@ def lire_sonde(dom: str) -> dict | None:
     m = MOTIF_SONDE.search(dom or "")
     if not m:
         return None
-    v, s, n, h, q = m.groups()
+    v, s, n, h, q, p, pq, b = m.groups()
     return {"largeur": int(v), "scroll": int(s), "debordements": int(n), "hauteur": int(h),
-            "coupables": [c for c in q.split(" || ") if c], "ok": v == s and n == "0"}
+            "coupables": [c for c in q.split(" || ") if c], "ok": v == s and n == "0",
+            "petits": int(p or 0), "petits_exemples": [c for c in (pq or "").split(" || ") if c],
+            "bandes": b or "", "suite_claire": plus_longue_suite_claire(b or "")}
 
 
 def rendre(source: str, largeur: int, hauteur: int, chrome: str, cache: str | None, sortie: str) -> dict | None:
@@ -121,7 +154,11 @@ def rendre(source: str, largeur: int, hauteur: int, chrome: str, cache: str | No
         html, manquantes = localiser(Path(source).read_text(encoding="utf-8"), cache)
         if manquantes:
             print(f"   images absentes du cache (rendues vides) : {manquantes[:6]}")
-        tempo = Path(sortie).resolve().parent / "_rendu.html"
+        # À côté de la source, pas de la capture : une page qui charge ses
+        # feuilles et ses images en chemins relatifs (un miroir local) les perd
+        # si le fichier temporaire change de dossier, et la sonde mesure alors
+        # une page sans styles.
+        tempo = Path(source).resolve().parent / "_rendu.html"
         tempo.write_text(envelopper(html), encoding="utf-8")
         cible = tempo.as_uri()
     base = [chrome, "--headless", "--disable-gpu", "--no-sandbox"]
@@ -141,6 +178,8 @@ def main() -> int:
     ap.add_argument("--cache", help="dossier d'images et de polices rapatriées en local")
     ap.add_argument("--sortie", help="capture PNG (défaut : <nom>-<largeur>.png)")
     ap.add_argument("--chrome", help="chemin du navigateur")
+    ap.add_argument("--strict", action="store_true",
+                    help="échouer aussi sur un texte sous 12 px ou plus de 2 bandes claires de suite")
     a = ap.parse_args()
     chrome = trouver_chrome(a.chrome)
     if not chrome:
@@ -162,7 +201,14 @@ def main() -> int:
           f"débordements={mesure['debordements']} hauteur={mesure['hauteur']}  {etat}")
     for c in mesure["coupables"]:
         print(f"      coupable : {c}")
-    return 0 if mesure["ok"] else 1
+    print(f"   textes sous 12 px : {mesure['petits']}" + (f"  ({' ; '.join(mesure['petits_exemples'])})"
+                                                          if mesure["petits_exemples"] else ""))
+    if mesure["bandes"]:
+        print(f"   bandes pleine largeur : {mesure['bandes']} (C claire, R rupture : photo, sombre, ruban) · "
+              f"{mesure['suite_claire']} claire(s) de suite au plus"
+              + ("  ✗ (2 au plus)" if mesure["suite_claire"] > 2 else "  ✓"))
+    lisible = mesure["petits"] == 0 and mesure["suite_claire"] <= 2
+    return 0 if mesure["ok"] and (lisible or not a.strict) else 1
 
 
 if __name__ == "__main__":

@@ -191,6 +191,20 @@ Par ordre de préférence :
    Le recadrage d'une bande large (21:9) se choisit à l'œil, photo par
    photo : sur une vue plongeante le sujet est au milieu, sur un panorama
    de port il est en haut.
+
+   **Photos d'ambiance Unsplash** (un bureau, une rue, un geste de travail ;
+   jamais une preuve) : licence Unsplash, jamais Unsplash+ ni les « images
+   sponsorisées » des résultats. Le site bloque les robots (page de
+   vérification) : un agent lit la page de la photo avec un outil de
+   lecture web, en tire l'adresse `https://images.unsplash.com/photo-…`,
+   l'auteur et la licence, puis télécharge l'image recadrée par l'API
+   d'images (`?w=2000&h=858&fit=crop&crop=entropy` pour une bande 21:9 ;
+   `crop=focalpoint&fp-x=…&fp-y=…&fp-z=…` pour écarter un logo ou un menu
+   d'application). Vérifiez à l'œil : **aucune marque lisible** (un cadenas
+   gravé de sa marque a été écarté). Téléversée dans le CMS, créditée
+   « Photo : Prénom Nom sur Unsplash » avec le lien de la page, jamais liée
+   directement, jamais présentée comme l'équipe, un client ou un lieu de
+   l'entreprise.
 5. **Images générées** : sujets abstraits, illustrations de section, visuels
    de couverture, maquettes d'interface. Jamais pour prouver, **jamais un
    lieu réel, jamais un visage présenté comme l'équipe ou un client.** Une

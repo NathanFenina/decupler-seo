@@ -58,6 +58,18 @@ différence entre un brief et une supposition.
      titres et listes conservés. **Lisez-le** : angles, preuves et failles
      ne se mesurent pas, ils se lisent.
 
+   **Page locale** (« consultant + ville », « agence + ville ») : relevez la
+   SERP vue de la ville, `--lieu "Lille,Hauts-de-France,France"` (nom de lieu
+   DataForSEO). Pack local, AI Overview et composition du top n'y sont pas
+   ceux de la France entière.
+
+   **Les prix du top sont une donnée.** Dans `-contenus.md`, relevez les
+   grilles de prix, taux horaires et budgets minimums que le top affiche
+   (une plateforme qui liste 21 profils, une agence qui publie ses forfaits) :
+   médiane, fourchette, répartition. Consignés dans le registre des faits avec
+   leur source et leur date, prestataires non nommés sur la page, ils
+   répondent à la PAA « combien coûte… » sans inventer un prix.
+
    Une page illisible (403, rendu JavaScript) est signalée, pas inventée :
    `--repli-dataforseo` la relit par DataForSEO (payant, coût affiché), ou
    lisez-la avec Firecrawl.
@@ -409,7 +421,12 @@ qui manque. **Jamais un schéma qui affirme ce que la page ne montre pas.**
 ### 15. Sources & E-E-A-T à apporter
 
 - **Sources externes** (2 à 4) : institution, étude, norme, documentation
-  officielle d'un moteur — avec leur lien, jamais un concurrent direct.
+  officielle d'un moteur — avec leur lien, jamais un concurrent direct. La
+  documentation de Google Search Central fournit des citations exactes pour
+  les partis pris d'une page de service : « personne ne peut garantir la
+  première position » (embaucher un référenceur), pages satellites par ville
+  (règles anti-spam), hreflang réciproque (versions localisées), points forts
+  et points faibles (rédiger des avis), thèmes YMYL (contenus utiles).
 - **Preuves propriétaires** : chiffre interne, cas client, capture,
   méthode maison (`memoire/faits.md`). Ce qui manque s'écrit
   `[À COMPLÉTER : …]`, jamais inventé.

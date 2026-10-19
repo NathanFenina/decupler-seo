@@ -94,6 +94,11 @@ variante foncée.
   de lecture en `em` (environ 36 em pour 72 caractères).
 - **Plancher de 12 px** (`.75rem`) pour tout texte qui porte une information
   (pastille, étiquette, légende) ; en dessous, c'est de la décoration.
+  **Écrivez-le `font-size: max(12px, .75rem)`** : le `rem` suit la taille
+  racine que fixe le thème, et beaucoup de thèmes la baissent sur mobile
+  (93,75 %, parfois moins). Un `.75rem` y tombe à 10,9 px, un `.815rem` à
+  11,9 px : mesuré sur un site WordPress (Astra) à 505 px. `rendu.py` compte
+  les textes sous 12 px dans sa sonde.
 - **Deux familles au plus**, trois ou quatre graisses en tout. Chaque graisse
   est un fichier à charger.
 - **Pile système par défaut** (zéro requête, zéro décalage). Police de marque :
@@ -171,6 +176,9 @@ avant qu'on lise une phrase. Ceux qui reviennent le plus :
 | Surtitre partout | Petite étiquette en capitales au-dessus de chaque H2 | Une ou deux dans la page |
 | Capitales longues | Une pastille de 35 caractères en capitales | Capitales sur 2-3 mots au plus |
 | Texte en dégradé | `background-clip:text` sur les titres | Couleur pleine (voir § 2) |
+| Halo radial sur fond sombre | `radial-gradient` lumineux derrière une bande ou un encadré sombre | Aplat sombre ; la couleur d'accent sur un filet ou un point, pas en lueur |
+| Texte néon sur fond sombre | Chiffres cyan ou vert vif sur fond noir | Chiffres en blanc ; l'accent sur un petit repère graphique |
+| Filet d'accent sur une carte arrondie | `border-top` coloré sur un bloc à coins arrondis | Un aplat, ou un filet complet |
 | Grilles orphelines, bandes monotones | voir la checklist | voir la checklist |
 
 Un détecteur déterministe de ces motifs (par exemple Impeccable,
@@ -192,6 +200,13 @@ Deux règles de correction :
 
 ## 5 ter. Le rythme vertical
 
+- **Deux bandes claires de suite au plus** (blanc, gris très clair, teinte
+  pâle) entre deux ruptures : bande photo, bande sombre, ruban. Avec 4
+  ruptures, une page compte donc 10 bandes claires au plus : au-delà,
+  fusionnez des sections (une matière posée **dans** la section qu'elle
+  illustre plutôt que dans sa propre bande) au lieu d'en empiler. `rendu.py`
+  relève la suite des bandes pleine largeur (`CCRCC…`) et la plus longue
+  suite claire ; `--strict` échoue au-delà de 2.
 - Deux bandes **de même fond** qui se suivent additionnent leurs marges :
   150 à 180 px de vide, le « bas de page vide ». Fusionnez-les ou changez
   le fond de l'une.

@@ -811,8 +811,17 @@ def lire_csv(chemin: Path) -> list[dict]:
         return []
     texte = Path(chemin).read_text(encoding="utf-8-sig")
     lignes = [l for l in texte.splitlines(keepends=True) if l.strip() and not l.lstrip().startswith("#")]
-    return [{(k or "").strip(): (v or "").strip() for k, v in r.items()}
-            for r in csv.DictReader(io.StringIO("".join(lignes)))]
+    def propre(r: dict) -> dict:
+        # Une ligne qui a plus de champs que l'en-tête (virgule non protégée
+        # dans une définition) : DictReader range le surplus, en liste, sous la
+        # clé None. On le recolle au dernier champ au lieu de planter.
+        surplus = r.pop(None, None) or []
+        d = {(k or "").strip(): (v or "").strip() for k, v in r.items()}
+        if surplus and d:
+            dernier = list(d)[-1]
+            d[dernier] = ", ".join(x.strip() for x in [d[dernier], *surplus] if x and x.strip())
+        return d
+    return [propre(r) for r in csv.DictReader(io.StringIO("".join(lignes)))]
 
 
 def _plusieurs(v: str) -> list[str]:
@@ -1003,7 +1012,11 @@ def verifier(page: dict, entites: list[dict], triplets: list[dict], page_id: str
             continue
         visibles.append(e)
         cibles = {norm(f) for f in formes(e)}
-        trouvees = [d for d in declarees if (e["qid"] and d["qid"] == e["qid"]) or norm(d["nom"]) in cibles]
+        # Une référence { "@id": … } vers un nœud défini ailleurs (l'Organisation
+        # ou la Personne que sert l'extension SEO) vaut balisage si le registre
+        # porte cet @id dans ses sameAs.
+        trouvees = [d for d in declarees if (e["qid"] and d["qid"] == e["qid"]) or norm(d["nom"]) in cibles
+                    or (d.get("id") and d["id"] in e["sameAs"])]
         if not trouvees:
             dit("attention", e["entite"], f"nommée {occ} fois dans le texte, absente du JSON-LD (about/mentions)")
             continue
@@ -1016,9 +1029,12 @@ def verifier(page: dict, entites: list[dict], triplets: list[dict], page_id: str
             dit("info", e["entite"], "aucun QID ni sameAs au registre : chercher avec `triplets.py wikidata`")
     noms_registre = {norm(f) for e in entites for f in formes(e)}
     qids_registre = {e["qid"] for e in entites if e["qid"]}
+    ids_registre = {s for e in entites for s in e["sameAs"] if "#" in s}
     for d in declarees:
         if d["role"] not in ("about", "mentions"):
             continue
+        if not d["nom"] and d.get("id") in ids_registre:
+            continue  # référence @id vers une entité du registre (Organisation, Personne)
         if d["nom"] and not contient(page["texte_norm"], d["nom"]) and \
                 not any(contient(page["texte_norm"], f) for e in entites if d["qid"] and e["qid"] == d["qid"]
                         for f in formes(e)):

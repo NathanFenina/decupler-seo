@@ -37,6 +37,28 @@ class TestSonde(unittest.TestCase):
         self.assertFalse(mesure["ok"])
         self.assertEqual(len(mesure["coupables"]), 2)
 
+    def test_lecture_lisibilite_et_bandes(self):
+        dom = ('<div id="SONDE" data-v="390" data-s="390" data-n="0" data-h="9000" data-q="" '
+               'data-p="2" data-pq="SPAN.pill 10.9px || DIV.sub 11.8px" data-b="RCCCRCCR"></div>')
+        mesure = rendu.lire_sonde(dom)
+        self.assertTrue(mesure["ok"])
+        self.assertEqual(mesure["petits"], 2)
+        self.assertEqual(len(mesure["petits_exemples"]), 2)
+        self.assertEqual(mesure["bandes"], "RCCCRCCR")
+        self.assertEqual(mesure["suite_claire"], 3)
+
+    def test_ancienne_sonde_compatible(self):
+        dom = '<div id="SONDE" data-v="390" data-s="390" data-n="0" data-h="5000" data-q=""></div>'
+        mesure = rendu.lire_sonde(dom)
+        self.assertEqual(mesure["petits"], 0)
+        self.assertEqual(mesure["suite_claire"], 0)
+
+    def test_plus_longue_suite_claire(self):
+        self.assertEqual(rendu.plus_longue_suite_claire("RCCRCCR"), 2)
+        self.assertEqual(rendu.plus_longue_suite_claire("CCCCC"), 5)
+        self.assertEqual(rendu.plus_longue_suite_claire(""), 0)
+        self.assertEqual(rendu.plus_longue_suite_claire("RRR"), 0)
+
     def test_sonde_absente(self):
         self.assertIsNone(rendu.lire_sonde("<html></html>"))
         self.assertIsNone(rendu.lire_sonde(None))

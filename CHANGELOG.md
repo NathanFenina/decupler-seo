@@ -1,5 +1,29 @@
 # Journal des versions
 
+## 3.14.0 — rythme des bandes et lisibilité mesurés au rendu
+
+- **`rendu.py` mesure le rythme et la lisibilité** sur la page rendue (la
+  sonde attend 1,5 s après le chargement) : textes sous 12 px (avec
+  exemples), suite des bandes pleine largeur claires / sombres, plus longue
+  suite claire. `--strict` échoue au-delà de 2 bandes claires de suite ou
+  dès un texte sous 12 px. Le fichier temporaire est écrit à côté de la
+  source, pour garder les CSS relatifs.
+- **`triplets.py`** : une ligne d'`entites.csv` avec une virgule non
+  protégée ne fait plus planter la lecture (champs en trop recollés) ; une
+  entité reliée par son QID dans `sameAs` est reconnue ; une référence
+  `@id` du registre (Organisation, Personne) n'est plus comptée « hors
+  registre ».
+- **`seo-design-pages`** : plancher de 12 px écrit `max(12px, …rem)` ; trois
+  signatures d'IA de plus à éviter (halo radial sur fond sombre, texte néon,
+  bordure d'accent sur une carte arrondie) ; règle du rythme : 2 bandes
+  claires de suite au plus, contrôlée par `rendu.py`. Photos d'ambiance
+  libres (Unsplash) admises avec crédit, jamais présentées comme l'équipe,
+  un client ou un lieu du site.
+- **`seo-brief`** : SERP locale relevée depuis la ville (`--lieu`) ; prix du
+  top traités comme des données (fourchette sourcée) ; citations de Google
+  Search Central comme sources.
+- Tests : `test_rendu.py` (+3), `test_triplets.py` (+2) ; 488 tests.
+
 ## 3.13.1 — le garde-fou devient automatique
 
 - **Hook garde-fou actif d'office** : `hooks/hooks.json` (plugin) et
