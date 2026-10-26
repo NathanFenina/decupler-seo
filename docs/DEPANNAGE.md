@@ -8,6 +8,14 @@
 | Tous les MCP absents | `.mcp.json` mal placé | Il doit être à la racine du projet |
 | Un MCP démarre puis meurt | Variable d'environnement vide | `/seo doctor` pour voir laquelle |
 
+## Synchro et remontées de la méthode
+
+| Symptôme | Cause | Correctif |
+|----------|-------|-----------|
+| E-mail « Synchro de la méthode decupler-seo : All jobs have failed » | Le robot n'a pas le droit d'ouvrir une PR dans ce dépôt | Settings › Actions › General › cocher « Allow GitHub Actions to create and approve pull requests ». Depuis 3.15.0 le job ouvre une issue au lieu d'échouer |
+| Vercel : « decupler-seo@users.noreply.github.com attempted to deploy… not a member of the team » | Vercel (plan gratuit, dépôt privé) refuse l'aperçu de la branche `methode/…` poussée par le robot. Le site en ligne n'est pas touché | Un `vercel.json` qui ignore ces branches : `{"git": {"deploymentEnabled": {"methode/**": false}}}` |
+| Une amélioration faite dans un projet n'arrive pas dans les autres | Elle n'a pas été remontée, ou sa branche `remontee/…` n'a pas pu être fusionnée | `/seo-maj` dans le projet ; voir les issues ouvertes sur decupler-seo |
+
 ## Search Console
 
 | Symptôme | Cause | Correctif |

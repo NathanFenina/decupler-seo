@@ -258,6 +258,15 @@ def synchroniser(projet: Path, source: Path, forcer: bool = False, simuler: bool
     (projet / MANIFESTE).write_text(json.dumps(manifeste, ensure_ascii=False, indent=1), encoding="utf-8")
     (projet / DOSSIER_EMBARQUE / "VERSION").write_text(version + "\n", encoding="utf-8")
 
+    # Le workflow de synchro appartient à la méthode : on le tient à jour, sauf
+    # s'il a été réécrit au point de ne plus porter son nom.
+    modele, local = source / MODELE / WORKFLOW_SYNC, projet / WORKFLOW_SYNC
+    if modele.is_file() and local.is_file():
+        actuel = local.read_text(encoding="utf-8")
+        if "Synchro de la méthode decupler-seo" in actuel and actuel != modele.read_text(encoding="utf-8"):
+            shutil.copy2(modele, local)
+            print(f"  ✓ {WORKFLOW_SYNC} mis à jour")
+
     print(f"  ✓ Méthode synchronisée dans {projet / '.claude'}\n")
     return 0
 
@@ -607,10 +616,15 @@ def remonter(args) -> int:
     print(f"\n  ✓ Commit sur la branche {branche}.")
     if args.pousser:
         pousse = git("push", "-u", "origin", branche)
-        print("  ✓ Branche poussée : ouvrez la pull request sur GitHub." if pousse.returncode == 0
-              else f"  ✗ Push refusé :\n{pousse.stderr.strip()}")
+        if pousse.returncode == 0:
+            print("  ✓ Branche poussée. Le workflow « Intégration des remontées » de decupler-seo la\n"
+                  "    fusionne dans main si les tests passent ; sinon il ouvre une issue qui dit quoi faire.")
+        else:
+            print(f"  ✗ Push refusé :\n{pousse.stderr.strip()}\n"
+                  "    Session cloud : attachez d'abord le dépôt decupler-seo en écriture\n"
+                  "    (outil add_repo, NathanFenina/decupler-seo, access push), puis relancez.")
     else:
-        print(f"  Reste à faire : git -C {source} push -u origin {branche}, puis ouvrir la pull request.")
+        print(f"  Reste à faire : git -C {source} push -u origin {branche} (intégration automatique ensuite).")
     print("  Une fois fusionnée et publiée, `projet.py sync .` réaligne ce projet sur la méthode.\n")
     return 0
 

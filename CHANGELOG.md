@@ -1,5 +1,31 @@
 # Journal des versions
 
+## 3.15.0 — les améliorations des projets arrivent enfin dans la méthode
+
+Constat : les remontées des projets (`projet.py remonter --pousser`) et deux
+travaux de sessions de maintenance étaient poussés sur des branches que
+personne ne fusionnait. Les projets ne les recevaient donc jamais.
+
+- **Rapatrié dans `main`** : la sonde de `rendu.py` (éléments coupés par leur
+  parent, ruban sombre > 30 px), le test du `<title>` de SVG dans
+  `controle_contenu.py`, le **suivi mensuel** (`suivi.py`, skill
+  `seo-suivi-mensuel` : positions Google relevées en direct, page qui ranke,
+  concurrent devant, AI Overview ; batterie de prompts validée par le client),
+  branché dans la routine hebdo du premier mercredi ; registre complété.
+- **`serp_concurrents.py`** : une requête en arabe donnait un nom de fichier
+  vide et les relevés s'écrasaient ; le nom garde les lettres Unicode plus une
+  empreinte courte.
+- **Workflow « Intégration des remontées »** : toute branche `remontee/…` est
+  fusionnée dans `main` si les tests passent et qu'aucun nom de client n'y
+  entre ; sinon une issue dit quoi faire. `remonter` et `/seo-maj` l'expliquent,
+  et rappellent d'attacher decupler-seo en écriture dans une session cloud.
+- **Synchro des projets** : si GitHub refuse au robot d'ouvrir la PR (case
+  « Allow GitHub Actions to create and approve pull requests » non cochée), le
+  job n'échoue plus : il ouvre une issue avec le lien de la PR en un clic.
+  `projet.py sync` tient désormais ce workflow à jour dans chaque projet.
+- `CLAUDE.md` pour qui maintient la méthode : une modification n'existe que
+  fusionnée dans `main`.
+
 ## 3.14.0 — rythme des bandes et lisibilité mesurés au rendu
 
 - **`rendu.py` mesure le rythme et la lisibilité** sur la page rendue (la

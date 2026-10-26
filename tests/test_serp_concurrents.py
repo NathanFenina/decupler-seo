@@ -395,4 +395,4 @@ class TestSlug(unittest.TestCase):
     def test_latin_inchange(self):
         import serp_concurrents as s
         self.assertEqual(s.slug("Établir société"), "etablir-societe")
-        self.assertEqual(s.slug("Premium Residency Saudi Arabia"), "premium-residency-saudi-arabia")
+        self.assertEqual(s.slug("Expert Comptable Lyon"), "expert-comptable-lyon")

@@ -16,8 +16,12 @@ version plus récente est publiée.
 Si des fichiers de méthode ont été modifiés dans ce projet, demandez pour
 chacun : amélioration valable pour tous les sites, ou adaptation propre à
 ce client ?
-- pour tous → `python3 .claude/decupler-seo/scripts/projet.py remonter . [fichiers] --pousser`
-  (branche `remontee/…` sur decupler-seo, puis ouvrir la pull request) ;
+- pour tous → `python3 .claude/decupler-seo/scripts/projet.py remonter . [fichiers] --pousser`.
+  La branche `remontee/…` est fusionnée dans decupler-seo automatiquement si les
+  tests passent (workflow « Intégration des remontées ») ; sinon une issue s'ouvre
+  sur decupler-seo. Dans une session cloud, attacher d'abord decupler-seo en
+  écriture (outil `add_repo`, `NathanFenina/decupler-seo`, `access: push`), sans
+  quoi le push est refusé ;
 - propre au client → déplacer le contenu dans un skill `.claude/skills/projet-…`
   et remettre le fichier de méthode d'origine.
 

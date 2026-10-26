@@ -54,6 +54,18 @@ class TestProjet(DossierIsole):
         r = lancer("projet.py", "sync", ".", cwd=p)
         self.assertIn("0 ajouté(s) · 0 mis à jour", r.stdout)
 
+    def test_workflow_de_synchro_tenu_a_jour(self):
+        p = self.creer()
+        wf = p / ".github/workflows/sync-methode.yml"
+        modele = wf.read_text(encoding="utf-8")
+        wf.write_text(modele.replace("issues: write", ""), encoding="utf-8")
+        lancer("projet.py", "sync", ".", cwd=p)
+        self.assertEqual(wf.read_text(encoding="utf-8"), modele)
+        # Réécrit au point de ne plus porter son nom : on n'y touche plus.
+        wf.write_text("name: autre chose\n", encoding="utf-8")
+        lancer("projet.py", "sync", ".", cwd=p)
+        self.assertEqual(wf.read_text(encoding="utf-8"), "name: autre chose\n")
+
     def test_modification_locale_protegee(self):
         p = self.creer()
         skill = p / ".claude/skills/seo-redaction/SKILL.md"

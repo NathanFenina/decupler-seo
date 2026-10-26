@@ -1,0 +1,89 @@
+# Intègre automatiquement les améliorations remontées depuis les projets.
+#
+# `projet.py remonter . --pousser` (ou /seo-maj) pousse une branche
+# `remontee/<projet>-<date>` sur ce dépôt. Sans ce workflow, ces branches
+# attendaient une fusion manuelle que personne ne faisait.
+#
+# Ce que ça fait : fusionne la branche dans main, relance les tests, vérifie
+# qu'aucun nom de client n'entre dans ce dépôt public, puis pousse main et
+# supprime la branche. En cas de conflit, de test rouge ou de nom de client :
+# rien n'est fusionné, une issue explique quoi faire.
+name: Intégration des remontées
+
+on:
+  push:
+    branches: ["remontee/**"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: remontees
+  cancel-in-progress: false
+
+jobs:
+  integrer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Fusionner dans main, tester, pousser
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCHE: ${{ github.ref_name }}
+        run: |
+          set -u
+          git config user.name "decupler-seo"
+          git config user.email "decupler-seo@users.noreply.github.com"
+
+          signaler() {
+            gh issue create --title "Remontée à intégrer à la main : $BRANCHE" --body "$1
+
+          Branche : https://github.com/${{ github.repository }}/compare/main...$BRANCHE
+          Journal : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
+            echo "::warning::$1"
+            exit 0
+          }
+
+          git checkout -q main
+          if ! git merge --no-ff --no-edit "origin/$BRANCHE"; then
+            git merge --abort || true
+            signaler "La branche ne se fusionne pas sans conflit avec main. Ouvrez decupler-seo dans Claude Code et demandez : « intègre la branche $BRANCHE »."
+          fi
+
+          # Dépôt public : aucun nom de client ne doit y entrer.
+          if ! python3 - <<'PY'
+          import json, re, subprocess, sys
+          projets = json.load(open("projets.json"))["projets"]
+          mots = set()
+          for p in projets:
+              for m in [p.get("nom", ""), p.get("depot", "").split("/")[-1]]:
+                  m = m.strip().lower()
+                  if m and "decupler" not in m:
+                      mots.add(m)
+          ajouts = subprocess.run(["git", "diff", "HEAD^1", "HEAD", "--unified=0", "--", ".", ":!projets.json"],
+                                  capture_output=True, text=True).stdout
+          lignes = [l[1:].lower() for l in ajouts.splitlines() if l.startswith("+") and not l.startswith("+++")]
+          trouves = sorted({m for m in mots for l in lignes if re.search(r"\b" + re.escape(m) + r"\b", l)})
+          if trouves:
+              print("Noms de client dans la remontée :", ", ".join(trouves))
+              sys.exit(1)
+          PY
+          then
+            signaler "La remontée contient un nom de client (dépôt public). Retirez-le, ou déplacez ce savoir-faire dans un skill projet-… du projet."
+          fi
+
+          python -m py_compile scripts/*.py || signaler "Un script ne compile plus après la fusion."
+          (cd tests && python -m unittest discover -q) || signaler "Les tests échouent après la fusion."
+
+          git push origin main || signaler "Push sur main refusé."
+          git push origin --delete "$BRANCHE" || true
+          echo "Remontée $BRANCHE intégrée dans main."
