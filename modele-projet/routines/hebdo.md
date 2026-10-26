@@ -37,6 +37,9 @@ l'étiquette par `#traite` suivie du lien vers ce que tu as créé. Un
 ## 4. Le premier mercredi du mois, en plus
 Le rapport du mois écoulé (skill `seo-cycle`, mode rapport) et les propositions
 du mois (`pilotage.py donnees`, `proposer`, `injecter`).
+Suivi mensuel (skill `seo-suivi-mensuel`) : `suivi.py positions`, `suivi.py prompts`
+(batterie au statut « valide »), puis `suivi.py rapport --mois <AAAA-MM>`, repris
+dans le rapport du mois.
 
 ## 5. Le bilan de la semaine dans la page
 Écris `donnees/semaine.json` puis `pilotage.py mois --fichier donnees/semaine.json` :

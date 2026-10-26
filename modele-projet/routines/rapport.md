@@ -7,6 +7,9 @@ Lis `routines/_commun.md`, puis :
    `memoire/apprentissages.md`, demande et calendrier du mois.
 2. `python3 .claude/decupler-seo/scripts/cartographie.py mensuel --prompts`
    (seulement si `memoire/decisions.md` autorise le relevé IA payant).
+2bis. Suivi mensuel (skill `seo-suivi-mensuel`) : `suivi.py positions`, `suivi.py prompts`
+   (prompts au statut « valide »), puis `suivi.py rapport --mois <AAAA-MM>` ; reprendre
+   le résumé dans le rapport du mois.
 3. `rapport.py` : `rapports/<AAAA-MM>.md` et `.json`, section « Lecture et décisions » rédigée.
    Vérifie les runs du mois (`rapports/runs/` et branches `claude/*`) et signale toute absence en tête.
 
