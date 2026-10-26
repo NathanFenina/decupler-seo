@@ -13,7 +13,6 @@ name: Intégration des remontées
 on:
   push:
     branches: ["remontee/**"]
-  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -41,6 +40,7 @@ jobs:
           BRANCHE: ${{ github.ref_name }}
         run: |
           set -u
+          case "$BRANCHE" in remontee/*) ;; *) echo "Pas une branche remontee/ : rien à faire."; exit 0 ;; esac
           git config user.name "decupler-seo"
           git config user.email "decupler-seo@users.noreply.github.com"
 
