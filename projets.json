@@ -3,6 +3,7 @@
   "projets": [
     {"nom": "decupler.com", "depot": "NathanFenina/decupler-site", "routine": "hebdo, vendredi 7h07"},
     {"nom": "TechMedias", "depot": "NathanFenina/tech-medias", "routine": "voir ROUTINES.md du dépôt"},
-    {"nom": "Tasis Partners", "depot": "NathanFenina/saudi-arabia", "routine": "hebdo, vendredi 7h03"}
+    {"nom": "Tasis Partners", "depot": "NathanFenina/saudi-arabia", "routine": "hebdo, vendredi 7h03"},
+    {"nom": "Talent Up", "depot": "NathanFenina/Talent-up", "routine": "aucune (mission de refonte ponctuelle)"}
   ]
 }
