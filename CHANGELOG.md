@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 3.15.1 — registre
+
+- `projets.json` : ajout du projet « Greffe de cheveux Tunisie » (`NathanFenina/greffe-capillaire`), créé par `projet.py init`.
+
 ## 3.15.0 — les améliorations des projets arrivent enfin dans la méthode
 
 Constat : les remontées des projets (`projet.py remonter --pousser`) et deux
