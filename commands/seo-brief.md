@@ -9,9 +9,11 @@ avec `--url` si la page existe ; sans DataForSEO, `firecrawl_search` +
 `firecrawl_scrape` passés au script par `--serp-firecrawl` et
 `--pages-json`), style du client (`memoire/style.md`), questions PAA,
 vocabulaire Reddit, volumes (DataForSEO ou Ubersuggest avec le `locId` du
-pays), sitemap pour le maillage (`--sitemap`). Ne rédigez jamais un brief
-sans avoir regardé la SERP, et n'écrivez aucun chiffre qu'un appel n'a pas
-renvoyé (`n.d.` sinon).
+pays), sitemap pour le maillage (`--sitemap`). Aucun chiffre qu'un appel n'a pas
+renvoyé (`n.d.` sinon). **Sans aucun accès à la SERP, livrez quand même le
+brief en mode dégradé** (plan, carte des entités, réponse directe, FAQ),
+marqué « SERP non relevée » avec ce qui reste à vérifier : ne vous arrêtez
+pas sur une question.
 
 Le brief doit inclure la réponse directe (40-60 mots), le H1, l'intro et la
 FAQ **déjà rédigés**, les prompts IA et leur fan-out, les données

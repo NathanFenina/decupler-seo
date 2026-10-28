@@ -1,15 +1,12 @@
 ---
 name: seo-redaction
 description: >
-  Rédige un article ou une page complète à partir d'un brief, optimisé SEO et
-  GEO, dans un style humain qui ne se détecte pas comme généré : recherche
-  obligatoire avant écriture, une donnée par paragraphe, zéro chiffre
-  inventé, règles anti-détection IA, trame des pages de service, entités et alignement
-  du mot-clé, article GEO pour gagner un prompt IA, et
-  relecture. Déclencher sur "rédige", "écris un article", "rédaction",
-  "écris cette page", "produis le contenu", "article de blog", "rédige à
-  partir du brief", "écris-moi un guide", "réécris cette page", "article
-  GEO", "gagner un prompt".
+  Rédige un article ou une page à partir d'un brief, optimisé SEO et GEO, dans
+  un style humain : recherche avant écriture, zéro chiffre inventé, carte des
+  entités couverte, mot-clé aligné sans quota, passages citables, relecture.
+  Déclencher sur « rédige », « écris un article », « article de blog », «
+  écris cette page », « rédige à partir du brief ». Pas pour le plan →
+  seo-brief.
 ---
 
 # Rédaction — écrire quelque chose qui mérite d'exister
@@ -307,7 +304,7 @@ entités ».
   sujet → verbe → objet.
 - **Mot-clé exact aux seuls emplacements forts** : title, H1, première
   phrase (la définition), éventuellement **un** H2 et **une** question de
-  FAQ si c'est naturel — 4 à 6 occurrences, **sans quota ni minimum**.
+  FAQ si c'est naturel — des emplacements, **aucun nombre à viser**.
   Ailleurs : variantes, synonymes, champ lexical.
 - **Désambiguïser** à la première mention (nom complet du produit, de
   l'organisme, de la norme).

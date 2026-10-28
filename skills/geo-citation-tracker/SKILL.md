@@ -1,13 +1,11 @@
 ---
 name: geo-citation-tracker
 description: >
-  Analyse pourquoi un contenu précis n'est pas cité par les LLM, sur
-  5 dimensions (densité de réponse, clarté structurelle, citabilité,
-  couverture d'entités, écart concurrentiel), puis réécrit le paragraphe de
-  réponse directe et applique les correctifs. Déclencher sur "pourquoi je ne
-  suis pas cité", "cette page n'est pas reprise par ChatGPT", "rendre mon
-  contenu citable", "citation LLM", "extractibilité", "réponse directe",
-  "optimiser cette page pour l'IA".
+  Explique pourquoi une page précise n'est pas citée par ChatGPT, Perplexity
+  ou les AI Overviews (réponse directe, structure, citabilité, entités, écart
+  concurrent) et réécrit le passage. Déclencher sur « pourquoi je ne suis pas
+  cité », « rendre cette page citable », « citation LLM ». Pas pour un audit
+  IA du site entier → geo-visibilite-ia.
 ---
 
 # Pourquoi cette page n'est pas citée

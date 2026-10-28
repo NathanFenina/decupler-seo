@@ -1,16 +1,12 @@
 ---
 name: seo-keyword-research
 description: >
-  Recherche de mots-clés complète : expansion sémantique, volumes, difficulté,
-  filtrage du bruit, choix du mot-clé pivot, classification par intention et
-  par étape du tunnel (TOFU / MOFU / BOFU), risque zero-click IA, opportunité
-  GEO, contrôle de cannibalisation par type de page, arbitrage créer /
-  optimiser / ignorer, et export pour import en masse. Déclencher sur
-  "mots-clés", "keyword research", "recherche de mots-clés", "sur quoi me
-  positionner", "volume de recherche", "intention de recherche", "quels
-  sujets traiter", "champ sémantique", "requêtes", "mot-clé pivot", "je
-  cherche des idées de contenu", "mots-clés faciles", "KD max", "site neuf",
-  "DA faible", "difficulté sous 20".
+  Recherche de mots-clés : expansion, volumes, difficulté, filtrage du bruit,
+  mot-clé pivot, intention et étape du tunnel, risque zero-click,
+  cannibalisation, arbitrage créer / optimiser / ignorer. Déclencher sur «
+  mots-clés », « keyword research », « volume de recherche », « sur quoi me
+  positionner », « KD ». Pas pour prioriser par valeur business →
+  seo-opportunites.
 ---
 
 # Recherche de mots-clés — arbitrer, pas collectionner

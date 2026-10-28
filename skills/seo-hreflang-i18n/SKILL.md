@@ -1,12 +1,11 @@
 ---
 name: seo-hreflang-i18n
 description: >
-  Audite et génère le balisage hreflang pour les sites multilingues ou
-  multi-pays : validation des liens retour, x-default, codes langue/région,
-  choix de l'architecture (ccTLD, sous-domaine, sous-dossier), diagnostic des
-  erreurs GSC. Déclencher sur "hreflang", "multilingue", "international",
-  "plusieurs langues", "site en plusieurs pays", "x-default", "traduction
-  SEO", "version anglaise de mon site", "SEO international".
+  Audite et génère le hreflang des sites multilingues ou multi-pays : liens
+  retour, x-default, codes langue-région, architecture (ccTLD, sous-domaine,
+  sous-dossier), erreurs Search Console. Déclencher sur « hreflang », «
+  multilingue », « international », « version anglaise de mon site », « SEO
+  international ».
 ---
 
 # Hreflang et SEO international

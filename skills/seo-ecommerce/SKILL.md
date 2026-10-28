@@ -1,12 +1,11 @@
 ---
 name: seo-ecommerce
 description: >
-  SEO e-commerce : architecture catégories/produits, gestion des facettes et
-  du gonflement d'index, fiches produit, produits en rupture ou supprimés,
-  pagination, schema Product, cannibalisation catégorie/produit. Déclencher
-  sur "e-commerce", "boutique en ligne", "fiches produit", "pages catégorie",
-  "facettes", "filtres", "Shopify", "PrestaShop", "WooCommerce", "produit
-  épuisé", "SEO boutique".
+  SEO e-commerce : architecture catégories et produits, facettes et gonflement
+  d'index, fiches produit, ruptures et produits supprimés, pagination, schema
+  Product, cannibalisation catégorie/produit. Déclencher sur « e-commerce », «
+  fiches produit », « facettes », « Shopify », « WooCommerce », « PrestaShop
+  ».
 ---
 
 # SEO e-commerce — les problèmes qui n'existent que là

@@ -1,19 +1,11 @@
 ---
 name: seo-brief
 description: >
-  Produit un brief SEO/GEO consolidé en 18 sections, en deux variantes :
-  CRÉATION d'une page neuve ou OPTIMISATION d'un contenu existant (verdict,
-  décisions structurelles section par section). Données d'abord (SERP live
-  DataForSEO ou repli Firecrawl, top 5 lu et mesuré : Hn, longueur, entités,
-  formats, FAQ, schémas, médias ; PAA, AI Overview, Search Console,
-  cannibalisation, style mesuré du client, sitemap), puis intention, X-Ray
-  du top 5, gap et information gain, mix de mots-clés, noyau sémantique et
-  entités, réponse directe, H1 et intro rédigés, plan Hn chiffré, FAQ
-  rédigée, prompts IA et fan-out, données structurées, sources E-E-A-T,
-  checklist GEO, maillage et priorités chiffrées. Déclencher sur "brief", "brief SEO", "brief rédactionnel",
-  "brief d'optimisation", "plan d'article", "plan Hn", "que dois-je écrire
-  sur", "cahier des charges rédaction", "structure d'article", "je veux
-  écrire sur", "optimiser ce contenu existant".
+  Produit le brief SEO/GEO d'une page, création ou optimisation : SERP et top
+  5 mesurés, intention, carte des entités, information gain, plan Hn, réponse
+  directe et FAQ rédigées, fan-out, schema, maillage. Déclencher sur « brief
+  », « brief SEO », « plan d'article », « plan Hn », « que dois-je écrire sur
+  ». Pas pour rédiger le texte → seo-redaction.
 ---
 
 # Brief SEO consolidé — le document qui rend la page inévitable
@@ -37,8 +29,17 @@ il exécute.
 
 ## Étape 0 — les données avant le brief
 
-**Ne rédigez jamais un brief sans avoir regardé la SERP.** C'est la
-différence entre un brief et une supposition.
+**Regardez la SERP avant d'écrire le brief** : c'est la différence entre un
+brief et une supposition.
+
+**Sans aucun accès (ni DataForSEO, ni Firecrawl, ni recherche web) : livrez
+quand même**, en mode dégradé, plutôt que de vous arrêter sur une question.
+Plan Hn, carte des entités, réponse directe, FAQ et maillage se rédigent à
+partir des connaissances générales du sujet ; l'en-tête du brief dit
+« SERP non relevée », chaque élément non vérifié porte « à vérifier sur la
+SERP », aucun chiffre n'est donné sans source, et une dernière section liste
+ce qu'un relevé ajouterait. Proposez ensuite de compléter dès qu'un accès est
+branché (`/seo-doctor`).
 
 1. **SERP live et top 5 lu**, dans chaque langue du projet :
    ```bash
@@ -477,31 +478,14 @@ Le GAP CRITIQUE de la section 2 figure toujours en tête des critiques.
 
 ## Traçabilité — chaque chiffre a son origine
 
-En tête du brief, un bloc **Sources de données** : pour chaque mesure
-(volume, KD, positions, longueurs, PAA, AI Overview), l'outil appelé, la
-date et le paramètre de lieu. Une valeur qu'aucun appel n'a renvoyée
-s'écrit `n.d.` ou **non mesuré**. Les noms des concurrents restent dans le
-brief (section 3) et **jamais dans la page**.
-
----
-
-Pied de brief : `Brief SEO consolidé — [site] — [mot-clé] — [date]`
+Chaque chiffre du brief porte sa source et sa date : règles et format dans
+`references/brief-exploitable.md`.
 
 ## Ce qui distingue un brief exploitable
 
-| ❌ Brief inutile | ✅ Brief exploitable |
-|------------------|---------------------|
-| « Parler des avantages » | « 4 avantages, un paragraphe chacun, avec un chiffre par avantage. Les concurrents n'en citent que 2. » |
-| « Article de 2 000 mots » | « Le top 5 fait 1 400-2 600 mots. Écrivez ce que le sujet exige, sans remplissage. » |
-| « Optimiser pour le SEO » | « Carte des entités : principale X ; très liées A, B, C (chacune définie et reliée à X) ; contexte D, E. Mot-clé exact dans le title, le H1 et la première phrase, aucun quota. » |
-| « Ajouter une FAQ » | « 4 questions, les voici, réponses de 2 à 4 lignes. » |
-| « Envisager de revoir l'intro » | « DÉCISION : MODIFIER. Nouvelle intro ci-dessous. » |
-
-## Sources à citer
-
-Listez-les dans le brief, avec leur lien : textes officiels, organismes,
-études, et les chiffres de `memoire/faits.md`. Un chiffre sans source ne
-s'écrit pas — ni dans le brief, ni dans la page.
+Avant de remettre le brief, comparez chaque consigne aux exemples de
+`references/brief-exploitable.md` (consigne vague → consigne exploitable,
+et les sources à citer).
 
 ## Livrables
 

@@ -1,12 +1,10 @@
 ---
 name: seo-faq-paa
 description: >
-  Génère une FAQ qui vise les People Also Ask, les featured snippets et la
-  citation par les LLM, avec le schema FAQPage correspondant. Puise dans les
-  PAA réels, Reddit, les objections commerciales et les comparaisons.
-  Déclencher sur "FAQ", "questions fréquentes", "People Also Ask", "PAA",
-  "questions à ajouter", "schema FAQ", "featured snippet", "quelles questions
-  se posent mes clients".
+  Génère une FAQ (4-6 questions, 8-12 sur un pilier) à partir des PAA réels,
+  de Reddit et des objections, avec réponses citables de 40-80 mots et le
+  FAQPage correspondant. Déclencher sur « FAQ », « questions fréquentes », «
+  People Also Ask », « PAA », « quelles questions se posent mes clients ».
 ---
 
 # FAQ — le format le plus rentable pour la citation
@@ -48,6 +46,15 @@ conversation pour la meilleure matière du site.
 « X ou Y ? », « alternative à Z », « faut-il faire soi-même ou déléguer ».
 Fortes en intention, souvent citées par les LLM parce qu'elles appellent une
 réponse structurée.
+
+## Sans la page ou sans les chiffres du client : livrer quand même
+
+Rédigez la FAQ complète plutôt que de vous arrêter sur une question : les
+réponses génériques s'écrivent, et chaque donnée propre au client (prix,
+délai, zone, garantie) devient un emplacement explicite
+`[à confirmer : tarif de nuit]`. Jamais de chiffre inventé. Les questions
+non vérifiées sur les PAA réels sont signalées comme telles, et la liste de
+ce qu'il faut fournir vient **après** la FAQ, pas à sa place.
 
 ## Le format de réponse
 

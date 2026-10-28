@@ -1,13 +1,11 @@
 ---
 name: seo-page-builder-html
 description: >
-  Génère des pages HTML complètes, esthétiques et responsive, prêtes à coller
-  dans Elementor, Webflow, WordPress ou un site statique : sections
-  alternées, tableaux, CTA, FAQ dépliable, schema intégré, sans dépendance
-  externe. Déclencher sur "crée une page HTML", "génère la page", "code HTML",
-  "page prête à coller", "Elementor", "landing page", "mets ça en HTML",
-  "page de service", "composant HTML", "template de page", "hero",
-  "bannière témoignages", "bloc auteur", "sommaire", "tableau comparatif".
+  Code des pages HTML complètes et responsive, prêtes à coller dans Elementor,
+  Webflow, WordPress ou un site statique : sections, tableaux, CTA, FAQ
+  dépliable, schema intégré, sans dépendance. Déclencher sur « crée une page
+  HTML », « page prête à coller », « code HTML », « composant HTML », «
+  landing page ». Pas pour concevoir la maquette → seo-design-pages.
 ---
 
 # Génération de pages HTML

@@ -1,12 +1,10 @@
 ---
 name: seo-migration
 description: >
-  Pilote une refonte ou migration de site sans perdre de trafic : inventaire,
-  plan de redirections 301, mapping ancien/nouveau, checklist pré et post
-  mise en ligne, surveillance J+1 à J+90. Déclencher sur "migration",
-  "refonte", "changement de domaine", "je change de CMS", "nouveau site",
-  "redirections", "plan de redirection", "passage en HTTPS", "j'ai refait mon
-  site et j'ai perdu du trafic".
+  Pilote une refonte ou une migration sans perte de trafic : inventaire, plan
+  et mapping de redirections 301, checklists avant et après mise en ligne,
+  surveillance J+1 à J+90. Déclencher sur « migration », « refonte », «
+  changement de domaine », « changement de CMS », « plan de redirection ».
 ---
 
 # Migration — l'opération où l'on perd le plus vite

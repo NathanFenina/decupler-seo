@@ -1,13 +1,12 @@
 ---
 name: seo-benchmark
 description: >
-  Avant de créer ou refondre une page, relève ce que font les 3 meilleures
-  pages concurrentes sur sa requête, dans chaque langue du projet, et fixe la
-  grille « faire mieux » : la page ne sort que si elle bat la meilleure sur au
-  moins 5 axes. Déclencher dès qu'on crée, rédige ou refond une page, un
-  outil, un comparatif, une offre, et sur "benchmark", "faire mieux que",
-  "ce que font les autres", "meilleure page concurrente", "comparer à la
-  concurrence sur cette page".
+  Avant de créer ou refondre une page, relève les 3 meilleures pages
+  concurrentes sur sa requête et fixe la grille « faire mieux » (battre la
+  meilleure sur au moins 5 axes). Déclencher sur « benchmark de page », «
+  faire mieux que », « meilleure page concurrente », et à chaque création de
+  page. Pas pour une analyse de concurrents à l'échelle du site →
+  seo-competitor-gap.
 ---
 
 # Benchmark — faire mieux que la meilleure page

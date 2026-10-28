@@ -1,12 +1,11 @@
 ---
 name: seo-competitor-gap
 description: >
-  Analyse concurrentielle SEO et GEO : gaps de contenu, écarts de mots-clés,
-  différences de format, profils de liens, visibilité IA comparée. Produit une
-  matrice concurrentielle et un plan d'attaque 90 jours. Déclencher sur
-  "concurrents", "analyse concurrentielle", "gap analysis", "pourquoi ils
-  rankent mieux", "comparer avec", "benchmark", "content gap", "qu'est-ce
-  qu'ils ont que je n'ai pas", "comment les dépasser".
+  Analyse concurrentielle SEO et GEO à l'échelle du site : écarts de mots-clés
+  et de contenus, formats, liens, visibilité IA comparée, matrice et plan
+  d'attaque 90 jours. Déclencher sur « concurrents », « analyse
+  concurrentielle », « content gap », « pourquoi ils rankent mieux ». Pas pour
+  une seule page → seo-benchmark.
 ---
 
 # Analyse concurrentielle — trouver la brèche

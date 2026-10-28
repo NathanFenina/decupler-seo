@@ -1,13 +1,11 @@
 ---
 name: seo-quick-wins
 description: >
-  Identifie dans Search Console les pages en position 5-20 avec de fortes
-  impressions, analyse l'écart avec le top 3, et produit les corrections
-  exactes pour les faire monter. Le meilleur rapport effort/résultat du SEO.
-  Déclencher sur "quick wins", "gains rapides", "pages à rattraper",
-  "positions 8-15", "qu'est-ce que je corrige en premier", "j'ai peu de
-  temps", "actions rentables", "améliorer mon trafic rapidement",
-  "opportunités GSC", ou un export Search Console collé.
+  Trouve dans Search Console les pages en position 5-20 à fortes impressions,
+  mesure l'écart avec le top 3 et donne les corrections exactes pour les faire
+  monter. Déclencher sur « quick wins », « gains rapides », « positions 8-15
+  », « qu'est-ce que je corrige en premier », « j'ai peu de temps ». Pour
+  optimiser à fond une page → seo-optimisation-onpage.
 ---
 
 # Quick wins — la chaîne la plus rentable du dispositif

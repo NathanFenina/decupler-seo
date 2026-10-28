@@ -1,16 +1,11 @@
 ---
 name: seo-cycle
 description: >
-  Le cycle SEO autonome d'un projet : le mode hebdo (le mercredi, par défaut,
-  qui enchaîne contrôle, actions validées, mesure et bilan de la semaine dans
-  la page de suivi), ou quatre modes séparés pour un gros site : veille
-  (quotidienne), optimisation (hebdo), contenu (hebdo), rapport (mensuel). Lit la mémoire du
-  projet, décide sur les données Search Console, agit dans les limites des
-  niveaux d'autonomie, journalise chaque modification et laisse une trace de
-  chaque exécution. C'est le skill que lancent les routines. Déclencher sur
-  "lance le cycle", "mode veille", "mode optimisation", "mode contenu",
-  "mode rapport", "mode hebdo", "cycle hebdo", "routine du mercredi",
-  "routine SEO", ou quand une routine le demande.
+  Le cycle SEO autonome d'un projet, lancé par les routines : mode hebdo
+  (contrôle, actions validées, mesure, bilan) ou modes veille, optimisation,
+  contenu, rapport ; décide sur Search Console, agit dans les limites
+  d'autonomie, journalise. Déclencher sur « lance le cycle », « mode hebdo »,
+  « routine SEO », ou à la demande d'une routine.
 ---
 
 # Le cycle SEO autonome

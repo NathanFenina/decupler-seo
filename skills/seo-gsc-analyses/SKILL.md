@@ -1,18 +1,11 @@
 ---
 name: seo-gsc-analyses
 description: >
-  Bibliothèque de 21 analyses Google Search Console, chacune répondant à une
-  question précise : content decay, gagnants et perdants, requêtes
-  émergentes sans page, saisonnalité, incident avant / après,
-  cannibalisation, CTR anormal, pages à créer, sections manquantes, FAQ et
-  briefs tirés des vraies requêtes, consolidation, panier de requêtes
-  cibles, Google face aux IA. Déclencher sur une question posée aux données
-  Search Console : "qu'est-ce qui monte / qui baisse", "pages qui
-  déclinent", "content decay", "nouvelles requêtes", "c'est saisonnier ?",
-  "pages qui se cannibalisent", "quelle page créer", "quelles questions on
-  me pose", "fusionner des pages", "mes requêtes cibles", "depuis le
-  piratage / la migration / la refonte", ou un export Search Console à
-  analyser.
+  Bibliothèque de 21 analyses Search Console, chacune pour une question :
+  déclin, gagnants et perdants, requêtes émergentes, saisonnalité, incident
+  avant/après, cannibalisation, CTR anormal, pages à créer, consolidation.
+  Déclencher sur une question posée aux données Search Console ou un export à
+  analyser. Pas pour une chute brutale à diagnostiquer → seo-traffic-drop.
 ---
 
 # Analyses Search Console

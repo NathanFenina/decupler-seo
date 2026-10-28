@@ -1,12 +1,11 @@
 ---
 name: seo-journal-mesure
 description: >
-  Journalise chaque modification SEO publiée avec sa situation de départ,
-  la remesure à J+28 contre un groupe témoin, rend un verdict (gain, neutre,
-  perte), propose le retour arrière des pertes et tire les apprentissages du
-  site. Déclencher après toute publication, et sur "journalise", "mesure",
-  "est-ce que ça a marché", "effet de mes modifications", "retour arrière",
-  "qu'est-ce qui marche sur ce site", "bilan des optimisations".
+  Journalise chaque modification SEO publiée, la remesure à J+28 contre un
+  groupe témoin, rend un verdict (gain, neutre, perte), propose le retour
+  arrière et tire les apprentissages du site. Déclencher après toute
+  publication, et sur « est-ce que ça a marché », « effet de mes modifications
+  », « retour arrière ».
 ---
 
 # Journal et mesure

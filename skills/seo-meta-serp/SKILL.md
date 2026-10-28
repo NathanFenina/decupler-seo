@@ -1,12 +1,10 @@
 ---
 name: seo-meta-serp
 description: >
-  Optimise les balises title et meta description pour le taux de clic et la
-  citation par les moteurs IA : 3 variantes de title, 2 de meta, comptage
-  pixel, aperçu SERP simulé, recommandation argumentée. Traite une page ou un
-  lot. Déclencher sur "title", "balise title", "meta description", "améliorer
-  le CTR", "réécris mes titles", "snippet", "aperçu SERP", "mes pages ont un
-  mauvais taux de clic", "optimiser les métas".
+  Optimise title et meta description pour le clic et la citation par les IA :
+  3 variantes de title, 2 de meta, largeur en pixels, aperçu SERP,
+  recommandation ; une page ou un lot. Déclencher sur « title », « meta
+  description », « améliorer le CTR », « réécris mes titles », « snippet ».
 ---
 
 # Title et meta description — le levier le moins cher du SEO

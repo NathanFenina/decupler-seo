@@ -1,15 +1,12 @@
 ---
 name: seo-suivi-mensuel
 description: >
-  Suivi mensuel d'un projet sur deux mesures qui ne changent pas d'un mois à
-  l'autre : la position réelle de chaque mot-clé principal de la cartographie
-  dans Google (relevé direct, page qui ranke, concurrent devant, AI Overview),
-  et la présence de la marque sur une batterie de prompts validée par le
-  client dans ChatGPT, Gemini, Claude et Perplexity. Propose la batterie,
-  la fait valider, relève, compare au mois précédent. Déclencher sur "suivi
-  mensuel", "suivi des positions", "rank tracking", "est-ce qu'on remonte",
-  "suivi des prompts", "prompts à suivre", "monitoring mensuel", "batterie de
-  prompts", "faire valider les prompts", "positions du mois".
+  Suivi mensuel stable d'un projet : position réelle de chaque mot-clé
+  principal de la cartographie (page qui ranke, concurrent devant, AI
+  Overview) et présence sur une batterie de prompts validée par le client,
+  comparées au mois précédent. Déclencher sur « suivi mensuel », « rank
+  tracking », « est-ce qu'on remonte », « prompts à suivre », « positions du
+  mois ».
 ---
 
 # Suivi mensuel — positions et prompts

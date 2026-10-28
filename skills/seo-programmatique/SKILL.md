@@ -1,12 +1,11 @@
 ---
 name: seo-programmatique
 description: >
-  Conçoit, génère et audite des pages SEO à l'échelle depuis une source de
-  données : motifs d'URL, gabarits, variables, garde-fous anti-contenu mince,
-  maillage automatique, stratégie de canonical. Bloque au-delà des seuils sans
-  audit qualité. Déclencher sur "SEO programmatique", "pages à l'échelle",
-  "générer des centaines de pages", "pages ville", "pages par catégorie",
-  "template de page", "pSEO", "pages automatiques", "landing pages en masse".
+  Conçoit, génère et audite des pages à l'échelle depuis une source de données
+  : motifs d'URL, gabarits, variables, garde-fous anti-contenu mince, maillage
+  automatique, canonical ; bloque au-delà des seuils sans audit. Déclencher
+  sur « SEO programmatique », « pSEO », « pages à l'échelle », « générer des
+  centaines de pages ».
 ---
 
 # SEO programmatique — l'échelle sans le contenu mince

@@ -1,21 +1,12 @@
 ---
 name: seo-entites-triplets
 description: >
-  Rend les connaissances clés d'une page extractibles par les moteurs IA et
-  les graphes de connaissances : chaque fait énoncé en triplet explicite
-  (sujet — prédicat — objet), une idée par phrase, près du haut ; chaque
-  entité reliée à un identifiant stable (Wikidata, site officiel) par le
-  JSON-LD (about, mentions, sameAs, DefinedTerm, knowsAbout, provider,
-  author) ; une seule valeur par sujet et prédicat sur tout le site. Registre
-  du projet (memoire/entites.csv, memoire/triplets.csv), contrôle par script,
-  mode automatique pour les routines. Déclencher sur "triplets", "triplets
-  sémantiques", "entités", "entités nommées", "knowledge graph", "graphe de
-  connaissances", "saillance", "salience", "cohérence des faits",
-  "contradictions entre pages", "chiffres différents selon les pages",
-  "sameAs", "QID", "Wikidata", "DefinedTerm", "knowsAbout", "about /
-  mentions", "faits clés", "extractibilité", "trio sémantique", "Google ne
-  sait pas qui on est", "ChatGPT ne nous cite pas comme expert", "page
-  auteur", "entity home".
+  Rend les faits clés d'une page extractibles : triplets sujet — prédicat —
+  objet, entités reliées à Wikidata par about / mentions / sameAs, une seule
+  valeur par fait sur tout le site (registre memoire/entites.csv et
+  triplets.csv, contrôle par script). Déclencher sur « triplets », « entités
+  », « knowledge graph », « contradictions entre pages », « Wikidata », « QID
+  ». Pas pour le graphe JSON-LD complet → seo-schema-jsonld.
 ---
 
 # Triplets et entités — dire une chose, une fois, de la même façon partout

@@ -1,14 +1,11 @@
 ---
 name: seo-publication-cms
 description: >
-  Publie et met à jour du contenu sur WordPress, Webflow ou un CMS générique
-  via API REST : création d'articles et de pages, mise à jour de balises,
-  catégories, images, schema, avec sauvegarde préalable et publication en
-  brouillon par défaut. Déclencher sur "publie", "mets en ligne", "envoie sur
-  WordPress", "Webflow", "publier l'article", "mettre à jour la page",
-  "pousser le contenu", "créer le brouillon", "carte de contenu WordPress".
-  Sur WordPress, tout passe par scripts/wp.py : brouillon par défaut,
-  révision pour une page en ligne, journal de mesure, maillage.
+  Publie et met à jour du contenu sur WordPress (scripts/wp.py), Webflow ou un
+  CMS par API : brouillon par défaut, révision pour une page en ligne,
+  sauvegarde avant écriture, journal de mesure. Déclencher sur « publie », «
+  mets en ligne », « envoie sur WordPress », « créer le brouillon », « mettre
+  à jour la page ».
 ---
 
 # Publication — mettre en ligne sans casser

@@ -1,12 +1,11 @@
 ---
 name: seo-reddit-communautes
 description: >
-  Identifie les discussions Reddit, Quora et forums à forte valeur pour la
-  citation par les LLM et le trafic, les score, et rédige des réponses utiles
-  et honnêtes prêtes à publier (jamais publiées automatiquement). Extrait
-  aussi le vocabulaire réel de l'audience. Déclencher sur "Reddit", "Quora",
-  "forums", "communautés", "où parler de mon produit", "questions de mon
-  audience", "vocabulaire client", "être cité via Reddit", "discussions".
+  Repère les discussions Reddit, Quora et forums utiles à la citation par les
+  IA et au trafic, les note et rédige des réponses honnêtes prêtes à publier
+  (jamais automatiquement) ; extrait le vocabulaire réel de l'audience.
+  Déclencher sur « Reddit », « Quora », « forums », « où parler de mon produit
+  », « vocabulaire client ».
 ---
 
 # Reddit et communautés — la source que les LLM adorent

@@ -1,15 +1,13 @@
 ---
 name: seo-optimisation-onpage
 description: >
-  Audite un contenu existant face à un mot-clé cible, le note sur 100 avec un
-  feu vert/jaune/rouge par critère et un malus de sur-optimisation, PUIS
-  réécrit la version optimisée complète, prête à coller (ou en Word avec
-  suivi des modifications). Remplace Yoast et Rank Math : il note et il
-  corrige. Déclencher sur "optimise cette page", "score SEO", "note sur 100",
-  "audit on-page", "est-ce que c'est bien optimisé", "passe au vert",
-  "réécris cette page", "améliore ce contenu", "optimisation on-page",
-  "ré-optimisation", "couverture des entités", "maillage entrant",
-  "cannibalisation", ou un texte/URL collé avec un mot-clé cible.
+  Audite une page existante face à un mot-clé (score /100, feux par critère,
+  couverture des entités, Search Console, maillage entrant) puis livre la
+  version optimisée complète, prête à coller. Remplace Yoast et Rank Math.
+  Déclencher sur « optimise cette page », « score SEO », « audit on-page », «
+  passe au vert », « combien de fois répéter le mot-clé », ou une URL ou un
+  texte avec un mot-clé. Pas pour une page neuve → seo-brief puis
+  seo-redaction.
 ---
 
 # Optimisation on-page — noter puis corriger
@@ -61,8 +59,9 @@ skill `seo-serp-analysis`).
 
 - **Mot-clé exact aux seuls emplacements forts** : title, H1, première
   phrase (la définition), éventuellement **un** H2 et **une** question de
-  FAQ si c'est naturel. Soit 4 à 6 occurrences, **sans quota ni minimum**.
-  Ne jamais tordre une phrase pour placer l'expression exacte.
+  FAQ si c'est naturel. **Aucun nombre d'occurrences à viser** : ce sont
+  des emplacements, pas un compte. Ne jamais tordre une phrase pour placer
+  l'expression exacte.
 - **Chaque entité très liée** est nommée, expliquée et reliée à l'entité
   principale (« X automatise Y entre A, B et C »).
 - **Relations explicites** sujet → verbe → objet : « X permet de… »,

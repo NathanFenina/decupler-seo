@@ -1,14 +1,12 @@
 ---
 name: seo-schema-jsonld
 description: >
-  Définit, génère, valide et déploie les données structurées JSON-LD
-  schema.org d'un site : un seul @graph par page, socle global identique
-  partout (Organization + WebSite), nœuds propres à chaque type de page
-  (WebPage, Service, BlogPosting, Course, CollectionPage, FAQPage, Person),
-  entités reliées à Wikidata. Signale les pièges et les dépréciations Google.
-  Déclencher sur "schema", "données structurées", "JSON-LD", "rich results",
-  "rich snippets", "balisage", "schema.org", "étoiles dans Google", "extraits
-  enrichis", "microdata", "@graph", "Wikidata", "sameAs".
+  Définit, génère, valide et déploie le JSON-LD d'un site : un @graph par
+  page, socle Organization + WebSite identique partout, nœuds par type de
+  page, identité de l'organisation, pièges et dépréciations Google, contrôle
+  par schema_validate.py. Déclencher sur « schema », « données structurées »,
+  « JSON-LD », « rich results », « @graph », « vérifie mon JSON-LD ». Pour les
+  seuls faits et entités → seo-entites-triplets.
 ---
 
 # Données structurées — dire aux machines ce qu'est la page

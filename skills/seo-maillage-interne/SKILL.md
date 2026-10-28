@@ -1,12 +1,11 @@
 ---
 name: seo-maillage-interne
 description: >
-  Conçoit et applique le maillage interne : détection des orphelines, flux
-  d'autorité vers les pages qui convertissent, ancres optimisées, réduction de
-  la profondeur, liens contextuels à poser page par page. Déclencher sur
-  "maillage interne", "liens internes", "pages orphelines", "linking interne",
-  "où mettre mes liens", "ancres", "flux de jus", "PageRank interne",
-  "relier mes articles".
+  Conçoit et applique le maillage interne : orphelines, flux d'autorité vers
+  les pages qui convertissent, liens entrants dosés selon la force de la page
+  (maillage_entrant.py), ancres variées, profondeur. Déclencher sur « maillage
+  interne », « liens internes », « ancres », « pages orphelines », « PageRank
+  interne », « relier mes articles ».
 ---
 
 # Maillage interne — le levier le plus sous-estimé

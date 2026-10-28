@@ -1,12 +1,11 @@
 ---
 name: seo-crawl-architecture
 description: >
-  Crawle un site et en cartographie l'architecture : profondeur, silos, pages
-  orphelines, culs-de-sac, distribution de l'autorité, budget de crawl.
-  Produit une carte exploitable et un plan de restructuration. Déclencher sur
-  "crawl", "crawler mon site", "architecture", "arborescence", "pages
-  orphelines", "profondeur de clic", "structure du site", "budget de crawl",
-  "cartographie", "combien de pages j'ai".
+  Crawle un site et cartographie son architecture : profondeur, pages
+  orphelines, culs-de-sac, autorité interne, budget de crawl, plan de
+  restructuration. Déclencher sur « crawler mon site », « architecture », «
+  pages orphelines », « profondeur de clic », « structure du site ». Pas pour
+  la carte mot-clé par page → seo-cartographie.
 ---
 
 # Crawl et architecture

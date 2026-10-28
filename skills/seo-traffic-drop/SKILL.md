@@ -1,12 +1,11 @@
 ---
 name: seo-traffic-drop
 description: >
-  Diagnostique une chute de trafic organique : datation précise, isolement du
-  segment touché, arbre de causes (technique, mise à jour Google, saisonnalité,
-  perte de positions, AI Overviews, concurrence), et plan de récupération.
-  Déclencher sur "chute de trafic", "j'ai perdu du trafic", "baisse SEO",
-  "mon trafic s'effondre", "pénalité", "core update", "je suis déclassé",
-  "mes positions ont chuté", "moins de clics qu'avant".
+  Diagnostique une chute de trafic organique : datation, segment touché, arbre
+  de causes (technique, mise à jour Google, saisonnalité, positions, AI
+  Overviews, concurrence) et plan de récupération. Déclencher sur « chute de
+  trafic », « j'ai perdu du trafic », « core update », « pénalité », « mes
+  positions ont chuté ».
 ---
 
 # Chute de trafic — diagnostiquer avant de réagir

@@ -2,11 +2,10 @@
 name: seo-netlinking
 description: >
   Pilote une campagne de netlinking : audit du profil de liens, prospection
-  qualifiée, scoring des opportunités, rédaction des prises de contact, suivi
-  des liens obtenus, surveillance des liens perdus et des liens toxiques.
-  Déclencher sur "netlinking", "backlinks", "liens externes", "link building",
-  "obtenir des liens", "prospection de liens", "guest blogging", "profil de
-  liens", "domaines référents", "acheter des liens", "liens toxiques".
+  qualifiée et notée, prises de contact rédigées, suivi des liens obtenus,
+  perdus et toxiques. Déclencher sur « netlinking », « backlinks », « link
+  building », « domaines référents », « liens toxiques », « guest blogging ».
+  Pas pour attirer des liens par un contenu → seo-digital-pr.
 ---
 
 # Netlinking — obtenir des liens qui comptent

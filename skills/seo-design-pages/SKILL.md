@@ -1,18 +1,12 @@
 ---
 name: seo-design-pages
 description: >
-  Conçoit le design d'une page SEO qui convertit : gabarit section par
-  section selon le type de page (service, article, page locale, landing,
-  comparatif, outil ou calculateur, lead magnet), placement et nombre des
-  CTA, choix des bannières (contact, confiance E-E-A-T, témoignages, lead
-  magnet), plan d'images (hero, corps, schémas, Open Graph, génération),
-  tokens de design, règles mobile, accessibilité, performance, et checklist
-  avant publication. Pour WordPress/Elementor, Webflow et Next.js/React.
-  Déclencher sur "design de la page", "maquette", "structure de la page",
-  "gabarit", "où mettre les CTA", "combien de CTA", "bannière", "hero",
-  "images de la page", "plan d'images", "génère une image", "la page ne
-  convertit pas", "mise en page", "composants", "design system", "UX de la
-  page", "page de conversion".
+  Conçoit le design d'une page qui convertit : gabarit par type de page,
+  nombre et place des CTA, bannières (contact, confiance, témoignages, lead
+  magnet), plan d'images, règles mobile, accessibilité et checklist avant
+  publication. Déclencher sur « maquette », « gabarit », « où mettre les CTA
+  », « hero », « plan d'images », « la page ne convertit pas ». Pas pour coder
+  la page → seo-page-builder-html.
 ---
 
 # Design de pages SEO — la page qui se lit, se cite et convertit

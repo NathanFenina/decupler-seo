@@ -1,12 +1,11 @@
 ---
 name: seo-nouveau-projet
 description: >
-  Crée un nouveau projet SEO piloté en autonomie : dépôt privé à partir du
-  gabarit, mémoire du projet (CLAUDE.md, marque, décisions, apprentissages),
-  méthode embarquée pour les routines, configuration, et la routine du
-  mercredi prête à créer. Déclencher sur "nouveau projet", "nouveau client", "lancer
-  un site", "onboarder un client", "créer le repo du projet", "mettre un
-  client sous pilotage", "ajouter un site au portefeuille".
+  Crée un projet SEO piloté en autonomie : dépôt privé depuis le gabarit,
+  mémoire (CLAUDE.md, marque, décisions), méthode embarquée, configuration,
+  routines prêtes à créer. Déclencher sur « nouveau projet », « nouveau client
+  », « onboarder un client », « créer le repo du projet », « mettre un client
+  sous pilotage ».
 ---
 
 # Nouveau projet

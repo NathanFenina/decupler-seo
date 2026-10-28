@@ -24,7 +24,7 @@
 
 ## Pièges
 
-- Écrire un brief sans avoir regardé la SERP du jour.
+- Écrire un brief sans avoir regardé la SERP du jour quand elle est accessible ; sans accès, le brief part en mode dégradé, marqué « SERP non relevée ».
 - Ce qu'une source ne donne pas s'écrit « non mesuré », jamais « absent ».
 - Un volume qu'aucun outil n'a renvoyé s'écrit « n.d. », pas une estimation.
 

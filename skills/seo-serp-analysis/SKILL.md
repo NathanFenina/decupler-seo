@@ -2,11 +2,10 @@
 name: seo-serp-analysis
 description: >
   Analyse une SERP en direct : qui ranke et pourquoi, intention dominante,
-  features occupées (featured snippet, PAA, AI Overview, images, vidéos,
-  local pack), format attendu, difficulté réelle. Déclencher sur "analyse la
-  SERP", "qui ranke sur", "que sort Google sur", "featured snippet", "People
-  Also Ask", "AI Overview", "quel format pour cette requête", "intention de
-  recherche", "difficulté de ce mot-clé".
+  features (featured snippet, PAA, AI Overview, local pack), format attendu,
+  difficulté réelle. Déclencher sur « analyse la SERP », « qui ranke sur », «
+  que sort Google sur », « quel format pour cette requête ». Pas pour un brief
+  complet → seo-brief.
 ---
 
 # Analyse de SERP — lire ce que Google a déjà décidé

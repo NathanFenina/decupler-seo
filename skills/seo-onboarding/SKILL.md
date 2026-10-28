@@ -1,13 +1,11 @@
 ---
 name: seo-onboarding
 description: >
-  Point d'entrée de Claude Code SEO Décupler. Accueille un nouvel utilisateur,
-  diagnostique ce qui est branché, explique quoi connecter en premier et
-  pourquoi, configure le projet, puis lance la première action utile.
-  Déclencher quand l'utilisateur dit "je commence", "installe", "configure",
-  "par où je commence", "qu'est-ce que je dois connecter", "ça marche pas",
-  "doctor", "quels outils", ou à la toute première utilisation du dispositif
-  sur un projet (aucun decupler-seo.config.yml dans le dossier du projet).
+  Point d'entrée du plugin : diagnostique ce qui est branché, dit quoi
+  connecter en premier et pourquoi, configure le projet, lance la première
+  action utile. Déclencher sur « je commence », « par où je commence », «
+  qu'est-ce que je dois connecter », « ça marche pas », « doctor », ou sans
+  decupler-seo.config.yml dans le projet.
 ---
 
 # Onboarding — la première demi-heure

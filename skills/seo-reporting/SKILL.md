@@ -1,14 +1,11 @@
 ---
 name: seo-reporting
 description: >
-  Produit le rapport SEO mensuel : les chiffres sont calculés par
-  rapport.py (Search Console, journal des modifications, routines), l'agent
-  rédige la lecture — causes, ce qui a marché, ce qu'on arrête, les 5 actions
-  du mois suivant — et ajoute la santé des données structurées, l'exactitude
-  de l'entité dans les IA, le croisement avec la roadmap et le point client.
-  Déclencher sur "rapport", "reporting", "bilan mensuel", "rapport SEO",
-  "comment ça évolue", "résultats du mois", "point mensuel", "rapport
-  client", "évolution du trafic".
+  Produit le rapport SEO mensuel : chiffres calculés par rapport.py (Search
+  Console, journal, routines), lecture rédigée (causes, ce qui a marché, ce
+  qu'on arrête, 5 actions), santé du schema, exactitude de l'entité dans les
+  IA. Déclencher sur « rapport », « reporting », « bilan mensuel », « rapport
+  client », « résultats du mois ».
 ---
 
 # Rapport — dire ce qui s'est passé et pourquoi

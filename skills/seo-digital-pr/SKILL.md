@@ -1,12 +1,11 @@
 ---
 name: seo-digital-pr
 description: >
-  Conçoit des contenus qui attirent naturellement des liens et des citations :
-  études de données, baromètres, outils gratuits, classements, prises de
-  position. Puis pilote leur diffusion presse et communautés. Déclencher sur
-  "digital PR", "linkbait", "étude", "baromètre", "données originales",
-  "attirer des liens naturellement", "relations presse SEO", "contenu
-  virail", "comment obtenir des liens sans démarcher".
+  Conçoit des contenus qui attirent liens et citations (études de données,
+  baromètres, outils gratuits, classements) et pilote leur diffusion presse et
+  communautés. Déclencher sur « digital PR », « linkbait », « baromètre », «
+  données originales », « obtenir des liens sans démarcher ». Pas pour la
+  prospection de liens → seo-netlinking.
 ---
 
 # Digital PR — produire ce qui se cite tout seul

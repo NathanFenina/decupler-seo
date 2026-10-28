@@ -1,12 +1,11 @@
 ---
 name: geo-visibilite-ia
 description: >
-  Audit de visibilité dans les moteurs IA (ChatGPT, Perplexity, Google AI
-  Overviews, Claude, Gemini) : score GEO sur 100, analyse par moteur,
-  benchmark concurrentiel, quick wins 30 jours et feuille de route 90 jours.
-  Déclencher sur "GEO", "AEO", "visibilité IA", "ChatGPT ne me cite pas",
-  "AI Overview", "Perplexity", "être cité par les IA", "SEO pour les LLM",
-  "optimisation IA", "générative", "score GEO".
+  Audit de visibilité d'un site dans les moteurs IA (ChatGPT, Perplexity, AI
+  Overviews, Gemini, Claude) : score GEO /100, analyse par moteur,
+  concurrents, quick wins 30 jours, feuille de route 90 jours. Déclencher sur
+  « GEO », « AEO », « visibilité IA », « score GEO », « être cité par les IA
+  ». Pas pour une seule page → geo-citation-tracker.
 ---
 
 # Visibilité IA — être la source, pas le résultat

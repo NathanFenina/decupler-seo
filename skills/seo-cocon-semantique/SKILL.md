@@ -1,12 +1,11 @@
 ---
 name: seo-cocon-semantique
 description: >
-  Conçoit l'architecture éditoriale d'un site : silos thématiques, pages
-  piliers et satellites, cocon sémantique, plan de maillage entre les niveaux,
-  et calendrier de production. Déclencher sur "cocon sémantique", "silo",
-  "architecture éditoriale", "topic cluster", "page pilier", "structurer mon
-  contenu", "plan de contenu", "arborescence éditoriale", "comment organiser
-  mes articles", "stratégie de contenu".
+  Conçoit l'architecture éditoriale : silos, pages piliers et satellites,
+  cocon sémantique, maillage entre niveaux et calendrier de production.
+  Déclencher sur « cocon sémantique », « silo », « topic cluster », « page
+  pilier », « stratégie de contenu », « arborescence éditoriale ». Pas pour
+  choisir les mots-clés → seo-keyword-research.
 ---
 
 # Cocon sémantique — construire une autorité de sujet

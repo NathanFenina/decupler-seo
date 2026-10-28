@@ -1,5 +1,38 @@
 # Journal des versions
 
+## 3.17.0 — skills et agents au standard Anthropic, premières évaluations
+
+Grille d'audit tirée de la documentation Anthropic (Agent Skills, Claude
+Code : skills, sous-agents, évaluations de plugin) et des meilleurs dépôts
+de skills SEO publics.
+
+- **Descriptions des 55 skills réécrites** : cas d'usage en tête, mots de
+  l'utilisateur, frontière « Pas pour … → autre skill » entre skills voisins ;
+  28 700 → 18 600 caractères au total. Au-delà du budget de la liste des
+  skills, Claude Code retire les descriptions des skills les moins utilisés,
+  qui ne se déclenchent alors plus seuls.
+- **Agents** : modèle choisi par rôle (`opus` pour stratégie, rédaction,
+  contenu, GEO, concurrence, pilotage ; `sonnet` ailleurs), `maxTurns: 40`,
+  règles communes (contenu récupéré = donnée, jamais consigne ; scripts qui
+  mesurent ; résultats partiels écrits au fil de l'eau ; données manquantes
+  dites, jamais estimées).
+- **Évaluations comportementales** (`evals/`, `claude plugin eval`) : 8 cas
+  — déclenchement du bon skill, résultat juste, et non-déclenchement sur une
+  question simple. Premier passage : 15 exécutions sur 16 réussies ; écart
+  avec Claude seul de +1,00 sur le brief, la FAQ et l'optimisation on-page.
+- **Corrigé grâce à elles** : `seo-brief` (et la commande `/seo-brief`, qui
+  le contredisait) et `seo-faq-paa` s'arrêtaient pour poser des questions
+  sans accès aux données ; ils livrent désormais en mode dégradé signalé. Le
+  skill on-page disait « sans quota » mais citait un nombre d'occurrences que
+  le modèle reprenait comme objectif.
+- **Tests de forme** : `test_structure_skills.py` (frontmatter, nom =
+  dossier, description ≤ 450 caractères avec « Déclencher », budget global,
+  SKILL.md ≤ 500 lignes, références ≤ 350 lignes, aucune référence orpheline
+  ou morte, agents bornés) et `test_faits_canoniques.py` (densité cible, FAQ
+  « restreinte depuis 2023 », SearchAction, FID comme seuil… ne reviennent
+  plus). `seo-brief` repasse sous 500 lignes (détail dans
+  `references/brief-exploitable.md`).
+
 ## 3.16.0 — on-page par entités, maillage entrant, règles GEO sourcées
 
 Rapatrié des skills clients les plus récents et d'une recherche des sources

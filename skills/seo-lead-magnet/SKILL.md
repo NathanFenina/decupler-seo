@@ -1,16 +1,11 @@
 ---
 name: seo-lead-magnet
 description: >
-  Crée ou refond une page « lead magnet » (guide, kit, modèles, checklist
-  offerts contre un email) qui ranke ET capture : ciblée sur un mot-clé
-  principal et un prompt IA principal, authentique (logos et visuels réels
-  des outils cités, exemples réels, parti pris signé, limites assumées),
-  avec un livrable téléchargeable, un formulaire qui ne cache jamais le
-  contenu à Google, et un parcours de capture vérifié avant publication.
-  Déclencher sur "lead magnet", "aimant à prospects", "guide gratuit contre
-  email", "ressource téléchargeable", "kit à télécharger", "page de
-  capture", "commente X et reçois le guide", "pop-up d'inscription",
-  "contenu verrouillé", "gated content", "refais ce lead magnet".
+  Crée ou refond une page lead magnet (guide, kit, modèles contre un email)
+  qui ranke et capture : mot-clé et prompt principaux, preuves réelles,
+  livrable téléchargeable, formulaire qui ne cache jamais le contenu à Google,
+  parcours vérifié. Déclencher sur « lead magnet », « guide gratuit contre
+  email », « page de capture », « gated content ».
 ---
 
 # Lead magnet — une page qui donne tout, ranke, et capture l'email

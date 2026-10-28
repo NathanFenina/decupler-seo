@@ -1,12 +1,11 @@
 ---
 name: seo-indexation
 description: >
-  Diagnostique et corrige les problèmes d'indexation : pages découvertes non
-  indexées, explorées non indexées, sitemaps, robots.txt, canonicals,
-  duplication, budget de crawl. Déclencher sur "indexation", "pas indexé",
-  "mes pages n'apparaissent pas", "découverte actuellement non indexée",
-  "explorée actuellement non indexée", "couverture", "sitemap", "Google ne
-  voit pas mes pages", "désindexation", "j'ai disparu de Google".
+  Diagnostique et corrige l'indexation : pages découvertes ou explorées non
+  indexées, sitemaps, robots.txt, canonicals, duplication, budget de crawl.
+  Déclencher sur « pas indexé », « découverte actuellement non indexée », «
+  explorée actuellement non indexée », « sitemap », « Google ne voit pas mes
+  pages ».
 ---
 
 # Indexation — pourquoi Google ignore vos pages

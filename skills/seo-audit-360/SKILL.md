@@ -2,12 +2,10 @@
 name: seo-audit-360
 description: >
   Audit SEO complet d'un site : crawl, technique, contenu, E-E-A-T, schema,
-  performance, maillage, visibilité IA. Orchestre les agents spécialisés en
-  parallèle, agrège en un score de santé /100 et sort un plan d'action
-  priorisé par impact business. Déclencher sur "audit", "audit complet",
-  "audite mon site", "analyse mon site", "checkup SEO", "bilan SEO",
-  "diagnostic", "état des lieux", "qu'est-ce qui cloche sur mon site",
-  ou une URL de domaine seule sans autre consigne.
+  performance, maillage, IA, par agents en parallèle, avec score de santé /100
+  et plan priorisé. Déclencher sur « audit complet », « audite mon site », «
+  bilan SEO », ou une URL de domaine seule. Pas pour une page →
+  seo-optimisation-onpage ; pas pour élaguer les pages → seo-audit-contenu.
 ---
 
 # Audit 360 — le point d'entrée de tout

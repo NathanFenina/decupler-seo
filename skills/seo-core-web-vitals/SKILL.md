@@ -1,11 +1,10 @@
 ---
 name: seo-core-web-vitals
 description: >
-  Mesure les Core Web Vitals réels (LCP, INP, CLS) via Chrome DevTools,
-  identifie la cause exacte de chaque métrique dégradée et applique les
-  correctifs front. Déclencher sur "Core Web Vitals", "CWV", "LCP", "INP",
-  "CLS", "PageSpeed", "site lent", "performance", "temps de chargement",
-  "vitesse", "Lighthouse", "mon site rame".
+  Mesure les Core Web Vitals réels (LCP, INP, CLS) avec Chrome DevTools,
+  trouve la cause de chaque métrique dégradée et applique les correctifs
+  front. Déclencher sur « Core Web Vitals », « LCP », « INP », « CLS », «
+  PageSpeed », « site lent », « Lighthouse ».
 ---
 
 # Core Web Vitals — mesurer, comprendre, corriger

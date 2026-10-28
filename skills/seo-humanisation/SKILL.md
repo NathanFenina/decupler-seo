@@ -1,19 +1,12 @@
 ---
 name: seo-humanisation
 description: >
-  Dernière passe d'écriture sur un texte français : repère et retire les tics
-  d'écriture générée (vocabulaire de modèle, triades, « ce n'est pas X, c'est
-  Y », tirets cadratins, puces en gras, rythme uniforme, sources vagues, ton
-  promo, conclusions-résumés) sans toucher au fond ni inventer quoi que ce
-  soit, en alignant le texte sur le style mesuré du client
-  (memoire/style.md). Score des tics sur 100 par script, signaux ligne par
-  ligne, comparatif avant / après qui bloque tout chiffre apparu. Appelée en
-  fin de seo-redaction et sur tout texte existant. Déclencher sur
-  "humanise", "humaniser", "ça sonne IA", "ça fait IA", "enlève les tics IA",
-  "retire les tics d'écriture", "relis le style", "rends ce texte plus
-  naturel", "détecteur IA", "détecteur d'IA", "texte trop robotique",
-  "dé-IA-ise", "passe d'humanisation", "Pangram", "score Pangram",
-  "passer les détecteurs".
+  Dernière passe sur un texte français : retire les tics d'écriture générée
+  (vocabulaire de modèle, triades, tirets cadratins, ton promo,
+  conclusions-résumés) sans toucher au fond, aligné sur memoire/style.md, avec
+  score par script et contrôle qu'aucun chiffre n'apparaît. Déclencher sur «
+  humanise », « ça sonne IA », « enlève les tics IA », « Pangram », « passer
+  les détecteurs ».
 ---
 
 # Humanisation : la dernière passe avant de rendre un texte

@@ -1,6 +1,11 @@
 ---
 name: seo-pilotage
-description: Tableau de bord partagé de plusieurs projets et leur roadmap validée par le client — propositions du mois, validation, exécution par les routines, statut « faite » avec le lien du résultat. Déclencher sur « roadmap », « tableau de bord », « actions à valider », « qu'est-ce qu'on lance », « lance les tâches validées », à l'ouverture de la conversation dédiée à un projet, et dans les routines de rapport, d'optimisation et de contenu.
+description: >
+  Page de suivi d'un projet et sa roadmap validée par le client : propositions
+  du mois, validation, exécution par les routines, statut « faite » avec le
+  lien du résultat, règle anti-doublon entre conversations. Déclencher sur «
+  roadmap », « actions à valider », « qu'est-ce qu'on lance », « lance les
+  tâches validées », et à l'ouverture de la conversation d'un projet.
 ---
 
 # Pilotage — la roadmap validée

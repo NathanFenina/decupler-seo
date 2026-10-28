@@ -1,18 +1,12 @@
 ---
 name: seo-opportunites
 description: >
-  Classe toutes les opportunités SEO d'un client par ce qu'elles rapportent
-  : clics gagnables × valeur du thème pour son chiffre d'affaires ×
-  facilité, à partir de Search Console et du lexique de son métier. Donne
-  pour chaque ligne la page, l'action (title, enrichissement, consolidation,
-  page à créer, format spécial), l'étape du funnel, le schema conseillé et
-  le gain estimé ; dit quels thèmes du métier ne sont pas encore couverts,
-  compare le trafic au mix TOFU/MOFU/BOFU cible, produit un calendrier
-  éditorial, et un mode budget réduit (3 actions par mois). Déclencher sur
-  "opportunités", "par où commencer", "priorités SEO", "qu'est-ce qui
-  rapporte le plus", "cartographie des opportunités", "plan d'action", "sur
-  quoi travailler ce mois-ci", "calendrier éditorial", "budget réduit", et
-  au début de chaque cycle d'optimisation.
+  Classe les opportunités SEO d'un client par ce qu'elles rapportent (clics
+  gagnables × valeur du thème × facilité) : page, action, étape du funnel,
+  gain estimé, thèmes non couverts, calendrier éditorial, mode budget réduit.
+  Déclencher sur « opportunités », « priorités SEO », « qu'est-ce qui rapporte
+  le plus », « calendrier éditorial », et au début de chaque cycle
+  d'optimisation.
 ---
 
 # Opportunités — agir d'abord là où ça rapporte

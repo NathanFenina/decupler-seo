@@ -1,11 +1,10 @@
 ---
 name: seo-dashboard
 description: >
-  Génère un tableau de bord SEO en HTML autonome : KPI, évolutions, roadmap,
-  pipeline de leads, score GEO, pages à travailler — un seul fichier, sans
-  dépendance, publiable en artifact ou partageable par email. Déclencher sur
-  "dashboard", "tableau de bord", "visualiser mes données", "rapport visuel",
-  "graphique SEO", "vue d'ensemble", "présenter les résultats", "artifact".
+  Génère un tableau de bord SEO en HTML autonome (KPI, évolutions, pages à
+  travailler, score GEO), publiable en artifact ou par email. Déclencher sur «
+  dashboard », « rapport visuel », « graphique SEO », « présenter les
+  résultats ». Pas pour la roadmap validée d'un projet → seo-pilotage.
 ---
 
 # Tableau de bord — voir l'état du SEO en dix secondes

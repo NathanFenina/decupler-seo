@@ -1,11 +1,10 @@
 ---
 name: seo-comparatifs
 description: >
-  Produit des pages comparatives et « alternatives à X » qui captent
-  l'intention commerciale : tableau de comparaison, positionnement honnête,
-  schema Product, structure orientée conversion. Déclencher sur "page
-  comparative", "X vs Y", "alternative à", "comparatif", "concurrent contre",
-  "page versus", "meilleurs logiciels", "top 10", "page de comparaison".
+  Produit des pages comparatives et « alternatives à X » à intention
+  commerciale : critères explicites, tableau, méthodologie et positionnement
+  honnêtes, schema adapté. Déclencher sur « X vs Y », « alternative à », «
+  comparatif », « meilleurs logiciels », « top 10 ».
 ---
 
 # Pages comparatives — l'intention la plus proche de l'achat

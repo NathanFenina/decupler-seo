@@ -1,11 +1,11 @@
 ---
 name: seo-local
 description: >
-  SEO local complet : fiche Google Business Profile, cohérence NAP, citations
-  et annuaires, avis clients, pages ville sans doorway pages, schema
-  LocalBusiness, pack local. Déclencher sur "SEO local", "Google Business
-  Profile", "fiche Google", "référencement local", "pack local", "pages
-  ville", "avis Google", "NAP", "être visible dans ma ville", "Google Maps".
+  SEO local : fiche Google Business Profile, NAP cohérent, citations, avis,
+  pages ville sans doorway pages, schema LocalBusiness, pack local. Déclencher
+  sur « SEO local », « fiche Google », « Google Maps », « pages ville », «
+  avis Google », « NAP ». Pas pour des centaines de pages générées →
+  seo-programmatique.
 ---
 
 # SEO local — être choisi dans un rayon de dix kilomètres

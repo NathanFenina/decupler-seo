@@ -1,13 +1,11 @@
 ---
 name: seo-technique-autofix
 description: >
-  Audit technique SEO ET application automatique des correctifs : robots.txt,
-  sitemaps, canonicals, redirections, balises, hreflang, headers, données
-  structurées, images. Détecte, génère le patch, l'applique dans le repo ou
-  le CMS, et vérifie que c'est corrigé. Déclencher sur "corrige la technique",
-  "fix SEO", "répare", "problèmes techniques", "robots.txt", "canonical",
-  "redirections", "404", "chaînes de redirection", "audit technique",
-  "erreurs d'indexation", ou après un audit qui a remonté des points techniques.
+  Audit technique et correctifs appliqués : robots.txt, sitemaps, canonicals,
+  redirections, balises, hreflang, headers, données structurées ; génère le
+  patch, l'applique dans le dépôt ou le CMS, vérifie. Déclencher sur « corrige
+  la technique », « fix SEO », « 404 », « chaînes de redirection », « audit
+  technique ». Pas pour l'indexation seule → seo-indexation.
 ---
 
 # Technique + correction automatique

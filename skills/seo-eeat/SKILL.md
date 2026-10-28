@@ -1,12 +1,10 @@
 ---
 name: seo-eeat
 description: >
-  Évalue et renforce les signaux E-E-A-T (Experience, Expertise,
-  Authoritativeness, Trustworthiness) d'une page ou d'un site, selon les
-  Quality Rater Guidelines. Note sur 40, verdict publier/réviser/réécrire, et
-  correctifs localisés. Déclencher sur "E-E-A-T", "EEAT", "autorité",
-  "crédibilité", "signaux de confiance", "YMYL", "quality rater", "pourquoi
-  Google ne me fait pas confiance", "page auteur", "expertise".
+  Évalue et renforce les signaux E-E-A-T d'une page ou d'un site (expérience,
+  expertise, autorité, confiance) selon les Quality Rater Guidelines : note
+  /40, verdict et correctifs localisés. Déclencher sur « E-E-A-T », «
+  crédibilité », « YMYL », « page auteur », « signaux de confiance ».
 ---
 
 # E-E-A-T — prouver, pas déclarer

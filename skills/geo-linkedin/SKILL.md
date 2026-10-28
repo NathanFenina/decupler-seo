@@ -1,15 +1,11 @@
 ---
 name: geo-linkedin
 description: >
-  Prépare des articles LinkedIn (page entreprise ou profil) qui servent la
-  visibilité dans les moteurs IA et l'entité de la marque sans dupliquer le
-  site : choix du format (article dérivé d'une page, réponse à un prompt,
-  newsletter), angle différent de la page source, faits repris de
-  memoire/faits.md, liens vers le site, passe d'humanisation, fiche de
-  publication manuelle et post d'annonce, mesure par les prompts à J+30.
-  Déclencher sur "article LinkedIn", "LinkedIn", "page entreprise",
-  "newsletter LinkedIn", "republier sur LinkedIn", "Pulse", "recycler un
-  article sur LinkedIn", "contenu LinkedIn pour le GEO".
+  Prépare des articles LinkedIn (page entreprise, profil, newsletter) qui
+  renforcent l'entité de la marque dans les IA sans dupliquer le site : angle
+  propre, faits de memoire/faits.md, liens, fiche de publication. Déclencher
+  sur « article LinkedIn », « newsletter LinkedIn », « recycler un article sur
+  LinkedIn ».
 ---
 
 # Articles LinkedIn — être cité, pas dupliqué

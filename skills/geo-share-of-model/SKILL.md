@@ -1,12 +1,11 @@
 ---
 name: geo-share-of-model
 description: >
-  Mesure et suit dans le temps la part de voix d'une marque dans les réponses
-  des moteurs IA : batterie de prompts, relevé des citations par moteur,
-  calcul du share of model, benchmark concurrentiel, suivi mensuel.
-  Déclencher sur "share of model", "part de voix IA", "suivi des citations",
-  "monitoring GEO", "mesurer ma visibilité IA", "est-ce que ChatGPT me cite",
-  "baromètre IA", "tracking LLM".
+  Mesure la part de voix d'une marque dans les réponses des IA sur une
+  batterie de prompts, moteur par moteur et face aux concurrents, puis la suit
+  dans le temps. Déclencher sur « share of model », « part de voix IA », «
+  est-ce que ChatGPT me cite », « baromètre IA ». Pas pour le suivi mensuel
+  cartographie + positions → seo-suivi-mensuel.
 ---
 
 # Share of Model — mesurer la part de voix dans les IA

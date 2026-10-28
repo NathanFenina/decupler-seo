@@ -1,13 +1,12 @@
 ---
 name: seo-veille
 description: >
-  Surveillance continue d'un site : positions, indexation, erreurs techniques,
-  Core Web Vitals, liens perdus, mentions, mises à jour Google, mouvements
-  concurrents. Détecte les anomalies et alerte avec un diagnostic, pas juste
-  un chiffre. Déclencher sur "veille", "surveillance", "monitoring", "alerte",
-  "surveiller mon site", "prévenir si", "détecter les problèmes", "suivi
-  automatique", "check quotidien", "veille vidéo", "dernières vidéos de",
-  "transcription YouTube", "lire cette vidéo".
+  Surveillance continue d'un site (positions, indexation, erreurs, Core Web
+  Vitals, liens perdus, mises à jour Google, concurrents) avec alerte et
+  diagnostic ; veille vidéo par transcription YouTube. Déclencher sur « veille
+  », « surveillance », « alerte », « check quotidien », « dernières vidéos de
+  », « transcription YouTube ». Pour une chute déjà constatée →
+  seo-traffic-drop.
 ---
 
 # Veille — détecter avant que ça coûte

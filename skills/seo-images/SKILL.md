@@ -1,13 +1,11 @@
 ---
 name: seo-images
 description: >
-  Audite et optimise les images : poids, formats modernes, dimensions, alt,
-  lazy loading, nommage, impact sur le LCP et le CLS, sitemap images, schema
-  ImageObject ; et prévoit l'illustration d'un contenu neuf (combien, où,
-  brief de chaque image, légende). Déclencher sur "images", "optimiser mes
-  images", "alt", "poids des images", "WebP", "AVIF", "SEO images", "Google
-  Images", "mes images sont trop lourdes", "lazy loading", "illustrer
-  l'article", "brief image".
+  Audite et optimise les images (poids, formats, dimensions, alt, lazy
+  loading, LCP, CLS, sitemap images) et prévoit l'illustration d'un contenu
+  neuf. Déclencher sur « images », « alt », « WebP », « AVIF », « mes images
+  sont trop lourdes », « illustrer l'article ». Pas pour le plan d'images
+  d'une maquette → seo-design-pages.
 ---
 
 # Images — le poids mort le plus facile à corriger

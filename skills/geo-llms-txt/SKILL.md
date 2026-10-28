@@ -1,12 +1,11 @@
 ---
 name: geo-llms-txt
 description: >
-  Met en place l'infrastructure GEO d'un site : fichier llms.txt, gestion des
-  crawlers IA dans robots.txt, définition de l'entité (Organization, Person,
-  sameAs), cohérence de marque cross-plateformes, entrée Wikidata.
-  Déclencher sur "llms.txt", "crawlers IA", "GPTBot", "PerplexityBot",
-  "robots.txt IA", "entité", "Wikidata", "knowledge graph", "infra GEO",
-  "comment les IA voient mon site".
+  Pose l'infrastructure d'accès des IA : robots.txt par robot (OAI-SearchBot,
+  Claude-SearchBot, PerplexityBot, GPTBot…), llms.txt (priorité basse),
+  identité de l'entité et Wikidata. Déclencher sur « crawlers IA », « GPTBot
+  », « robots.txt IA », « llms.txt », « infra GEO ». Pas pour le balisage
+  JSON-LD d'une page → seo-schema-jsonld.
 ---
 
 # Infrastructure GEO — poser les fondations

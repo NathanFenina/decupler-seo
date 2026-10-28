@@ -1,13 +1,11 @@
 ---
 name: seo-pilotage-notion
 description: >
-  Crée et alimente dans Notion les 5 bases de pilotage d'une activité SEO :
-  Leads & Prospects, Objectifs & KPI, Roadmap SEO, Briefs & Contenus,
-  Backlinks. Connecte Notion, crée les bases avec leurs propriétés et leurs
-  vues, puis les met à jour automatiquement à chaque action. Déclencher sur
-  "Notion", "connecter Notion", "pilotage", "tracking de leads", "roadmap",
-  "objectifs", "suivi de projet", "base de données SEO", "tableau de bord
-  Notion", "où je suis dans mon SEO".
+  Crée et alimente dans Notion les bases de pilotage SEO (leads, objectifs,
+  roadmap, contenus, backlinks) pour un client qui travaille dans Notion ; le
+  dépôt reste la mémoire. Déclencher sur « Notion », « connecter Notion », «
+  bases Notion », « export Notion ». Pas pour la roadmap validée d'un projet →
+  seo-pilotage.
 ---
 
 # Pilotage Notion — la mémoire du dispositif

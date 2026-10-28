@@ -1,17 +1,11 @@
 ---
 name: seo-audit-contenu
 description: >
-  Passe en revue toutes les pages publiées d'un site et donne à chacune un
-  verdict et une action : vide, morte, périmée, mince, à pousser, saine ou
-  technique — supprimer (410), rediriger (301), fusionner, mettre à jour,
-  enrichir, pousser, garder. Croise Search Console sur 180 jours, la carte
-  de contenu (nombre de mots, date de modification) et des signaux
-  d'obsolescence (année passée dans un titre, versions retirées). Rien n'est
-  modifié pendant l'audit. Déclencher sur "pages pourries", "audit de
-  contenu", "nettoyage du site", "quelles pages supprimer", "pages
-  obsolètes", "pages mortes", "contenu périmé", "élaguer le site", "content
-  pruning", "quelles pages mettre à jour en priorité", "inventaire de
-  contenu".
+  Donne à chaque page publiée un verdict et une action (supprimer en 410,
+  rediriger, fusionner, mettre à jour, enrichir, garder) d'après Search
+  Console sur 180 jours et des signaux d'obsolescence, sans rien modifier.
+  Déclencher sur « audit de contenu », « pages mortes », « quelles pages
+  supprimer », « content pruning », « nettoyage du site ».
 ---
 
 # Audit de contenu — un verdict et une action par page

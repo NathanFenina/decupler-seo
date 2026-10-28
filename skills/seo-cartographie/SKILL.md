@@ -1,16 +1,12 @@
 ---
 name: seo-cartographie
 description: >
-  Tient la cartographie d'un site : un tableau vivant où chaque page a son
-  mot-clé principal (ce qu'elle doit gagner sur Google) et son prompt
-  principal (la question qu'elle doit gagner dans ChatGPT, Gemini et Claude),
-  suivis chaque mois — position de la page sur son mot-clé, citation par
-  chaque moteur IA, action suggérée. Initialisation depuis Search Console, le
-  sitemap et le calendrier éditorial, validation avec le client, relevé
-  mensuel, alerte de cannibalisation, export Notion. Déclencher sur
-  "cartographie", "carto", "mapping mots-clés", "un mot-clé par page",
-  "mot-clé principal", "prompt principal", "keyword mapping", "plan de
-  positionnement", "quelle page vise quoi", "suivi des positions par page".
+  Tient la cartographie du site : pour chaque page, un mot-clé principal et un
+  prompt principal, suivis chaque mois (position, citation par les IA,
+  action), avec alerte de cannibalisation et export Notion. Déclencher sur «
+  cartographie », « mot-clé principal », « prompt principal », « keyword
+  mapping », « quelle page vise quoi ». Pas pour le crawl de l'architecture →
+  seo-crawl-architecture.
 ---
 
 # La cartographie — une page, un mot-clé, un prompt

@@ -9,6 +9,18 @@ Ce dépôt est **public** et alimente tous les projets clients.
   `.claude-plugin/plugin.json` et `marketplace.json`, une entrée dans
   `CHANGELOG.md`, tests verts, fusion dans `main`.
 - **Tests** : `python3 -m py_compile scripts/*.py && (cd tests && python3 -m unittest discover -q)`.
+  Ils vérifient aussi la forme des skills et des agents (`test_structure_skills.py` :
+  description ≤ 450 caractères qui dit quoi et quand, budget global, SKILL.md
+  ≤ 500 lignes, références reliées) et l'absence de faits périmés
+  (`test_faits_canoniques.py`).
+- **Évaluations** : `claude plugin eval .` (voir `evals/README.md`). Toute
+  règle importante ou tout nouveau skill ajoute un cas ; un skill dont le Δ
+  reste nul face à Claude seul est à renforcer ou à fusionner.
+- **Skills** : le cas d'usage en tête de la description, une frontière
+  « Pas pour … → autre skill » quand deux skills se ressemblent, le détail
+  dans `references/` lu au besoin, les règles critiques en haut du fichier.
+  Un skill livre toujours le maximum possible avec ce qu'il a (mode dégradé
+  signalé) plutôt que de s'arrêter sur une question.
 - **Aucun nom de client, aucun chiffre client, aucun accès** ici. Ce qui ne vaut
   que pour un client va dans un skill `projet-…` de son dépôt. Seule exception :
   le registre `projets.json`.

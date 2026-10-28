@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-55 skills · 15 agents · 43 scripts Python (le cœur sans aucune dépendance) · 15 MCP préconfigurés · 17 SOP · 509 tests
+55 skills · 15 agents · 43 scripts Python (le cœur sans aucune dépendance) · 15 MCP préconfigurés · 17 SOP · 516 tests
 
 > **Par où commencer ?** [Prise en main pas à pas](docs/PRISE-EN-MAIN.md) : le plugin en
 > 15 minutes, votre premier projet en 1 heure, ou rejoindre un projet comme prestataire, avec ce que
