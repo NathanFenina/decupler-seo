@@ -3,6 +3,11 @@
 
     python3 scripts/crawl_site.py https://exemple.com --max 500
     python3 scripts/crawl_site.py https://exemple.com --exporter crawl.csv
+    python3 scripts/crawl_site.py https://exemple.com --liens liens.csv   # + chaque lien interne
+
+Avec --liens, chaque lien interne est écrit avec son ancre et sa zone
+(contenu, menu, en-tête, pied de page, fil d'Ariane) : c'est l'entrée de
+maillage_entrant.py. Les compteurs du CSV principal restent ceux du contenu.
 
 Respecte robots.txt, limite le débit, reste sur le domaine de départ.
 Sort un CSV exploitable par internal_pagerank.py et par les skills.
@@ -62,6 +67,7 @@ class Page:
     images_sans_alt: int = 0
     erreur: str = ""
     sources: list[str] = field(default_factory=list, repr=False)
+    arcs: list[tuple[str, str, str]] = field(default_factory=list, repr=False)
 
 
 def normaliser(url: str) -> str:
@@ -81,9 +87,44 @@ def crawlable(url: str) -> bool:
     return not any(chemin.endswith(ext) for ext in EXTENSIONS_IGNOREES)
 
 
+def zone_du_lien(a) -> str:
+    """Où vit un lien : le fil d'Ariane, le menu, l'en-tête, le pied de page, ou le contenu."""
+    for parent in a.parents:
+        nom = (parent.name or "").lower()
+        marques = " ".join([parent.get("id") or "", " ".join(parent.get("class") or []),
+                            parent.get("aria-label") or "", parent.get("role") or ""]).lower() \
+            if hasattr(parent, "get") else ""
+        if "breadcrumb" in marques or "ariane" in marques:
+            return "fil d'Ariane"
+        if nom == "nav" or "navigation" in marques or re.search(r"\bmenu\b", marques):
+            return "menu"
+        if nom == "header":
+            return "en-tête"
+        if nom == "footer" or "footer" in marques:
+            return "pied de page"
+    return "contenu"
+
+
+def arcs_internes(soup, url: str, hote: str) -> list[tuple[str, str, str]]:
+    """Chaque lien interne de la page : (cible, ancre, zone). À lire avant de retirer menu et pied de page."""
+    arcs = []
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if href.startswith(("mailto:", "tel:", "javascript:", "#")):
+            continue
+        absolue = normaliser(urljoin(url, href))
+        if meme_domaine(absolue, hote) and crawlable(absolue):
+            ancre = a.get_text(" ", strip=True)
+            if not ancre and a.find("img"):
+                ancre = a.find("img").get("alt") or ""
+            arcs.append((absolue, " ".join(ancre.split())[:150], zone_du_lien(a)))
+    return arcs
+
+
 def analyser(html: str, url: str, hote: str) -> tuple[dict, list[str]]:
     """Extrait les signaux SEO d'une page et la liste de ses liens internes."""
     soup = BeautifulSoup(html, "html.parser")
+    arcs = arcs_internes(soup, url, hote)
 
     title = (soup.title.string or "").strip() if soup.title else ""
     meta_desc_tag = soup.find("meta", attrs={"name": re.compile("^description$", re.I)})
@@ -137,6 +178,7 @@ def analyser(html: str, url: str, hote: str) -> tuple[dict, list[str]]:
             "liens_sortants_externes": externes,
             "a_schema": bool(soup.find("script", attrs={"type": "application/ld+json"})),
             "images_sans_alt": sans_alt,
+            "arcs": arcs,
         },
         internes,
     )
@@ -251,12 +293,13 @@ def main() -> int:
     p.add_argument("--delai", type=int, default=1000, help="délai entre requêtes en ms")
     p.add_argument("--exporter", default="crawl.csv", help="fichier CSV de sortie")
     p.add_argument("--ignorer-robots", action="store_true", help="ne pas respecter robots.txt")
+    p.add_argument("--liens", help="CSV de chaque lien interne (source, cible, ancre, zone), pour maillage_entrant.py")
     args = p.parse_args()
 
     print(f"Crawl de {args.url} — max {args.max} pages\n", file=sys.stderr)
     pages = crawler(args.url, args.max, args.delai, not args.ignorer_robots)
 
-    champs = [c for c in asdict(next(iter(pages.values()))) if c != "sources"]
+    champs = [c for c in asdict(next(iter(pages.values()))) if c not in ("sources", "arcs")]
     with open(args.exporter, "w", newline="", encoding="utf-8") as f:
         ecrivain = csv.DictWriter(f, fieldnames=champs)
         ecrivain.writeheader()
@@ -264,8 +307,17 @@ def main() -> int:
             ligne = {c: getattr(page, c) for c in champs}
             ecrivain.writerow(ligne)
 
+    if args.liens:
+        with open(args.liens, "w", newline="", encoding="utf-8") as f:
+            ecrivain = csv.writer(f)
+            ecrivain.writerow(["source", "cible", "ancre", "zone"])
+            for page in pages.values():
+                for cible, ancre, zone in page.arcs:
+                    if cible != page.url:
+                        ecrivain.writerow([page.url, cible, ancre, zone])
+
     resumer(pages)
-    print(f"Inventaire écrit dans {args.exporter}\n")
+    print(f"Inventaire écrit dans {args.exporter}" + (f", liens dans {args.liens}" if args.liens else "") + "\n")
     return 0
 
 

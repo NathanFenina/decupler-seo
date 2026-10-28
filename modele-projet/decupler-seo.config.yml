@@ -28,8 +28,9 @@ regles:
   # Expressions interdites propres à ce client (expressions régulières),
   # vérifiées par controle_contenu.py en plus de celles de la méthode.
   interdits: []
-  # Laissez vide pour un placement naturel. Mettez 20 si c'est la règle
-  # validée avec ce client.
+  # Vide = méthode par entités : mot-clé exact aux emplacements forts (title,
+  # H1, première phrase), aucun quota. Mettez un nombre (ex. 20) seulement si
+  # ce client l'exige : il est alors contrôlé hors score, sous le plafond.
   mot_cle_occurrences_min:
   densite_max_pct: 3
 

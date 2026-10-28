@@ -18,12 +18,17 @@ class TestCalculs(unittest.TestCase):
     def test_malus_par_palier(self):
         self.assertEqual([o.malus(d) for d in (0, 3.5, 3.6, 5, 5.1, 6.5, 6.6, 12)], [0, 0, 5, 5, 8, 8, 12, 12])
 
-    def test_feu_de_densite(self):
-        self.assertEqual(o.feu_densite(1.2), o.VERT)
-        self.assertEqual(o.feu_densite(3.0), o.JAUNE)
-        self.assertEqual(o.feu_densite(0.4), o.JAUNE)
-        self.assertEqual(o.feu_densite(4.0), o.ROUGE)
-        self.assertEqual(o.feu_densite(0.1), o.ROUGE)
+    def test_sur_optimisation_sans_plancher(self):
+        self.assertEqual(o.feu_sur_optimisation(1.2), o.VERT)
+        self.assertEqual(o.feu_sur_optimisation(0.1), o.VERT)   # densité faible : pas une faute
+        self.assertEqual(o.feu_sur_optimisation(3.0), o.JAUNE)
+        self.assertEqual(o.feu_sur_optimisation(4.0), o.ROUGE)
+
+    def test_couverture_des_entites(self):
+        carte = o.couverture_entites("Le COP mesure le rendement de la pompe.", ["Quelles aides ?"],
+                                     ["COP", "aides", "géothermie"])
+        self.assertEqual([(c["entite"], c["ou"]) for c in carte],
+                         [("COP", "texte"), ("aides", "intertitre"), ("géothermie", "")])
 
     def test_points_jaune_arrondi_au_superieur(self):
         self.assertEqual([o.points(f, 5) for f in (o.VERT, o.JAUNE, o.ROUGE, o.NA)], [5, 3, 0, 0])
@@ -97,7 +102,7 @@ class TestNotation(DossierIsole):
         self.assertGreater(res["densite"]["effective"], 6.5)
         self.assertEqual(res["malus"], 12)
         self.assertEqual(res["score"], max(0, res["score_brut"] - 12))
-        self.assertEqual(self.critere(res, "Densité")["feu"], o.ROUGE)
+        self.assertEqual(self.critere(res, "Pas de sur-optimisation")["feu"], o.ROUGE)
 
     def test_fragment_sans_head_non_applicable(self):
         res = self.noter("<h1>Plombier à Lyon</h1><p>" + "texte " * 50 + "</p>")
@@ -115,6 +120,15 @@ class TestNotation(DossierIsole):
         self.assertEqual(self.critere(res, "Longueur de la meta")["feu"], o.VERT)
         res = self.noter(PAGE.format(meta="Plombier à Lyon " + "m" * 145, corps="texte " * 50))
         self.assertEqual(self.critere(res, "Longueur de la meta")["feu"], o.JAUNE)
+
+    def test_entites_et_exigence_client(self):
+        res = self.noter(PAGE.format(meta="m" * 130, corps="Plombier Lyon : fuite, chauffe-eau. " + "texte " * 50),
+                         "--entites", "fuite, chauffe-eau, débouchage, devis", "--occurrences-min", "20")
+        c = self.critere(res, "Couverture des entités")
+        self.assertEqual(c["feu"], o.JAUNE)
+        self.assertIn("débouchage", c["constat"])
+        self.assertFalse(res["exigence_client"]["respectee"])
+        self.assertEqual(self.critere(res, "Alignement du mot-clé")["feu"], o.VERT)
 
     def test_secondaires_et_na_declares(self):
         res = self.noter(PAGE.format(meta="m" * 130, corps="Dépannage urgent. " + "texte " * 50),

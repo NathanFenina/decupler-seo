@@ -4,8 +4,8 @@ description: >
   Rédige un article ou une page complète à partir d'un brief, optimisé SEO et
   GEO, dans un style humain qui ne se détecte pas comme généré : recherche
   obligatoire avant écriture, une donnée par paragraphe, zéro chiffre
-  inventé, règles anti-détection IA, trame des pages de service, politique
-  d'occurrences du mot-clé, article GEO pour gagner un prompt IA, et
+  inventé, règles anti-détection IA, trame des pages de service, entités et alignement
+  du mot-clé, article GEO pour gagner un prompt IA, et
   relecture. Déclencher sur "rédige", "écris un article", "rédaction",
   "écris cette page", "produis le contenu", "article de blog", "rédige à
   partir du brief", "écris-moi un guide", "réécris cette page", "article
@@ -283,30 +283,32 @@ pas** ou de ce qu'on ne sait pas ; un contre-argument honnête. Ce dernier
 point est le plus efficace : « cette méthode ne convient pas si vous êtes
 dans ce cas » rend un texte immédiatement plus crédible.
 
-## Optimisation SEO — la politique d'occurrences
+## Optimisation SEO — entités d'abord, mot-clé aligné
 
-Le mot-clé se pilote **par la densité**, pas par un compte fixe : un compte
-fixe sur-optimise un texte court et sous-optimise un long.
+Le sujet se couvre **par ses entités**, pas par la répétition du mot-clé :
+Google et les IA comprennent une page par les entités qu'elle nomme et les
+relations qu'elle établit entre elles. La densité n'est pas un facteur de
+classement ; la répétition forcée est du bourrage. Méthode détaillée :
+skill `seo-optimisation-onpage`, section « La méthode : optimiser par
+entités ».
 
-- **Densité cible : 1,5 à 2,5 %** du mot-clé principal (au moins 1 % si le
-  texte est court).
-- **Comptez séparément** la correspondance exacte, la partielle (mots
-  séparés ou dans le désordre) et les variantes ; la densité se lit sur
-  l'ensemble, l'exacte ne porte pas tout.
-- **Emplacements obligatoires** : H1, première phrase, au moins un H2,
-  conclusion, **CTA final**, et un `alt` d'image.
-- **15 à 20 occurrences exactes** seulement si la longueur le permet
-  (environ 1 000 mots et plus) : c'est alors la même densité, pas une règle
-  de plus.
+- **La carte des entités du brief est couverte en entier** : chaque entité
+  très liée nommée, expliquée et reliée à l'entité principale, en phrases
+  sujet → verbe → objet.
+- **Mot-clé exact aux seuls emplacements forts** : title, H1, première
+  phrase (la définition), éventuellement **un** H2 et **une** question de
+  FAQ si c'est naturel — 4 à 6 occurrences, **sans quota ni minimum**.
+  Ailleurs : variantes, synonymes, champ lexical.
+- **Désambiguïser** à la première mention (nom complet du produit, de
+  l'organisme, de la norme).
 - **Plafond** : `regles.densite_max_pct` du projet (3 % par défaut), jamais
-  au-delà de **3,5 %** — c'est de la sur-optimisation, visible par le
-  lecteur comme par Google.
-- Si le client a validé un minimum, il est dans
-  `regles.mot_cle_occurrences_min` (`decupler-seo.config.yml`) et s'applique
-  — sous le plafond. Si le texte est trop court pour l'atteindre sans le
-  dépasser, allongez avec un angle utile (voir « Longueur ») ou signalez-le.
+  au-delà de **3,5 %**.
+- **Exigence d'un client** : s'il impose un minimum d'occurrences
+  (`regles.mot_cle_occurrences_min` dans `decupler-seo.config.yml`), on le
+  respecte sous le plafond, et le paragraphe suivant s'applique. Vide =
+  aucun quota.
 
-**Plancher d'occurrences + plafond de densité = une longueur minimale.**
+**Si le client impose un plancher d'occurrences : plancher + plafond = une longueur minimale.**
 Quand le client impose les deux, la longueur se calcule avant d'écrire,
 elle ne s'estime pas : `mots ≥ occurrences_min ÷ densité_max`, dans la
 définition de densité de l'outil qui contrôle. Si cet outil compte chaque
@@ -319,13 +321,14 @@ La FAQ est le gisement d'occurrences le plus naturel : trois questions qui
 contiennent le mot-clé exact, telles qu'un acheteur les pose.
 
 **La page d'accueil fait exception** : elle se classe sur la marque. Ni
-politique d'occurrences, ni densité, ni mot-clé dans le slug, ni H2 en
+exigence d'occurrences, ni densité, ni mot-clé dans le slug, ni H2 en
 questions ; les CTA y pointent volontairement plusieurs fois vers la même
 page. Restent : longueur suffisante pour dire ce que fait l'entreprise,
 FAQ, maillage, `alt`, et le reste de la relecture.
 
-Mesure : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onpage_score.py" page.html "<mot-clé>"`
-donne occurrences et densité.
+Mesure : `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onpage_score.py" page.html "<mot-clé>" --entites "<carte>"`
+donne l'alignement, la couverture des entités, la densité (plafond) et,
+avec `--occurrences-min`, le contrôle de l'exigence du client.
 
 Le reste : variantes et synonymes répartis naturellement, entités du brief
 mentionnées, ancres de liens internes descriptives, `alt` qui décrit
@@ -419,7 +422,7 @@ dont 1 600 sont du remplissage.
 - [ ] Chaque paragraphe apporte une idée nouvelle
 - [ ] La réponse directe fonctionne sortie de son contexte
 - [ ] Aucune formule des interdits, `controle_contenu.py` passe
-- [ ] Densité du mot-clé dans la cible, sous le plafond
+- [ ] Toutes les entités de la carte couvertes ; mot-clé aligné (H1, première phrase), densité sous le plafond
 - [ ] Les liens internes du brief sont posés
 - [ ] Rythme, adresse et personne conformes à `memoire/style.md`
       (`style_maison.py … --json`)

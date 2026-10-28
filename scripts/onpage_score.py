@@ -5,7 +5,7 @@
     python3 scripts/onpage_score.py page.html "mot clé cible" --json
     python3 scripts/onpage_score.py page.html "pompe à chaleur" \
         --secondaires "pac air eau, prix pompe à chaleur" --url https://exemple.com/pompe-a-chaleur/ \
-        --na "FAQ,Fraîcheur"
+        --na "FAQ,Fraîcheur" --entites "COP, rendement, aides MaPrimeRénov'" --occurrences-min 20
 
 Barème : balises 20 · contenu 25 · lisibilité 15 · GEO 15 · E-E-A-T 15 ·
 maillage 10. Chaque critère prend un feu : 🟢 = tous ses points, 🟡 = la
@@ -13,6 +13,12 @@ moitié arrondie au supérieur, 🔴 = 0, ⚪ = non applicable (ses points sont
 redistribués au prorata dans sa catégorie, le score est « sous réserve »).
 Puis un malus de sur-optimisation s'applique au score global, selon la
 densité effective du mot-clé : max(densité exacte, densité distribuée).
+
+Méthode par entités (par défaut) : aucun quota ni densité minimale. Le
+mot-clé exact sert à l'alignement (title, H1, ouverture, ±1 H2) ; la
+pertinence se mesure par la couverture des entités du sujet (--entites,
+issues de la SERP et du brief). Un client qui exige un nombre
+d'occurrences le déclare (--occurrences-min) : contrôle affiché, hors score.
 
 Moteur de notation du skill seo-optimisation-onpage : il mesure, le skill
 interprète et réécrit. Les fonctions de calcul sont pures et testées sans
@@ -94,11 +100,11 @@ POURQUOI = {
     "H1": "Le H1 annonce le sujet au lecteur et aux moteurs ; deux H1 brouillent le message.",
     "Hiérarchie Hn": "Les moteurs et les IA découpent la page par ses titres : un saut de niveau casse le plan.",
     "Mot-clé dans le slug": "L'URL s'affiche dans la SERP et reste un signal de pertinence, stable dans le temps.",
-    "Mot-clé dans les zones clés": "Le H1, l'ouverture, un H2 et la conclusion sont les zones que les moteurs pondèrent.",
-    "Densité": "Trop peu, le sujet est flou ; trop, le texte sent le bourrage et le lecteur décroche.",
+    "Alignement du mot-clé": "Le H1 et la première phrase disent aux moteurs et aux IA quel sujet la page traite ; ailleurs, les variantes suffisent.",
+    "Pas de sur-optimisation": "La densité n'est pas un facteur de classement ; la répétition forcée relève du bourrage et fait décrocher le lecteur.",
     "Mot-clé dans un alt": "L'alt rattache les images au sujet et alimente la recherche d'images.",
     "Mots-clés secondaires": "Les variantes couvrent les requêtes voisines sans créer une page par formulation.",
-    "Richesse sémantique": "Un vocabulaire varié signale une couverture réelle du sujet, pas une répétition.",
+    "Couverture des entités": "Google et les IA comprennent un sujet par ses entités et leurs relations : une entité attendue absente est une question sans réponse.",
     "Profondeur": "Un contenu mince ne répond pas à toutes les questions que le top 3 traite.",
     "Originalité et preuves": "Chiffres, tableaux et listes sont ce que les moteurs et les IA reprennent et citent.",
     "Clarté des entités": "« Notre solution » ne veut rien dire hors contexte : un passage cité doit nommer ce dont il parle.",
@@ -222,12 +228,27 @@ def malus(densite: float) -> int:
     return 12
 
 
-def feu_densite(d: float) -> str:
-    if 0.5 <= d <= 2.5:
+def feu_sur_optimisation(d: float) -> str:
+    """Pas de plancher : une densité faible n'est pas une faute, seul l'excès l'est."""
+    if d <= 2.5:
         return VERT
-    if 2.5 < d <= 3.5 or 0.3 <= d < 0.5:
+    if d <= 3.5:
         return JAUNE
     return ROUGE
+
+
+def couverture_entites(texte: str, titres: list[str], entites: list[str]) -> list[dict]:
+    """Où chaque entité attendue apparaît : dans un intertitre, dans le texte, ou nulle part."""
+    lignes = []
+    for e in entites:
+        if any(trouve(t, e) for t in titres):
+            ou = "intertitre"
+        elif trouve(texte, e):
+            ou = "texte"
+        else:
+            ou = ""
+        lignes.append({"entite": e, "presente": bool(ou), "ou": ou})
+    return lignes
 
 
 def points(feu: str, maxi: int) -> int:
@@ -325,7 +346,8 @@ def charger(source: str) -> str:
 
 
 def noter(html: str, cle: str, secondaires: list[str] | None = None, url: str | None = None,
-          na: list[str] | None = None, aujourdhui: dt.date | None = None) -> dict:
+          na: list[str] | None = None, aujourdhui: dt.date | None = None,
+          entites: list[str] | None = None, occurrences_min: int | None = None) -> dict:
     from bs4 import BeautifulSoup
 
     aujourdhui = aujourdhui or dt.date.today()
@@ -428,18 +450,21 @@ def noter(html: str, cle: str, secondaires: list[str] | None = None, url: str | 
     dens = densites(texte, cle)
 
     # ── B · Contenu et sémantique (25) ──────────────────────────────
-    zones = {"H1": bool(h1s) and presence(h1s[0].get_text(" "), cle) in ("exact", "complet"),
-             "100 premiers mots": trouve(" ".join(mots[:100]), cle),
-             "un H2": any(presence(h.get_text(" "), cle) in ("exact", "complet") for h in soup.find_all("h2")),
-             "conclusion": trouve(" ".join(mots[-150:]), cle)}
-    couvertes = sum(zones.values())
-    manquantes = [z for z, ok in zones.items() if not ok]
-    ajouter("B", "Mot-clé dans les zones clés", 5, VERT if couvertes == 4 else JAUNE if couvertes >= 2 else ROUGE,
-            f"{couvertes}/4" + (f" — manque : {', '.join(manquantes)}" if manquantes else ""))
+    # Alignement : le mot-clé exact aux emplacements forts (H1, ouverture),
+    # un H2 en plus si c'est naturel. Pas de quota ailleurs.
+    en_h1 = bool(h1s) and presence(h1s[0].get_text(" "), cle) in ("exact", "complet")
+    en_ouverture = trouve(" ".join(mots[:100]), cle)
+    en_h2 = any(presence(h.get_text(" "), cle) in ("exact", "complet") for h in soup.find_all("h2"))
+    forts = int(en_h1) + int(en_ouverture)
+    manque = [z for z, ok in (("H1", en_h1), ("ouverture (100 premiers mots)", en_ouverture)) if not ok]
+    ajouter("B", "Alignement du mot-clé", 5, VERT if forts == 2 else JAUNE if forts == 1 else ROUGE,
+            f"H1 {'oui' if en_h1 else 'non'} · ouverture {'oui' if en_ouverture else 'non'} · "
+            f"un H2 {'oui' if en_h2 else 'non (facultatif)'}" + (f" — manque : {', '.join(manque)}" if manque else ""))
 
-    ajouter("B", "Densité", 3, feu_densite(dens["effective"]),
-            f"effective {dens['effective']} % (exacte {dens['exacte']} %, distribuée {dens['distribuee']} %) "
-            f"— cible 0,5-2,5 %")
+    ajouter("B", "Pas de sur-optimisation", 3, feu_sur_optimisation(dens["effective"]),
+            f"densité effective {dens['effective']} % (exacte {dens['exacte']} %, distribuée "
+            f"{dens['distribuee']} %, {dens['occurrences_exactes']} occurrence(s) exacte(s)) — "
+            f"aucun minimum, rouge au-delà de 3,5 %")
 
     if not images:
         ajouter("B", "Mot-clé dans un alt", 2, NA, "aucune image")
@@ -461,9 +486,19 @@ def noter(html: str, cle: str, secondaires: list[str] | None = None, url: str | 
         ajouter("B", "Mots-clés secondaires", 3, feu, f"{len(presents)}/{len(secondaires)} présents, densité max "
                 f"{pic} %" + (f" — absents : {', '.join(absents)}" if absents else ""))
 
-    termes = set(re.findall(r"\b[a-zà-ÿ]{5,}\b", texte.lower()))
-    ajouter("B", "Richesse sémantique", 4, VERT if len(termes) > 300 else JAUNE if len(termes) > 150 else ROUGE,
-            f"{len(termes)} termes distincts")
+    titres = [h.get_text(" ", strip=True) for h in soup.find_all(["h2", "h3"])]
+    carte = couverture_entites(texte, titres, entites or [])
+    if carte:
+        presentes = [c for c in carte if c["presente"]]
+        absentes = [c["entite"] for c in carte if not c["presente"]]
+        ratio = len(presentes) / len(carte)
+        ajouter("B", "Couverture des entités", 4, VERT if ratio >= 0.8 else JAUNE if ratio >= 0.5 else ROUGE,
+                f"{len(presentes)}/{len(carte)} entités présentes"
+                + (f" — absentes : {', '.join(absentes)}" if absentes else ""))
+    else:
+        termes = set(re.findall(r"\b[a-zà-ÿ]{5,}\b", texte.lower()))
+        ajouter("B", "Couverture des entités", 4, VERT if len(termes) > 300 else JAUNE if len(termes) > 150 else ROUGE,
+                f"entités non fournies (--entites) : richesse lexicale approximative, {len(termes)} termes distincts")
 
     ajouter("B", "Profondeur", 4, VERT if nb_mots >= 1000 else JAUNE if nb_mots >= 500 else ROUGE,
             f"{nb_mots} mots (seuil indicatif : comparer au top 3)")
@@ -594,7 +629,13 @@ def noter(html: str, cle: str, secondaires: list[str] | None = None, url: str | 
         if normaliser_nom(c["critere"]) in declares:
             c.update(feu=NA, points=0, constat=c["constat"] + " — déclaré non applicable")
 
-    return agreger(criteres, dens, nb_mots)
+    res = agreger(criteres, dens, nb_mots)
+    res["entites"] = carte
+    if occurrences_min:
+        res["exigence_client"] = {"occurrences_min": occurrences_min,
+                                  "occurrences_exactes": dens["occurrences_exactes"],
+                                  "respectee": dens["occurrences_exactes"] >= occurrences_min}
+    return res
 
 
 def agreger(criteres: list[dict], dens: dict, nb_mots: int) -> dict:
@@ -643,6 +684,14 @@ def afficher(res: dict, cle: str) -> None:
     na = [c["critere"] for c in res["criteres"] if c["feu"] == NA]
     if na:
         print(f"  ⚪ Non applicables : {', '.join(na)}\n")
+    if res.get("entites"):
+        print("─── Couverture des entités ───\n")
+        for c in res["entites"]:
+            print(f"  {'✅' if c['presente'] else '❌'} {c['entite']}" + (f"  ({c['ou']})" if c["ou"] else "  → à ajouter"))
+        print()
+    if ex := res.get("exigence_client"):
+        print(f"  Exigence du client (hors score) : {ex['occurrences_min']} occurrences exactes minimum — "
+              f"{ex['occurrences_exactes']} trouvée(s) {'✅' if ex['respectee'] else '❌'}\n")
 
 
 def main() -> int:
@@ -652,6 +701,9 @@ def main() -> int:
     p.add_argument("--secondaires", help="mots-clés secondaires séparés par des virgules")
     p.add_argument("--url", help="URL de la page, pour le slug, si le fichier n'a pas de canonical")
     p.add_argument("--na", help="critères non applicables, séparés par des virgules (ex. \"FAQ,Fraîcheur\")")
+    p.add_argument("--entites", help="entités attendues (SERP, brief), séparées par des virgules")
+    p.add_argument("--occurrences-min", type=int,
+                   help="exigence d'un client en occurrences exactes : contrôlée et affichée, hors score")
     p.add_argument("--json", action="store_true")
     args = p.parse_args()
 
@@ -664,7 +716,9 @@ def main() -> int:
     secondaires = [s.strip() for s in (args.secondaires or "").split(",") if s.strip()]
     url = args.url or (args.source if args.source.startswith("http") else None)
     na = (args.na or "").split(",")
-    res = noter(charger(args.source), args.motcle, secondaires, url, na)
+    entites = [e.strip() for e in (args.entites or "").split(",") if e.strip()]
+    res = noter(charger(args.source), args.motcle, secondaires, url, na,
+                entites=entites, occurrences_min=args.occurrences_min)
     if args.json:
         print(json.dumps(res, ensure_ascii=False, indent=2))
     else:

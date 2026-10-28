@@ -267,6 +267,21 @@ lieux — ce que le Knowledge Graph relie au sujet) et **glossaire métier**
 (le terme juste et son usage). Pas pour les caser : pour vérifier qu'aucun
 sous-sujet n'est oublié. Export : `champ-semantique.csv`.
 
+**La carte des entités**, livrée dans le brief et reprise telle quelle par
+la rédaction et le score (`onpage_score.py --entites`) :
+
+| Niveau | Combien | Exemple de contenu |
+|---|---|---|
+| Entité principale | 1 | le concept que la page doit « posséder » |
+| Entités très liées | 3-6 | processus, étapes, documents, indicateurs sans lesquels le sujet n'est pas traité |
+| Entités de contexte | 5-12 | produits, marques, normes, métiers, lieux, organismes |
+| Attributs attendus | — | définition, étapes, coûts, durée, critères de choix, limites |
+
+**Lacunes prioritaires** : entités et attributs présents chez au moins 3
+pages du top 10 et absents de la page (ou de l'existant du site). Le mot-clé
+exact n'a aucun quota : title, H1, première phrase, éventuellement un H2 et
+une question de FAQ.
+
 ### Triplets et entités
 
 Le brief liste les **triplets à affirmer** : 3 à 8 faits sous la forme
@@ -477,7 +492,7 @@ Pied de brief : `Brief SEO consolidé — [site] — [mot-clé] — [date]`
 |------------------|---------------------|
 | « Parler des avantages » | « 4 avantages, un paragraphe chacun, avec un chiffre par avantage. Les concurrents n'en citent que 2. » |
 | « Article de 2 000 mots » | « Le top 5 fait 1 400-2 600 mots. Écrivez ce que le sujet exige, sans remplissage. » |
-| « Optimiser pour le SEO » | « Mot-clé dans le H1, la première phrase, un H2 et le CTA final ; densité 1,5-2,5 %. » |
+| « Optimiser pour le SEO » | « Carte des entités : principale X ; très liées A, B, C (chacune définie et reliée à X) ; contexte D, E. Mot-clé exact dans le title, le H1 et la première phrase, aucun quota. » |
 | « Ajouter une FAQ » | « 4 questions, les voici, réponses de 2 à 4 lignes. » |
 | « Envisager de revoir l'intro » | « DÉCISION : MODIFIER. Nouvelle intro ci-dessous. » |
 

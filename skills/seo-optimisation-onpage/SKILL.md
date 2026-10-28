@@ -8,7 +8,8 @@ description: >
   corrige. Déclencher sur "optimise cette page", "score SEO", "note sur 100",
   "audit on-page", "est-ce que c'est bien optimisé", "passe au vert",
   "réécris cette page", "améliore ce contenu", "optimisation on-page",
-  "ré-optimisation", ou un texte/URL collé avec un mot-clé cible.
+  "ré-optimisation", "couverture des entités", "maillage entrant",
+  "cannibalisation", ou un texte/URL collé avec un mot-clé cible.
 ---
 
 # Optimisation on-page — noter puis corriger
@@ -34,12 +35,64 @@ Ce skill fait les deux.
 - Le type de livrable : **OPTIMISATION** (page existante) ou **CRÉATION**
   (page neuve), et le format (texte à coller ou Word)
 
+## La méthode : optimiser par entités, pas par mot-clé exact
+
+Google comprend un sujet par ses **entités** (Knowledge Graph) et leurs
+relations, pas par la répétition d'une chaîne de caractères. La densité
+n'est pas un facteur de classement, et la répétition forcée relève du
+bourrage (politiques anti-spam de Google). Le mot-clé garde un rôle
+**d'alignement** sur les emplacements forts — la correspondance du title
+compte toujours — mais plus aucun rôle de volume.
+
+**1. La carte des entités, avant toute rédaction**
+
+| Niveau | Quoi | Sources |
+|---|---|---|
+| Entité principale | Le concept que la page doit « posséder » | mot-clé, intention de recherche |
+| Entités très liées (3-6) | Ce sans quoi le sujet n'est pas traité : processus, étapes, documents, indicateurs, composants | SERP top 10, Wikidata, PAA, Search Console |
+| Entités de contexte (5-12) | Produits, marques, normes, métiers, lieux, organismes | offre du client, SERP, Search Console |
+| Attributs et relations | Ce que les concurrents disent de l'entité : définition, étapes, coûts, durée, critères de choix, limites | H2/H3 récurrents du top 10, PAA |
+
+Lacunes prioritaires = entités et attributs présents chez **au moins 3
+concurrents du top 10** et absents de la page (`serp_concurrents.py`,
+skill `seo-serp-analysis`).
+
+**2. Les règles de rédaction**
+
+- **Mot-clé exact aux seuls emplacements forts** : title, H1, première
+  phrase (la définition), éventuellement **un** H2 et **une** question de
+  FAQ si c'est naturel. Soit 4 à 6 occurrences, **sans quota ni minimum**.
+  Ne jamais tordre une phrase pour placer l'expression exacte.
+- **Chaque entité très liée** est nommée, expliquée et reliée à l'entité
+  principale (« X automatise Y entre A, B et C »).
+- **Relations explicites** sujet → verbe → objet : « X permet de… »,
+  « X se compose de… », « X s'intègre à… » (skill `seo-entites-triplets`).
+- **Variantes, synonymes et champ lexical** partout ailleurs.
+- **Désambiguïser** : le nom complet à la première mention (éditeur +
+  produit + version, organisme en toutes lettres).
+- **Profondeur plutôt que répétition** : une entité bien expliquée vaut
+  mieux que trois mentions vides.
+- **Cohérence avec le JSON-LD** : entité principale (+ 1-2 très liées) en
+  `about`, entités de contexte réellement citées en `mentions`.
+
+**Exigence d'un client.** Si un client impose un nombre d'occurrences
+(`regles.mot_cle_occurrences_min` dans `decupler-seo.config.yml`), on le
+respecte, en le contrôlant hors score (`--occurrences-min`), sans jamais
+dépasser le plafond de densité (`regles.densite_max_pct`). Vide = méthode
+par entités, aucun quota.
+
 ## Mesurer
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onpage_score.py" <url|fichier.html> "mot-clé" \
-  [--secondaires "variante 1, variante 2"] [--url https://…/slug/] [--na "FAQ,Fraîcheur"] [--json]
+  --entites "entité liée 1, entité liée 2, …" \
+  [--secondaires "variante 1, variante 2"] [--url https://…/slug/] [--na "FAQ,Fraîcheur"] \
+  [--occurrences-min 20] [--json]
 ```
+
+`--entites` reçoit la carte des entités (très liées + contexte) : le
+script dit où chacune apparaît (intertitre, texte) ou qu'elle manque.
+Sans elle, la couverture n'est qu'une richesse lexicale approximative.
 
 Le script mesure ; vous interprétez, vous vérifiez les heuristiques
 (voix passive, entités vagues) à la lecture, et vous réécrivez.
@@ -101,11 +154,11 @@ déguisé en variantes reste du bourrage, et Google le lit comme tel.
 
 | Critère | Pts | 🟢 | 🟡 | 🔴 |
 |---------|-----|----|----|----|
-| Mot-clé dans les zones clés | 5 | H1 + 100 premiers mots + un H2 + conclusion | 2-3 zones | 0-1 zone |
-| Densité (effective) | 3 | 0,5 – 2,5 % | 2,5 – 3,5 % ou 0,3 – 0,5 % | > 3,5 % ou quasi nulle |
+| Alignement du mot-clé | 5 | H1 + ouverture (100 premiers mots) ; un H2 en plus si naturel | L'un des deux | Ni l'un ni l'autre |
+| Pas de sur-optimisation | 3 | Densité effective ≤ 2,5 % — **aucun minimum** | 2,5 – 3,5 % | > 3,5 % |
 | Mot-clé dans un alt | 2 | ≥ 1 alt avec le mot-clé | Variante | Aucun (⚪ sans image) |
 | Mots-clés secondaires | 3 | Tous présents, aucun > 2,5 % | La moitié, aucun > 3,5 % | Moins, ou bourrés (⚪ si non fournis) |
-| Richesse sémantique | 4 | Entités et cooccurrences du top 3 couvertes | Partielle | Vocabulaire pauvre |
+| Couverture des entités | 4 | ≥ 80 % de la carte des entités présente | ≥ 50 % | Moins |
 | Profondeur | 4 | Au niveau du top 3 | En dessous | Contenu mince |
 | Originalité et preuves | 2 | Données, exemples, méthode propres | Un élément | Paraphrase |
 | Clarté des entités | 2 | Chaque passage nomme ce dont il parle | 1-2 « notre solution », « la ville » | Récurrent |
@@ -150,6 +203,76 @@ déguisé en variantes reste du bourrage, et Google le lit comme tel.
 | Images avec alt | 2 | Toutes | Aucune image ou aucun alt |
 | Schema JSON-LD | 2 | Adapté et valide (`seo-schema-jsonld`) | Absent |
 
+## Search Console — obligatoire en optimisation
+
+Fenêtres : **3 derniers mois** (données finales) et les **3 mois
+précédents** pour la tendance (`gsc.py`, skill `seo-gsc-analyses`).
+
+1. **Requêtes de la page** : clics, impressions, CTR, position. Elles
+   donnent les secondaires réelles, les **opportunités** (position 5-20
+   avec impressions, CTR faible) et des entités exprimées par les
+   internautes, à ajouter à la carte.
+2. **Cannibalisation** (requête × page, tout le site, sur le mot-clé et
+   les principales requêtes de la page) : quelles autres URL prennent des
+   impressions sur les mêmes requêtes ?
+3. **Verdict par requête partagée** : *pas de risque* (intentions
+   différentes, l'autre URL très loin) · *à surveiller* · *cannibalisation*
+   (deux URL alternent ou se partagent clics et positions).
+4. **Action** : différencier l'angle et les entités de chaque page,
+   réserver l'ancre exacte à la page cible et la retirer des liens vers
+   l'URL concurrente, consolider (fusion + 301) ou canonical en dernier
+   recours.
+
+## Maillage interne entrant
+
+Les liens sortants ne suffisent pas : une page se renforce surtout par les
+liens qu'elle **reçoit**.
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/crawl_site.py" https://exemple.com --liens liens.csv --exporter crawl.csv
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/gsc.py" perf --par page --jours 90 --lignes 5000 --json > gsc-pages.json
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/maillage_entrant.py" --liens liens.csv --pages crawl.csv \
+  --cible <url> --mot-cle "<mot-clé>" --entites "<entités liées>" --gsc gsc-pages.json --marque "<marque>"
+```
+
+1. **Existant** : page source, ancre, zone (contenu, menu, en-tête, pied
+   de page, fil d'Ariane), statut (OK, ancre générique, hors contenu), et
+   diversité des ancres en contenu (exacte, partielle, marque, générique).
+2. **Ancres concurrentes** : le mot-clé de la page utilisé comme ancre
+   vers une autre URL — cannibalisation par le maillage, à corriger.
+3. **Opportunités dosées**, pas une longue liste : page cible faible → 4-5
+   liens, moyenne → 2-3, forte → 1-2 (ou seulement corriger les ancres).
+   Sources = pages puissantes (clics + impressions sur 3 mois, PageRank
+   interne des liens de contenu) ou très proches du sujet, qui ne lient
+   pas déjà la cible. **Ancre exacte une seule fois**, sur la meilleure
+   source ; ailleurs, ancres partielles ou par entité liée, jamais deux
+   fois la même. Pour chacune : la phrase existante où poser le lien, ou
+   la phrase à ajouter, écrite.
+
+## Ajouter une information : la vérifier d'abord
+
+Ajouter ce qui manque (fonctionnalités, réglementation, chiffres de
+marché, nouveautés) est encouragé, à condition de le vérifier :
+
+1. **Produit, outil, partenaire** : ne le présenter comme une offre du
+   client que si son site le montre (page dédiée, cas client). Sinon,
+   exemple du marché, signalé « à valider ».
+2. **Réglementation et dates** : la source officielle, jamais de mémoire.
+3. **Fonctionnalités d'un logiciel** : la documentation de l'éditeur ;
+   décrire exactement ce que fait l'outil.
+4. **Le contenu existant** passe la même vérification : une affirmation
+   fausse est corrigée et signalée dans l'audit.
+5. **Traçabilité** : chaque ajout listé avec sa source ; ce qui n'a pas
+   pu être confirmé est marqué « à valider avec le client ». Rien de non
+   vérifié n'est présenté comme vérifié.
+
+## Auteur
+
+Une ligne visible : « Rédigé par <expert>, <fonction> chez <marque> —
+mis à jour en <mois année> », et `author` + `dateModified` dans le
+JSON-LD. **Pas de « relu par » ni de `reviewedBy`** sans relecture
+réellement confirmée par le client.
+
 ## Le rapport
 
 ```
@@ -179,26 +302,41 @@ Puis, pour chaque critère non vert, du rouge au jaune :
 
 ## Les livrables
 
-### OPTIMISATION — trois parties
+### OPTIMISATION — cinq parties (onglets d'un document, ou sections)
 
-**① Audit complet** — le rapport ci-dessus, tous les critères.
+**① Audit** — score et feux, **carte et couverture des entités**,
+alignement du mot-clé, **Search Console (requêtes et cannibalisation)**,
+plan Hn actuel → recommandé (CONSERVER / MODIFIER / NOUVEAU), E-E-A-T,
+GEO, liens sortants à créer, ajouts vérifiés et « à valider », plan
+d'action priorisé. Toutes les sections remplies, pas une synthèse.
 
-**② Contenu optimisé en couleur** — pour le relecteur :
+**② Optimisations en couleur** — pour le relecteur :
 - **vert** = ajouté ; **noir** = conservé ; *gris italique* = consigne à
   l'intégrateur (où placer l'image, quel bloc déplacer)
 - chaque bloc nouveau est **écrit en entier**, jamais un renvoi
   (« ajouter une section sur les aides » n'est pas un livrable)
 
-**③ « À coller »** — tout en noir, pour l'intégrateur :
+**③ Contenu optimisé « à coller »** — tout en noir, pour l'intégrateur :
 - Title et Meta en premier
 - chaque titre balisé en tête de ligne : `H1 :`, `H2 :`, `H3 :`
 - **le contenu ENTIER** : jamais « [conserver l'existant] », volume ≥
   l'original
 - liens internes **déjà insérés** dans le texte, avec leurs ancres
+- **toutes les entités de la carte couvertes** ; mot-clé exact aux seuls
+  emplacements forts
+
+**④ Données structurées** — le `@graph` complet (skill `seo-schema-jsonld`) :
+`about` et `mentions` alignés sur la carte des entités, `FAQPage` = la FAQ
+de ③ mot pour mot, `author`, `datePublished`, `dateModified`.
+
+**⑤ Maillage entrant** — liens existants et leurs ancres, ancres
+concurrentes, opportunités dosées avec leur phrase (`maillage_entrant.py`).
 
 ### CRÉATION — deux parties
 
-1. **Le brief** — intention, plan Hn, entités, questions, liens (voir `seo-brief`)
+1. **Le brief** — intention, **carte des entités**, plan Hn, prompts GEO
+   visés, FAQ, E-E-A-T, liens, schema, et requêtes déjà captées par des pages
+   existantes (risque de cannibalisation) — voir `seo-brief`
 2. **Le contenu à publier** — au format ③
 
 ### Variante Word avec suivi des modifications
@@ -236,7 +374,8 @@ Terminez toujours par :
 
 ## Livrables
 
-- `ONPAGE-<slug>.md` — audit, contenu en couleur, « À coller »
+- `ONPAGE-<slug>.md` — les cinq parties : audit, optimisations en couleur,
+  « à coller », JSON-LD, maillage entrant
 - `ONPAGE-<slug>.docx` — variante Word avec suivi des modifications
 - `optimise-<slug>.html` — version HTML si destinée à un CMS (`seo-page-builder-html`)
 - Le tableau avant/après par critère
