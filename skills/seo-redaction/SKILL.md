@@ -1,11 +1,12 @@
 ---
 name: seo-redaction
 description: >
-  Rédige un article ou une page à partir d'un brief, optimisé SEO et GEO, dans
-  un style humain : recherche avant écriture, zéro chiffre inventé, carte des
-  entités couverte, mot-clé aligné sans quota, passages citables, relecture.
-  Déclencher sur « rédige », « écris un article », « article de blog », «
-  écris cette page », « rédige à partir du brief ». Pas pour le plan →
+  Rédige tout article, page ou texte web, même court et sans brief, optimisé
+  SEO et GEO dans un style humain : recherche avant écriture, zéro chiffre
+  inventé (emplacements à compléter), carte des entités couverte, mot-clé
+  aligné sans quota, passages citables, FAQ, relecture. Déclencher sur «
+  rédige un article sur », « écris un article », « écris cette page », «
+  article de blog », « rédige à partir du brief ». Pas pour le plan seul →
   seo-brief.
 ---
 
@@ -17,7 +18,15 @@ pas ». Si vous n'avez pas de réponse, ne l'écrivez pas.
 
 ## Règle zéro — chercher avant d'écrire
 
-Interdiction d'écrire depuis les seules connaissances du modèle.
+N'écrivez pas depuis les seules connaissances du modèle quand les sources
+sont accessibles.
+
+**Sans aucun accès (ni SERP, ni web, ni brief) : rédigez quand même**, plutôt
+que de vous arrêter sur une question. Le texte s'appuie sur des
+connaissances générales sûres ; aucun chiffre n'est présenté comme vérifié
+(fourchette attribuée à sa source ou marquée « à vérifier ») ; toute donnée
+propre au client (prix, délais, zone, références) devient un emplacement
+`[à compléter : …]` ; une note finale liste ce qu'il faut vérifier.
 
 Avant la première phrase :
 1. Lire le brief, ou le produire (`/seo brief`)

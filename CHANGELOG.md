@@ -1,5 +1,22 @@
 # Journal des versions
 
+## 3.17.1 — corrections trouvées par les évaluations
+
+- 13 cas d'évaluation (5 nouveaux : maillage d'une page faible, rédaction
+  sans chiffre inventé, chute de trafic, humanisation, demande hors SEO ;
+  3 durcis : pièges JSON-LD propres à la méthode, causes propres à ChatGPT,
+  titles mesurés). Passage avec et sans le plugin : 12 sur 13 réussis avec,
+  écart de +1,00 sur la FAQ, l'humanisation, le maillage, les titles et
+  l'optimisation on-page.
+- **`geo-citation-tracker` faisait moins bien que Claude seul** : il
+  oubliait que chaque moteur a son accès et son index (ChatGPT s'appuie
+  largement sur Bing). Nouvelle étape « le moteur peut-il trouver la page ? »
+  (robots par moteur, index, HTML initial).
+- **`seo-redaction`** ne se déclenchait pas sur « rédige un article sur… »
+  (sa description supposait un brief) et refusait d'écrire sans sources ; il
+  rédige désormais en mode dégradé, prix et données client en emplacements
+  « à compléter ». Ce cas reste instable d'un passage à l'autre.
+
 ## 3.17.0 — skills et agents au standard Anthropic, premières évaluations
 
 Grille d'audit tirée de la documentation Anthropic (Agent Skills, Claude

@@ -2,5 +2,5 @@
 type: llm
 ---
 
-PASS si la réponse propose au moins deux variantes de title, dont au moins une contient « avocat », « droit du travail » et « Nantes », et au moins une meta description.
-FAIL si elle ne propose qu'un seul title ou aucune meta description.
+PASS si la réponse propose au moins trois variantes de title et au moins deux metas, indique pour chaque title sa longueur en caractères ou en pixels, et désigne une variante recommandée avec sa raison.
+FAIL si l'un de ces éléments manque.

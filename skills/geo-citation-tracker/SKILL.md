@@ -1,11 +1,12 @@
 ---
 name: geo-citation-tracker
 description: >
-  Explique pourquoi une page précise n'est pas citée par ChatGPT, Perplexity
-  ou les AI Overviews (réponse directe, structure, citabilité, entités, écart
-  concurrent) et réécrit le passage. Déclencher sur « pourquoi je ne suis pas
-  cité », « rendre cette page citable », « citation LLM ». Pas pour un audit
-  IA du site entier → geo-visibilite-ia.
+  Explique pourquoi une page précise n'est pas citée par ChatGPT, Perplexity,
+  Claude ou les AI Overviews alors qu'elle se classe : accès des robots IA,
+  index propre à chaque moteur (Bing pour ChatGPT), réponse directe,
+  citabilité, entités ; puis réécrit le passage. Déclencher sur « pourquoi je
+  ne suis pas cité », « ChatGPT ne cite pas ma page », « rendre cette page
+  citable ». Pas pour un audit IA du site entier → geo-visibilite-ia.
 ---
 
 # Pourquoi cette page n'est pas citée
@@ -25,6 +26,23 @@ réponse à partir de fragments qu'il peut :
 Un contenu excellent mais impossible à découper en fragments autonomes ne
 sera pas cité. C'est la cause numéro un, et elle n'a rien à voir avec la
 qualité rédactionnelle.
+
+## D'abord : le moteur peut-il trouver la page ?
+
+Avant le contenu, deux vérifications qui expliquent la plupart des « je suis
+bien placé sur Google mais jamais cité » — chaque moteur a son propre accès
+et **son propre index** :
+
+| Moteur | Robot à laisser passer (robots.txt **et** CDN / pare-feu) | Index sur lequel il s'appuie |
+|---|---|---|
+| ChatGPT (recherche) | `OAI-SearchBot` (et `ChatGPT-User` pour les visites demandées) | **largement Bing** : vérifier l'indexation et le classement Bing (Bing Webmaster Tools) — une page 4e sur Google peut être absente ou loin sur Bing |
+| Claude | `Claude-SearchBot`, `Claude-User` | recherche web propre |
+| Perplexity | `PerplexityBot` | index propre + sources web |
+| AI Overviews / AI Mode, Gemini | Googlebot (pas Google-Extended), aucun `nosnippet` | Google : le classement organique est le prérequis |
+
+Contrôle : `scripts/agents_ia.py` (robots par robot) ; contenu principal
+dans le HTML initial (les robots IA hors Google n'exécutent pas le JS).
+Sources : `../seo-optimisation-onpage/references/preuves-2026.md`.
 
 ## L'audit — 5 dimensions, 50 points
 

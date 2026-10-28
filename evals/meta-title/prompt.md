@@ -1,5 +1,5 @@
 ---
-description: "Titles et metas en variantes"
+description: "Titles et metas : variantes mesurées et recommandation"
 max_turns: 15
 allowed_tools: [Read, Glob, Grep, Skill]
 ---

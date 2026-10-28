@@ -1,7 +1,7 @@
 ---
-description: "Une page précise : geo-citation-tracker, pas l'audit IA du site"
+description: "Une page précise : causes propres à ChatGPT, pas un audit IA du site"
 max_turns: 15
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-Pourquoi ChatGPT ne cite jamais ma page sur l'isolation des combles alors que je suis 4e sur Google ?
+Je suis 4e sur Google pour « isolation des combles prix » mais ChatGPT ne cite jamais ma page. Pourquoi, et que faire ?
