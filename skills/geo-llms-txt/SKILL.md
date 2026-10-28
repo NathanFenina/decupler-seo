@@ -72,10 +72,14 @@ Les acteurs sérieux la respectent, les autres non.
 Convention émergente : un fichier markdown à la racine qui présente le site
 aux modèles, comme robots.txt le fait pour les crawlers.
 
-Statut à connaître : ce n'est **pas un standard officiel**, aucun moteur ne
-garantit le lire. Le coût de le publier est de dix minutes ; le bénéfice
-potentiel est réel. Faites-le, sans en attendre de miracle, et dites-le
-franchement au client plutôt que de le vendre comme une révolution.
+Statut à connaître (relevé d'octobre 2026) : ce n'est **pas un standard
+officiel**. Google Search l'ignore explicitement (guide IA, mai 2026), et
+sur 137 210 domaines, 97 % des fichiers llms.txt n'ont reçu aucune requête
+(Ahrefs, juin 2026). **Priorité basse** : utile surtout pour une
+documentation développeur ou des agents. S'il est publié, il coûte dix
+minutes ; ne le vendez jamais comme un levier de visibilité. Les vrais
+leviers d'accès sont robots.txt (section 1), le HTML initial et
+l'indexation Bing.
 
 `https://exemple.com/llms.txt` :
 

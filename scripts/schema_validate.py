@@ -25,6 +25,7 @@ import hashlib
 import json
 import re
 import sys
+from urllib.parse import urlparse
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -88,6 +89,13 @@ TYPES_PAGE = {"WebPage", "CollectionPage", "AboutPage", "ContactPage", "ProfileP
 # Types dont deux exemplaires sur une page créent une ambiguïté que Google
 # résout en les ignorant : typiquement un plugin SEO et un thème.
 UNIQUES = {"Article", "BlogPosting", "NewsArticle", "Organization", "WebSite", "Product"}
+# hasPart relie des parties éditoriales (CreativeWork) : pas une liste, une personne, un service…
+PAS_DES_PARTIES = {"ItemList", "BreadcrumbList", "Service", "Organization", "LocalBusiness", "Person",
+                   "Thing", "Place", "Product", "Brand"}
+ARTICLES = {"Article", "BlogPosting", "NewsArticle"}
+# Balises que Google accepte dans le texte d'une réponse de FAQ.
+HTML_FAQ_PERMIS = {"h1", "h2", "h3", "h4", "h5", "h6", "br", "ol", "ul", "li", "a", "p", "div", "b",
+                   "strong", "i", "em"}
 
 CLES_URL = {"url", "logo", "image", "sameAs", "item", "contentUrl", "thumbnailUrl",
             "embedUrl", "mainEntityOfPage", "@id", "downloadUrl", "installUrl"}
@@ -328,11 +336,66 @@ def valider(entites: list[dict], blocs: list | None = None, chemins: list[tuple]
             if isinstance(cible, dict) and "ItemList" in types_de(cible):
                 c("attention", "ItemList", "ItemList relié par hasPart : une liste secondaire se relie par "
                                            "mentions (hasPart en ferait une partie éditoriale de la page).")
+            elif isinstance(cible, dict) and set(types_de(cible)) & PAS_DES_PARTIES:
+                c("attention", nom, f"hasPart vers un {'/'.join(types_de(cible))} : hasPart relie des parties "
+                                    "éditoriales (CreativeWork). Utiliser mentions, provider ou about.")
+
+        if "serviceType" in entite and not isinstance(entite["serviceType"], str):
+            c("attention", nom, "serviceType doit être un texte libre ; l'entité désambiguïsée va dans category.")
+
+        if "BreadcrumbList" in types:
+            elements = [e for e in liste(entite.get("itemListElement")) if isinstance(e, dict)]
+            positions = [e.get("position") for e in elements]
+            try:
+                positions_int = [int(x) for x in positions]
+            except (TypeError, ValueError):
+                positions_int = []
+            if positions_int != list(range(1, len(elements) + 1)):
+                c("erreur", "BreadcrumbList", f"Positions {positions} : elles doivent aller de 1 à {len(elements)} "
+                                              "sans trou ni doublon, dans l'ordre du fil d'Ariane visible.")
+            premier = elements[0].get("item") if elements else None
+            premier = premier.get("@id") if isinstance(premier, dict) else premier
+            if isinstance(premier, str) and urlparse(premier).path not in ("", "/"):
+                c("attention", "BreadcrumbList", f"Le premier élément pointe vers « {premier} » : il doit "
+                                                 "être l'accueil du site.")
+
+        if "Question" in types:
+            question = entite.get("name") or entite.get("text")
+            reponse = next((r for r in liste(entite.get("acceptedAnswer")) if isinstance(r, dict)), {})
+            texte = reponse.get("text") if isinstance(reponse.get("text"), str) else ""
+            if not (isinstance(question, str) and question.strip()) or not texte.strip():
+                c("erreur", "FAQPage", "Question ou réponse vide : chaque Question porte name et "
+                                       "acceptedAnswer.text, identiques au texte visible.")
+            interdites = sorted({b.lower() for b in re.findall(r"</?\s*([a-zA-Z][a-zA-Z0-9]*)", texte)}
+                                - HTML_FAQ_PERMIS)
+            if interdites:
+                c("attention", "FAQPage", f"Balises HTML non acceptées par Google dans une réponse : "
+                                          f"{', '.join(interdites)}.")
 
         debut, fin = entite.get("datePublished"), entite.get("dateModified")
         if isinstance(debut, str) and isinstance(fin, str) and DATE_ISO.match(debut) \
                 and DATE_ISO.match(fin) and fin[:10] < debut[:10]:
             c("erreur", nom, f"dateModified ({fin}) antérieure à datePublished ({debut}).")
+
+    # Un seul nœud page par URL : deux WebPage = deux pages qui se disputent l'identité.
+    pages = {n.get("@id") or id(n) for n in entites if set(types_de(n)) & TYPES_PAGE}
+    if len(pages) > 1:
+        c("erreur", "WebPage", f"{len(pages)} nœuds de page (WebPage ou sous-type) : une URL = un seul nœud page. "
+                               "Cause fréquente : une extension SEO et un balisage maison qui en posent chacun un.")
+
+    # Un établissement, une adresse : jamais une adresse par ville desservie.
+    localites = {str(a.get("addressLocality", "")).strip().lower()
+                 for n in entites for a in liste(n.get("address")) if isinstance(a, dict) and a.get("addressLocality")}
+    if len(localites) > 1:
+        c("attention", "Adresse", f"{len(localites)} villes en addressLocality ({', '.join(sorted(localites))}) : "
+                                  "une seule adresse réelle ; les villes desservies vont en areaServed, sur leur page.")
+
+    # about/mentions posés à la fois sur la page et sur l'article.
+    a_page = any(set(types_de(n)) & TYPES_PAGE and (n.get("about") or n.get("mentions")) for n in entites)
+    a_article = any(set(types_de(n)) & ARTICLES and (n.get("about") or n.get("mentions")) for n in entites)
+    if a_page and a_article:
+        c("attention", "about/mentions", "about/mentions sur la WebPage ET sur l'article : sur un article, "
+                                         "ils vont sur le BlogPosting seulement.")
 
     # Doublons : très fréquent sur WordPress (plugin SEO + thème).
     for t in sorted(set(types_vus)):
@@ -373,6 +436,20 @@ def controler_graphe(blocs: list, entites: list[dict], aujourdhui: dt.date | Non
             signalees.add(ref)
             c("erreur", "@id", f"Référence {cle} → « {ref} » introuvable dans le graphe de la page. Google "
                                "ne va pas chercher un nœud ailleurs : l'entité doit figurer dans le @graph.")
+
+    # Un seul hôte canonique pour les @id et URL internes (https, avec ou sans www).
+    site = next((n.get("url") for n in entites if "WebSite" in types_de(n) and isinstance(n.get("url"), str)), None)
+    if site:
+        base = urlparse(site).netloc.lower().removeprefix("www.")
+        variantes = set()
+        for cle, v in list(valeurs(blocs)) + [("@id", n["@id"]) for n in entites if isinstance(n.get("@id"), str)]:
+            if cle in CLES_URL | {"@id", "url"} and v.startswith("http"):
+                u = urlparse(v)
+                if u.netloc.lower().removeprefix("www.") == base:
+                    variantes.add(f"{u.scheme}://{u.netloc.lower()}")
+        if len(variantes) > 1:
+            c("attention", "URL", f"Plusieurs formes de l'hôte du site dans le graphe ({', '.join(sorted(variantes))}) : "
+                                  "une seule forme canonique, partout.")
 
     for cle, v in valeurs(blocs):
         if PROVISOIRES.search(v):

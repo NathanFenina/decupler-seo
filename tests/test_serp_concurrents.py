@@ -396,3 +396,9 @@ class TestSlug(unittest.TestCase):
         import serp_concurrents as s
         self.assertEqual(s.slug("Établir société"), "etablir-societe")
         self.assertEqual(s.slug("Expert Comptable Lyon"), "expert-comptable-lyon")
+
+
+class TestOccurrencesDuTop(unittest.TestCase):
+    def test_occurrences_exactes(self):
+        self.assertEqual(S.occurrences_exactes("La pompe à chaleur. Une Pompe a chaleur air-eau.", "pompe à chaleur"), 2)
+        self.assertEqual(S.occurrences_exactes("texte", ""), 0)

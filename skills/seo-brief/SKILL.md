@@ -352,8 +352,9 @@ Règles de forme :
 - **Prompts GEO ciblés** : pour chaque section, la question conversationnelle
   qu'un utilisateur poserait à ChatGPT ou Perplexity, et à laquelle la
   section répond **dès ses premières lignes**.
-- **FAQ** : 3 à 5 vraies questions PAA (issues de `demande.py serp` ou de
-  Search Console), réponses de 2 à 4 lignes dont la première phrase répond.
+- **FAQ** : 4 à 6 vraies questions PAA (8 à 12 pour un pilier), issues de
+  `demande.py serp` ou de Search Console ; réponses de 40 à 80 mots, 4 phrases
+  au plus, dont la première répond seule.
   Rédigées dans le brief.
 - **Conclusion** : les points clés en 3 lignes, puis un **CTA lié à
   l'objectif** de la section 0, avec le libellé exact du bouton ou du lien.

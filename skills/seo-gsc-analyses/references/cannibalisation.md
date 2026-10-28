@@ -18,6 +18,9 @@ Accès aux données : voir « Récupérer les données » dans `../SKILL.md`.
 2. Signaler les cas où Google **alterne** entre les URLs d'un mois sur l'autre : c'est le vrai symptôme, pas la simple co-présence.
 3. Désigner l'URL à garder : celle qui a la meilleure position moyenne ET les meilleurs signaux de conversion.
 4. Distinguer la vraie cannibalisation d'une couverture légitime (une page catégorie et une page produit peuvent coexister).
+5. **Verdict par requête partagée** : *pas de risque* (intentions différentes, l'autre URL très loin) · *à surveiller* · *cannibalisation* (deux URL alternent ou se partagent clics et positions).
+6. **Qui possède quoi, par type de page** : la page qui convertit (service, fiche, offre) possède la requête « entité + service » ; un article, un portfolio, une actualité ou une page recrutement ne la visent jamais — ils visent leur longue traîne et renvoient vers la page qui convertit avec cette ancre.
+7. **Le maillage peut cannibaliser** : une ancre exacte qui pointe vers la mauvaise URL (`maillage_entrant.py`, « ancres concurrentes ») se corrige en même temps.
 
 ## Sortie attendue
 

@@ -32,6 +32,14 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/guard.py" --action publier --cible <url>
 pas une limitation : Claude fait tout le travail, vous gardez le dernier
 clic. Changez-le dans la config si vous voulez publier directement.
 
+### Site sans brouillon : déployer, c'est publier
+
+Sur un site en code ou statique (git, Vercel, FTP), il n'existe pas de
+brouillon : tout ce qui est déployé est indexable. Un contenu encore en
+relecture chez le client part avec `<meta name="robots" content="noindex">`
+(ou ne part pas), et la balise est retirée à la validation, en même temps
+que la page entre au sitemap.
+
 ## Étape 1 — Sauvegarder avant d'écrire
 
 Sur toute mise à jour d'un contenu existant :

@@ -314,6 +314,13 @@ def candidats_maillage(urls: list[str], mot: str, champ: dict | None = None, max
     return sortie[:maxi]
 
 
+def occurrences_exactes(texte: str, mot: str) -> int:
+    """Occurrences exactes du mot-clé (insensible aux accents et à la casse)."""
+    norm = lambda s: " ".join(re.findall(r"[a-z0-9]+", C.sans_accents(s).lower()))
+    cle = norm(mot)
+    return f" {norm(texte)} ".count(f" {cle} ") if cle else 0
+
+
 def construire(mot: str, lieu: str, langue: str, serp: dict, pages: list[dict], client: dict | None,
                date: str, echecs: list[dict] | None = None, sitemap: list[str] | None = None) -> dict:
     """Assemble le rapport à partir de la SERP et des pages déjà lues. Pur : aucun réseau."""
@@ -344,6 +351,9 @@ def construire(mot: str, lieu: str, langue: str, serp: dict, pages: list[dict], 
             "images_mediane": C.mediane([p["images"] for p in lues]) if lues else None,
             "avec_video": sum(1 for p in lues if p.get("videos")),
             "schemas": sorted({s for p in lues for s in p["schemas"]}),
+            # Combien de fois le top répète vraiment le mot-clé : l'argument face à un quota imposé.
+            "occurrences_exactes_mediane": C.mediane([occurrences_exactes(p.get("texte") or "", mot)
+                                                      for p in lues]) if lues else None,
         },
         "sujets_recurrents": recurrents,
         "sujets_isoles": isoles[:15],
@@ -399,6 +409,9 @@ def markdown(r: dict) -> str:
                                           f"de {lg['min']} à {lg['max']} ({lg['pages']} pages)" if lg else "n.d.") + " |",
          f"| **Fourchette cible** | " + (("**environ {0} mots**" if lg["fourchette"][0] == lg["fourchette"][1]
                                         else "**{0} à {1} mots**").format(*lg["fourchette"]) if lg else "n.d.") + " |",
+         f"| Occurrences exactes du mot-clé (médiane du top) | "
+         + (f"{st['occurrences_exactes_mediane']:g} — aucun quota à viser au-delà"
+            if st.get("occurrences_exactes_mediane") is not None else "n.d.") + " |",
          f"| AI Overview | " + ("non mesuré (SERP sans features)" if not aio.get("mesure", True)
                                  else ("oui" if aio["present"] else "non")
                                  + (f" · {len(aio['sources'])} source(s) citée(s)" if aio["present"] else "")) + " |",

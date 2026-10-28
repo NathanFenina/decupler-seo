@@ -47,9 +47,19 @@ Croisez GA4 (conversions) avec le nombre de liens entrants. Le constat
 habituel : la page « devis » reçoit 2 liens contextuels, la page « mentions
 légales » en reçoit 400 (le footer).
 
-Objectif : au moins **10 liens contextuels** vers chaque page prioritaire.
-Contextuels, c'est-à-dire dans le corps du texte — un lien de footer ou de
-menu ne transmet quasiment rien en comparaison.
+Objectif : des **liens contextuels** (dans le corps du texte — un lien de
+footer ou de menu ne transmet presque rien en comparaison), **dosés selon la
+force de la page** : faible → 4-5 liens de plus, moyenne → 2-3, forte → 1-2
+(ou seulement corriger les ancres). Ancre exacte une seule fois, sur la
+source la plus puissante ; ailleurs ancres partielles ou par entité, jamais
+deux fois la même. Outil : `scripts/maillage_entrant.py` (liens existants,
+ancres concurrentes, opportunités dosées), à partir de
+`crawl_site.py --liens`.
+
+**Option projet — satellites isolés** : certains clients veulent que les
+articles d'une même série ne se lient pas entre eux et lient tous une page
+service. C'est une règle de `memoire/decisions.md`, pas le défaut : par
+défaut, le maillage intra-silo reste prioritaire.
 
 ### 3. Profondeur excessive
 Toute page qui rapporte doit être à 3 clics maximum de la home. Au-delà de

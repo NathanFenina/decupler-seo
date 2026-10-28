@@ -101,7 +101,19 @@ Ne devinez pas. Testez.
 | meilleur logiciel de facturation TPE | A, B, Wikipedia | A, C, Reddit | A, B | ❌ |
 | combien coûte un ERP pour PME | B, D | B, forum | B | ✅ (3e) |
 
-Refaites la mesure tous les mois. C'est le seul indicateur GEO qui compte.
+Refaites la mesure tous les mois, **avec plusieurs exécutions par question**
+(3 au moins) : les réponses varient d'un appel à l'autre, une seule mesure
+est du bruit.
+
+Deux sources officielles complètent le panel :
+- **Search Console → rapport « Generative AI performance »** (ouvert à tous
+  les sites depuis le 31/08/2026) : impressions dans AI Overviews et AI
+  Mode par page, pays, appareil — sans les clics ;
+- **Bing Webmaster Tools → « AI Performance »** (préversion) : citations,
+  pages citées, requêtes d'ancrage dans Copilot.
+
+Les plateformes citent des sources très différentes (AI Mode et AI
+Overviews ne partagent que 14 % de leurs URL citées) : mesurez chacune.
 
 ## Le diagnostic
 

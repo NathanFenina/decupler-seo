@@ -283,6 +283,16 @@ pas** ou de ce qu'on ne sait pas ; un contre-argument honnête. Ce dernier
 point est le plus efficace : « cette méthode ne convient pas si vous êtes
 dans ce cas » rend un texte immédiatement plus crédible.
 
+## Écrire à partir d'une source brute (post, transcript, notes)
+
+1. Formulez en une phrase, avec les mots de la source, **l'objectif réel**
+   et **l'audience réelle** du texte : on ne plaque pas un angle générique.
+2. **Réécrivez, ne recopiez pas** : la duplication et le ton « réseau
+   social » ne passent pas sur une page.
+3. **Seuls les faits présents dans la source** entrent dans le texte ; le
+   reste va dans une note « À vérifier » en fin de livrable.
+4. Une section sans matière **se fusionne**, elle ne se remplit pas.
+
 ## Optimisation SEO — entités d'abord, mot-clé aligné
 
 Le sujet se couvre **par ses entités**, pas par la répétition du mot-clé :
@@ -351,7 +361,7 @@ Un LLM cite ce qu'il peut extraire proprement :
   (voir `seo-entites-triplets`).
 - **Données chiffrées sourcées** : les LLM privilégient le vérifiable
 - **Structure lisible par machine** : titres explicites, listes, tableaux
-- **FAQ en fin d'article** avec des réponses de 40-60 mots
+- **FAQ en fin d'article** : 4 à 6 questions, réponses de 40 à 80 mots (4 phrases au plus) dont la première phrase répond seule
 - **Cohérence de l'entité** : nommez votre marque, votre auteur, vos
   produits de la même façon partout, sur tout le site
 

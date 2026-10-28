@@ -156,7 +156,7 @@ chaque lot, relever le top 5 de deux ou trois villes du lot
 ces requêtes, il arrive couramment que la page n°1 fasse 600 à 900 mots,
 sans FAQ ni adresse locale : **la longueur ne décide pas, la preuve si**
 (missions chiffrées et liées, zone servie claire, autorité du domaine).
-Une consigne maison pensée pour les articles (20 occurrences, 1 700 mots)
+Une consigne maison pensée pour les articles (un quota d'occurrences, 1 700 mots)
 rend la page deux fois plus longue que la gagnante sans rien gagner.
 Le relevé se date et se refait : une règle non sourcée finit par coûter.
 

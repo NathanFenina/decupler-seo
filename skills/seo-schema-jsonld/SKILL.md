@@ -165,7 +165,52 @@ du `Service`, `author` → `Person` : graphe complet dans
 | Homonymes | `disambiguatingDescription` d'une phrase sur l'`Organization` |
 | Identité légale | `legalName`, `identifier` (`PropertyValue` avec le numéro d'immatriculation), `vatID` — **recopiés des mentions légales** |
 | `foundingDate` | Ne pas la baliser si elle contredit ce que dit le site |
-| `logo` | Version sombre (affichée sur fond blanc), URL absolue |
+| `logo` | Version sombre (affichée sur fond blanc), URL absolue, au moins 112 × 112 px |
+| `branchOf` | Remplacé : une agence pointe vers le siège par `parentOrganization` |
+| Siège non ouvert au public | `Organization`, pas `LocalBusiness` ; une agence avec adresse visible = `LocalBusiness` + `parentOrganization` |
+| Type local | Le sous-type précis, éventuellement plusieurs (`["GeneralContractor","HousePainter"]`), plutôt qu'une `Organization` doublée d'un `LocalBusiness` |
+| Un seul `LocalBusiness`, une seule adresse | Jamais une adresse par page ville : la ville va en `Service.areaServed`, sur sa seule page, une ville par page |
+| NAP | Nom, adresse, téléphone dans la même graphie que la fiche Google (« Av. » ≠ « avenue ») ; `geo` et horaires validés contre elle |
+| `Service.audience` | `BusinessAudience` (le secteur, sur une page secteur) ; vocabulaire de `serviceType` identique sur tout le site |
+| Catalogue de l'accueil | `hasOfferCatalog` ou `ItemList` de `Service` sans URL ; `sameAs` seulement sur la `category` — un `sameAs` sur le `Service` affirmerait qu'il **est** le concept |
+| `about` / `mentions` d'un article | Sur le `BlogPosting`, pas sur la `WebPage` ; jamais aux deux endroits |
+| `BreadcrumbList` | Seulement si un fil d'Ariane est visible, avec les mêmes libellés ; positions 1..n, la première = l'accueil, aucun niveau qui n'existe pas |
+| FAQ multiples | Plusieurs blocs FAQ sur une page = un seul `FAQPage` ; jamais la même question sur deux pages voisines |
+| `Course` | `offers` seulement si un prix est affiché (« à partir de » → `priceSpecification.minPrice`, `valueAddedTaxIncluded: false`) ; `courseMode`, `coursePrerequisites`, `teaches` seulement s'ils sont visibles |
+| Santé et bien-être hors site médical | Jamais `MedicalCondition` ni `MedicalTherapy` |
+| Images | L'URL d'origine en grande taille, jamais une version redimensionnée par un CDN ; pour une photo sous licence : `ImageObject` avec `creditText`, `license`, `acquireLicensePage` |
+| Personnes | Pas de nœud `Person` sans profil réel ; les comptes personnels d'un fondateur vont dans le `sameAs` de la `Person`, pas de l'`Organization` ; `sameAs` sans paramètres de suivi |
+| Logos clients | Non balisés sans accord écrit |
+| Graphe d'une extension SEO (Yoast…) | S'aligner sur ses `@id` (Yoast : `WebPage` = l'URL sans `#webpage`, `Person` = `#/schema/person/{hash}`) plutôt que l'inverse — sinon deux nœuds page. Si sa sortie schema est coupée, vérifier qu'elle le reste après chaque mise à jour |
+
+## L'identité de l'organisation — la réconciliation d'entité
+
+Google et les LLM doivent comprendre que tous les noms, profils et sites
+désignent **la même** organisation. C'est le socle le plus rentable, et le
+plus souvent bâclé.
+
+1. **Unifier d'abord le contenu visible** : un seul nom dans les titres,
+   les mentions légales, les profils. Baliser un désordre le fige.
+2. `name` = la marque ; `legalName` = la raison sociale (jamais l'inverse) ;
+   `alternateName` = tous les noms en circulation (sigle, ancien nom) ; un
+   nœud `Brand` si la marque diffère de la société.
+3. **Groupe** : `parentOrganization` / `subOrganization`. Ne jamais
+   s'attribuer la certification ou le statut partenaire d'une société sœur.
+4. **Preuves** : `hasCredential` (`EducationalOccupationalCredential` avec
+   `name`, `credentialCategory`, `recognizedBy`), `memberOf`, `award`,
+   `founder` — seulement ce que le site montre.
+5. **Identifiants** : société française → `identifier` (SIREN/SIRET) et
+   `vatID` recopiés des mentions légales ; société étrangère → `taxID` avec
+   l'identifiant national, jamais un SIREN inventé.
+6. `foundingDate` en année seule, et seulement si elle ne contredit pas
+   l'ancienneté affichée ; `numberOfEmployees` avec son périmètre (société
+   ou groupe), cohérent avec le texte.
+7. `WebSite` : `name` et `alternateName` (le nom de site que Google
+   affiche en SERP), `inLanguage`, `publisher` → `#organization`.
+8. **Personne-pivot** : si les IA reconnaissent mieux le fondateur que la
+   marque (mesuré par `geo-share-of-model`), citez les deux ensemble dans
+   le texte des pages clés (« Prénom Nom, fondateur de Marque »), avec
+   `founder`/`worksFor` dans le graphe et le `sameAs` de la `Person`.
 
 ## Placeholders et livraison
 
@@ -200,6 +245,12 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_validate.py" <fichier.html|fichier
 | `A_CONFIRMER`, marqueur « à faire », doubles accolades de gabarit | erreur |
 | `sameAs` : `https://www.wikidata.org/wiki/Q…`, Wikipédia en https | attention |
 | `SoftwareApplication` hors sujet principal, `SearchAction`, note auto-attribuée, `about` > 3, `mentions` > 12, `headline` > 110 | attention |
+| Plus d'un nœud page (`WebPage` ou sous-type) pour l'URL | erreur |
+| `BreadcrumbList` : positions 1..n sans trou ; premier élément ≠ accueil | erreur / attention |
+| `FAQPage` : question ou réponse vide ; balise HTML non acceptée dans une réponse | erreur / attention |
+| `hasPart` vers un non-`CreativeWork` (liste, service, organisation, personne, lieu) ; `serviceType` non textuel | attention |
+| Plusieurs villes en `addressLocality` ; `about`/`mentions` à la fois sur la page et sur l'article | attention |
+| Plusieurs formes de l'hôte du site (http/https, avec ou sans www) dans les `@id` et URL | attention |
 
 `--strict` renvoie 1 à la première erreur : c'est ce qui bloque une
 livraison ou un commit. Sur une URL, le script lit le **HTML initial** —
@@ -225,13 +276,21 @@ prix balisé égale la valeur du registre (`memoire/triplets.csv`) ;
 | `Course`, `Event`, `VideoObject`, `Recipe`, `JobPosting` | ✅ | |
 | `SoftwareApplication` | ⚠️ | **Seulement si le logiciel est le sujet de la page.** Cité → `Thing` |
 | `Review` / `AggregateRating` | ⚠️ | Avis réels, visibles, vérifiables. Jamais sur sa propre `Organization` |
-| `FAQPage` | ⚠️ | Rich result restreint depuis août 2023 aux sites gouvernementaux et de santé. Reste utile pour les LLM |
+| `FAQPage` | ⚠️ | Rich result retiré de Google le 7 mai 2026 (rapport et test supprimés ensuite). Balisage valide et sans risque, mais sans bénéfice d'affichage : à garder seulement s'il reprend une FAQ réellement visible |
 | `HowTo` | ⚠️ | Rich result déprécié depuis septembre 2023 |
 | `SearchAction` | ❌ | Champ de recherche sitelinks retiré en novembre 2024 |
 | `SpecialAnnouncement` | ❌ | Déprécié en juillet 2025 |
 
 Annoncez ces limites. Promettre des étoiles là où Google ne les affiche plus
 est la façon la plus rapide de perdre la confiance d'un client.
+
+**Données structurées et IA** : Google n'utilise aucun schema spécial pour
+ses fonctions IA, et ajouter du JSON-LD n'a pas augmenté les citations de
+façon significative dans la seule étude contrôlée disponible (Ahrefs, mai
+2026). ChatGPT et Perplexity lisent le JSON-LD comme du texte. Le schema
+sert à la désambiguïsation et aux résultats enrichis qui restent ; **tout
+fait balisé doit être visible dans la page**. Sources :
+`../seo-optimisation-onpage/references/preuves-2026.md`.
 
 ## Recette et suivi
 

@@ -1,5 +1,54 @@
 # Journal des versions
 
+## 3.16.0 — on-page par entités, maillage entrant, règles GEO sourcées
+
+Rapatrié des skills clients les plus récents et d'une recherche des sources
+2025-2026 (Google, Bing, OpenAI, Anthropic, études Ahrefs, SE Ranking,
+Semrush, papier GEO). Chaque règle et son niveau de preuve :
+`skills/seo-optimisation-onpage/references/preuves-2026.md`.
+
+- **Méthode par entités, plus de densité cible.** Le mot-clé exact sert à
+  l'alignement (title, H1, première phrase, ±1 H2, ±1 question de FAQ),
+  sans quota ni minimum ; la pertinence se juge sur la **carte des entités**
+  (principale, très liées, contexte, attributs ; lacunes = présentes chez au
+  moins 3 concurrents). `onpage_score.py` : critères « Alignement du
+  mot-clé », « Pas de sur-optimisation » (aucun plancher) et « Couverture des
+  entités » (`--entites`, tableau présent / absent / où) ; une exigence
+  client en occurrences se contrôle hors score (`--occurrences-min`,
+  `regles.mot_cle_occurrences_min` vide par défaut). `seo-redaction`,
+  `seo-brief` et la config alignés.
+- **Maillage entrant** : `crawl_site.py --liens` garde chaque lien interne
+  avec son ancre et sa zone (contenu, menu, en-tête, pied de page, fil
+  d'Ariane) ; nouveau `maillage_entrant.py` : liens existants et statut des
+  ancres, ancres concurrentes (cannibalisation par le maillage), opportunités
+  dosées selon la force de la page (4-5 / 2-3 / 1-2), ancre exacte une seule
+  fois, PageRank interne des liens de contenu croisé avec Search Console.
+- **`seo-optimisation-onpage`** : Search Console obligatoire (3 + 3 mois,
+  verdict de cannibalisation par requête), vérification et traçabilité de
+  toute information ajoutée, ligne auteur sans « relu par » fictif, livrable
+  en 5 parties (audit, optimisations, à coller, JSON-LD, maillage entrant),
+  variante « audit seul », pièges d'audit (gabarit qui sur-optimise, erreurs
+  de fond d'abord, quelle page possède quelle requête), **règles GEO 2026**
+  (accès des robots IA, fan-out dans la page, premier tiers, passages de
+  120-180 mots ouverts par une phrase autonome, apport d'information,
+  preuves, dates honnêtes, ce qu'il ne faut pas faire).
+- **Données structurées** : identité de l'organisation (name / legalName /
+  alternateName, groupe, preuves, identifiants, WebSite.alternateName,
+  personne-pivot), règles par type (LocalBusiness, agences, NAP, Service,
+  catalogue, Course, santé, images, personnes, graphe Yoast), FAQ retirée des
+  résultats enrichis (07/05/2026). `schema_validate.py` contrôle en plus :
+  un seul nœud page, fil d'Ariane (positions, accueil), FAQ vide ou HTML non
+  accepté, `hasPart` hors CreativeWork, `serviceType` non textuel, adresses
+  multiples, about/mentions en double page + article, hôte canonique.
+- **Harmonisation** : FAQ 4-6 questions (8-12 sur un pilier), réponses de
+  40-80 mots ; maillage dosé au lieu de « 10 liens minimum » ; option projet
+  « satellites isolés » ; cannibalisation par type de page ; site sans
+  brouillon → noindex tant que non validé ; écriture à partir d'une source
+  brute ; llms.txt en priorité basse (ignoré par Google) ; suivi IA avec
+  plusieurs exécutions et les rapports Search Console / Bing.
+- `serp_concurrents.py` : médiane des occurrences exactes du mot-clé dans le
+  top, l'argument face à un quota imposé.
+
 ## 3.15.1 — registre
 
 - `projets.json` : ajout du projet « Greffe de cheveux Tunisie » (`NathanFenina/greffe-capillaire`), créé par `projet.py init`.

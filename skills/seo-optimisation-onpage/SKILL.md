@@ -81,6 +81,43 @@ respecte, en le contrôlant hors score (`--occurrences-min`), sans jamais
 dépasser le plafond de densité (`regles.densite_max_pct`). Vide = méthode
 par entités, aucun quota.
 
+## Les règles GEO qui tiennent en 2026
+
+Pour Google, le GEO **est** du SEO : les réponses IA s'appuient sur le
+classement habituel et éclatent la question en sous-requêtes (*fan-out*).
+Sources et niveaux de preuve de chaque règle : `references/preuves-2026.md`.
+
+1. **Accès d'abord** : page indexable, pas de `nosnippet` involontaire ;
+   robots.txt et CDN qui laissent passer Googlebot, Bingbot, OAI-SearchBot,
+   Claude-SearchBot et PerplexityBot (`agents_ia.py`) ; contenu principal
+   dans le **HTML initial**, rien d'essentiel dans un onglet, un PDF ou une
+   image.
+2. **Couvrir le fan-out dans la page** : la requête et ses 8 à 15
+   sous-questions (suite logique, généralisation, précision, comparaison,
+   implication…), **une section H2/H3 par sous-question**. Jamais une page
+   par variante : c'est de l'abus de contenu à grande échelle.
+3. **L'essentiel dans le premier tiers** : réponse directe de 40 à 60 mots
+   sous le H1, définition de l'entité dans l'introduction, résumé des points
+   clés — c'est là que se prennent près de la moitié des citations.
+4. **Des passages citables** : sections d'environ 120 à 180 mots, chacune
+   ouverte par 1 à 2 phrases autonomes (6 à 20 mots) qui répondent hors
+   contexte ; l'entité nommée plutôt que « il » ; une idée par phrase. Ne
+   pas micro-découper pour autant (Google le déconseille).
+5. **Apport d'information** : au moins **3 éléments absents du top 10 et de
+   la réponse qu'un LLM donnerait seul** — donnée propre, test de première
+   main, cas chiffré, expert interne, photo originale, grille de décision.
+   Le contrôle : générer la réponse d'un assistant sur la requête et lister
+   ce que la page apporte en plus.
+6. **Des preuves** : au moins une donnée sourcée par section clé, 1 à 2
+   citations d'experts nommés avec leur fonction. Zéro chiffre inventé.
+7. **Title en langage naturel**, proche de la requête principale (50-60
+   caractères, entité dans les 40 premiers), sans répétition du mot-clé ;
+   slug lisible de 4 à 7 mots ; title, H1 et meta alignés.
+8. **Dates honnêtes** : « Publié / Mis à jour le » visible et identique au
+   JSON-LD ; une date ne change qu'avec un changement réel du contenu.
+9. **Ne pas faire** : llms.txt « pour le SEO », schema « pour l'IA »,
+   campagnes de mentions artificielles, date rafraîchie sans changement.
+
 ## Mesurer
 
 ```bash
@@ -180,7 +217,7 @@ déguisé en variantes reste du bourrage, et Google le lit comme tel.
 | Réponse directe | 5 | 40-60 mots en haut, autonome | Aucune réponse avant le 3e écran |
 | Structure extractible | 3 | Listes, tableaux, titres explicites | Bloc de texte continu |
 | Définitions | 2 | Termes clés définis en une phrase autonome | Rien de définissable |
-| FAQ | 3 | 4+ questions, réponses de 40-60 mots | Absente |
+| FAQ | 3 | 4-6 questions (8-12 sur un pilier), réponses de 40-80 mots dont la première phrase répond | Absente |
 | Données sourcées | 2 | Chiffres avec source vérifiable | Chiffres non sourcés, ou aucun |
 
 ### E · E-E-A-T (15)
@@ -358,6 +395,29 @@ Utilisez le skill docx s'il est disponible.
 Terminez toujours par :
 - le tableau **« changement → critère passé au vert »**
 - le score **avant → après**, avec le même barème (61 → 86)
+
+## Pièges d'audit
+
+- **Les erreurs de fond d'abord** : un intertitre copié d'une autre page du
+  site, une section hors sujet, un chiffre qui contredit `memoire/faits.md`
+  passent avant toute question de balise.
+- **La sur-optimisation par le gabarit** : hero, intertitres de section,
+  FAQ et bande CTA répètent souvent déjà le mot-clé. Mesurez sur le HTML
+  **réellement servi** (URL), pas seulement sur le texte source, et
+  corrigez par des variantes, jamais en supprimant des sections. Si
+  l'audit ne porte que sur le texte collé, dites-le.
+- **Quelle page possède quelle requête** : un article (actualité, retour
+  d'événement, cas client) ne vise jamais la requête « entité + service »
+  de la page qui convertit ; il vise sa longue traîne et renvoie vers elle
+  avec cette ancre. Si Search Console montre l'article à sa place,
+  recentrez l'article et renforcez le lien.
+
+## Variante « audit seul »
+
+Pour un client qui publie lui-même et ne veut pas de réécriture du corps :
+recommandations ciblées — title, meta, H1, deux à quatre H2, introduction,
+FAQ à ajouter, entités manquantes, liens — chacune écrite, prête à
+appliquer. Même barème, même score avant → après estimé.
 
 ## La réécriture — les contraintes
 

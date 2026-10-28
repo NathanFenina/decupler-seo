@@ -147,6 +147,43 @@ class TestSchemaValidate(DossierIsole):
         self.assertTrue(any("novembre 2024" in m for m in msgs))
         self.assertTrue(any("auto-attribués" in m for m in msgs))
 
+    def test_fil_d_ariane_positions_et_accueil(self):
+        n = self.noeuds()
+        n[4]["itemListElement"] = [
+            {"@type": "ListItem", "position": 1, "name": "Services", "item": f"{SITE}/services/"},
+            {"@type": "ListItem", "position": 3, "name": "Plomberie", "item": PAGE}]
+        code, d = self.controler(page_html(graphe(n)))
+        self.assertEqual(code, 1)
+        self.assertTrue(any("de 1 à 2" in m for m in self.erreurs(d)))
+        self.assertTrue(any("accueil" in m for m in self.avertissements(d)))
+
+    def test_deux_noeuds_page_et_faq_vide(self):
+        n = self.noeuds()
+        n.append({"@type": "WebPage", "@id": f"{PAGE}", "url": PAGE, "name": "Doublon"})
+        n.append({"@type": "FAQPage", "@id": f"{PAGE}#faq", "mainEntity": [
+            {"@type": "Question", "name": "Combien ?", "acceptedAnswer": {"@type": "Answer", "text": " "}},
+            {"@type": "Question", "name": "Où ?", "acceptedAnswer": {"@type": "Answer",
+                                                                     "text": "<span>Lyon</span> et <p>Rhône</p>"}}]})
+        _, d = self.controler(page_html(graphe(n)))
+        err = self.erreurs(d)
+        self.assertTrue(any("nœuds de page" in m for m in err))
+        self.assertTrue(any("Question ou réponse vide" in m for m in err))
+        self.assertTrue(any("span" in m for m in self.avertissements(d)))
+
+    def test_adresses_multiples_hote_et_haspart(self):
+        n = self.noeuds()
+        n[0]["address"] = {"@type": "PostalAddress", "addressLocality": "Lyon"}
+        n[3]["address"] = {"@type": "PostalAddress", "addressLocality": "Villeurbanne"}
+        n[3]["serviceType"] = {"@type": "Thing", "name": "Plomberie"}
+        n[2]["hasPart"] = {"@id": f"{PAGE}#service"}
+        n[2]["url"] = "https://www.exemple.com/plomberie/"
+        _, d = self.controler(page_html(graphe(n)))
+        msgs = self.avertissements(d)
+        self.assertTrue(any("villes en addressLocality" in m for m in msgs))
+        self.assertTrue(any("serviceType" in m for m in msgs))
+        self.assertTrue(any("hasPart vers un Service" in m for m in msgs))
+        self.assertTrue(any("formes de l'hôte" in m for m in msgs))
+
     def test_doublon_organization_en_ligne(self):
         n = self.noeuds()
         n.append({"@type": "BlogPosting", "@id": f"{PAGE}#article", "headline": "T", "image": f"{SITE}/a.webp",

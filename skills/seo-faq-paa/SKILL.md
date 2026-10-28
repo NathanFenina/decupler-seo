@@ -68,13 +68,15 @@ c'est exactement ce qu'en fera un LLM ou un featured snippet.
 
 Ensuite : 2-3 phrases de contexte, de nuance ou d'exemple.
 
-**Longueur : 40 à 120 mots.** En dessous, la réponse est creuse. Au-dessus,
-elle n'est plus extractible — et c'est le seuil qui compte pour les
+**Longueur : 40 à 80 mots, 4 phrases au plus**, la première répondant seule.
+En dessous, la réponse est creuse. Au-dessus, elle n'est plus extractible — et c'est le seuil qui compte pour les
 featured snippets comme pour les LLM.
 
 ## Le volume
 
-**10 à 20 questions** pour une page pilier, 5 à 8 pour un article.
+**8 à 12 questions** pour une page pilier, 4 à 6 pour un article. Jamais la
+même question sur deux pages voisines ; plusieurs blocs FAQ sur une page = un
+seul `FAQPage`.
 
 Au-delà de 20, la valeur marginale s'effondre et la page devient une liste
 sans hiérarchie. Mieux vaut 12 questions bien répondues que 30 expédiées.
