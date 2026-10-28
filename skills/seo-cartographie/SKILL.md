@@ -20,6 +20,14 @@ rapport mensuel parle de trafic global sans dire quelle page tient sa promesse.
 Le tableau vit dans le projet : `memoire/cartographie.csv`. Il appartient au
 client autant qu'à vous : on le valide ensemble, on le relit chaque mois.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Les trois règles
 
 1. **Un mot-clé principal par page, une page par mot-clé principal.** Deux

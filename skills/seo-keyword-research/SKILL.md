@@ -15,6 +15,14 @@ Une liste de 800 mots-clés n'est pas un livrable. C'est une façon de ne rien
 décider. Le livrable, c'est **20 requêtes qu'on va travailler et la raison
 pour laquelle on ignore les autres**.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Étape 1 — Le point de départ
 
 Trois sources, dans cet ordre de fiabilité :

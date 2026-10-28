@@ -1337,6 +1337,77 @@ def chercher_wikidata(label: str, langue: str = "fr", limite: int = 5, domaine: 
     return {"candidats": cands, "erreur": None}
 
 
+def revalider_qids(entites: list[dict], recuperer=None, langue: str = "fr") -> dict:
+    """Revérifie chaque QID du registre : existe toujours, fusionné (redirigé) ou supprimé.
+
+    Les éléments Wikidata fusionnent et disparaissent : un sameAs vers un QID
+    mort affaiblit la désambiguïsation. À lancer chaque trimestre.
+    """
+    recuperer = recuperer or _get_json
+    avec_qid = [e for e in entites if e.get("qid")]
+    lignes, erreur = [], None
+    for i in range(0, len(avec_qid), 50):
+        lot = avec_qid[i:i + 50]
+        try:
+            rep = recuperer({"action": "wbgetentities", "ids": "|".join(e["qid"] for e in lot),
+                             "props": "labels|descriptions|sitelinks", "languages": langue,
+                             "sitefilter": f"{langue}wiki", "redirects": "yes", "format": "json"})
+        except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+            erreur = f"Wikidata injoignable ({str(getattr(exc, 'reason', exc))[:80]})"
+            break
+        donnees = rep.get("entities") or {}
+        par_source = {}
+        for cle, ent in donnees.items():
+            source = (ent.get("redirects") or {}).get("from") or ent.get("id") or cle
+            par_source[source] = ent
+        for e in lot:
+            ent = par_source.get(e["qid"]) or donnees.get(e["qid"]) or {}
+            if not ent or "missing" in ent:
+                statut, nouveau = "supprime", ""
+            elif (ent.get("redirects") or {}).get("to"):
+                statut, nouveau = "redirige", ent["redirects"]["to"]
+            else:
+                statut, nouveau = "ok", ""
+            libelle = ((ent.get("labels") or {}).get(langue) or {}).get("value", "")
+            wiki = ((ent.get("sitelinks") or {}).get(f"{langue}wiki") or {}).get("title", "")
+            lignes.append({"entite": e["entite"], "qid": e["qid"], "statut": statut, "nouveau_qid": nouveau,
+                           "libelle": libelle,
+                           "description": ((ent.get("descriptions") or {}).get(langue) or {}).get("value", ""),
+                           "wikipedia": f"https://{langue}.wikipedia.org/wiki/{wiki.replace(' ', '_')}" if wiki else ""})
+    return {"lignes": lignes, "sans_qid": [e["entite"] for e in entites if not e.get("qid")], "erreur": erreur}
+
+
+def ecrire_qids_revalides(chemin: Path, lignes: list[dict], date: str) -> int:
+    """Remplace dans le CSV les QID redirigés par leur cible ; note la date de revérification."""
+    remplacements = {l["qid"]: l["nouveau_qid"] for l in lignes if l["statut"] == "redirige" and l["nouveau_qid"]}
+    brut = chemin.read_text(encoding="utf-8").splitlines()
+    sortie, n = [], 0
+    entete = None
+    for ligne in brut:
+        if ligne.startswith("# Revérifié sur Wikidata"):
+            continue
+        if ligne.startswith("#") or not ligne.strip():
+            sortie.append(ligne)
+            continue
+        cellules = next(csv.reader([ligne]))
+        if entete is None:
+            entete = cellules
+            sortie.append(ligne)
+            sortie.append(f"# Revérifié sur Wikidata le {date} (triplets.py revalider)")
+            continue
+        if "qid" in entete:
+            k = entete.index("qid")
+            if k < len(cellules) and normaliser_qid(cellules[k]) in remplacements:
+                cellules[k] = remplacements[normaliser_qid(cellules[k])]
+                n += 1
+                tampon = io.StringIO()
+                csv.writer(tampon, lineterminator="").writerow(cellules)
+                ligne = tampon.getvalue()
+        sortie.append(ligne)
+    chemin.write_text("\n".join(sortie) + "\n", encoding="utf-8")
+    return n
+
+
 # ─── Affichage ────────────────────────────────────────────────────
 
 def _cellule(s) -> str:
@@ -1462,7 +1533,33 @@ def main() -> int:
     w.add_argument("--site", help="domaine officiel : retient l'élément dont P856 pointe vers lui")
     w.add_argument("--json", action="store_true")
 
+    rv = sp.add_parser("revalider", help="revérifier les QID du registre (fusionnés, supprimés), chaque trimestre")
+    rv.add_argument("--entites", default="memoire/entites.csv")
+    rv.add_argument("--langue", default="fr")
+    rv.add_argument("--ecrire", action="store_true", help="remplacer les QID redirigés dans le registre")
+    rv.add_argument("--json", action="store_true")
+
     a = ap.parse_args()
+
+    if a.cmd == "revalider":
+        import datetime as _dt
+        entites = charger_entites(a.entites)
+        r = revalider_qids(entites, langue=a.langue)
+        if a.json:
+            print(json.dumps(r, ensure_ascii=False, indent=2))
+        else:
+            if r["erreur"]:
+                print(f"✗ {r['erreur']} : rien n'est modifié, relancez plus tard.")
+            for l in r["lignes"]:
+                note = {"ok": "✓", "redirige": f"→ fusionné dans {l['nouveau_qid']}", "supprime": "✗ supprimé"}
+                print(f"  {note[l['statut']]:<26} {l['entite']} ({l['qid']}) — {l['libelle'] or '?'} : "
+                      f"{l['description'][:70]}")
+            if r["sans_qid"]:
+                print(f"\n  Sans QID ({len(r['sans_qid'])}) : {', '.join(r['sans_qid'][:15])}")
+        if a.ecrire and not r["erreur"] and Path(a.entites).suffix == ".csv":
+            n = ecrire_qids_revalides(Path(a.entites), r["lignes"], _dt.date.today().isoformat())
+            print(f"\n  {n} QID remplacé(s) dans {a.entites}")
+        return 1 if any(l["statut"] == "supprime" for l in r["lignes"]) else 0
 
     if a.cmd == "extraire":
         if not a.source and a.texte is None:

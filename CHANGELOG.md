@@ -1,5 +1,35 @@
 # Journal des versions
 
+## 3.18.0 — tous les skills testés, générateur JSON-LD, revérification Wikidata
+
+- **58 évaluations, une au moins par skill** (`evals/couv-*`, tag
+  `couverture`) : le skill se déclenche-t-il, et livre-t-il quelque chose
+  d'utile ? Dernier passage : 55 sur 58 réussies. Les cas « durcis »
+  (brief, chute de trafic, citation IA, JSON-LD) exigent désormais ce que
+  seule la méthode sait.
+- **Corrigé grâce à elles, pour tous les skills** : sans projet configuré ni
+  données, 13 skills s'arrêtaient pour poser des questions. Chaque skill
+  livre désormais tout de suite ce qui ne dépend pas des données (méthode
+  appliquée au cas, exemple, livrable type avec emplacements à compléter),
+  puis la liste de ce qu'il faut fournir. Déclenchement corrigé pour
+  `seo-eeat` et `seo-veille`. `geo-linkedin` rédige l'article au lieu d'une
+  fiche ; `geo-share-of-model` impose 3 exécutions par question ;
+  `seo-dashboard` livre le HTML dans la réponse quand il ne peut pas écrire
+  de fichier.
+- **« L'essentiel — ce qui ne se négocie pas » en tête de 13 skills** (on-page,
+  brief, FAQ, schema, maillage, meta, humanisation, cycle, publication,
+  entités, LinkedIn, part de voix, tableau de bord) : la leçon de la
+  rédaction (une règle à la ligne 421 n'est pas suivie).
+- **`schema_build.py`** : JSON-LD complet d'une page depuis un petit fichier
+  (type, fil d'Ariane, about / mentions résolus dans le registre, service ou
+  article, FAQ), socle inclus, validé avant livraison ; refuse les
+  configurations fautives. Repris des générateurs des skills clients.
+- **`triplets.py revalider`** : revérification trimestrielle de tous les QID
+  du registre (existe, fusionné, supprimé), `--ecrire` remplace les QID
+  fusionnés et date la revérification.
+- `schema_validate.py` : la FAQ (nœud `#faq` séparé) ne compte plus comme un
+  second nœud de page.
+
 ## 3.17.2 — rédaction stabilisée
 
 - `seo-redaction` : les règles non négociables (FAQ même sur un texte

@@ -15,6 +15,23 @@ description: >
 Les plugins SEO vous disent que c'est orange. Ils ne le passent pas au vert.
 Ce skill fait les deux.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Mot-clé sans quota** : title, H1, première phrase ; la pertinence se juge sur la **couverture des entités**, jamais sur une densité.
+2. **Search Console d'abord** sur une page existante : requêtes réelles et cannibalisation avant toute réécriture.
+3. **Livrer la page entière** prête à coller (jamais « conserver l'existant »), liens internes déjà insérés.
+4. **Zéro information non vérifiée** présentée comme vraie : source ou « à valider ».
+5. **Garder ce qui marche** : une page qui ranke s'enrichit, elle ne se réécrit pas de zéro.
+
 ## Entrées
 
 - Le contenu : URL (à récupérer) ou texte collé

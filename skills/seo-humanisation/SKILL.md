@@ -19,6 +19,22 @@ retire ces tics et rapproche le texte de la façon d'écrire du client.
 Elle ne fait que ça. Elle ne rajoute pas de contenu, ne change pas le plan,
 ne corrige pas le référencement.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Ne touchez jamais au fond** : aucun fait, chiffre ou exemple ajouté ; le contrôle avant / après bloque tout chiffre apparu.
+2. **Retirez les tics** (formules toutes faites, triades, tirets cadratins, ton promo, conclusions-résumés) sans appauvrir le sens.
+3. **Alignez sur `memoire/style.md`** quand il existe.
+4. **Livrez le texte réécrit**, puis la liste des changements.
+
 ## Le principe : la forme change, le fond reste
 
 1. **Chaque information du texte d'origine survit.** On peut couper une

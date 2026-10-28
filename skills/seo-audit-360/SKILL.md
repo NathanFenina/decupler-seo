@@ -15,6 +15,14 @@ collectez les faits, vous déléguez aux spécialistes, vous agrégez, vous
 priorisez. Ce qui distingue un bon audit d'un mauvais n'est pas le nombre de
 problèmes trouvés, c'est **l'ordre dans lequel on les corrige**.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Phase 0 — Cadrage (2 min)
 
 1. Lire `./decupler-seo.config.yml` du projet → section `projet`. S'il n'existe pas,

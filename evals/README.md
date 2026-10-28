@@ -7,8 +7,17 @@ déclenché (`tool_used: Skill`), et le résultat est-il juste. Certains cas
 vérifient qu'un skill ne se déclenche **pas** (`min: 0`, `max: 0`,
 `arm: both`).
 
+Deux familles : les cas **durcis** (règles propres à la méthode, avec
+comparaison à Claude seul) et les cas **couverture** (`couv-*`, tag
+`couverture`) : un par skill, qui vérifient qu'il se déclenche et livre
+quelque chose d'utile même sans projet configuré ni données.
+
+Le coût affiché est une estimation au tarif public de l'API ; avec un
+abonnement Claude, il ne se paie pas en euros mais consomme le quota d'usage.
+
 ```bash
-claude plugin eval .                        # toute la suite (payant : appels au modèle)
+claude plugin eval . --runs 1 --ablation none --max-cost-usd 8 -j 6   # toute la suite, une fois
+claude plugin eval . --tag couverture --runs 1 --ablation none        # couverture seule
 claude plugin eval . --case onpage-* --runs 1 --ablation none   # itérer vite
 ```
 

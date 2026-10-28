@@ -14,6 +14,14 @@ Le lien reste le signal d'autorité le plus fort, et le plus difficile à
 simuler. Il est aussi le principal levier de la citation par les LLM :
 un site mentionné partout est un site que les modèles connaissent.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Étape 1 — Auditer l'existant
 
 Via Ahrefs : domaines référents, autorité, liens dofollow/nofollow, ancres,

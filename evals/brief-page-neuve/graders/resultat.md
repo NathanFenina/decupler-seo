@@ -2,5 +2,5 @@
 type: llm
 ---
 
-PASS si la réponse livre un brief exploitable même sans accès à la SERP : un plan de titres (H1, H2), une liste de notions ou d'entités à couvrir (par exemple déclaration préalable, surface de plancher, taxe d'aménagement, délais d'instruction) et des questions de FAQ, en signalant ce qui reste à vérifier.
-FAIL si elle s'arrête sans plan ni liste d'entités pour demander des informations, ou si elle rédige l'article complet à la place du brief.
+PASS si la réponse livre un brief qui contient : (1) une carte des entités organisée en niveaux (entité principale, entités très liées, entités de contexte) ; (2) des éléments d'apport d'information propres à ajouter, absents des pages concurrentes ; (3) des sous-questions ou prompts IA à couvrir ; (4) un plan de titres et une FAQ.
+FAIL si l'un des quatre manque, ou si elle s'arrête pour poser des questions sans livrer.

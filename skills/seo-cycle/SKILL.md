@@ -22,6 +22,22 @@ découlent, avant tout le reste :
 3. **Chaque exécution laisse une trace**, y compris quand il n'y avait rien
    à faire. C'est le seul moyen de savoir qu'une routine a réellement tourné.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Rien hors des niveaux d'autonomie** de `decupler-seo.config.yml` et des décisions de `memoire/decisions.md`.
+2. **Journaliser chaque modification avant la suivante** (`journal.py ajouter`), journal de run dès le démarrage.
+3. **Une routine ne reste jamais bloquée** : étape refusée → PR laissée ouverte, signalée, et la routine se termine.
+4. **Décider sur les données** (Search Console), jamais sur une impression.
+
 ## Étape 0 — Commune à tous les modes
 
 1. Lire `CLAUDE.md`, `decupler-seo.config.yml`, `memoire/decisions.md`,

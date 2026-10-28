@@ -15,6 +15,14 @@ Un projet = un dépôt **privé**. Il contient ce qui est propre au client
 dans `.claude/` — c'est la seule façon pour une routine cloud de l'utiliser,
 car elle ne charge pas les plugins installés via marketplace.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## 1. Tout demander en une fois
 
 Une seule liste de questions, pas un interrogatoire en dix messages :

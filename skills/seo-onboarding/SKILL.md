@@ -16,6 +16,14 @@ Votre travail ici : faire passer quelqu'un de « j'ai cloné un repo » à
 Règle absolue de ce skill : **ne jamais bloquer sur un outil manquant.**
 Il y a toujours quelque chose d'utile à faire avec ce qui est déjà là.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## 1. Diagnostiquer avant de parler
 
 ```bash

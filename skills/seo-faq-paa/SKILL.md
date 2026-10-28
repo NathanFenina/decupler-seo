@@ -16,6 +16,13 @@ effort/visibilité de la production de contenu.
 Une FAQ mal faite — cinq questions inventées auxquelles personne ne pense —
 n'occupe rien du tout.
 
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Livrer la FAQ rédigée**, même sans la page ni les chiffres du client (emplacements `[à confirmer : …]`).
+2. **4 à 6 questions** (8 à 12 sur un pilier), réponses de **40 à 80 mots** dont la première phrase répond seule.
+3. **Jamais de prix ou de délai inventé.**
+4. Le `FAQPage` reprend la FAQ visible **mot pour mot** (plus de résultat enrichi Google depuis le 07/05/2026 : utile seulement si la FAQ est réelle).
+
 ## Les 4 sources de questions (dans cet ordre)
 
 ### 1. People Also Ask — les questions que Google a validées

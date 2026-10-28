@@ -16,6 +16,24 @@ affichages enrichis. En 2026, il a une seconde fonction, plus importante :
 il dit aux moteurs IA qui est l'entité, ce qu'elle fait, et de quoi parle
 chaque page — sans ambiguïté possible.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Un seul `@graph` par page**, socle Organization + WebSite identique partout.
+2. **Tout fait balisé est visible** dans la page ; jamais de note sur sa propre organisation.
+3. **Logiciel cité = `Thing`**, jamais `SoftwareApplication` hors sujet principal.
+4. **Générer** (`schema_build.py`), **valider** (`schema_validate.py --strict`), jamais retoucher le JSON à la main.
+5. **QID depuis le registre**, jamais de mémoire.
+6. **Sans pouvoir lancer le script** (JSON collé, pas de shell) : appliquez à la main **chaque ligne** du tableau « Valider », hôte canonique compris, et livrez le graphe corrigé complet.
+
 ## L'architecture — deux couches, un seul graphe
 
 **Un seul `<script type="application/ld+json">` par page, avec un seul
@@ -223,6 +241,22 @@ Format de livraison :
    - **Nœuds présents** — type et `@id` de chaque nœud
    - **Données à confirmer** — ce qui manque, et qui peut le fournir
    - **Résultat du contrôle** — la sortie du script ci-dessous
+
+## Générer
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/schema_build.py" page.json --socle socle-global.json \
+  --entites memoire/entites.csv [--html] [--sortie page.jsonld]
+```
+
+Un petit fichier par page (type, URL, titre, fil d'Ariane, about, mentions,
+service ou article, FAQ — format en tête du script) ; le socle vient d'un
+seul fichier ; les entités se résolvent dans le registre (QID, sameAs). Le
+script refuse plus de 3 about, plus de 12 mentions, une entité dans les deux,
+un article sans date, auteur ou image, un fil qui ne part pas de l'accueil,
+une FAQ vide ; il place about/mentions sur le `BlogPosting` pour un article,
+puis valide le graphe produit (code 1 sur une erreur). On ne retouche pas le
+JSON à la main : on corrige le fichier de page et on régénère.
 
 ## Valider
 

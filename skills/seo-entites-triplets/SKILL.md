@@ -30,6 +30,22 @@ Le travail tient en trois couches, qui se contrôlent chacune par script :
 L'exemple fil rouge est fictif : **Atlas Conseil**, cabinet d'expertise
 comptable à Lyon.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Une seule valeur par sujet et prédicat sur tout le site** ; le registre fait foi, la page a tort.
+2. **QID inscrit seulement s'il est vérifié** ; sans élément Wikidata, le site officiel, jamais un QID voisin.
+3. **Chaque fait clé en phrase sujet → verbe → objet**, près du haut de la page.
+4. **Revérifier les QID chaque trimestre** (`triplets.py revalider`).
+
 ## 1. Le triplet — écrire des faits extractibles
 
 | Sujet | Prédicat | Objet |
@@ -278,7 +294,8 @@ niveaux d'autonomie de `CLAUDE.md` :
    candidat dont la description correspond au sens de la page (et, pour une
    organisation, dont P856 est son domaine). Sinon : inscrite sans QID,
    ligne dans `rapports/a-valider.md`. Un QID existant ne se remplace que
-   si Wikidata le signale fusionné.
+   si Wikidata le signale fusionné (`triplets.py revalider --ecrire`,
+   chaque trimestre).
 4. **Nouveau triplet au registre** : seulement avec une source officielle
    lue dans la session et la date du jour dans `date_verif`. Jamais une
    valeur modifiée sans source.

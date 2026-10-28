@@ -14,6 +14,22 @@ Ce qui ne se mesure pas ne s'améliore pas. Le share of model est au GEO ce
 que le suivi de positions est au SEO : l'indicateur qui dit si le travail
 paye.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Batterie figée** de questions d'acheteurs (on ajoute, on ne retire pas), sans nommer la marque pour la part de voix.
+2. **Au moins 3 exécutions par question et par moteur** : les réponses varient, une seule mesure est du bruit.
+3. **Part de voix = réponses où la marque est citée ÷ total**, par moteur, comparée au mois précédent et aux concurrents.
+4. Compléter par Search Console (rapport « Generative AI performance ») et Bing (« AI Performance »).
+
 ## 1. Construire la batterie de prompts
 
 **20 à 40 questions**, celles que pose réellement un acheteur. Pas vos

@@ -4,7 +4,8 @@ description: >
   Évalue et renforce les signaux E-E-A-T d'une page ou d'un site (expérience,
   expertise, autorité, confiance) selon les Quality Rater Guidelines : note
   /40, verdict et correctifs localisés. Déclencher sur « E-E-A-T », «
-  crédibilité », « YMYL », « page auteur », « signaux de confiance ».
+  crédibilité », « YMYL », « page auteur », « signaux de confiance », «
+  montrer que mes articles sont écrits par des experts », « article santé ».
 ---
 
 # E-E-A-T — prouver, pas déclarer
@@ -18,6 +19,14 @@ C'est aussi, en 2026, l'un des principaux critères de **citation par les
 LLM** : un modèle cite ce qu'il peut attribuer à quelqu'un d'identifiable.
 
 Notez sans complaisance. Un audit E-E-A-T indulgent ne sert à rien.
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
 
 ## Experience — l'expérience de première main (10 pts)
 

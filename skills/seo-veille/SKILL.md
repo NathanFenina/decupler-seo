@@ -4,9 +4,9 @@ description: >
   Surveillance continue d'un site (positions, indexation, erreurs, Core Web
   Vitals, liens perdus, mises à jour Google, concurrents) avec alerte et
   diagnostic ; veille vidéo par transcription YouTube. Déclencher sur « veille
-  », « surveillance », « alerte », « check quotidien », « dernières vidéos de
-  », « transcription YouTube ». Pour une chute déjà constatée →
-  seo-traffic-drop.
+  », « surveille mon site », « préviens-moi si », « chaque matin », « alerte
+  », « check quotidien », « dernières vidéos de », « transcription YouTube ».
+  Pour une chute déjà constatée → seo-traffic-drop.
 ---
 
 # Veille — détecter avant que ça coûte
@@ -18,6 +18,14 @@ raccourcir ce délai.
 Principe : **alerter peu, et toujours avec un diagnostic.** Une alerte qui
 dit « les positions ont baissé » sans dire lesquelles ni pourquoi sera
 ignorée au bout de la troisième.
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
 
 ## Ce qu'on surveille, et à quelle fréquence
 

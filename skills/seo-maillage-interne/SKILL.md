@@ -14,6 +14,22 @@ C'est la seule variable de ranking que vous contrôlez à 100 %, qui ne coûte
 rien, et qui produit un effet en 2-4 semaines. Et c'est celle que presque
 personne ne travaille sérieusement.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Liens contextuels**, dans le texte ; un lien de menu ou de pied de page ne compte presque pas.
+2. **Dosés selon la force de la page** (faible 4-5, moyenne 2-3, forte 1-2), pas un maximum.
+3. **Ancre exacte une seule fois**, sur la source la plus puissante ; ailleurs des ancres partielles ou par entité, jamais deux fois la même.
+4. **Corriger les ancres concurrentes** (le mot-clé envoyé vers une autre URL).
+
 ## Étape 1 — Cartographier
 
 ```bash

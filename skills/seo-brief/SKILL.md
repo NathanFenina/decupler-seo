@@ -27,6 +27,13 @@ Fichier produit, dans un projet : `recherche/briefs/<slug>.md`.
 « éventuellement ». Chaque ligne dit quoi faire : le rédacteur n'arbitre pas,
 il exécute.
 
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Livrer un brief exploitable même sans données** (mode dégradé signalé), jamais une question à sa place.
+2. **Carte des entités** (principale, très liées, contexte) et **apport d'information** propre, pas un résumé du top.
+3. **Réponse directe, H1, intro et FAQ rédigés** dans le brief ; verdicts tranchés.
+4. **Aucun chiffre sans source** (`n.d.` sinon).
+
 ## Étape 0 — les données avant le brief
 
 **Regardez la SERP avant d'écrire le brief** : c'est la différence entre un
@@ -75,14 +82,8 @@ branché (`/seo-doctor`).
    `--repli-dataforseo` la relit par DataForSEO (payant, coût affiché), ou
    lisez-la avec Firecrawl.
 
-   **Quelle source pour la SERP** — la première qui répond, dans cet ordre :
-
-   | Source | Ce qu'elle donne | Ce qui reste à relever |
-   |---|---|---|
-   | DataForSEO (`serp_concurrents.py`) | top 10, PAA, AI Overview et ses sources, features | rien |
-   | MCP Firecrawl (`firecrawl_search`, puis `firecrawl_scrape` sur le top 5, formats `markdown` + `html`) | top organique, pages rendues (JavaScript compris) | PAA, AI Overview, features : **non mesurés** |
-   | MCP Ubersuggest (`serp_analysis`, `locId` du pays) | top 10 avec trafic et autorité des domaines | PAA, AI Overview |
-   | Aucune | — | lecture manuelle de la SERP, signalée en tête du brief |
+   **Quelle source pour la SERP** : DataForSEO, puis Firecrawl, puis Ubersuggest, sinon
+   lecture manuelle signalée — ce que chacune donne : `references/brief-exploitable.md`.
 
    Avec Firecrawl, enregistrez les réponses (`serp.json`, `pages.json` :
    `[{"url", "html", "markdown"}]`) et passez-les au même script, qui
@@ -154,11 +155,7 @@ Consignez l'option retenue et sa raison en tête du brief.
 
 ## Contrainte de gabarit CMS
 
-Une page de service ou de catégorie vit dans un gabarit : blocs fixes (hero,
-réassurance, formulaire, CTA), emplacements limités. Le brief s'y plie.
-**Ce qui n'entre pas dans le gabarit ne se force pas** : un développement
-pédagogique trop long pour une page service devient un article de blog qui
-renvoie vers elle (décision DÉPLACER en section 9, ou ligne en section 17).
+Si la page passe par un gabarit CMS : règles dans `references/brief-exploitable.md`.
 
 ## Les 18 sections
 

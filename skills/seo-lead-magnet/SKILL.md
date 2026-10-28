@@ -17,6 +17,14 @@ trois paragraphes génériques. Ce skill fait l'inverse : **la page donne la
 méthode en entier, en clair**, et l'email s'échange contre ce qui se garde —
 le fichier, le kit, les modèles.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## 0. Cibler avant d'écrire
 
 1. **Le mot-clé principal** : sur une niche, les requêtes réelles de la page

@@ -438,3 +438,39 @@ class TestGabarit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRevaliderQids(unittest.TestCase):
+    def test_ok_redirige_supprime_et_ecriture(self):
+        import tempfile
+        from pathlib import Path
+        import triplets as T2
+        entites = [{"entite": "A", "qid": "Q1"}, {"entite": "B", "qid": "Q2"}, {"entite": "C", "qid": "Q3"},
+                   {"entite": "D", "qid": ""}]
+        reponse = {"entities": {
+            "Q1": {"id": "Q1", "labels": {"fr": {"value": "A"}}, "sitelinks": {"frwiki": {"title": "A b"}}},
+            "Q20": {"id": "Q20", "redirects": {"from": "Q2", "to": "Q20"}, "labels": {"fr": {"value": "B"}}},
+            "Q3": {"id": "Q3", "missing": ""}}}
+        r = T2.revalider_qids(entites, recuperer=lambda params: reponse)
+        statuts = {l["entite"]: (l["statut"], l["nouveau_qid"]) for l in r["lignes"]}
+        self.assertEqual(statuts, {"A": ("ok", ""), "B": ("redirige", "Q20"), "C": ("supprime", "")})
+        self.assertEqual(r["sans_qid"], ["D"])
+        self.assertEqual(r["lignes"][0]["wikipedia"], "https://fr.wikipedia.org/wiki/A_b")
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "entites.csv"
+            f.write_text("entite,type,qid,sameAs,definition,alias\n# commentaire\nB,Thing,Q2,,\"déf, avec virgule\",\n",
+                         encoding="utf-8")
+            self.assertEqual(T2.ecrire_qids_revalides(f, r["lignes"], "2026-10-28"), 1)
+            texte = f.read_text(encoding="utf-8")
+            self.assertIn("B,Thing,Q20,", texte)
+            self.assertIn('"déf, avec virgule"', texte)
+            self.assertIn("# Revérifié sur Wikidata le 2026-10-28", texte)
+            self.assertIn("# commentaire", texte)
+
+    def test_panne_reseau_dite(self):
+        import triplets as T2
+
+        def panne(params):
+            raise OSError("hors ligne")
+        r = T2.revalider_qids([{"entite": "A", "qid": "Q1"}], recuperer=panne)
+        self.assertIn("injoignable", r["erreur"])

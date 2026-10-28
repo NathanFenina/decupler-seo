@@ -25,6 +25,21 @@ Deux limites à connaître avant de commencer :
   ni Unipile) : la rédaction s'automatise, la publication reste manuelle
   (5 minutes). Seul le post d'annonce peut partir par API.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Rédiger l'article LinkedIn complet**, même sans la page source : angle propre, faits du client en `[à compléter : …]`, 2 à 3 liens vers le site ; la fiche de publication vient après, pas à la place.
+2. **Jamais une copie du blog** (pas de canonique sur LinkedIn) : même sujet, autre angle.
+3. **Aucun chiffre inventé.**
+
 ## Profil ou page entreprise
 
 | | Profil du dirigeant | Page entreprise |

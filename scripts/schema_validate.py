@@ -378,7 +378,8 @@ def valider(entites: list[dict], blocs: list | None = None, chemins: list[tuple]
             c("erreur", nom, f"dateModified ({fin}) antérieure à datePublished ({debut}).")
 
     # Un seul nœud page par URL : deux WebPage = deux pages qui se disputent l'identité.
-    pages = {n.get("@id") or id(n) for n in entites if set(types_de(n)) & TYPES_PAGE}
+    # La FAQ est un nœud séparé (#faq) dans la méthode : elle ne compte pas comme page.
+    pages = {n.get("@id") or id(n) for n in entites if set(types_de(n)) & (TYPES_PAGE - {"FAQPage", "QAPage"})}
     if len(pages) > 1:
         c("erreur", "WebPage", f"{len(pages)} nœuds de page (WebPage ou sous-type) : une URL = un seul nœud page. "
                                "Cause fréquente : une extension SEO et un balisage maison qui en posent chacun un.")

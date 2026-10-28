@@ -16,6 +16,14 @@ redirections a été fait après la mise en ligne, pas avant.**
 Ce skill sert autant à préparer une migration qu'à réparer celle qui vient
 de mal se passer.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Phase 1 — Inventaire de l'existant (avant tout)
 
 À faire **pendant que l'ancien site est encore en ligne**. Une fois éteint,

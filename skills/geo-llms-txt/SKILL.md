@@ -14,6 +14,14 @@ Avant d'optimiser le contenu pour les moteurs IA, il faut qu'ils puissent
 vous lire et savoir qui vous êtes. Ce skill traite ces deux préalables. Il
 se fait une fois, il sert partout.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## 1. Les crawlers IA dans robots.txt
 
 Décision à prendre consciemment, pas par réflexe.

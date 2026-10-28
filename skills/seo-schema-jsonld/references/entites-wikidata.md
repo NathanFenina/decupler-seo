@@ -40,11 +40,16 @@ migrez-le vers le CSV à la prochaine mise à jour.
 ## Re-vérification trimestrielle
 
 Les éléments Wikidata fusionnent, changent de description, sont supprimés.
-Chaque trimestre : relire chaque QID du registre avec `triplets.py wikidata`,
-comparer la description au sens de l'entité dans les pages. Un élément
-fusionné redirige vers un autre QID : remplacer dans le registre, puis
-`triplets.py verifier --strict` sur les pages signale chaque balisage resté
-sur l'ancien.
+Chaque trimestre : `triplets.py revalider` relit tous les QID du registre
+d'un coup (existe, fusionné, supprimé) avec libellé, description et page
+Wikipédia ; `--ecrire` remplace les QID fusionnés par leur cible et date la
+revérification dans le registre. Code 1 s'il reste un QID supprimé : à
+retirer ou remplacer à la main. Comparez ensuite la description au sens de
+l'entité dans les pages, puis `triplets.py verifier --strict` signale chaque
+balisage resté sur l'ancien QID. Wikidata répond 429 : relancer plus tard,
+ne jamais inscrire un QID approchant ; un concept mal couvert en français se
+cherche en anglais (`--langue en`) ; sans élément Wikidata, `sameAs` vers le
+site officiel, jamais un QID voisin.
 
 ## Choisir about ou mentions
 

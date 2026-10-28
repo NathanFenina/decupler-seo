@@ -13,6 +13,22 @@ Une réécriture de title prend dix minutes et produit un effet mesurable en
 deux semaines. Sur une page en position 6 avec 5 000 impressions, passer de
 2 % à 4 % de CTR, c'est 100 clics par mois pour dix minutes de travail.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Title de 50 à 60 caractères** en langage naturel, entité principale dans les 40 premiers, sans répéter le mot-clé ; marque en fin si elle apporte quelque chose.
+2. **Meta de 120 à 156 caractères**, bénéfice concret et preuve.
+3. **3 variantes de title, 2 de meta**, chacune mesurée, et **une recommandation argumentée**.
+4. Title, H1 et meta **alignés** ; jamais une promesse que la page ne tient pas.
+
 ## Où chercher les pages à traiter
 
 Search Console, 90 jours : les pages en position 3-10 dont le CTR est

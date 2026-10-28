@@ -17,6 +17,14 @@ site entier — quand les pages ne sont que des permutations de variables.
 Google n'évalue pas ces pages une par une. Il évalue le **lot**. Si 60 % du
 lot est vide, les 40 % utiles tombent avec.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Garde-fous
 
 ```bash

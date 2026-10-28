@@ -12,6 +12,21 @@ description: >
 Un rapport se lit. Un tableau de bord se regarde. Les deux sont utiles à des
 moments différents : le rapport explique, le tableau de bord alerte.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Un seul fichier HTML autonome**, sans dépendance, lisible clair et sombre.
+2. **Si l'écriture de fichier est impossible**, livrer le HTML complet dans la réponse, prêt à enregistrer — jamais une simple description.
+3. **Aucun chiffre inventé** : sans données, le gabarit part avec des emplacements `[à compléter]` et la liste des exports à fournir.
+
 ## Contraintes
 
 1. **Un seul fichier HTML.** Pas de CDN, pas de bibliothèque de graphiques,

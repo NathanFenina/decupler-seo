@@ -17,6 +17,14 @@ clic. La question n'est plus seulement « suis-je en position 3 » mais
 Bonne nouvelle : ce terrain est bien moins disputé que la SERP classique, et
 les leviers sont différents.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## Le score GEO sur 100
 
 ### Signaux d'autorité externe — 30 points

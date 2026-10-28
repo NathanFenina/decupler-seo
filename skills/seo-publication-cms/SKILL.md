@@ -13,6 +13,22 @@ description: >
 C'est l'étape où une erreur coûte le plus cher, parce qu'elle est visible
 publiquement et parfois irréversible.
 
+
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
+## L'essentiel — ce qui ne se négocie pas
+
+1. **Sauvegarde avant toute écriture**, brouillon par défaut, révision pour une page en ligne.
+2. **Sur WordPress, tout passe par `scripts/wp.py`.**
+3. **Vérifier après publication** (page en 200, indexable, balises), puis journaliser.
+4. **Site sans brouillon** (git, statique) : un contenu non validé part en `noindex` ou ne part pas.
+
 ## Étape 0 — Le garde-fou, systématiquement
 
 ```bash

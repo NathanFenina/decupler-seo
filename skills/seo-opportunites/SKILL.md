@@ -16,6 +16,14 @@ quel ordre**, pour ce client-là. Deux sites qui ont le même trafic n'ont pas
 les mêmes priorités : une requête « prix » vaut plus qu'une requête
 « définition » pour un cabinet, l'inverse pour un média.
 
+
+**Sans projet configuré, sans données ni accès** (dossier vide, pas de
+Search Console, pas d'outil web) : ne vous arrêtez pas sur une question.
+Livrez tout de suite ce qui ne dépend pas des données — la méthode appliquée
+au cas, un exemple rempli, le livrable type avec des emplacements
+`[à compléter : …]` — puis, en fin de réponse, la liste de ce qu'il faut
+fournir pour la version chiffrée. Aucun chiffre inventé.
+
 ## 1. Le lexique du client — une fois, puis à chaque nouveau service
 
 `memoire/lexique.csv`, une ligne par motif :
