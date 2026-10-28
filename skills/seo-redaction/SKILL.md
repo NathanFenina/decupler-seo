@@ -16,6 +16,19 @@ La question n'est pas « comment produire 1 500 mots optimisés ». C'est
 « qu'est-ce que ce texte apporte que les dix premiers résultats n'apportent
 pas ». Si vous n'avez pas de réponse, ne l'écrivez pas.
 
+## Ce qui ne se négocie pas, quelle que soit la longueur
+
+1. **Une FAQ termine toujours le texte** : 4 à 6 questions, et au moins 3
+   même pour un article court. S'il faut tenir une longueur, coupez le
+   milieu, jamais la FAQ.
+2. **Zéro chiffre inventé** : une donnée non vérifiée est attribuée à sa
+   source ou marquée « à vérifier » ; une donnée du client absente devient
+   `[à compléter : …]`.
+3. **Le mot-clé sans quota** : title, H1, première phrase ; les entités du
+   sujet couvertes partout ailleurs.
+4. **Livrer** : sans accès aux sources, le texte part en mode dégradé
+   signalé, jamais une question à la place du texte.
+
 ## Règle zéro — chercher avant d'écrire
 
 N'écrivez pas depuis les seules connaissances du modèle quand les sources
@@ -108,6 +121,7 @@ courantes → comparatif ou cas → FAQ (questions réelles) → CTA.
   un Hn, sinon ni Google ni un LLM ne le lit comme tel.
 - Pas de saut de niveau (H2 → H4 interdit).
 - **5 à 8 H2**, 2 à 3 H3 au plus par H2. Au-delà, la page traite deux sujets.
+- **Le dernier H2 avant le CTA est la FAQ**, même dans un texte court.
 - **H2 formulé en question**, suivi d'une **réponse directe de 1 à 3
   phrases** avant tout développement : c'est ce qu'extraient le featured
   snippet et les LLM.

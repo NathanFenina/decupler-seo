@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 3.17.2 — rédaction stabilisée
+
+- `seo-redaction` : les règles non négociables (FAQ même sur un texte
+  court, zéro chiffre inventé, mot-clé sans quota, livrer en mode dégradé)
+  remontées en tête du skill ; la FAQ, demandée seulement à la ligne 421,
+  disparaissait des articles courts. Évaluation : 1 réussite sur 3 avant,
+  3 sur 3 après (correcteur unanime) ; 1,00 avec le plugin contre 0,00 sans.
+
 ## 3.17.1 — corrections trouvées par les évaluations
 
 - 13 cas d'évaluation (5 nouveaux : maillage d'une page faible, rédaction
