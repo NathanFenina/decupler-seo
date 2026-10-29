@@ -12,6 +12,16 @@ comparaison à Claude seul) et les cas **couverture** (`couv-*`, tag
 `couverture`) : un par skill, qui vérifient qu'il se déclenche et livre
 quelque chose d'utile même sans projet configuré ni données.
 
+Troisième famille : les cas **projet** (`projet-*`, tag `projet`), qui
+jouent le vrai parcours avec les scripts sur un mini-projet fictif
+(`_projet-test/`, plombier inventé, copié dans l'espace de travail) :
+score on-page avant/après, maillage entrant, JSON-LD généré et validé. Ils
+demandent `--scaffold --allow-tools Bash Write` :
+
+```bash
+claude plugin eval . --tag projet --runs 1 --ablation none --scaffold --allow-tools Bash Write
+```
+
 Le coût affiché est une estimation au tarif public de l'API ; avec un
 abonnement Claude, il ne se paie pas en euros mais consomme le quota d'usage.
 

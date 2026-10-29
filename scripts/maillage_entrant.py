@@ -221,6 +221,11 @@ def analyser(liens: list[dict], cible: str, mot_cle: str, entites: list[str] | N
     for i, x in enumerate(retenus):
         x["ancre"] = file[i] if i < len(file) else f"[ancre par entité liée à « {mot_cle} »]"
         x["priorite"] = "haute" if i == 0 else "moyenne" if i < 3 else "basse"
+    # Une ancre concurrente redirigée vers la cible ferait une 2e ancre exacte : on la change.
+    porteur = next((x["source"] for x in retenus if x["ancre"] == mot_cle), None)
+    for e in concurrentes:
+        e["consigne"] = (f"changer l'ancre, sans la rediriger vers la cible : l'ancre exacte va sur {porteur}"
+                         if porteur else "changer l'ancre (la cible porte déjà l'ancre exacte) ou retirer le lien")
 
     return {"cible": cible, "mot_cle": mot_cle,
             "force_cible": round(force_cible, 2), "niveau": niveau, "liens_a_ajouter": nombre,
@@ -241,7 +246,7 @@ def afficher(r: dict) -> None:
               + ", ".join(f"{k} {v}" for k, v in sorted(r["diversite_ancres"].items())))
     print(f"\n─── 2. Ancres concurrentes : {len(r['ancres_concurrentes'])} ───")
     for e in r["ancres_concurrentes"]:
-        print(f"  « {e['ancre'][:60]} »  {e['source']} → {e['cible']}  (retirer ou changer l'ancre)")
+        print(f"  « {e['ancre'][:60]} »  {e['source']} → {e['cible']}\n    → {e['consigne']}")
     print(f"\n─── 3. Opportunités ({len(r['opportunites'])}) ───")
     for x in r["opportunites"]:
         trafic = f"{x['clics']:.0f} clics / {x['impressions']:.0f} impr." if x["clics"] or x["impressions"] else "—"

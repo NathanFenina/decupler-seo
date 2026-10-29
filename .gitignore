@@ -66,3 +66,6 @@ desktop.ini
 
 # Résultats des évaluations
 evals/results/
+
+# Mini-projet fictif des évaluations : ses CSV font partie du test
+!evals/_projet-test/**/*.csv

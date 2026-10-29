@@ -72,8 +72,8 @@ ATTENDUES_METHODE = {
 DEPRECIES = {
     "HowTo": "Rich result déprécié en septembre 2023. Le balisage reste valide "
              "mais n'affiche plus rien dans Google.",
-    "FAQPage": "Rich result restreint depuis août 2023 aux sites gouvernementaux "
-               "et de santé reconnus. Reste utile pour les moteurs IA.",
+    "FAQPage": "Rich results FAQ retirés de Google le 7 mai 2026. Le balisage reste valide "
+               "et lisible par les autres moteurs ; ne rien promettre en affichage.",
     "SpecialAnnouncement": "Déprécié en juillet 2025.",
 }
 

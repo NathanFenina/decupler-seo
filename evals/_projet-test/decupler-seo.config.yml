@@ -1,0 +1,12 @@
+mode: assisted
+projet:
+  nom: "Exemple Plomberie"
+  domaine: "https://exemple-plomberie.fr"
+  pays_cible: FR
+  langues: [fr]
+regles:
+  interdits: []
+  mot_cle_occurrences_min:
+  densite_max_pct: 3
+publication:
+  mode: cms

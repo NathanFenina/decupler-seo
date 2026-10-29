@@ -1,0 +1,8 @@
+url,statut,profondeur,title,h1,indexable
+https://exemple-plomberie.fr/,200,0,Exemple Plomberie Lyon,Plombier chauffagiste à Lyon,True
+https://exemple-plomberie.fr/pompe-a-chaleur/,200,1,Nos solutions de chauffage,Chauffage écologique,True
+https://exemple-plomberie.fr/blog/cop-pompe-a-chaleur/,200,1,COP d'une pompe à chaleur : comprendre le rendement,Le COP d'une pompe à chaleur,True
+https://exemple-plomberie.fr/blog/guide-chauffage/,200,1,Guide du chauffage de la maison,Guide du chauffage,True
+https://exemple-plomberie.fr/blog/aides-renovation/,200,2,Aides à la rénovation énergétique,Les aides à la rénovation,True
+https://exemple-plomberie.fr/blog/chaudiere-gaz/,200,2,Remplacer une chaudière gaz,Remplacer sa chaudière gaz,True
+https://exemple-plomberie.fr/guide-pac/,200,2,Guide pompe à chaleur,Guide de la pompe à chaleur,True

@@ -53,7 +53,23 @@ def racine(url: str) -> str:
     return f"{u.scheme}://{u.netloc}/"
 
 
+# L'organisation du socle porte souvent un sous-type précis (Plumber, Dentist…) :
+# on la reconnaît par ces types, ou par un @id en #organization.
+TYPES_ORGANISATION = {"Organization", "LocalBusiness", "Corporation", "ProfessionalService", "NGO",
+                      "EducationalOrganization", "MedicalOrganization", "OnlineBusiness", "OnlineStore",
+                      "Store", "HomeAndConstructionBusiness", "Plumber", "Electrician", "HVACBusiness",
+                      "RoofingContractor", "GeneralContractor", "HousePainter", "Locksmith", "Dentist",
+                      "Physician", "LegalService", "Attorney", "Notary", "AccountingService",
+                      "FinancialService", "RealEstateAgent", "Restaurant", "Hotel", "AutoRepair",
+                      "BeautySalon", "HealthAndBeautyBusiness", "SportsActivityLocation"}
+
+
 def id_socle(socle: list[dict], type_: str) -> str | None:
+    if type_ == "Organization":
+        for n in socle:
+            if TYPES_ORGANISATION & set(V.types_de(n)) or str(n.get("@id", "")).endswith("#organization"):
+                return n.get("@id")
+        return None
     return next((n.get("@id") for n in socle if type_ in V.types_de(n)), None)
 
 
@@ -136,7 +152,8 @@ def construire(page: dict, socle: list[dict], registre: list[dict] | None = None
         service = {"@type": "Service", "@id": f"{base}#service", "name": s["nom"],
                    "serviceType": s.get("type") or s["nom"], "provider": {"@id": org}}
         if s.get("zone"):
-            service["areaServed"] = {"@type": "City", "name": s["zone"]}
+            e = T.trouver(s["zone"], registre)      # la ville du registre porte son QID
+            service["areaServed"] = T.noeud_entite(e) if e else {"@type": "City", "name": s["zone"]}
         if s.get("categorie"):
             service["category"] = entites_noeuds([s["categorie"]], registre, "category", avis)[0]
         graphe.append(service)

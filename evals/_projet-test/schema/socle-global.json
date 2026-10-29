@@ -1,0 +1,22 @@
+[
+ {
+  "@type": "Plumber",
+  "@id": "https://exemple-plomberie.fr/#organization",
+  "name": "Exemple Plomberie",
+  "url": "https://exemple-plomberie.fr/",
+  "logo": {
+   "@type": "ImageObject",
+   "@id": "https://exemple-plomberie.fr/#logo",
+   "url": "https://exemple-plomberie.fr/logo.png"
+  }
+ },
+ {
+  "@type": "WebSite",
+  "@id": "https://exemple-plomberie.fr/#website",
+  "name": "Exemple Plomberie",
+  "url": "https://exemple-plomberie.fr/",
+  "publisher": {
+   "@id": "https://exemple-plomberie.fr/#organization"
+  }
+ }
+]

@@ -1,0 +1,32 @@
+{
+ "url": "https://exemple-plomberie.fr/plombier-lyon/",
+ "type": "service",
+ "titre": "Plombier à Lyon",
+ "fil": [
+  [
+   "Accueil",
+   "https://exemple-plomberie.fr/"
+  ],
+  [
+   "Plombier à Lyon",
+   "https://exemple-plomberie.fr/plombier-lyon/"
+  ]
+ ],
+ "about": [
+  "Plomberie"
+ ],
+ "mentions": [
+  "Lyon"
+ ],
+ "service": {
+  "nom": "Dépannage plomberie",
+  "type": "Plomberie",
+  "zone": "Lyon"
+ },
+ "faq": [
+  [
+   "Le devis est-il gratuit ?",
+   "Oui, le devis est gratuit et remis avant toute intervention."
+  ]
+ ]
+}

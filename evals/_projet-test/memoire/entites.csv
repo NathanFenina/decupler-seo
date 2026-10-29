@@ -1,0 +1,5 @@
+entite,type,qid,sameAs,definition,alias
+Lyon,City,Q456,https://fr.wikipedia.org/wiki/Lyon,Ville où intervient l'entreprise,
+Pompe à chaleur air-eau,Thing,,,Système de chauffage qui capte les calories de l'air extérieur pour chauffer l'eau du circuit,PAC air-eau
+Plomberie,Thing,,,Métier de l'installation et de l'entretien des réseaux d'eau,
+Exemple Plomberie,Organization,,https://exemple-plomberie.fr/#organization,Entreprise de plomberie et chauffage fictive à Lyon,

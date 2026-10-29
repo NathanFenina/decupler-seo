@@ -1,0 +1,42 @@
+schema_version: "1.1"
+name: projet-onpage-reel
+description: "Parcours réel : optimiser une page d'un projet configuré en mesurant avec onpage_score.py"
+tags: [projet, durci]
+runs: 1
+context:
+  scaffold_script: preparer.sh
+execution:
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Bash, Write]
+  prompt: |
+    Le projet est configuré dans ce dossier (decupler-seo.config.yml, memoire/, donnees/).
+    Optimise la page contenus/pompe-a-chaleur.html sur le mot-clé « pompe à chaleur air-eau ».
+    Mesure le score avant et après, puis écris la version corrigée dans contenus/pompe-a-chaleur-optimisee.html.
+graders:
+  - name: skill-onpage
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?seo-optimisation-onpage"'
+  - name: script-mesure
+    type: tool_used
+    tool: Bash
+    input_match: 'onpage_score\.py'
+    min: 2
+  - name: livrable-ecrit
+    type: file_exists
+    path: contenus/pompe-a-chaleur-optimisee.html
+  - name: pas-de-quota
+    type: regex
+    pattern: 'densit[ée] (?:cible|id[ée]ale)|1[,.]5 ?% ?(?:à|-) ?2[,.]5 ?%|\d+ (?:fois|occurrences) minimum'
+    flags: i
+    match: not_contains
+  - name: resultat
+    type: llm
+    criteria: |
+      PASS si la réponse : (1) donne un score avant et un score après issus de l'outil, le second nettement supérieur ;
+      (2) identifie la sur-optimisation (répétition du mot-clé, malus) et la corrige au lieu d'ajouter des occurrences ;
+      (3) met le mot-clé ou une formulation très proche dans le title et le H1 ;
+      (4) ajoute des notions du sujet absentes (par exemple COP, aides, émetteurs ou dimensionnement) ;
+      (5) n'invente aucun chiffre présenté comme un fait sur l'entreprise (prix, années, nombre de chantiers) ou les signale comme à confirmer.
+      FAIL si l'un de ces points manque ou si un tarif ou une statistique est inventé et présenté comme vrai.

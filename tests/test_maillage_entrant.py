@@ -71,6 +71,8 @@ class TestAnalyse(unittest.TestCase):
         ancres = [o["ancre"] for o in r["opportunites"]]
         self.assertEqual(ancres.count("pompe à chaleur"), 1)          # l'exacte une seule fois
         self.assertEqual(len(ancres), len(set(ancres)))              # jamais deux fois la même
+        consigne = r["ancres_concurrentes"][0]["consigne"]
+        self.assertIn("sans la rediriger", consigne)                  # sinon 2 ancres exactes
 
     def test_pas_d_exacte_si_deja_portee_en_contenu(self):
         liens = self.liens + [lien("/blog/chaudiere/", "/pompe-a-chaleur/", "pompe à chaleur")]

@@ -49,6 +49,21 @@ class TestConstruire(unittest.TestCase):
         self.assertNotIn("about", webpage)
         self.assertEqual([c for c in B.valider(doc) if c["gravite"] == "erreur"], [])
 
+    def test_socle_en_sous_type_de_localbusiness(self):
+        socle = [{**SOCLE[0], "@type": "Plumber", "address": {"@type": "PostalAddress", "addressLocality": "Lyon"},
+                  "telephone": "+33400000000"}, SOCLE[1]]
+        doc, _ = B.construire(page(), socle, REGISTRE)
+        service = next(n for n in doc["@graph"] if n["@type"] == "Service")
+        self.assertEqual(service["provider"], {"@id": f"{S}/#organization"})
+
+    def test_zone_resolue_dans_le_registre(self):
+        registre = REGISTRE + [{"entite": "Lyon", "type": "City", "qid": "Q456", "sameAs": [],
+                                "definition": "", "alias": []}]
+        doc, _ = B.construire(page(), SOCLE, registre)
+        service = next(n for n in doc["@graph"] if n["@type"] == "Service")
+        self.assertEqual(service["areaServed"]["@type"], "City")
+        self.assertIn("https://www.wikidata.org/wiki/Q456", service["areaServed"]["sameAs"])
+
     def test_refus(self):
         cas = [page(about=["a", "b", "c", "d"]), page(mentions=["Plomberie"]),
                page(type="article", service=None, article={"publie": "2026-10-01"}),

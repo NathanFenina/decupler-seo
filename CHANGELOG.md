@@ -1,5 +1,25 @@
 # Journal des versions
 
+## 3.18.1 — le vrai parcours testé sur un projet fictif
+
+- **3 évaluations « projet »** (`evals/projet-*`, tag `projet`) : un
+  mini-projet de plombier inventé (`evals/_projet-test/`) est copié dans
+  l'espace de travail, et Claude doit faire le travail avec les scripts —
+  score on-page avant/après et page réécrite, maillage entrant, JSON-LD
+  généré et validé. Les 3 réussissent (coût estimé du passage : ~1,50 $).
+- **Corrigé grâce à elles** :
+  - `schema_build.py` refusait un socle dont l'organisation porte un
+    sous-type précis (Plumber, Dentist…), pourtant recommandé par la
+    méthode ; la zone desservie d'un service reprend désormais la ville du
+    registre avec son QID.
+  - `maillage_entrant.py` : une ancre concurrente doit être **changée**,
+    pas redirigée vers la page cible (sinon deux ancres exactes) ; l'outil
+    le dit et nomme la source qui porte l'ancre exacte.
+  - `seo-maillage-interne` lance l'outil avant de doser au lieu d'estimer
+    la force de la page à l'œil.
+  - `schema_validate.py` : message FAQPage à jour (résultats enrichis FAQ
+    retirés de Google le 7 mai 2026).
+
 ## 3.18.0 — tous les skills testés, générateur JSON-LD, revérification Wikidata
 
 - **58 évaluations, une au moins par skill** (`evals/couv-*`, tag

@@ -1,0 +1,39 @@
+{
+ "rows": [
+  {
+   "keys": [
+    "https://exemple-plomberie.fr/"
+   ],
+   "clicks": 120,
+   "impressions": 4000
+  },
+  {
+   "keys": [
+    "https://exemple-plomberie.fr/blog/cop-pompe-a-chaleur/"
+   ],
+   "clicks": 85,
+   "impressions": 6200
+  },
+  {
+   "keys": [
+    "https://exemple-plomberie.fr/blog/guide-chauffage/"
+   ],
+   "clicks": 40,
+   "impressions": 2100
+  },
+  {
+   "keys": [
+    "https://exemple-plomberie.fr/pompe-a-chaleur/"
+   ],
+   "clicks": 3,
+   "impressions": 900
+  },
+  {
+   "keys": [
+    "https://exemple-plomberie.fr/blog/chaudiere-gaz/"
+   ],
+   "clicks": 2,
+   "impressions": 300
+  }
+ ]
+}
