@@ -297,9 +297,52 @@ signerait, pas un score.
 `controle_contenu.py` bloque déjà les tics les plus fréquents ; les
 expressions propres au projet vont dans `regles.interdits`.
 
+### La ponctuation et les remarques qui trahissent un texte généré
+
+Ce sont les deux signes que les lecteurs (et les clients) repèrent en
+premier. Par défaut, ils sont **à zéro** ; seul un projet dont les pages
+écrites par le client les emploient (`memoire/style.md`, exception
+consignée dans `memoire/decisions.md`) les garde, au même dosage.
+
+- **Zéro tiret cadratin (—)**, et pas de demi-cadratin (–) comme
+  ponctuation. On réécrit la phrase, on ne remplace pas le signe à
+  l'aveugle : une incise passe entre parenthèses (ou entre virgules si elle
+  est courte) ; une explication ou une conséquence prend un deux-points ou
+  un point ; un ajout en « et », « mais », « donc », « sans » prend une
+  virgule ; un libellé suivi de sa description prend un deux-points ; une
+  cellule de tableau vide reçoit le mot juste (« Aucun », « Absent ») ; un
+  séparateur de titre devient « : » ou « | ». Jamais deux deux-points dans
+  la même phrase. Les plages de nombres (« 10–20 ») restent permises,
+  « 10 à 20 » se lit mieux.
+- **Pas de remarque méta sur la source ou sa validation** : « le client
+  n'a pas confirmé », « (à confirmer) », « données Search Console du …
+  uniquement », « ceci n'est pas une capture réelle », « chiffres à
+  l'appui ». Une donnée non validée n'est pas sur la page ; une donnée
+  validée s'écrit comme un fait, avec sa période dans la phrase quand la
+  période change son sens.
+- **Un fait de `memoire/faits.md` s'écrit comme un fait** : sans « d'après
+  le fondateur », « selon le client », « déclaration de », « sans capture
+  publiée », « non publié », « on ne publie pas ». Une donnée absente ne
+  s'annonce pas : la phrase disparaît. Citer une **source publique
+  externe** (« selon l'étude GEO de Princeton », « d'après la documentation
+  de Google ») reste une bonne pratique : c'est une preuve, pas une
+  précaution.
+- **Pas de formule de franchise** : « et je le dis », « nous te le
+  dirons », « autant le dire », « je l'écris noir sur blanc ». Le fait seul,
+  ou le geste concret.
+
+**Le style vit dans le dépôt du projet.** Cette méthode ne garde que le
+générique. La voix d'un client (adresse, rythme, expressions, exceptions)
+se mesure et se consigne dans son dépôt : `memoire/style.md` (avec sa
+section « Lecture » remplie à la main), `memoire/marque.md`, les
+expressions interdites dans `regles.interdits`, et, quand il le faut, un
+skill d'écriture propre au projet (`.claude/skills/projet-…`). Ce skill
+projet complète celui-ci, il ne le remplace pas.
+
 Les marqueurs d'humain, à cultiver : une opinion assumée avec sa raison ;
 un exemple précis, daté, chiffré, vécu ; la mention de ce qui **ne marche
-pas** ou de ce qu'on ne sait pas ; un contre-argument honnête. Ce dernier
+pas** ou de ce que la méthode ne couvre pas (une limite du sujet, jamais une
+remarque sur la source d'un chiffre) ; un contre-argument honnête. Ce dernier
 point est le plus efficace : « cette méthode ne convient pas si vous êtes
 dans ce cas » rend un texte immédiatement plus crédible.
 
