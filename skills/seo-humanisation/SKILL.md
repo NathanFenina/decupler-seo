@@ -31,7 +31,7 @@ fournir pour la version chiffrée. Aucun chiffre inventé.
 ## L'essentiel — ce qui ne se négocie pas
 
 1. **Ne touchez jamais au fond** : aucun fait, chiffre ou exemple ajouté ; le contrôle avant / après bloque tout chiffre apparu.
-2. **Retirez les tics** (formules toutes faites, triades, tirets cadratins, ton promo, conclusions-résumés) sans appauvrir le sens.
+2. **Retirez les tics** (formules toutes faites, triades, tirets cadratins, remarques méta sur la source, formules d'attribution ou de franchise, ton promo, conclusions-résumés) sans appauvrir le sens.
 3. **Alignez sur `memoire/style.md`** quand il existe.
 4. **Livrez le texte réécrit**, puis la liste des changements.
 
@@ -76,6 +76,10 @@ Avant de réécrire, lire `memoire/style.md` (mesuré par `style_maison.py`) :
 - **Expressions** : reprendre celles qui portent la marque, pas celles du
   catalogue ci-dessous.
 - **Section « Lecture »** : registre, traits de voix, à faire, à éviter.
+
+Le style vit **dans le dépôt du projet** (`memoire/style.md`, `memoire/marque.md`,
+`regles.interdits`, un skill `projet-…` d'écriture si besoin) ; ce skill ne
+garde que le générique et s'aligne sur ce que le projet consigne.
 
 Sans `memoire/style.md` : `memoire/marque.md` et `projet.ton` de la config.
 Un texte « humain » générique n'est pas l'objectif ; un texte que le client
@@ -220,9 +224,14 @@ dit ; sinon, `[À COMPLÉTER : par quoi commencer]`.)
 
 ### 3. Ponctuation
 
-- **Tirets cadratins (—)** pour relier deux idées, plusieurs fois par
-  paragraphe. En français courant : virgule, deux-points, parenthèses ou
-  point.
+- **Tirets cadratins (—)**, et demi-cadratins (–) employés comme
+  ponctuation : **zéro par défaut**, même un seul ; c'est le signe que les
+  lecteurs repèrent en premier. On réécrit la phrase : incise entre
+  parenthèses (ou virgules si elle est courte), explication après un
+  deux-points ou un point, ajout en « et / mais / donc / sans » après une
+  virgule, cellule de tableau vide remplacée par le mot juste. Seule
+  exception : un client dont les propres pages en emploient
+  (`memoire/style.md`, décision consignée).
 - **Deux-points en cascade** : « Résultat : un constat : il faut agir. »
 - **Emojis** dans un contenu éditorial (🚀, ✅, 💡).
 
@@ -283,6 +292,25 @@ le source (`memoire/faits.md`) ou on le retire.
 > programmer.
 
 Une précaution utile (une limite réelle, une condition légale) se garde.
+
+- **Remarques méta sur la source** : « le client n'a pas confirmé »,
+  « (à confirmer) », « données Search Console du … uniquement », « ceci
+  n'est pas une capture réelle », « chiffres à l'appui ». Le lecteur n'a
+  pas à voir la cuisine : une donnée non validée sort du texte, une donnée
+  validée s'écrit comme un fait.
+- **Formules d'attribution et de franchise** sur un fait de la mémoire du
+  projet : « d'après le fondateur », « selon le client », « déclaration
+  de », « sans capture publiée », « non publié », « et je le dis »,
+  « autant le dire ». Une source publique externe citée (« selon la
+  documentation de Google ») n'est pas visée : c'est une preuve.
+
+> **Avant** : D'après le fondateur, qui suit le compte, l'entreprise
+> réalise 10 interventions par jour (chiffre à confirmer).
+>
+> **Après** : L'entreprise réalise aujourd'hui 10 interventions par jour.
+>
+> (Seulement si le chiffre est dans `memoire/faits.md` ; sinon la phrase
+> disparaît.)
 
 ### 7. Ouvertures et fermetures génériques
 

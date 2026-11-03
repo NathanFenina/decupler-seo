@@ -297,9 +297,17 @@ signerait, pas un score.
 `controle_contenu.py` bloque déjà les tics les plus fréquents ; les
 expressions propres au projet vont dans `regles.interdits`.
 
+### Tirets et remarques méta : à zéro par défaut (détail : `seo-humanisation`)
+
+- **Zéro tiret cadratin (—)** : réécrire la phrase (parenthèses, deux-points, point, virgule).
+- **Pas de remarque méta ni de formule d'attribution** (« (à confirmer) », « n'a pas confirmé »,
+  « d'après le fondateur », « non publié ») : un fait de `memoire/faits.md` s'écrit comme un fait.
+- **Le style vit dans le dépôt du projet** (`memoire/style.md`, skill `projet-…`) ; ici, le générique.
+
 Les marqueurs d'humain, à cultiver : une opinion assumée avec sa raison ;
 un exemple précis, daté, chiffré, vécu ; la mention de ce qui **ne marche
-pas** ou de ce qu'on ne sait pas ; un contre-argument honnête. Ce dernier
+pas** ou de ce que la méthode ne couvre pas (une limite du sujet, jamais une
+remarque sur la source d'un chiffre) ; un contre-argument honnête. Ce dernier
 point est le plus efficace : « cette méthode ne convient pas si vous êtes
 dans ce cas » rend un texte immédiatement plus crédible.
 

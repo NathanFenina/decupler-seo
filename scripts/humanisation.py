@@ -57,7 +57,8 @@ CONSEILS = {
     "structures": "Garder une énumération quand il y a vraiment trois choses ; dire Y directement "
                   "plutôt que « ce n'est pas X » ; une question au plus, suivie de sa réponse ; "
                   "titres en minuscules à la française.",
-    "ponctuation": "Remplacer le tiret cadratin par une virgule, des parenthèses ou un point ; "
+    "ponctuation": "Zéro tiret cadratin : réécrire la phrase (parenthèses pour une incise, deux-points "
+                   "ou point pour une explication, virgule devant « et / mais / donc ») ; "
                    "un deux-points par phrase au plus ; aucun emoji dans un contenu éditorial.",
     "mise_en_forme": "Transformer les puces « **Terme** : explication » en phrases ; "
                      "le gras pour un mot qu'on doit voir, pas pour chaque début de ligne.",
@@ -313,7 +314,8 @@ def famille_ponctuation(lignes, base) -> dict:
             emojis += 1
             sig.append(signal("ponctuation", n, _extrait(l, m.start(), m.end(), 15), "emoji"))
     t1000, d1000 = tirets / base, deux_points / base
-    intensite = (0.6 * _borne((t1000 - 1) / 5) + 0.4 * _borne((d1000 - 5) / 12)
+    # Le premier tiret compte : zéro tiret cadratin par défaut (un seul se voit).
+    intensite = (0.6 * _borne(t1000 / 3 + (0.15 if tirets else 0)) + 0.4 * _borne((d1000 - 5) / 12)
                  + 0.1 * cascades + 0.15 * emojis)
     return {"intensite": _borne(intensite), "signaux": sig,
             "detail": {"tirets_cadratins": tirets, "tirets_pour_1000_mots": round(t1000, 1),

@@ -85,8 +85,8 @@
       ]
     },
     "ton": {
-      "libelle": "Ton promotionnel et précautions excessives",
-      "conseil": "Dire ce que la chose fait, à l'indicatif. Une précaution utile se garde, une précaution réflexe se coupe.",
+      "libelle": "Ton promotionnel, précautions excessives et remarques méta sur la source",
+      "conseil": "Dire ce que la chose fait, à l'indicatif. Une précaution utile se garde, une précaution réflexe se coupe. Une remarque sur la source ou la validation d'un chiffre (« à confirmer », « non publié », « d'après le fondateur ») sort du texte : le fait validé s'écrit comme un fait.",
       "motifs": [
         {"motif": "\\bn'hésitez (?:pas|plus)\\b"},
         {"motif": "\\b(?:idéale?s?|parfaite?s?) pour\\b", "poids": 0.5},
@@ -105,7 +105,18 @@
         {"motif": "\\bdans une certaine mesure\\b"},
         {"motif": "\\bil semblerait que\\b"},
         {"motif": "\\bil est possible que\\b", "poids": 0.5},
-        {"motif": "\\bpermet(?:tent)? (?:de|d')\\b", "poids": 0.5}
+        {"motif": "\\bpermet(?:tent)? (?:de|d')\\b", "poids": 0.5},
+        {"motif": "\\bn['’]a pas (?:encore )?(?:été )?confirmée?s?\\b", "poids": 1},
+        {"motif": "\\(à confirmer\\)", "poids": 1},
+        {"motif": "\\b(?:données|chiffres?|relevés?)\\b[^.\\n]{0,60}\\b(?:Search Console|GSC|GA4|Analytics)\\b[^.\\n]{0,40}\\buniquement\\b", "poids": 1},
+        {"motif": "\\bce n['’]est pas (?:la|une) capture\\b", "poids": 1},
+        {"motif": "\\bchiffres? à l['’]appui\\b", "poids": 1},
+        {"motif": "\\bsans capture publiée\\b", "poids": 1},
+        {"motif": "\\bnon publiée?s?\\b", "poids": 1},
+        {"motif": "\\b(?:on|nous|je) ne (?:les |le |la |l['’])?publi(?:e|ons) pas\\b", "poids": 1},
+        {"motif": "\\bdéclarations? d(?:e|u) (?:fondateur|dirigeant|client)\\b", "poids": 1},
+        {"motif": "\\bet (?:je|nous|on) le (?:dis|disons|dit)\\b", "poids": 1},
+        {"motif": "\\bautant le dire\\b", "poids": 1}
       ]
     },
     "ouverture_cloture": {
