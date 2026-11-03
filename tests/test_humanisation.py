@@ -131,6 +131,27 @@ class TestScore(unittest.TestCase):
         crucial = [s for s in r["signaux"] if s["raison"] == "« crucial »"]
         self.assertEqual(crucial[0]["ligne"], 3)
 
+    def test_un_seul_tiret_cadratin_compte(self):
+        texte = ("Le volume ne compense plus la médiocrité — il l'amplifie. Une page lente perd ses "
+                 "visiteurs avant qu'ils lisent la première ligne. On corrige la vitesse, puis le "
+                 "contenu, page par page, en commençant par celles qui reçoivent déjà des visites. "
+                 "Le reste attend son tour.")
+        r = H.analyser(texte, "txt", self.marqueurs)
+        self.assertEqual(r["familles"]["ponctuation"]["detail"]["tirets_cadratins"], 1)
+        self.assertGreater(r["familles"]["ponctuation"]["points"], 0)
+        sans = H.analyser(texte.replace(" — ", " : "), "txt", self.marqueurs)
+        self.assertEqual(sans["familles"]["ponctuation"]["points"], 0)
+
+    def test_remarques_meta_sur_la_source_relevees(self):
+        texte = ("Le client réalise dix interventions par jour (à confirmer). Le dirigeant n'a pas "
+                 "confirmé les dates. Données Search Console du 18/09 uniquement. Le cas est "
+                 "présenté sans capture publiée, chiffres à l'appui.")
+        r = H.analyser(texte, "txt", self.marqueurs)
+        self.assertGreaterEqual(r["familles"]["ton"]["detail"]["occurrences"], 5)
+        propre = H.analyser("Le client réalise dix interventions par jour, du lundi au samedi.",
+                            "txt", self.marqueurs)
+        self.assertEqual(propre["familles"]["ton"]["detail"]["occurrences"], 0)
+
     def test_titre_a_l_anglaise(self):
         self.assertTrue(H.titre_a_l_anglaise("Comment Choisir Son Expert-Comptable"))
         self.assertFalse(H.titre_a_l_anglaise("Créer une société en Arabie Saoudite"))
