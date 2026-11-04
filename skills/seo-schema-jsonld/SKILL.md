@@ -294,6 +294,20 @@ manuelle — la première cause de pénalité liée aux données structurées. U
 prix balisé égale la valeur du registre (`memoire/triplets.csv`) ;
 `triplets.py coherence` trouve les pages où le texte dit autre chose.
 
+
+### Contrôler le HTML servi, page par page
+
+`schema_validate.py` vérifie la syntaxe et le graphe. Sur un site en production, quatre contrôles
+de plus attrapent des erreurs que l'outil de test de Google ne signale pas, et se lancent après chaque
+mise en ligne (`scripts/schema_pages.py --urls <url> --org-id <id> --personne-id <id>`) :
+
+| Contrôle | Pourquoi |
+|---|---|
+| Une seule `FAQPage` par page, et chaque `Question.name` présent mot pour mot dans le texte visible | deux sources (extension SEO + bloc maison) produisent des doublons ; une question absente du texte est une donnée structurée trompeuse |
+| `areaServed` typé selon la zone : `City` pour une commune, `AdministrativeArea` pour un département ou une région, `Country` pour un pays | un gabarit de pages villes déclare facilement un département en ville |
+| Organisation et Personne du site toujours en `@id`, jamais redéfinies ni écrites en objet dans `provider`, `author`, `publisher` | une deuxième Organisation casse la réconciliation d'entité |
+| `sameAs` vivants (un élément Wikidata supprimé reste servi par une extension) ; 403, 429, 999 = non vérifiable | un sameAs mort affaiblit l'entité qu'il devait renforcer |
+
 ## L'état des types en 2026
 
 | Type | Statut | Note |

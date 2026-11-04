@@ -65,6 +65,26 @@ fournir pour la version chiffrée. Aucun chiffre inventé.
 Moins de 5 axes gagnés → la page n'est pas prête. Dites-le, et dites ce
 qui manque, plutôt que de publier une page « correcte ».
 
+## Veille mensuelle — le benchmark ne s'arrête pas à la publication
+
+Le top 5 bouge (relevés de projets : aucun domaine commun entre deux tops pris à quelques semaines
+d'écart). Le premier cycle de chaque mois, sur les 10 pages qui rapportent le plus
+(`projet.pages_prioritaires`), on relève de nouveau le top 5 du mot-clé et on remplit une grille
+par page concurrente dans `recherche/veille/<AAAA-MM>.md` :
+
+| Axe | Ce qu'on note |
+|---|---|
+| Design | structure du hero, blocs visuels (carte, comparatif, process, simulateur), photos ou illustrations, rythme des sections |
+| UX | sommaire et ancres, lisibilité mobile, formulaire, téléphone cliquable, temps pour trouver le prix ou le contact |
+| CRO | nombre de CTA, places, libellés, preuves près des CTA (avis, logos, chiffres), offres ou formules affichées, outil gratuit en appel |
+| SEO | title, H1, plan H2, longueur, FAQ, questions « Autres questions posées » traitées, maillage vers les pages sœurs |
+| Technique | types JSON-LD, FAQPage, vitesse ressentie, poids et `alt` des images, canonique |
+
+Chaque bonne idée entre, datée et avec l'URL source, dans le skill de rédaction du projet
+(`.claude/skills/projet-*`) : c'est ainsi que le skill s'améliore de mois en mois. Une idée qui demande
+un nouveau bloc devient une action de la page de suivi ; une idée déjà mieux appliquée chez nous ne
+s'ajoute pas. Le style et les exemples restent dans le dépôt du projet, jamais dans la méthode.
+
 ## Garde-fous
 
 - **Ne jamais copier.** S'inspirer d'une structure, écrire mieux.
