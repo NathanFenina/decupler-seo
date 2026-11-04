@@ -25,6 +25,7 @@ import re
 import socket
 import unicodedata
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
 from html.parser import HTMLParser
@@ -712,6 +713,7 @@ def verifier_url(url: str) -> None:
 def telecharger(url: str, delai: float = 15.0, langue: str = "fr") -> tuple[str, str]:
     """(HTML, URL finale). Lève PageIllisible si la page ne se lit pas : jamais d'exception brute."""
     verifier_url(url)
+    url = urllib.parse.quote(url, safe=":/?#[]@!$&'()*+,;=%~")  # une URL accentuée ferait échouer la requête
     requete = urllib.request.Request(url, headers={"User-Agent": AGENT, "Accept": "text/html,application/xhtml+xml",
                                                    "Accept-Language": f"{langue},en;q=0.5"})
     try:

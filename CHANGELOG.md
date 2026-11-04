@@ -1,5 +1,34 @@
 # Journal des versions
 
+## 3.19.0 — copywriting : des pages qui donnent envie d'appeler
+
+- **Nouveau skill `seo-copywriting`** : écrire ou réécrire une page
+  commerciale (offre, service, formation, landing) qui convainc sans perdre
+  le SEO. Le texte imposé par le client (programme, mentions obligatoires)
+  reste mot pour mot ; tout le reste est retravaillé à partir du top 5 :
+  carte de persuasion, bénéfices et scènes métier, preuves réelles près des
+  CTA, objections, trois appels à l'action au moins, zéro vente par la
+  négative. Formules, libellés de CTA et exemples avant / après dans
+  `references/`, grille de relecture à voix haute en dix questions.
+- **`copywriting.py`** : score /100 d'une page (.md ou .html) sur ce qui se
+  mesure — tirets cadratins, orientation lecteur (vous / nous), négations,
+  rythme, tournures explicatives (« permet de », « afin de »), promesses
+  creuses, nombre et place des CTA, accroche — avec les lignes à reprendre.
+- **`serp_concurrents.py`** :
+  - Google masque désormais certains liens du classement
+    (`google.com/goto?url=…`) : le domaine vient du fil d'Ariane, l'URL du
+    dernier relevé DataForSEO Labs (~0,0003 $). Avant, ces pages comptaient
+    comme « google.com » et n'étaient pas lues ;
+  - `--top 5` veut dire 5 pages **lues** : une page bloquée cède sa place à
+    la suivante du classement ;
+  - `--brouillon page.md` : le gap sémantique d'une page pas encore en ligne
+    (termes, sujets, questions du top absents du brouillon) ;
+  - une URL accentuée ne fait plus échouer la lecture (`_contenu.py`).
+- `seo-benchmark` lit les 5 meilleures pages (au lieu de 3), avec
+  `serp_concurrents.py`.
+- Évaluation `copywriting-page-offre` : texte rendu vendeur, mention
+  obligatoire intacte, aucune preuve inventée.
+
 ## 3.18.1 — le vrai parcours testé sur un projet fictif
 
 - **3 évaluations « projet »** (`evals/projet-*`, tag `projet`) : un

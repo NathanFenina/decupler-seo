@@ -8,7 +8,7 @@ Une méthode qui audite, corrige, rédige, publie — puis **mesure si ça a mar
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-yellow)](LICENSE)
 [![Français](https://img.shields.io/badge/langue-fran%C3%A7ais-blue)](#)
 
-55 skills · 15 agents · 44 scripts Python (le cœur sans aucune dépendance) · 15 MCP préconfigurés · 17 SOP · 521 tests · 58 évaluations
+56 skills · 15 agents · 45 scripts Python (le cœur sans aucune dépendance) · 15 MCP préconfigurés · 17 SOP · 531 tests · 59 évaluations
 
 > **Par où commencer ?** [Prise en main pas à pas](docs/PRISE-EN-MAIN.md) : le plugin en
 > 15 minutes, votre premier projet en 1 heure, ou rejoindre un projet comme prestataire, avec ce que
@@ -206,14 +206,14 @@ Search Console se lit aussi en direct, sans intermédiaire, avec
 ## La méthode
 
 <details>
-<summary><b>54 skills</b>, en 8 familles</summary>
+<summary><b>56 skills</b>, en 8 familles</summary>
 
 | Famille | Skills |
 |---|---|
 | **Diagnostic et technique** | `seo-onboarding` · `seo-audit-360` · `seo-technique-autofix` · `seo-crawl-architecture` · `seo-core-web-vitals` · `seo-indexation` · `seo-audit-contenu` · `seo-migration` · `seo-veille` |
 | **Données Search Console** | `seo-gsc-analyses` — 21 analyses : content decay, gagnants et perdants, requêtes émergentes, saisonnalité, cannibalisation, pages à créer… |
 | **Recherche et stratégie** | `seo-opportunites` · `seo-cartographie` · `seo-quick-wins` · `seo-keyword-research` · `seo-competitor-gap` · `seo-benchmark` · `seo-cocon-semantique` · `seo-serp-analysis` · `seo-traffic-drop` |
-| **Contenu** | `seo-brief` · `seo-redaction` · `seo-humanisation` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` · `seo-lead-magnet` |
+| **Contenu** | `seo-brief` · `seo-redaction` · `seo-humanisation` · `seo-copywriting` · `seo-optimisation-onpage` · `seo-meta-serp` · `seo-faq-paa` · `seo-eeat` · `seo-comparatifs` · `seo-lead-magnet` |
 | **Structure et échelle** | `seo-design-pages` · `seo-page-builder-html` · `seo-programmatique` · `seo-maillage-interne` · `seo-schema-jsonld` · `seo-entites-triplets` · `seo-hreflang-i18n` · `seo-images` |
 | **GEO — moteurs IA** | `geo-visibilite-ia` · `geo-citation-tracker` · `geo-llms-txt` · `geo-share-of-model` · `geo-linkedin` |
 | **Autorité** | `seo-netlinking` · `seo-reddit-communautes` · `seo-local` · `seo-digital-pr` |

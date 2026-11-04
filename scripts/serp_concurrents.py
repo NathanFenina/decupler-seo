@@ -20,6 +20,12 @@
    termes présents sur au moins la moitié du top.
 4. Avec --url (ou projet.domaine) : la page du client lue de la même façon,
    et ce qui lui manque face au top — sujets, termes, questions, longueur.
+   Avec --brouillon page.md : la même comparaison sur une page pas encore en
+   ligne (le gap sémantique d'un brouillon avant publication).
+
+Google masque parfois les liens du classement (google.com/goto?url=…) : le
+domaine vient alors du fil d'Ariane et l'URL du dernier relevé DataForSEO Labs
+du même mot-clé (~0,0003 $) ; une page introuvable reste listée, non lue.
 
 Sans DataForSEO (repli documenté dans `seo-brief`) : la SERP vient d'une
 recherche Firecrawl enregistrée (--serp-firecrawl, top organique seulement :
@@ -76,6 +82,51 @@ def domaine(url: str) -> str:
     return h[4:] if h.startswith("www.") else h
 
 
+def lien_masque(url: str | None) -> bool:
+    """Lien de redirection Google (google.com/goto?url=…) : il ne mène pas à la page sans navigateur."""
+    u = urlparse(url or "")
+    return (u.hostname or "").endswith("google.com") and u.path.startswith("/goto")
+
+
+def url_du_fil(fil: str) -> str:
+    """L'URL reconstruite depuis le fil d'Ariane (« https://site.fr › dossier › page »), si elle n'est pas tronquée."""
+    morceaux = [m.strip() for m in fil.split("›")]
+    if not morceaux or not morceaux[0].startswith("http"):
+        return ""
+    if len(morceaux) == 1:
+        return morceaux[0]
+    chemin = morceaux[1:]
+    if any(m.endswith(("...", "…")) or " " in m for m in chemin):
+        return ""  # tronqué ou libellé (« Articles ») : pas une URL fiable
+    return morceaux[0].rstrip("/") + "/" + "/".join(chemin)
+
+
+def demasquer(organique: list[dict], mot: str, lieu_code: int | None, langue: str) -> float:
+    """Remplace les liens masqués par l'URL connue de DataForSEO Labs (dernier relevé du même mot-clé, même domaine).
+
+    Coût : ~0,0003 $. Un lien qui reste introuvable garde son domaine et sort en « non lu ».
+    """
+    a_faire = [o for o in organique if o.get("masque") and o["domaine"]]
+    if not a_faire:
+        return 0.0
+    tache = {"keyword": mot, "language_code": langue}
+    tache.update({"location_code": lieu_code} if lieu_code else {"location_name": "France"})
+    try:
+        res, cout = demande.appel("dataforseo_labs/google/historical_serps/live", [tache])
+    except demande.ErreurAPI:
+        return 0.0
+    connues: dict[str, list[str]] = {}
+    for instantane in (res[0].get("items") or [])[:3] if res else []:
+        for x in instantane.get("items") or []:
+            if x.get("type") == "organic" and x.get("url"):
+                connues.setdefault(domaine(x["url"]), []).append(x["url"])
+    for o in a_faire:
+        candidates = connues.get(o["domaine"]) or []
+        if not o["url"] and candidates:
+            o["url"] = candidates[0]
+    return cout
+
+
 def _references(objet) -> list[dict]:
     refs = []
     if isinstance(objet, dict):
@@ -98,8 +149,14 @@ def lire_serp(resultats: list[dict]) -> dict:
         for it in r.get("items") or []:
             t = it.get("type")
             if t == "organic":
-                organique.append({"rang": it.get("rank_group"), "url": it.get("url"),
-                                  "domaine": domaine(it.get("url")) or it.get("domain"),
+                url, fil = it.get("url"), it.get("breadcrumb") or ""
+                if lien_masque(url):  # Google masque certains liens (google.com/goto) : le fil d'Ariane garde le site
+                    organique.append({"rang": it.get("rank_group"), "url": url_du_fil(fil), "masque": True,
+                                      "domaine": domaine(fil.split(" ")[0]) or "",
+                                      "titre": it.get("title") or "", "description": it.get("description") or ""})
+                    continue
+                organique.append({"rang": it.get("rank_group"), "url": url,
+                                  "domaine": domaine(url) or it.get("domain"),
                                   "titre": it.get("title") or "", "description": it.get("description") or ""})
             elif t == "people_also_ask":
                 questions += [q.get("title") for q in it.get("items") or [] if q.get("title")]
@@ -647,8 +704,11 @@ def main() -> int:
     ap.add_argument("--langue", help="fr, en, ar…")
     ap.add_argument("--pays", help="code ISO, défaut : projet.pays_cible")
     ap.add_argument("--lieu", help="nom de lieu DataForSEO, pour un pays hors liste")
-    ap.add_argument("--top", type=int, default=5, help="pages concurrentes à lire (défaut 5, max 10)")
+    ap.add_argument("--top", type=int, default=5, help="pages concurrentes lisibles à lire (défaut 5, max 10) : "
+                    "une page bloquée est remplacée par la suivante du classement")
     ap.add_argument("--url", help="page du client à comparer (sinon : celle de projet.domaine si elle ranke)")
+    ap.add_argument("--brouillon", help="page du client encore en brouillon (.md ou .html) : comparée au top à la place "
+                    "de la page en ligne ; --url donne alors son adresse finale")
     ap.add_argument("--repli-dataforseo", action="store_true",
                     help="relire par DataForSEO les pages illisibles (payant)")
     ap.add_argument("--serp-json", help="réponse SERP DataForSEO déjà enregistrée (évite de repayer l'appel)")
@@ -684,13 +744,21 @@ def main() -> int:
                                                + lire_questions(Path(a.questions).read_text(encoding="utf-8"))))
     relevees = lire_pages_json(json.loads(Path(a.pages_json).read_text(encoding="utf-8"))) if a.pages_json else {}
 
+    if any(o.get("masque") for o in serp["organique"]):
+        cout += demasquer(serp["organique"], a.mot, None, langue)
+        masques = [o for o in serp["organique"] if o.get("masque")]
+        print(f"  liens masqués par Google : {len(masques)}, retrouvés : {sum(1 for o in masques if o['url'])}",
+              file=sys.stderr)
     dom_client = domaine(a.url) if a.url else domaine(lire_valeur("projet.domaine"))
     url_client = a.url or next((o["url"] for o in serp["organique"] if dom_client and o["domaine"] == dom_client),
                                None)
-    cibles = [o for o in serp["organique"] if not (dom_client and o["domaine"] == dom_client)][:max(1, min(a.top, 10))]
+    cibles = [o for o in serp["organique"] if o["url"] and not (dom_client and o["domaine"] == dom_client)]
+    voulu = max(1, min(a.top, 10))
 
     pages, echecs = [], []
-    for o in cibles:
+    for o in cibles:  # on lit jusqu'à `voulu` pages lisibles : une page bloquée cède sa place à la suivante
+        if len(pages) >= voulu:
+            break
         page, raison, c = lire_page(o["url"], langue, a.repli_dataforseo, relevees)
         cout += c
         if c:
@@ -704,7 +772,12 @@ def main() -> int:
               f"{page['mots'] if page else 0} mots{'' if not raison else ' (' + raison + ')'}", file=sys.stderr)
 
     client = None
-    if url_client:
+    if a.brouillon:
+        brut = Path(a.brouillon).read_text(encoding="utf-8")
+        adresse = url_client or f"https://{dom_client or 'brouillon.local'}/"
+        client = (C.lire_html(brut, adresse) if a.brouillon.endswith((".html", ".htm"))
+                  else C.lire_markdown(brut, adresse))
+    elif url_client:
         client, raison, c = lire_page(url_client, langue, a.repli_dataforseo, relevees)
         cout += c
         if raison:

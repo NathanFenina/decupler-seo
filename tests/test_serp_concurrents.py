@@ -402,3 +402,27 @@ class TestOccurrencesDuTop(unittest.TestCase):
     def test_occurrences_exactes(self):
         self.assertEqual(S.occurrences_exactes("La pompe à chaleur. Une Pompe a chaleur air-eau.", "pompe à chaleur"), 2)
         self.assertEqual(S.occurrences_exactes("texte", ""), 0)
+
+
+class LiensMasques(unittest.TestCase):
+    """Google masque parfois les liens du classement (google.com/goto) : le site vient du fil d'Ariane."""
+
+    def test_lien_masque_reconnu(self):
+        self.assertTrue(S.lien_masque("https://google.com/goto?url=CAESdQHr"))
+        self.assertFalse(S.lien_masque("https://www.exemple.fr/goto"))
+
+    def test_url_du_fil(self):
+        self.assertEqual(S.url_du_fil("https://www.exemple.fr › formations › formation-ia"),
+                         "https://www.exemple.fr/formations/formation-ia")
+        self.assertEqual(S.url_du_fil("https://www.exemple.fr › quelle-fo..."), "")
+        self.assertEqual(S.url_du_fil("https://www.exemple.fr › Articles › IA générative"), "")
+
+    def test_serp_masquee_garde_le_domaine(self):
+        serp = S.lire_serp([{"items": [
+            {"type": "organic", "rank_group": 1, "url": "https://google.com/goto?url=XYZ",
+             "breadcrumb": "https://www.exemple.fr › guide", "title": "Guide"},
+            {"type": "organic", "rank_group": 2, "url": "https://autre.fr/page", "title": "Page"}]}])
+        self.assertEqual(serp["organique"][0]["domaine"], "exemple.fr")
+        self.assertEqual(serp["organique"][0]["url"], "https://www.exemple.fr/guide")
+        self.assertTrue(serp["organique"][0]["masque"])
+        self.assertEqual(serp["organique"][1]["domaine"], "autre.fr")

@@ -1,4 +1,4 @@
-# Les 54 skills
+# Les 56 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -41,6 +41,7 @@ aussi l'appeler par son nom.
 | `seo-benchmark` | Les 3 meilleures pages concurrentes lues, grille « faire mieux » : 5 axes gagnés ou la page ne sort pas | « benchmark », « faire mieux que », avant toute page neuve |
 | `seo-redaction` | Rédaction SEO + GEO : anti-cannibalisation, thèse avant le plan, test anti-remplissage, sources vérifiées | « rédige », « écris un article » |
 | `seo-humanisation` | Dernière passe d'écriture : retire les tics d'écriture générée en français sans toucher au fond, dans le style mesuré du client ; score /100, comparatif avant/après qui bloque tout chiffre apparu | « humanise », « ça sonne IA », « enlève les tics IA », « détecteur IA » |
+| `seo-copywriting` | Page commerciale qui convainc et convertit sans perdre le SEO : top 5 lu, gap sémantique du brouillon, carte de persuasion, bénéfices et scènes métier, preuves réelles, CTA ; score /100 par `copywriting.py` | « plus vendeur », « copywriting », « page qui convertit » |
 | `seo-optimisation-onpage` | Note /100 par critère **puis réécrit** | « optimise cette page », « score SEO », « passe au vert » |
 | `seo-meta-serp` | 3 titles, 2 metas, aperçu SERP, comptage pixel | « title », « meta description », « CTR » |
 | `seo-faq-paa` | FAQ ciblant PAA, snippets et LLM, + schema | « FAQ », « People Also Ask » |

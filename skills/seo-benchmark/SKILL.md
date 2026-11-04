@@ -1,7 +1,7 @@
 ---
 name: seo-benchmark
 description: >
-  Avant de créer ou refondre une page, relève les 3 meilleures pages
+  Avant de créer ou refondre une page, relève les 5 meilleures pages
   concurrentes sur sa requête et fixe la grille « faire mieux » (battre la
   meilleure sur au moins 5 axes). Déclencher sur « benchmark de page », «
   faire mieux que », « meilleure page concurrente », et à chaque création de
@@ -38,7 +38,9 @@ fournir pour la version chiffrée. Aucun chiffre inventé.
 1. **SERP**, pour le mot-clé principal, **dans chaque langue du projet**
    (`decupler-seo.config.yml` → `projet.langues`) : top 5 organique et
    questions « Autres questions posées » (DataForSEO, Firecrawl, recherche web).
-2. **Lire réellement les 3 meilleures pages** (Firecrawl) et relever :
+2. **Lire réellement les 5 meilleures pages** : `serp_concurrents.py --mot "…" --url <URL>`
+   (avec `--brouillon page.md` pour une page pas encore en ligne : le gap sémantique du brouillon
+   face au top), sinon Firecrawl. Relever :
    - angle et promesse, structure Hn, profondeur (étapes, coûts, délais)
    - données chiffrées, leur source et leur date
    - outils : tableau, calculateur, checklist, modèle, visuel

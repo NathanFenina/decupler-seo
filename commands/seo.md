@@ -34,6 +34,7 @@ laissez jamais l'utilisateur devant un menu.
 | `brief` | `seo-brief` |
 | `article`, `rédige` | `seo-redaction` |
 | `humanise`, `ça sonne IA`, `tics IA`, `relis le style` | `seo-humanisation` |
+| `copywriting`, `plus vendeur`, `plus commercial`, `page qui convertit` | `seo-copywriting` |
 | `onpage`, `score`, `optimise` | `seo-optimisation-onpage` |
 | `meta`, `title` | `seo-meta-serp` |
 | `faq` | `seo-faq-paa` |

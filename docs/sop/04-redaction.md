@@ -2,7 +2,7 @@
 
 # SOP 4 · Rédaction
 
-**Skills** : `seo-redaction`, `seo-eeat`, `seo-humanisation` · **Commande** : `/seo article`
+**Skills** : `seo-redaction`, `seo-eeat`, `seo-humanisation`, `seo-copywriting` (page commerciale) · **Commande** : `/seo article`
 
 **Objectif** : Un texte qui se lit comme le tien, sourcé, sans remplissage, prêt à être cité.
 
