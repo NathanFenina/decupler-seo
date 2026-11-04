@@ -128,6 +128,18 @@ voir le prompt sans payer). Contrôle avant publication :
   sujet net, de l'espace autour ; **aucun texte incrusté, logo, filigrane
   ni élément d'interface** ; un seul style sur tout l'article (photo
   réaliste ou illustration, pas les deux).
+- **Le prompt d'une illustration générée**, dans cet ordre : sujet concret
+  (ce qu'on voit) ; cadrage (plan, angle, place laissée au texte) ;
+  lumière (naturelle, douce, direction) ; objectif (35 mm reportage,
+  50 mm, macro ; profondeur de champ) ; palette (celle de la charte du
+  site) ; style (photo éditoriale réaliste **ou** illustration plate,
+  jamais les deux) ; interdits écrits dans le prompt (aucun texte ni
+  logo, aucun visage réel ou reconnaissable, aucune marque, jamais
+  l'équipe, un client ou un lieu réel nommé : pour un lieu réel, une vraie
+  photo). Une image générée illustre, elle ne prouve jamais rien.
+- **Photo libre de droits** (Unsplash et équivalents) pour l'ambiance
+  d'un lieu ou d'un métier, crédit en légende, jamais présentée comme
+  l'équipe, un client ou les locaux du site.
 - **Sans génération disponible** : un emplacement et son brief plutôt
   qu'une photo de banque générique —
   `<!-- IMG 2 : schéma des trois étapes, du diagnostic à la réception -->`
