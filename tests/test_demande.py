@@ -47,3 +47,22 @@ class TestRepliDeMarche(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLienOrganique(unittest.TestCase):
+    """Liens masqués par Google (google.com/goto) : le vrai site vient du fil d'Ariane."""
+
+    def test_lien_normal(self):
+        self.assertEqual(demande.lien_organique({"url": "https://www.site.fr/page"}), ("https://www.site.fr/page", False))
+
+    def test_lien_masque_fil_complet(self):
+        it = {"url": "https://google.com/goto?url=CAES", "domain": "google.com",
+              "breadcrumb": "https://rdvartisans.fr › rdv › plombier-sanitaire › 69-rhone"}
+        self.assertEqual(demande.lien_organique(it), ("https://rdvartisans.fr/rdv/plombier-sanitaire/69-rhone", True))
+
+    def test_lien_masque_fil_tronque(self):
+        it = {"url": "https://google.com/goto?url=CAES", "breadcrumb": "https://www.site.fr › blog › prix-liposucci..."}
+        self.assertEqual(demande.lien_organique(it), ("https://www.site.fr/", True))
+
+    def test_lien_masque_sans_fil(self):
+        self.assertEqual(demande.lien_organique({"url": "https://google.com/goto?url=X", "breadcrumb": "Facebook · page"}), ("", True))

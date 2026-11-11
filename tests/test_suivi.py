@@ -51,3 +51,18 @@ class TestPrompts(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestPositionLienMasque(unittest.TestCase):
+    """Un lien google.com/goto reconstruit depuis le fil d'Ariane compte pour le bon domaine."""
+
+    def test_position_trouvee_page_inconnue(self):
+        organique = [{"rang": 1, "url": "https://autre.fr/x", "masque": False},
+                     {"rang": 2, "url": "https://www.client.fr/", "masque": True}]
+        pos = suivi.position_dans_serp(organique, "client.fr", "https://client.fr/service/")
+        self.assertEqual((pos["position"], pos["bonne_page"], pos["devant"]), (2, "?", "autre.fr"))
+
+    def test_position_page_exacte(self):
+        organique = [{"rang": 3, "url": "https://client.fr/service", "masque": True}]
+        pos = suivi.position_dans_serp(organique, "client.fr", "https://client.fr/service/")
+        self.assertEqual((pos["position"], pos["bonne_page"]), (3, "oui"))

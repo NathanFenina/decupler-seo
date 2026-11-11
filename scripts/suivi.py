@@ -72,8 +72,11 @@ def position_dans_serp(organique: list[dict], dom: str, url_cible: str = "") -> 
     for it in organique:
         d = domaine(it.get("url") or "")
         if d == dom or d.endswith("." + dom):
-            bonne = (not url_cible) or chemin(it["url"]) == chemin(url_cible)
-            return {"position": it.get("rang"), "url_classee": it["url"], "bonne_page": "oui" if bonne else "non",
+            if it.get("masque") and chemin(it["url"]) == "/" and url_cible:
+                bonne = "?"  # lien masqué par Google et fil d'Ariane tronqué : page exacte inconnue
+            else:
+                bonne = "oui" if (not url_cible) or chemin(it["url"]) == chemin(url_cible) else "non"
+            return {"position": it.get("rang"), "url_classee": it["url"], "bonne_page": bonne,
                     "devant": devant[0] if devant else ""}
         if d and d not in devant:
             devant.append(d)
@@ -190,7 +193,8 @@ def cmd_positions(a, racine: Path) -> int:
         for r in res:
             for it in r.get("items") or []:
                 if it.get("type") == "organic":
-                    organique.append({"rang": it.get("rank_group"), "url": it.get("url")})
+                    url, masque = demande.lien_organique(it)
+                    organique.append({"rang": it.get("rank_group"), "url": url, "masque": masque})
                 elif it.get("type") == "ai_overview":
                     aio = True
         pos = position_dans_serp(organique, dom, c.get("url", ""))

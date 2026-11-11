@@ -30,6 +30,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -169,6 +170,28 @@ def cmd_idees(a) -> dict:
     return {"lieu": lieu, "langue": langue, "graines": graines, "cout_usd": cout, "lignes": lignes}
 
 
+def lien_organique(it: dict) -> tuple[str, bool]:
+    """L'URL réelle d'un résultat organique DataForSEO, et si Google l'avait masquée.
+
+    Depuis novembre 2026, Google sert certains liens sous la forme google.com/goto?url=… :
+    `url` et `domain` valent alors google.com. Le vrai site se lit dans le fil d'Ariane
+    (« https://site.fr › dossier › page ») : URL complète s'il n'est pas tronqué, sinon la
+    racine du site, assez pour le domaine et la position (pas pour vérifier la page exacte).
+    """
+    url = it.get("url") or ""
+    u = urllib.parse.urlparse(url)
+    if not ((u.hostname or "").endswith("google.com") and u.path.startswith("/goto")):
+        return url, False
+    morceaux = [m.strip() for m in (it.get("breadcrumb") or "").split("›")]
+    if not morceaux or not morceaux[0].startswith("http"):
+        return "", True
+    racine = morceaux[0].split(" ")[0].rstrip("/")
+    chemin = morceaux[1:]
+    if chemin and not any(m.endswith(("...", "…")) or " " in m for m in chemin):
+        return racine + "/" + "/".join(chemin), True
+    return racine + "/", True
+
+
 def cmd_serp(a) -> dict:
     lieu, langue = lieu_et_langue(a)
     if not a.mot:
@@ -181,8 +204,9 @@ def cmd_serp(a) -> dict:
         for it in r.get("items") or []:
             t = it.get("type")
             if t == "organic":
-                organique.append({"rang": it.get("rank_group"), "url": it.get("url"), "titre": it.get("title"),
-                                  "description": it.get("description")})
+                url, masque = lien_organique(it)
+                organique.append({"rang": it.get("rank_group"), "url": url, "titre": it.get("title"),
+                                  "description": it.get("description"), **({"masque": True} if masque else {})})
             elif t == "people_also_ask":
                 questions += [q.get("title") for q in it.get("items") or [] if q.get("title")]
             elif t == "related_searches":

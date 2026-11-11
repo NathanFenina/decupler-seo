@@ -1,5 +1,21 @@
 # Journal des versions
 
+## 3.19.1 — liens masqués par Google dans `demande.py serp` et `suivi.py positions`
+
+Constat (11/11/2026) : Google sert désormais une partie des résultats sous la
+forme `google.com/goto?url=…`, et DataForSEO renvoie alors `google.com` comme
+URL et comme domaine. `serp_concurrents.py` savait déjà les démasquer ; ce
+n'était pas le cas de `demande.py serp` (concurrents affichés « google.com ») ni
+de `suivi.py positions` (le site du client n'était plus retrouvé : positions
+vides).
+
+- `demande.lien_organique()` : URL réelle reconstruite depuis le fil d'Ariane,
+  ou racine du site si le fil est tronqué ; utilisée par `demande.py serp` et
+  `suivi.py positions`.
+- `suivi.py` : un lien masqué au fil tronqué donne la position, avec
+  `bonne_page = ?` (page exacte inconnue) au lieu d'un faux « non ».
+- 6 tests.
+
 ## 3.19.0 — copywriting : des pages qui donnent envie d'appeler
 
 - **Nouveau skill `seo-copywriting`** : écrire ou réécrire une page
