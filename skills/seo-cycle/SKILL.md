@@ -76,6 +76,19 @@ cet ordre, et le consigne dans la page de suivi (skill `seo-pilotage`) :
 6. **Bilan de la semaine** dans l'onglet du mois : `pilotage.py mois` (résumé,
    wins mesurés, contenus avec leur lien Notion, reporting), republication, puis
    `pilotage.py sauvegarder` (copie `journal/pilotage.json` dans git).
+7. **Message de fin au pilote du projet** : une seule liste numérotée, sans
+   sections ni sous-listes, pour qu'il réponde point par point. Une phrase
+   d'ouverture donne le lien de la PR du bilan et dit où elle est inscrite
+   (« À décider »). Puis un point par sujet, toujours dans cet ordre :
+   contrôle du site, Search Console (28 et 7 jours, avec l'écart à la période
+   d'avant), mesure à J+28 (gains, pertes, neutres, en attente), GA4 (visites,
+   canaux IA, conversions), indexation, suivi IA (citations sur N réponses,
+   contre la semaine d'avant, et le coût du relevé), liens et contenus posés,
+   ce qui reste volontairement en pause, rappels datés (articles, relevés),
+   blocages de la méthode. Chaque point commence par son libellé en gras,
+   donne le chiffre puis sa comparaison, en une ou deux phrases. Les questions
+   qui attendent une réponse viennent en dernier, regroupées par page.
+   Un chiffre absent s'écrit « nécessite tel outil », jamais une estimation.
 
 Le détail de chaque étape est dans `routines/hebdo.md` du projet.
 
