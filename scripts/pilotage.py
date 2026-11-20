@@ -558,6 +558,10 @@ def cmd_ajouter(a) -> int:
             action[cle] = getattr(a, cle)
     if a.mois_cible:
         action["mois_cible"] = mois_valide(a.mois_cible)
+    if a.lot:                                         # lot de la semaine : affiché dans « Cette semaine à valider »
+        action["lot"] = date_valide(a.lot)
+        ouvrir_lot(p, action["lot"])
+        action["lot"] = max(action["lot"], p.get("lot_courant", ""))     # un lot déjà dépassé : le lot ouvert
     existante = next((x for x in p.setdefault("actions", []) if x["id"] == action["id"]), None)
     if existante:
         existante.update({k: v for k, v in action.items() if v})
@@ -566,6 +570,109 @@ def cmd_ajouter(a) -> int:
     etat["maj"] = date
     page.write_text(ecrire_etat(html, etat), encoding="utf-8")
     print(f"  ✓ {action['id']} [{a.statut}] {a.titre}")
+    return 0
+
+
+def date_valide(d: str) -> str:
+    try:
+        return dt.date.fromisoformat(d).isoformat()
+    except ValueError:
+        raise SystemExit(f"✗ date « {d} » : attendu AAAA-MM-JJ")
+
+
+def ouvrir_lot(p: dict, date: str) -> int:
+    """Ouvre le lot `date` s'il est plus récent que le lot courant. Ce qui attend encore une réponse
+    dans l'ancien lot (proposée ou bloquée) passe dans le nouveau : rien ne disparaît du bloc sans réponse."""
+    ancien = p.get("lot_courant", "")
+    if date <= ancien:
+        return 0
+    p["lot_courant"] = date
+    n = 0
+    for x in p.get("actions", []):
+        if ancien and x.get("lot") == ancien and x.get("statut") in ("proposee", "bloquee"):
+            x["lot"] = date
+            n += 1
+    return n
+
+
+def non_lues(p: dict) -> list[dict]:
+    """Remarques des humains pas encore lues par Claude : fil de chaque action, puis fil général."""
+    sortie = []
+    for x in p.get("actions", []):
+        for c in x.get("commentaires", []):
+            if c.get("de") != "Claude" and c.get("lu") is False:
+                sortie.append({"id": x["id"], "titre": x["titre"], "statut": x.get("statut"), "lot": x.get("lot", ""), **c})
+    for c in p.get("remarques", []):
+        if c.get("de") != "Claude" and c.get("lu") is False:
+            sortie.append({"id": "general", "titre": "Remarque générale", **c})
+    return sortie
+
+
+def cmd_lot(a) -> int:
+    """Ouvre (--date) ou ferme (--fermer) le lot de la semaine, et liste ce qu'il contient."""
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = _projet_existant(etat, a.projet_id)
+    if a.fermer:
+        p.pop("lot_courant", None)
+    elif a.date:
+        d = date_valide(a.date)
+        if d < p.get("lot_courant", ""):
+            raise SystemExit(f"✗ le lot ouvert ({p['lot_courant']}) est plus récent que {d}")
+        n = ouvrir_lot(p, d)
+        if n:
+            print(f"  {n} élément(s) sans réponse reporté(s) du lot précédent")
+    if a.fermer or a.date:
+        page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    lot = p.get("lot_courant")
+    if not lot:
+        print("  aucun lot ouvert")
+        return 0
+    actions = [x for x in p.get("actions", []) if x.get("lot") == lot]
+    if a.json:
+        print(json.dumps({"lot": lot, "actions": actions}, ensure_ascii=False, indent=1))
+        return 0
+    print(f"  lot du {lot} · {len(actions)} élément(s)")
+    for x in actions:
+        print(f"  [{x['statut']:<9}] {x['id']}  {x['titre']}" + (f"  → {x['note']}" if x.get("note") else ""))
+    return 0
+
+
+def cmd_remarques(a) -> int:
+    """Remarques non lues (fils des actions et fil général), à traiter puis à clore par `repondre`."""
+    p = _projet_existant(lire_etat(Path(a.html).read_text(encoding="utf-8")), a.projet_id)
+    r = non_lues(p)
+    if a.json:
+        print(json.dumps(r, ensure_ascii=False, indent=1))
+        return 0
+    for c in r:
+        print(f"  {c['id']}  {c.get('date', '')}  {c.get('de', '')} · {c['titre'][:70]}\n      « {c['texte']} »")
+    if not r:
+        print("  aucune remarque non lue")
+    return 0
+
+
+def cmd_repondre(a) -> int:
+    """Répond dans un fil (une action, ou « general ») et marque lues les remarques précédentes."""
+    page = Path(a.html)
+    html = page.read_text(encoding="utf-8")
+    etat = lire_etat(html)
+    p = _projet_existant(etat, a.projet_id)
+    if a.id == "general":
+        fil = p.setdefault("remarques", [])
+    else:
+        x = next((x for x in p.get("actions", []) if x["id"] == a.id), None)
+        if x is None:
+            raise SystemExit(f"✗ action {a.id} introuvable dans le projet {a.projet_id}")
+        fil = x.setdefault("commentaires", [])
+    for c in fil:
+        if c.get("de") != "Claude":
+            c["lu"] = True
+    if a.texte:
+        fil.append({"date": dt.date.today().isoformat(), "de": "Claude", "texte": a.texte, "lu": True})
+    page.write_text(ecrire_etat(html, etat), encoding="utf-8")
+    print(f"  ✓ {a.id} : remarques lues" + (" · réponse ajoutée" if a.texte else ""))
     return 0
 
 
@@ -589,6 +696,11 @@ def cmd_etat(a) -> int:
               + (f"  → {x['note']}" if x.get("note") else ""))
     if not actions:
         print("  aucune action" + (f" « {a.statut} »" if a.statut else ""))
+    n = len(non_lues(p))
+    if n:
+        print(f"  ⚠ {n} remarque(s) non lue(s) : pilotage.py remarques")
+    if p.get("lot_courant"):
+        print(f"  lot ouvert : {p['lot_courant']} (pilotage.py lot)")
     return 0
 
 
@@ -1048,7 +1160,26 @@ def main() -> int:
     p.add_argument("--qui", help="qui porte l'action (Claude, Nathan, consultant…) ; défaut : déduit du statut et d'--attend")
     p.add_argument("--mois-cible", help="AAAA-MM : mois de la roadmap où l'action est programmée")
     p.add_argument("--date", help="AAAA-MM-JJ : date de l'action (défaut : aujourd'hui), pour reprendre un historique")
+    p.add_argument("--lot", help="AAAA-MM-JJ : range l'action dans le lot de la semaine (bloc « Cette semaine à valider »)")
     p.set_defaults(f=cmd_ajouter)
+    p = sp.add_parser("lot", help="ouvrir, fermer ou lister le lot de la semaine")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--date", help="AAAA-MM-JJ : ouvre ce lot")
+    p.add_argument("--fermer", action="store_true")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(f=cmd_lot)
+    p = sp.add_parser("remarques", help="remarques et commentaires non lus, laissés dans la page")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(f=cmd_remarques)
+    p = sp.add_parser("repondre", help="répondre dans un fil (action ou « general ») et marquer les remarques lues")
+    p.add_argument("--html", required=True)
+    p.add_argument("--projet-id", required=True)
+    p.add_argument("--id", required=True, help="id de l'action, ou general")
+    p.add_argument("--texte", help="réponse de Claude (sans texte : marque seulement lu)")
+    p.set_defaults(f=cmd_repondre)
     p = sp.add_parser("etat", help="actions d'un projet")
     p.add_argument("--html", required=True)
     p.add_argument("--projet-id", required=True)
