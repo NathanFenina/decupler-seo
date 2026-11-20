@@ -145,8 +145,21 @@ button.pl-tuile:hover{border-color:var(--trait-fort);background:var(--creux)}
 .pl-btn.pl-oui{background:var(--cta);border-color:var(--cta);color:var(--cta-texte)}
 .pl-btn.pl-non{color:var(--non)}
 .pl-btn:disabled{opacity:.45;cursor:not-allowed}
-.pl-note{grid-column:1/-1;display:flex;gap:8px}
-.pl-note input{flex:1;min-width:0;font:inherit;font-size:.86rem;padding:7px 9px;border:1px solid var(--trait-fort);border-radius:4px;background:var(--fond);color:var(--encre)}
+.pl-note{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.pl-note input,.pl-note textarea{flex:1 1 16rem;min-width:0;font:inherit;font-size:.86rem;line-height:1.45;padding:7px 9px;border:1px solid var(--trait-fort);border-radius:4px;background:var(--fond);color:var(--encre)}
+.pl-note textarea{min-height:2.7em;resize:vertical}
+.pl-note-d{grid-column:1/-1}
+#app .pl-note-d>summary{font:600 .8rem var(--texte);color:var(--lien);cursor:pointer;margin:0}
+#app .pl-note-d[open]>summary{margin-bottom:8px}
+.pl-fil{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:6px}
+.pl-fil li{font-size:.86rem;line-height:1.45;padding:7px 10px;border-radius:4px;background:var(--creux);color:var(--encre);overflow-wrap:anywhere}
+.pl-fil li[data-de="claude"]{background:var(--accent-doux)}
+.pl-fil b{display:block;font:600 .7rem var(--texte);letter-spacing:.05em;text-transform:uppercase;color:var(--doux);margin-bottom:2px}
+.pl-fil li[data-lu="non"] b::after{content:" · non lue";color:var(--attente)}
+.pl-bloc.pl-lot{border-left:3px solid var(--accent)}
+.pl-lot .pl-entete h2{flex:1 1 auto}
+.pl-remarque{display:grid;gap:8px;border-top:1px dashed var(--trait);padding-top:12px}
+#app .pl-lot details>summary{list-style-position:inside}
 .pl-groupe{display:grid;gap:8px;min-width:0}
 .pl-groupe+.pl-groupe{border-top:1px dashed var(--trait);padding-top:12px}
 .pl-groupe>details{border-top:1px solid var(--trait);padding-top:8px}
@@ -345,6 +358,18 @@ const gainNum=a=>{const m=/\d+/.exec(String(a.gain||"").replace(/\s/g,""));retur
 function dire(msg){const z=document.getElementById("enreg");if(z)z.textContent=msg}
 function aller(v,f){vue=v;if(f){Object.assign(filtres,{q:"",chantier:"",statut:"",mois:"",qui:""},f)}defiler=true;try{localStorage.setItem("pilotage-vue",v)}catch(e){}rendre()}
 
+/* ── Remarques et commentaires : un fil par action, et un fil général par projet (p.remarques).
+   Chaque message : {date, de, texte, lu}. Claude répond avec pilotage.py repondre. ── */
+function noter(cible,texte,p){const t=String(texte||"").trim();if(!t)return false;(cible.commentaires=cible.commentaires||[]).push({date:aujourdhui,de:decideur(p),texte:t,lu:false});return true}
+function fil(liste){const c=liste||[];if(!c.length)return null;
+  return el("ul",{class:"pl-fil"},...c.map(x=>el("li",{"data-de":x.de==="Claude"?"claude":"humain","data-lu":x.de!=="Claude"&&x.lu===false?"non":"oui"},
+    el("b",{texte:(x.de||"")+(x.date?" · "+dateCourte(x.date):"")}),bidi(x.texte))))}
+function zoneNote(a,p,ouverte){
+  const ta=el("textarea",{id:"note-"+a.id,rows:"2",placeholder:"Remarque ou commentaire pour Claude","aria-label":"Remarque pour "+a.titre});
+  const envoyer=el("button",{class:"pl-btn",type:"button",texte:"Envoyer la remarque",onclick:()=>{if(noter(a,ta.value,p)){programmer();rendre();dire("Remarque en cours d'enregistrement…")}else ta.focus()}});
+  const z=el("div",{class:"pl-note"},ta,envoyer);
+  return ouverte?z:el("details",{class:"pl-note-d"},el("summary",{texte:(a.commentaires||[]).length?"Répondre":"Commenter"}),z);
+}
 /* ── Cartes d'action (boutons Valider / Refuser et remarque) ── */
 function carteAction(a,p){
   const li=el("li",{class:"pl-action","data-statut":a.statut,id:"action-"+a.id});
@@ -356,16 +381,16 @@ function carteAction(a,p){
     el("span",{class:"pl-statut",texte:(LIBELLES[a.statut]||a.statut)+(a.maj?" · "+dateCourte(a.maj):"")}));
   const corps=el("div",{class:"pl-corps"},el("div",{class:"pl-titre"},bidi(a.titre)),a.pourquoi?el("div",{class:"pl-meta"},bidi(a.pourquoi)):null,
     a.statut==="bloquee"&&a.attend?el("div",{class:"pl-attend",texte:"En attente : "+a.attend}):null,meta,
-    a.note?el("div",{class:"pl-meta",texte:"Remarque : "+a.note}):null,lien(a.lien,"Voir le résultat"));
+    a.note&&!(a.commentaires||[]).length?el("div",{class:"pl-meta",texte:"Remarque : "+a.note}):null,lien(a.lien,"Voir le résultat"),fil(a.commentaires));
   const b=el("div",{class:"pl-boutons"});
   if(FIGEE){li.append(corps);return li}
-  const changer=s=>()=>{const n=document.getElementById("note-"+a.id);if(n&&n.value.trim())a.note=n.value.trim();a.statut=s;if(s!=="bloquee")delete a.attend;a.maj=aujourdhui;programmer();rendre()};
+  const changer=s=>()=>{const n=document.getElementById("note-"+a.id);if(n&&n.value.trim()){a.note=n.value.trim();noter(a,n.value,p)}a.statut=s;if(s!=="bloquee")delete a.attend;a.maj=aujourdhui;programmer();rendre()};
   if(a.statut==="proposee")b.append(el("button",{class:"pl-btn pl-oui",type:"button",disabled:lectureSeule,onclick:changer("validee"),texte:"Valider"}),
     el("button",{class:"pl-btn pl-non",type:"button",disabled:lectureSeule,onclick:changer("refusee"),texte:"Refuser"}));
   else if(a.statut==="bloquee")b.append(el("button",{class:"pl-btn pl-oui",type:"button",disabled:lectureSeule,onclick:changer("validee"),texte:"C'est débloqué"}));
   else if(a.statut==="validee"||a.statut==="refusee")b.append(el("button",{class:"pl-btn",type:"button",disabled:lectureSeule,onclick:changer("proposee"),texte:"Remettre à valider"}));
   li.append(corps,b);
-  if((a.statut==="proposee"||a.statut==="bloquee")&&!lectureSeule)li.append(el("div",{class:"pl-note"},el("input",{id:"note-"+a.id,type:"text",placeholder:"Remarque pour Claude (facultatif)","aria-label":"Remarque pour "+a.titre,value:a.note||""})));
+  if(!lectureSeule)li.append(zoneNote(a,p,a.statut==="proposee"||a.statut==="bloquee"));
   return li;
 }
 function itemAction(a){
@@ -420,10 +445,36 @@ function tuile(g,k,v,nt,onclick){
   return onclick?el("button",{class:"pl-tuile",type:"button","data-g":g,onclick},...enfants):el("div",{class:"pl-tuile","data-g":g},...enfants);
 }
 
+/* ── Lot de la semaine : ce que la routine a préparé (actions portant lot = p.lot_courant), à valider en une fois ── */
+const dansLot=(a,p)=>!!(p.lot_courant&&a.lot===p.lot_courant);
+function zoneRemarque(p){
+  const ta=el("textarea",{id:"remarque-generale",rows:"3",placeholder:"Une consigne, une idée, une question pour Claude : elle est lue dès l'enregistrement","aria-label":"Remarque générale pour Claude"});
+  const envoyer=el("button",{class:"pl-btn pl-oui",type:"button",texte:"Envoyer à Claude",disabled:lectureSeule,onclick:()=>{const t=ta.value.trim();if(!t){ta.focus();return}
+    (p.remarques=p.remarques||[]).push({date:aujourdhui,de:decideur(p),texte:t,lu:false});programmer();rendre();dire("Remarque en cours d'enregistrement…")}});
+  const recentes=(p.remarques||[]).slice(-8);
+  return el("div",{class:"pl-remarque"},el("h3",{texte:"Remarque générale pour Claude"}),fil(recentes),
+    lectureSeule?null:el("div",{class:"pl-note"},ta,envoyer));
+}
+function blocLot(p){
+  if(!p.lot_courant||FIGEE)return null;
+  const A=(p.actions||[]).filter(a=>dansLot(a,p)),att=A.filter(a=>a.statut==="proposee"||a.statut==="bloquee"),faits=A.filter(a=>!att.includes(a));
+  const aValider=att.filter(a=>a.statut==="proposee");
+  let arme=false;
+  const tout=el("button",{class:"pl-btn pl-oui",type:"button",disabled:lectureSeule||!aValider.length,texte:"Tout valider ("+aValider.length+")"});
+  tout.addEventListener("click",()=>{if(!arme){arme=true;tout.textContent="Confirmer : valider les "+aValider.length;setTimeout(()=>{arme=false;tout.textContent="Tout valider ("+aValider.length+")"},6000);return}
+    aValider.forEach(a=>{const n=document.getElementById("note-"+a.id);if(n&&n.value.trim()){a.note=n.value.trim();noter(a,n.value,p)}a.statut="validee";a.maj=aujourdhui});programmer();rendre()});
+  return el("div",{class:"pl-bloc pl-lot",role:"region","aria-labelledby":"t-lot",id:"lot"},
+    el("div",{class:"pl-entete"},el("h2",{id:"t-lot",texte:"Cette semaine à valider · "+att.length+(A.length!==att.length?" sur "+A.length:"")}),el("div",{class:"pl-boutons"},tout)),
+    el("p",{class:"pl-meta",texte:"Lot préparé le "+dateLongue(p.lot_courant)+". Valider, refuser ou laisser une remarque sur chaque élément : Claude reçoit la réponse dès l'enregistrement. Sans validation, rien de neuf ne part."}),
+    att.length?el("ul",{class:"pl-actions"},...att.map(a=>carteAction(a,p))):el("p",{class:"pl-vide",texte:"Tout le lot de la semaine est traité."}),
+    faits.length?el("details",{class:"pl-groupe"},el("summary",{texte:"Déjà traité dans ce lot · "+faits.length}),el("ul",{class:"pl-actions"},...faits.map(a=>carteAction(a,p)))):null,
+    zoneRemarque(p));
+}
+
 /* ── Synthèse ── */
 function urgentes(p){
   const d=decideur(p);
-  return aDecider(p).filter(a=>a.statut==="proposee"||qui(a,p)===d).sort((x,y)=>moisPrevu(x).localeCompare(moisPrevu(y))
+  return aDecider(p).filter(a=>!dansLot(a,p)&&(a.statut==="proposee"||qui(a,p)===d)).sort((x,y)=>moisPrevu(x).localeCompare(moisPrevu(y))
     ||(x.statut==="bloquee"?0:1)-(y.statut==="bloquee"?0:1)||(x.type==="decision"?0:1)-(y.type==="decision"?0:1)
     ||gainNum(y)-gainNum(x)||(RANG_EFFORT[x.effort]??1)-(RANG_EFFORT[y.effort]??1)||String(x.maj||"").localeCompare(String(y.maj||""))).slice(0,5);
 }
@@ -450,6 +501,7 @@ function vueSynthese(p){
   const synth=mm.synthese||(db.mois&&(p.mois[db.mois]||{}).synthese)||"";
   return el("div",{class:"pl-panneau",role:"tabpanel",id:"vue-synthese","aria-labelledby":"onglet-synthese"},
     synth?el("p",{class:"pl-chapeau"},bidi(synth)):null,
+    blocLot(p),
     frise(p)?el("div",{class:"pl-section",role:"region","aria-label":"Phases du programme"},el("div",{class:"pl-entete"},el("h3",{texte:"Le programme"}),el("button",{class:"pl-lien-btn",type:"button",onclick:()=>aller("roadmap"),texte:"Roadmap détaillée →"})),frise(p)):null,
     el("div",{class:"pl-tuiles"},
       tuile("chiffre","Clics",clics[0],[clics[1],v==null?"":" ",v==null?"":el("strong",{class:v>=0?"pl-var-plus":"pl-var-moins",texte:(v>=0?"+":"")+v+" %"}),source?" · "+source:""]),
@@ -470,7 +522,7 @@ function vueSynthese(p){
 
 /* ── À décider ── */
 function vueDecider(p){
-  const A=p.actions||[],l=aDecider(p),bloquees=l.filter(a=>a.statut==="bloquee"),aValider=l.filter(a=>a.statut==="proposee");
+  const A=p.actions||[],l=aDecider(p).filter(a=>!dansLot(a,p)),lot=blocLot(p),bloquees=l.filter(a=>a.statut==="bloquee"),aValider=l.filter(a=>a.statut==="proposee");
   const parQui={};bloquees.forEach(a=>{const q=qui(a,p);(parQui[q]=parQui[q]||[]).push(a)});
   const quis=Object.keys(parQui).sort((x,y)=>parQui[y].length-parQui[x].length||x.localeCompare(y));
   const g={};aValider.forEach(a=>{(g[chantierDe(a)]=g[chantierDe(a)]||[]).push(a)});
@@ -480,9 +532,10 @@ function vueDecider(p){
   const tard=A.filter(a=>plusTard(a)&&(a.statut==="proposee"||a.statut==="bloquee")).sort((x,y)=>moisPrevu(x).localeCompare(moisPrevu(y)));
   const refusees=A.filter(a=>a.statut==="refusee");
   return el("div",{class:"pl-panneau",role:"tabpanel",id:"vue-decider","aria-labelledby":"onglet-decider"},
+    lot||(FIGEE?null:el("div",{class:"pl-bloc pl-lot"},zoneRemarque(p))),
     el("div",{class:"pl-bloc pl-decider",role:"region","aria-labelledby":"t-decider"},
       el("div",{class:"pl-entete"},el("h2",{id:"t-decider",texte:"À décider · "+l.length}),
-        el("span",{class:"pl-meta",texte:"Valider lance l'action au prochain passage de la routine hebdomadaire. Une remarque y est lue comme une consigne."})),
+        el("span",{class:"pl-meta",texte:"Valider prévient Claude, qui lance l'action. Une remarque y est lue comme une consigne."})),
       bloquees.length?el("div",{class:"pl-groupe"},el("h3",{texte:"Bloqué, en attente de quelqu'un · "+bloquees.length}),
         ...quis.map(q=>el("div",{class:"pl-groupe"},el("h4",{texte:"En attente : "+q+" · "+parQui[q].length}),el("ul",{class:"pl-actions"},...parQui[q].map(a=>carteAction(a,p)))))):null,
       aValider.length?el("div",{class:"pl-groupe"},el("h3",{texte:"À valider, par chantier · "+aValider.length}),...groupes):null,
@@ -934,7 +987,7 @@ function documentComplet(){
 async function enregistrer(){
   if(!artifact){dire("Enregistrement impossible ici : ouvrez la page dans claude.ai.");return}
   dire("Enregistrement…");
-  try{await artifact.publish(documentComplet());enAttente=false;dire("Enregistré. La routine hebdomadaire exécutera les actions validées.")}
+  try{await artifact.publish(documentComplet());enAttente=false;dire("Enregistré. Claude reçoit les validations et les remarques.")}
   catch(e){const c=e&&e.code;enAttente=false;
     if(c==="conflict")dire("Une autre modification vient d'être enregistrée : la page se recharge, refaites votre choix si besoin.");
     else if(c==="not_writer"||c==="not_granted"){lectureSeule=true;rendre();dire("Lecture seule : votre modification n'a pas été enregistrée.")}
