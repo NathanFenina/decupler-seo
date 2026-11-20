@@ -151,6 +151,22 @@ secondaire), `attente`, `ok`, `non`, `info` et leurs `_doux`, `chiffre`. Vérifi
 
 Ne jamais réécrire la page à la main : seul le bloc `etat` change.
 
+## Une seule validation par semaine : le lot et les remarques
+
+La routine range ce qu'elle a préparé pour la semaine suivante (pages en brouillon,
+articles, posts, décisions) dans un **lot** : `pilotage.py lot --date AAAA-MM-JJ` l'ouvre
+(ce qui attendait encore une réponse dans le lot précédent y passe), puis
+`ajouter … --statut proposee --lot AAAA-MM-JJ` y range chaque élément. La page l'affiche
+en tête de la synthèse et de « À décider » : « Cette semaine à valider », avec Valider,
+Refuser, « Tout valider » (deux clics) et une remarque par élément.
+
+Le client écrit aussi des **remarques** : sur chaque action (champ « Commenter », fil
+`commentaires`) et en remarque générale (`remarques` du projet). Chaque passage de la
+routine, et chaque réveil par une republication de la page, commence par
+`pilotage.py remarques` : une remarque est une consigne ; on l'applique, puis on répond
+dans son fil avec `pilotage.py repondre --id <id ou general> --texte "…"`, ce qui la
+marque lue. `etat` signale les remarques non lues et le lot ouvert.
+
 ## Règle anti-doublon — dans toute conversation du projet
 
 - **Avant** de lancer une tâche : lire la page et vérifier qu'elle n'y est pas
