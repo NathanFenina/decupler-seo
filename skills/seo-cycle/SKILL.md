@@ -255,10 +255,10 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
 
 ## Mode rapport — mensuel
 
-1. `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" mesurer-tout --auto`, puis `bilan`
+1. `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" mesurer-tout --auto`, puis `bilan --ecrire`
    (voir `seo-journal-mesure`).
-2. Reporter dans `memoire/apprentissages.md` uniquement ce que `bilan`
-   signale (au moins 3 mesures du même type). Pas d'intuition.
+2. `bilan --ecrire` écrit dans `memoire/apprentissages.md` ce que le bilan
+   retient (au moins 3 mesures du même type), et rien d'autre. Pas d'intuition.
 3. Lister dans `rapports/a-valider.md` les retours arrière proposés
    (`journal.py a-annuler`).
 4. **Visibilité IA**, même liste chaque mois : `share_of_model.py --prompts

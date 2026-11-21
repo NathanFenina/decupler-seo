@@ -116,12 +116,17 @@ journalisé.
 ## 4. Apprendre
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" bilan
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/journal.py" bilan --ecrire
 ```
 
-Le bilan ne propose un apprentissage qu'à partir de **3 mesures jugeables
-du même type** et d'une majorité nette. Reportez ces lignes, et seulement
-elles, dans `memoire/apprentissages.md`, datées, avec les chiffres.
+Le bilan ne retient un apprentissage qu'à partir de **3 mesures jugeables
+du même type** et d'une majorité nette (60 % de gains, ou 40 % de pertes).
+Avec `--ecrire`, il les écrit lui-même dans `memoire/apprentissages.md`, dans
+un bloc automatique daté et réécrit à chaque bilan ; ce qui est écrit à la main
+hors du bloc est gardé. Sans `--ecrire`, le bilan ne fait qu'afficher : c'est
+ainsi que des projets ont eu des centaines de mesures et un fichier vide.
+Avant de proposer une modification, lire ce fichier : un type qui « nuit
+souvent » sur le site ne se propose plus sans raison écrite.
 
 C'est ce fichier qui rend le dispositif meilleur de mois en mois **sur ce
 site précis** : si les réécritures de title y échouent quatre fois sur six,

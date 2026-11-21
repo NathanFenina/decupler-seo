@@ -77,3 +77,40 @@ class TestJournal(DossierIsole):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBilanEcrit(DossierIsole):
+    """Le bilan écrit lui-même les apprentissages : avant, il les affichait et personne ne les reportait."""
+
+    def preparer(self, verdicts):
+        (self.dossier / "journal").mkdir(exist_ok=True)
+        entete = ("id,date,url,requete,type,niveau,avant,apres,clics_avant,impressions_avant,position_avant,"
+                  "ctr_avant,date_mesure,clics_apres,impressions_apres,position_apres,ctr_apres,"
+                  "variation_temoin_pct,verdict,note\n")
+        lignes = [f"{i},2026-10-01,https://exemple.com/{i},,{t},auto,,,,,,,2026-10-29,,,,,,{v},\n"
+                  for i, (t, v) in enumerate(verdicts, 1)]
+        (self.dossier / "journal" / "modifications.csv").write_text(entete + "".join(lignes), encoding="utf-8")
+        (self.dossier / "memoire").mkdir(exist_ok=True)
+        (self.dossier / "memoire" / "apprentissages.md").write_text(
+            "# Apprentissages\n\nNote écrite à la main.\n\n## Ce qui marche ici\n\n"
+            "_(aucun apprentissage mesuré pour l'instant)_\n\n## Ce qui ne marche pas ici\n\n"
+            "_(aucun apprentissage mesuré pour l'instant)_\n", encoding="utf-8")
+
+    def contenu(self):
+        return (self.dossier / "memoire" / "apprentissages.md").read_text(encoding="utf-8")
+
+    def test_ecrit_ce_qui_nuit_et_garde_le_manuel(self):
+        self.preparer([("title", "perte")] * 3 + [("title", "gain"), ("faq", "gain")])
+        lancer("journal.py", "bilan", "--ecrire", cwd=self.dossier)
+        texte = self.contenu()
+        self.assertIn("« title » nuit souvent", texte)
+        self.assertIn("Note écrite à la main.", texte)
+        self.assertNotIn("faq", texte)  # 1 seule mesure : pas d'apprentissage
+
+    def test_reecrit_le_bloc_sans_le_dupliquer(self):
+        self.preparer([("meta", "gain")] * 3)
+        lancer("journal.py", "bilan", "--ecrire", cwd=self.dossier)
+        lancer("journal.py", "bilan", "--ecrire", cwd=self.dossier)
+        texte = self.contenu()
+        self.assertEqual(texte.count("journal.py bilan : début"), 1)
+        self.assertIn("« meta » fonctionne", texte)
