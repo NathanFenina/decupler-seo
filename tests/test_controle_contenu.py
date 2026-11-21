@@ -70,3 +70,18 @@ class TestControle(DossierIsole):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+class TestLongueurDecodee(unittest.TestCase):
+    """Une apostrophe codée « &#39; » compte pour un caractère, comme dans la SERP."""
+
+    def test_entites_decodees(self):
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+        import controle_contenu as cc
+        r = cc.Rapport()
+        titre = "L&#39;agence &amp; l&#39;équipe " + "x" * 30  # 52 car. décodés, 64 en source
+        cc.verifier_longueur(Path("p.html"), "title", titre, 30, 60, r)
+        self.assertFalse(any("trop long" in str(m) for m in vars(r).values()))

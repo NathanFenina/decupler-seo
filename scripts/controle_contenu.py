@@ -24,6 +24,7 @@ Formats : .html, .md, .json (toutes les chaînes du JSON sont inspectées).
 
 from __future__ import annotations
 
+import html as html_lib
 import argparse
 import json
 import re
@@ -95,7 +96,13 @@ def verifier_texte(f: Path, texte: str, r: Rapport, interdits: list[re.Pattern])
 
 
 def verifier_longueur(f: Path, nom: str, valeur: str, mini: int, maxi: int, r: Rapport) -> None:
-    n = len(valeur.strip())
+    # On mesure le texte DÉCODÉ, pas la source HTML. Une apostrophe s'écrit « &#39; »
+    # dans le fichier (cinq caractères) et compte pour un seul dans la SERP ; une
+    # esperluette « &amp; » pour un aussi. Sans ce décodage, un title parfaitement
+    # calibré est signalé comme trop long dès qu'il contient une apostrophe — et on
+    # le raccourcit sans raison. Constaté sur un projet le 05/11/2026 : cinq fausses
+    # erreurs sur quarante pages, toutes dues à des apostrophes françaises.
+    n = len(html_lib.unescape(valeur).strip())
     if n == 0:
         r.err(f, f"{nom} vide")
     elif n > maxi:
