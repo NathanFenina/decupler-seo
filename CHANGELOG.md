@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 3.19.3 — `controle_contenu.py` mesure le texte décodé
+
+Remontée d'un projet (05/11/2026) : un title contenant une apostrophe codée
+`&#39;` était compté sur cinq caractères au lieu d'un, d'où de fausses erreurs
+« trop long » (cinq sur quarante pages). Les longueurs de title et de meta se
+mesurent désormais sur le texte décodé (`html.unescape`). 1 test.
+
 ## 3.19.2 — le bilan écrit enfin les apprentissages
 
 Constat (21/11/2026, audit des projets) : `journal.py bilan` affichait « À
