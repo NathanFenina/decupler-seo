@@ -301,6 +301,60 @@ def cmd_a_annuler(a) -> int:
     return 0
 
 
+DEBUT_AUTO = "<!-- journal.py bilan : début (bloc réécrit à chaque bilan, ne pas éditer) -->"
+FIN_AUTO = "<!-- journal.py bilan : fin -->"
+
+
+def ecrire_apprentissages(chemin: Path, apprentissages: list, nb_mesurees: int) -> None:
+    """Écrit les apprentissages du bilan dans memoire/apprentissages.md.
+
+    Sans cette étape, le bilan affichait « À reporter dans
+    memoire/apprentissages.md » et personne ne le reportait : le fichier
+    restait vide alors que des centaines de mesures existaient. Le bloc
+    automatique est encadré de marqueurs et réécrit à chaque bilan ; tout ce
+    qui est écrit à la main hors du bloc est conservé.
+    """
+    aujourd_hui = dt.date.today().isoformat()
+    marche = [x for x in apprentissages if x[0] == "marche"]
+    echoue = [x for x in apprentissages if x[0] == "echoue"]
+
+    def ligne(sens, type_, c, j):
+        libelle = "fonctionne" if sens == "marche" else "nuit souvent"
+        return (f"- « {type_} » {libelle} sur ce site : {c['gain']} gains, {c['neutre']} neutres, "
+                f"{c['perte']} pertes sur {j} mesures jugeables (bilan du {aujourd_hui})")
+
+    bloc = [DEBUT_AUTO, "",
+            f"Bilan du {aujourd_hui} : {nb_mesurees} modification(s) mesurée(s) à J+28. "
+            "Règle : au moins 3 mesures jugeables du même type ; « fonctionne » à 60 % de gains, "
+            "« nuit souvent » à 40 % de pertes.", "",
+            "## Ce qui marche ici", ""]
+    bloc += [ligne(*x) for x in marche] or ["_(aucun type de modification ne passe le seuil pour l'instant)_"]
+    bloc += ["", "## Ce qui ne marche pas ici", ""]
+    bloc += [ligne(*x) for x in echoue] or ["_(aucun type de modification ne passe le seuil pour l'instant)_"]
+    bloc += ["", FIN_AUTO]
+    texte_bloc = "\n".join(bloc)
+
+    entete = ("# Apprentissages\n\nCe qui a été mesuré sur **ce** site, à J+28, par `seo-journal-mesure`.\n"
+              "Un apprentissage n'entre ici que s'il repose sur au moins trois\n"
+              "modifications du même type : un cas isolé est du bruit.\n")
+    if chemin.is_file():
+        actuel = chemin.read_text(encoding="utf-8")
+    else:
+        actuel = entete
+    if DEBUT_AUTO in actuel and FIN_AUTO in actuel:
+        avant, _, reste = actuel.partition(DEBUT_AUTO)
+        _, _, apres = reste.partition(FIN_AUTO)
+        nouveau = avant + texte_bloc + apres
+    else:
+        # Première écriture : on retire les sections vides du gabarit, on garde le reste.
+        garde = actuel.replace("## Ce qui marche ici\n\n_(aucun apprentissage mesuré pour l'instant)_\n", "")
+        garde = garde.replace("## Ce qui ne marche pas ici\n\n_(aucun apprentissage mesuré pour l'instant)_\n", "")
+        nouveau = garde.rstrip() + "\n\n" + texte_bloc + "\n"
+    chemin.parent.mkdir(parents=True, exist_ok=True)
+    chemin.write_text(nouveau, encoding="utf-8")
+    print(f"  ✓ {chemin} mis à jour ({len(marche)} qui marche, {len(echoue)} qui nuit).")
+
+
 def cmd_bilan(a) -> int:
     mesurees = [l for l in lire() if l["verdict"]]
     par_type: dict[str, Counter] = defaultdict(Counter)
@@ -318,6 +372,12 @@ def cmd_bilan(a) -> int:
             apprentissages.append(("marche", type_, c, jugeables))
         elif c["perte"] / jugeables >= 0.4:
             apprentissages.append(("echoue", type_, c, jugeables))
+
+    if getattr(a, "ecrire", False):
+        memoire = Path(a.memoire)
+        if not memoire.is_absolute():
+            memoire = racine_projet() / memoire
+        ecrire_apprentissages(memoire, apprentissages, len(mesurees))
 
     if a.json:
         print(json.dumps({"par_type": {t: dict(c) for t, c in par_type.items()},
@@ -376,6 +436,9 @@ def main() -> int:
     sp.add_parser("a-annuler")
     b = sp.add_parser("bilan")
     b.add_argument("--json", action="store_true")
+    b.add_argument("--ecrire", action="store_true",
+                   help="écrire les apprentissages dans memoire/apprentissages.md (bloc automatique)")
+    b.add_argument("--memoire", default="memoire/apprentissages.md")
 
     charger_env()
     a = p.parse_args()

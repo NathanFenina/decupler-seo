@@ -11,7 +11,10 @@ robots.txt, sitemap. Retour du spam ou page clé cassée → une action
 
 ## 2. Les chiffres
 `gsc.py instantane` puis `journal.py mesurer-tout --auto` : on mesure ce qui a
-été fait avant d'en faire plus.
+été fait avant d'en faire plus. Puis `journal.py bilan --ecrire` : les
+conclusions entrent dans `memoire/apprentissages.md` et la routine les lit avant
+de proposer quoi que ce soit (un type de modification qui « nuit souvent » ici
+n'est plus proposé sans raison écrite).
 
 ## 2 bis. L'indexation
 `indexation.py auto` (pages du sitemap modifiées dans la semaine), puis

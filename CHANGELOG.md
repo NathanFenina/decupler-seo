@@ -1,5 +1,20 @@
 # Journal des versions
 
+## 3.19.2 — le bilan écrit enfin les apprentissages
+
+Constat (21/11/2026, audit des projets) : `journal.py bilan` affichait « À
+reporter dans memoire/apprentissages.md » et aucune routine ne le reportait.
+Sur un projet, 594 modifications étaient mesurées à J+28 (53 gains, 62 pertes)
+et `memoire/apprentissages.md` était vide dans tous les projets.
+
+- `journal.py bilan --ecrire` : écrit les apprentissages dans un bloc
+  automatique de `memoire/apprentissages.md`, daté, réécrit à chaque bilan,
+  sans toucher à ce qui est écrit à la main.
+- Routine hebdomadaire du gabarit, `seo-cycle` (mode rapport) et
+  `seo-journal-mesure` : `bilan --ecrire` après `mesurer-tout`, et lecture du
+  fichier avant toute proposition.
+- 2 tests.
+
 ## 3.19.1 — liens masqués par Google dans `demande.py serp` et `suivi.py positions`
 
 Constat (11/11/2026) : Google sert désormais une partie des résultats sous la
