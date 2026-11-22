@@ -50,6 +50,13 @@ class Grille(unittest.TestCase):
         self.assertEqual(r["criteres"]["accroche"]["points"], 5)
         self.assertGreater(r["score"], self.mesure(PLAT)["score"])
 
+    def test_tutoiement_compte_comme_le_vouvoiement(self):
+        tu = VENDEUR.replace("Vous savez", "Tu sais").replace("votre entreprise doit", "ton entreprise doit") \
+            .replace("Votre équipe", "Ton équipe").replace("votre commercial", "ton commercial") \
+            .replace("Vos questions", "Tes questions").replace("vous gardez", "tu gardes")
+        self.assertEqual(self.mesure(tu)["criteres"]["orientation_lecteur"]["points"],
+                         self.mesure(VENDEUR)["criteres"]["orientation_lecteur"]["points"])
+
     def test_section_et_notes_ignorees(self):
         brut = "## Fiche\n\nNotre texte — interne.\n\n## Contenu\n\n> Note — interne.\n\nVous gagnez du temps.\n"
         lignes = CW.texte_markdown(CW.extraire_section(brut, "Contenu"))

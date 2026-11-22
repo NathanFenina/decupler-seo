@@ -8,7 +8,7 @@
 Ce que le script mesure (score /100, détail ligne par ligne) :
 
 - tirets cadratins et demi-cadratins entre espaces : zéro attendu ;
-- orientation lecteur : « vous / votre / vos » face à « nous / notre / nos / la marque » ;
+- orientation lecteur : « vous / votre / vos » ou « tu / ton / tes » face à « nous / notre / nos / la marque » ;
 - argumentaire en négatif : phrases qui vendent par ce qu'on ne fait pas ;
 - rythme : longueur moyenne des phrases, part des phrases de plus de 28 mots ;
 - ton explicatif : « permet de », « il est important de », « afin de », « consiste à »… ;
@@ -29,7 +29,8 @@ import sys
 from pathlib import Path
 
 TIRET = re.compile(r"—|(?<=\s)–(?=\s)")
-LECTEUR = re.compile(r"\b(?:vous|votre|vos)\b", re.I)
+# Le lecteur, vouvoyé ou tutoyé : un site au tu ne doit pas perdre ce critère.
+LECTEUR = re.compile(r"\b(?:vous|votre|vos|tu|toi|ton|ta|tes|te)\b|\bt'(?=\w)", re.I)
 AUTEUR = re.compile(r"\b(?:nous|notre|nos)\b", re.I)
 NEGATION = re.compile(r"\b(?:ne|n')\s*(?:\w+\s+){0,3}?(?:pas|jamais|aucun(?:e)?|rien|plus)\b|\bsans\s+(?:promesse|garantie)\b",
                       re.I)
@@ -125,7 +126,7 @@ def mesurer(lignes: list[str], brut: str, marque: str | None = None) -> dict:
         "tirets": (15, 15 if not tirets else max(0, 15 - 5 * len(tirets)),
                    f"{len(tirets)} tiret(s) cadratin(s) ou demi-cadratin(s) : zéro attendu"),
         "orientation_lecteur": (15, round(15 * min(1, ratio / 1.5)),
-                                f"vous / votre / vos : {lecteur} · nous / notre / marque : {auteur} "
+                                f"vous / tu (et possessifs) : {lecteur} · nous / notre / marque : {auteur} "
                                 f"(ratio {ratio:.1f}, cible ≥ 1,5)"),
         "argumentaire_positif": (10, max(0, 10 - round(10 * (len(negations) / mille) / 6)),
                                  f"{len(negations)} négation(s), {len(negations) / mille:.1f} pour 1 000 mots "
