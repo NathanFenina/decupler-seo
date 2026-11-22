@@ -1,4 +1,4 @@
-# Les 56 skills
+# Les 57 skills
 
 Chaque skill se déclenche tout seul sur les bonnes formulations. Vous pouvez
 aussi l'appeler par son nom.
@@ -18,6 +18,7 @@ aussi l'appeler par son nom.
 | `seo-audit-contenu` | Un verdict et une action par page publiée : vide, morte, périmée, mince, à pousser, saine, technique — 410, 301, fusion, mise à jour ; Search Console 180 jours + carte de contenu + signaux d'obsolescence | « pages pourries », « audit de contenu », « quelles pages supprimer », « pages obsolètes » |
 | `seo-migration` | Refonte sans perte : inventaire, redirections, surveillance J+90 | « migration », « refonte », « j'ai perdu du trafic après » |
 | `seo-veille` | Surveillance continue, alertes diagnostiquées | « veille », « monitoring », « alerte » |
+| `seo-veille-qualite` | Relecture mensuelle des pages publiées face à la SERP, notée sur 100 | « veille qualité », « relire mes pages », « quelles pages améliorer » |
 
 ## Recherche et stratégie
 
