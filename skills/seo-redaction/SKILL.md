@@ -18,9 +18,7 @@ pas ». Si vous n'avez pas de réponse, ne l'écrivez pas.
 
 ## Ce qui ne se négocie pas, quelle que soit la longueur
 
-Avant tout : `.claude/decupler-seo/docs/REGLES-COMMUNES.md` (règles valables pour tous les
-projets) et `memoire/carnet-redaction.md` du projet s'il existe. Après la rédaction :
-agent `seo-relecteur`, puis `scores_page.py` (six notes sur 100).
+Avant : `docs/REGLES-COMMUNES.md` et `memoire/carnet-redaction.md` ; après : agent `seo-relecteur`, `scores_page.py`.
 
 1. **Une FAQ termine toujours le texte** : 4 à 6 questions, et au moins 3
    même pour un article court. S'il faut tenir une longueur, coupez le
