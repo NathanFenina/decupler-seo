@@ -1,5 +1,26 @@
 # Journal des versions
 
+## Non publiée — relecture premium, six notes avant publication, règles communes
+
+Remontée de decupler.com (demande du 22/11/2026), avec la relecture en questions et le
+carnet de rédaction repris d'un autre projet. Rien de propre à un client.
+
+- `docs/REGLES-COMMUNES.md` : 21 règles nées de corrections humaines sur de vrais projets
+  (écriture, preuves et cas clients, images, pages, pilotage), lues par les skills de
+  rédaction et par les deux nouveaux agents.
+- Agent `seo-relecteur` : relit comme le client le plus exigeant (fluidité, authenticité,
+  ton professionnel et haut de gamme, voix du client, tics), 8 questions de relecture,
+  réécritures prêtes à coller, et carnet de rédaction (`memoire/carnet-redaction.md`) :
+  un défaut vu deux fois devient une règle, confirmé sur 3 pages il passe dans un skill.
+- Agent `seo-challenger-serp` : mot-clé SMART (volume, difficulté, intention,
+  cannibalisation), top 5 lu en entier, verdict « bat le top » sur 5 axes, information gain,
+  AI Search.
+- `scripts/scores_page.py` : six notes sur 100 avant publication (SEO par
+  `onpage_score.py`, AI Search, rédaction par `humanisation.py` et `controle_contenu.py`,
+  conversion par `copywriting.py`, UX, design), code retour 1 sous le seuil. 3 tests.
+- `copywriting.py` : l'orientation lecteur compte aussi le tutoiement (un site au tu
+  tombait à 1/15 sur ce critère). 1 test.
+
 ## 3.20.0 — veille qualité : relire chaque mois les pages déjà publiées
 
 Remontée d'un projet (veille qualité mensuelle, grille notée) rendue

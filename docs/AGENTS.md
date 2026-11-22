@@ -10,6 +10,8 @@ de quarante minutes à six.
 | `seo-performance` | Core Web Vitals mesurés, décomposition du LCP, tâches longues, CLS |
 | `seo-contenu` | Qualité, profondeur, contenu mince, duplication, cannibalisation, lisibilité |
 | `seo-redacteur` | Rédaction SEO + GEO, style humain, recherche obligatoire, sources vérifiées |
+| `seo-relecteur` | Relecture finale : fluidité, authenticité, ton haut de gamme, réécritures prêtes à coller, carnet de rédaction |
+| `seo-challenger-serp` | Avocat du diable face au top 5 : mot-clé SMART, information gain, verdict « bat le top » |
 | `seo-data` | Search Console, GA4, DataForSEO. La source de vérité chiffrée |
 | `seo-serp` | Lecture de SERP, intention réelle, features, difficulté véritable |
 | `seo-schema` | JSON-LD, validation, dépréciations, chaîne d'entité |
