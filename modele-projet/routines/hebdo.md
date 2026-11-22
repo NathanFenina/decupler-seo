@@ -16,6 +16,11 @@ conclusions entrent dans `memoire/apprentissages.md` et la routine les lit avant
 de proposer quoi que ce soit (un type de modification qui « nuit souvent » ici
 n'est plus proposé sans raison écrite).
 
+**Le premier mercredi du mois**, en plus : skill `seo-veille-qualite` — relire
+jusqu'à 10 pages publiées face à la SERP du moment, les noter sur la grille de
+100 points (`veille_qualite.py ajouter`), corriger les plus faibles hors mesure,
+puis `veille_qualite.py correler` pour vérifier que la grille prédit les gains.
+
 ## 2 bis. L'indexation
 `indexation.py auto` (pages du sitemap modifiées dans la semaine), puis
 `indexation.py suivre` : les URL annoncées depuis au moins 3 jours, indexées ou

@@ -1,5 +1,23 @@
 # Journal des versions
 
+## 3.20.0 — veille qualité : relire chaque mois les pages déjà publiées
+
+Remontée d'un projet (veille qualité mensuelle, grille notée) rendue
+générique. Jusqu'ici, les grilles et barèmes servaient au moment d'écrire ou
+d'optimiser une page ; rien ne repassait ensuite sur les pages publiées quand la
+SERP et les concurrents bougent.
+
+- Skill `seo-veille-qualite` : chaque mois, jusqu'à 10 pages relues face à la
+  SERP du moment et notées sur 100 (intention et SERP, valeur et gap
+  sémantique, concurrence, GEO, on-page et confiance), preuve obligatoire par
+  critère, les plus faibles corrigées d'abord, jamais une page en mesure.
+- Grille détaillée : `skills/seo-veille-qualite/references/grille-veille.md`.
+- `scripts/veille_qualite.py` : historique (`donnees/qualite.csv`), classement
+  avec l'évolution sur le mois précédent, et corrélation avec les mesures J+28
+  (la grille prédit-elle vraiment les gains ?).
+- Branché dans le mode rapport de `seo-cycle` et dans la routine hebdomadaire
+  du gabarit (premier mercredi du mois). 3 tests.
+
 ## 3.19.3 — `controle_contenu.py` mesure le texte décodé
 
 Remontée d'un projet (05/11/2026) : un title contenant une apostrophe codée

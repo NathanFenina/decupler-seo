@@ -261,6 +261,10 @@ revérifié.** Une fraîcheur affichée mais fausse est exactement ce que les
    retient (au moins 3 mesures du même type), et rien d'autre. Pas d'intuition.
 3. Lister dans `rapports/a-valider.md` les retours arrière proposés
    (`journal.py a-annuler`).
+3 bis. **Veille qualité** (skill `seo-veille-qualite`) : relire jusqu'à 10 pages
+   publiées face à la SERP du moment, les noter sur 100 (`veille_qualite.py
+   ajouter`), corriger les plus faibles hors mesure, `veille_qualite.py
+   correler` ; synthèse dans `rapports/qualite/AAAA-MM.md`.
 4. **Visibilité IA**, même liste chaque mois : `share_of_model.py --prompts
    recherche/prompts-ia.csv --concurrents "<concurrents de la config>"
    --exporter donnees/ia-<AAAA-MM>.csv` (le mois du rapport), puis
