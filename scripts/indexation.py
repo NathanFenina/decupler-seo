@@ -230,10 +230,40 @@ def cmd_annoncer(a) -> int:
     return 0
 
 
+FINIS = ("indexée", "retirée")
+
+
+def code_http(url: str) -> tuple[int, str]:
+    """Code HTTP de l'URL sans suivre les redirections (0 si injoignable)."""
+    import urllib.error
+    import urllib.request
+
+    class SansSuivre(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, *args, **kwargs):
+            return None
+
+    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "seo-decupler-indexation"})
+    try:
+        with urllib.request.build_opener(SansSuivre).open(req, timeout=15) as r:
+            return r.status, ""
+    except urllib.error.HTTPError as e:
+        return e.code, e.headers.get("Location", "") or ""
+    except Exception:
+        return 0, ""
+
+
 def cmd_suivre(a) -> int:
     lignes = lire_registre()
     limite = dt.date.today() - dt.timedelta(days=a.delai)
-    a_verifier = [l for l in lignes if l["statut"] != "indexée" and l["annoncee_le"] <= limite.isoformat()]
+    a_verifier = [l for l in lignes if l["statut"] not in FINIS and l["annoncee_le"] <= limite.isoformat()]
+    # Une URL redirigée ou supprimée depuis son annonce n'a plus à être indexée : on la sort du suivi
+    # (sinon elle revient chaque semaine dans la liste, « Google ne reconnaît pas cette URL »).
+    for l in a_verifier:
+        code, cible = code_http(l["url"])
+        if code in (301, 302, 307, 308, 404, 410):
+            l["statut"], l["detail"] = "retirée", f"HTTP {code}" + (f" vers {cible}" if cible else "")
+            l["verifiee_le"] = dt.date.today().isoformat()
+    a_verifier = [l for l in a_verifier if l["statut"] != "retirée"]
     if not a_verifier:
         print(f"\n  Rien à vérifier : aucune URL non indexée annoncée depuis {a.delai} jours ou plus.\n")
         return 0
